@@ -39,25 +39,21 @@ export default class Action extends Observable{
         this.__DEFAULT_ICON_PATH = "actions/ICON_SIZE";
 		this.options = LangUtils.objectMerge({
 			name:'',
-			src:'',
             icon_class:'',
 			text:'',
 			title:'',
 			text_id:'',
 			title_id:'',
+            weight:0,
 			hasAccessKey:false,
 			accessKey:'',
 			subMenu:false,
 			subMenuUpdateImage:false,
 			subMenuUpdateTitle:false,
 			callbackCode:'',
-			callbackDialogNode:null,
 			callback:function(){},
-			prepareModal:false, 
 			listeners : [],
-            activeCondition:null,
-			formId:undefined, 
-			formCode:undefined
+            activeCondition:null
 			}, arguments[0] || { });
 
 		this.context = LangUtils.objectMerge({
@@ -366,7 +362,7 @@ export default class Action extends Observable{
             raw_name: this.options.text,
             alt:this.options.title,
             action_id:this.options.name,
-            image_unresolved: this.options.src,
+            weight:this.options.weight || 0,
             callback: function(e){this.apply();}.bind(this)
         };
         if(this.options.icon_class){
@@ -413,19 +409,8 @@ export default class Action extends Observable{
                 var clientFormData = {};
 				for(j=0; j<node.childNodes.length; j++){
 					var processNode = node.childNodes[j];
-					if(processNode.nodeName == "clientForm"){
-                        // TODO: Filtering by theme
-                        if(!processNode.getAttribute("theme") || pydio.Parameters.get('theme') == processNode.getAttribute("theme")){
-                            clientFormData.formId = processNode.getAttribute("id");
-                            clientFormData.formCode = processNode.firstChild.nodeValue;
-                        }
-					}else if(processNode.nodeName == "clientCallback"){
-						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
-							this.options.prepareModal = true;
-						}
-						if(processNode.getAttribute('dialogOpenForm') || processNode.getAttribute("components")){
-							this.options.callbackDialogNode = processNode;
-						}else if(processNode.getAttribute('module')){
+                    if(processNode.nodeName == "clientCallback"){
+						if(processNode.getAttribute('module')){
                             let fName = processNode.getAttribute('module');
                             this.options.callback = function(manager, otherArguments){
                                 ResourcesManager.detectModuleToLoadAndApply(fName, function(){
@@ -458,6 +443,7 @@ export default class Action extends Observable{
 				this.options.title = this.manager.getMessage(node.getAttribute('title')) || 'not_found';
 				this.options.src = node.getAttribute('src');
 				this.options.icon_class = node.getAttribute('iconClass');
+				this.options.weight = node.getAttribute('weight') || 0;
 				if(node.getAttribute('hasAccessKey') && node.getAttribute('hasAccessKey') == "true"){
 					this.options.accessKey = node.getAttribute('accessKey');
 					this.options.hasAccessKey = true;

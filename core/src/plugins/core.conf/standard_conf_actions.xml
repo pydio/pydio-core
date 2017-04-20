@@ -236,8 +236,8 @@
             </processing>
         </action>
         <action name="switch_to_settings">
-            <gui src="drive_remote.png" text="165" title="506" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cogs" >
-                <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
+            <gui text="165" title="506" accessKey="settings_access_key" hasAccessKey="true" iconClass="mdi mdi-settings" >
+                <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="zlogin"/>
             </gui>
             <rightsContext adminOnly="true" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>

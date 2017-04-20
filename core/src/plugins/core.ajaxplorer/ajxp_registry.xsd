@@ -61,6 +61,7 @@
             <xs:attribute name="iconClass" use="optional"/>
             <xs:attribute name="text" use="required" type="xs:NMTOKEN"/>
             <xs:attribute name="title" use="required" type="xs:NMTOKEN"/>
+            <xs:attribute name="weight" use="optional" type="xs:integer"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="context">

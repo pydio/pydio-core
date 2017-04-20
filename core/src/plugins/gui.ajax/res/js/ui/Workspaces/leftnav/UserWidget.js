@@ -71,7 +71,7 @@ export default React.createClass({
                     />
                 );
             }
-
+            /*
             if(user.getRepositoriesList().has('ajxp_conf') && user.activeRepository === 'ajxp_home'){
                 settingsButton = (
                     <IconButton
@@ -82,6 +82,7 @@ export default React.createClass({
                     />
                 );
             }
+            */
             if(this.props.pydio.Controller.getActionByName('get_my_feed')){
                 notificationsButton = (
                     <AsyncComponent

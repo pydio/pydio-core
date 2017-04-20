@@ -33,8 +33,7 @@
             <action name="duo_show_iframe">
                 <gui text="duosecurity.1" title="duosecurity.2" iconClass="icon-signin" accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
-                             actionBar="false" contextMenu="false" infoPanel="false"
-                             actionBarGroup="zlogin">
+                             actionBar="false" contextMenu="false" infoPanel="false">
                     </context>
                 </gui>
                 <processing>

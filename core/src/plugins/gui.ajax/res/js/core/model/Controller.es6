@@ -229,10 +229,11 @@ export default class Controller extends Observable{
             });
 		}.bind(this));
         let first = true, keys = [];
-        for(let k of contextActionsGroup.keys()){
-            if(defaultGroup && k == defaultGroup) continue;
+        contextActionsGroup = this._sortToolbarsActions(contextActionsGroup);
+        contextActionsGroup.forEach((v, k) => {
+            if(defaultGroup && k == defaultGroup) return;
             keys.push(k);
-        }
+        });
         keys.sort();
         if(defaultGroup && contextActionsGroup.has(defaultGroup)){
             keys.unshift(defaultGroup);
@@ -320,7 +321,7 @@ export default class Controller extends Observable{
             this.actions.set("group_more_action", moreAction);
             toolbars.set('MORE_ACTION', [moreAction]);
         }
-
+        this._sortToolbarsActions(toolbars);
         return toolbars;
 
     }
@@ -568,5 +569,18 @@ export default class Controller extends Observable{
 	getActionByName (actionName){
 		return this.actions.get(actionName);		
 	}
+
+	_sortToolbarsActions(toolbars){
+        // Sort
+        toolbars.forEach((v,k) => {
+            if(!v.sort) return;
+            v.sort((a,b)=>{
+                const wA = a.weight || (a.options && a.options.weight) || 0;
+                const wB = b.weight || (b.options && b.options.weight) || 0;
+                return (wA === wB ? 0 : (wA > wB ? 1 : -1 ) );
+            })
+        });
+        return toolbars;
+    }
 
 }

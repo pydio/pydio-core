@@ -12,7 +12,7 @@
 	<registry_contributions>
 		<actions>
 			<action name="open_user_dashboard">
-				<gui text="user_dash.title" title="user_dash.desc" iconClass="mdi mdi-settings" accessKey="folder_access_key">
+				<gui text="user_dash.title" title="user_dash.desc" iconClass="mdi mdi-account-card-details" accessKey="folder_access_key" weight="-10">
 					<context selection="false" dir="" recycle="false" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
 				</gui>
 				<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="false"/>
