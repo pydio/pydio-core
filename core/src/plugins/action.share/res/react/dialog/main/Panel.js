@@ -106,7 +106,7 @@ let MainPanel = React.createClass({
                     users:users,
                     hash: hash,
                     enableIdentification:(linkData && linkData.target_users),
-                    crippleIdentificationKeys:false,
+                    crippleIdentificationKeys:true,
                     identifiedOnly:(linkData && linkData.restrict_to_target_users)
                 }
             });
@@ -220,13 +220,14 @@ let MainPanel = React.createClass({
             let customizeMessagePane;
             if(mailerData.hash){
                 const style = mailerData.enableIdentification ? {padding:'10px 20px', backgroundColor: '#ECEFF1'} : {padding:'10px 20px 0'};
+                const letUserChooseCripple = this.props.pydio.getPluginConfigs('action.share').get('EMAIL_PERSONAL_LINK_SEND_CLEAR');
                 customizeMessagePane = (
                     <div style={style}>
                         <Toggle label={this.getMessage(235)} toggled={mailerData.enableIdentification} onToggle={(e, c) => {this.toggleMailerData({enableIdentification:c})} }/>
                         {mailerData.enableIdentification &&
                         <Toggle label={"-- " + this.getMessage(236)} toggled={mailerData.identifiedOnly} onToggle={(e, c) => {this.toggleMailerData({identifiedOnly:c})} }/>
                         }
-                        {mailerData.enableIdentification &&
+                        {mailerData.enableIdentification && letUserChooseCripple &&
                         <Toggle label={"-- " + this.getMessage(237)} toggled={mailerData.crippleIdentificationKeys} onToggle={(e, c) => {this.toggleMailerData({crippleIdentificationKeys:c})} }/>
                         }
                     </div>
