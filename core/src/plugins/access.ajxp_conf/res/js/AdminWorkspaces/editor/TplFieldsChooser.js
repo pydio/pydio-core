@@ -1,3 +1,5 @@
+const {Checkbox} = require('material-ui')
+
 export default React.createClass({
 
     propTypes:{
@@ -14,8 +16,8 @@ export default React.createClass({
     render: function(){
         var fields = this.props.driverFields.map(function(f){
             return (
-                <div className="menu-entry-toggleable" key={this.props.driverName + '-' + f.name}>
-                    <ReactMUI.Checkbox
+                <div key={this.props.driverName + '-' + f.name} style={{paddingTop:6,paddingBottom:6}}>
+                    <Checkbox
                         label={f.label}
                         checked={this.props.selectedFields.indexOf(f.name) !== -1}
                         onCheck={this.toggleField.bind(this, f.name)}
@@ -25,7 +27,6 @@ export default React.createClass({
         }.bind(this));
         return (
             <div>
-                <PydioComponents.PaperEditorNavHeader key="save-k" label="3 - Add / Remove parameters"/>
                 {fields}
             </div>
         );

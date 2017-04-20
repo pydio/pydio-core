@@ -291,6 +291,11 @@ $mess=array(
     "ws.66" => "Laufende Aufgaben",
     "ws.67" => "Keine laufenden Aufgaben",
     "ws.68" => "Keine Parameter",
+    "ws.69" => "Template-based workspace",
+    "ws.70" => "Driver-based workspace",
+    "ws.71" => "Complete the steps below",
+    "ws.72" => "Fill in the form on the right",
+    "ws.73" => "Pick value before continuing",
 
     "scheduler.1" => "Nutzen Sie die Aufgabenplanung, um wiederkehrende Aufgaben zu konfigurieren. Mit Pydio-Booster sollte dies automatisch funktionieren. Verwenden Sie andernfalls einen CRON-Job um die Aufgabenplanung minütlich zu starten. Diese kümmert sich dann automatisch um die Ausführung der einzelnen Aufgaben.",
     "scheduler.2" => "Die Kommandozeile ist in den %1 nicht aktiviert. Aufgaben können nicht gestartet werden.",

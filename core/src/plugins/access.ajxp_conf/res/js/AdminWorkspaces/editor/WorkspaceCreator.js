@@ -1,5 +1,6 @@
 import Workspace from '../model/Workspace'
 import FeaturesListWizard from './FeaturesListWizard'
+import FeaturesStepper from './FeaturesStepper'
 import TplFieldsChooser from './TplFieldsChooser'
 
 export default React.createClass({
@@ -213,7 +214,7 @@ export default React.createClass({
             });
         }
 
-        var leftNav = (
+        const oldWizard = (
             <FeaturesListWizard
                 onSelectionChange={this.selectionChange}
                 driversLoaded={this.state.driversLoaded}
@@ -222,6 +223,17 @@ export default React.createClass({
                 wizardType={this.props.type}
                 additionalComponents={additionalFeatureComponents}
                 disableCreateButton={!currentValid}
+            />
+        );
+        var leftNav = (
+            <FeaturesStepper
+                onSelectionChange={this.selectionChange}
+                driversLoaded={this.state.driversLoaded}
+                wizardType={this.props.type}
+                formIsValid={currentValid}
+                save={this.save}
+                close={this.props.closeEditor}
+                additionalComponent={additionalFeatureComponents}
             />
         );
 
