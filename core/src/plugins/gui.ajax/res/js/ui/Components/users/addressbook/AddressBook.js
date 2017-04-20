@@ -349,6 +349,17 @@ let AddressBook = React.createClass({
 
         }else{
 
+            let emptyStatePrimary;
+            let emptyStateSecondary;
+            console.log(selectedItem.id);
+            if(selectedItem.id === 'teams'){
+                emptyStatePrimary = 'No teams created';
+                emptyStateSecondary = 'For easily sharing data with many users at once, create your own teams and add users to them.';
+            }else if(selectedItem.id === 'ext'){
+                emptyStatePrimary = 'No external users';
+                emptyStateSecondary = 'You can create your own users here, and give them access to specific resources using sharing.';
+            }
+
             centerComponent = (
                 <UsersList
                     item={selectedItem}
@@ -358,6 +369,8 @@ let AddressBook = React.createClass({
                     onDeleteAction={this.onDeleteAction}
                     loading={this.state.loading}
                     mode={mode}
+                    emptyStatePrimaryText={emptyStatePrimary}
+                    emptyStateSecondaryText={emptyStateSecondary}
                     onTouchTap={this.state.rightPaneItem ? () => { this.setState({rightPaneItem:null}) } : null}
                 />);
 

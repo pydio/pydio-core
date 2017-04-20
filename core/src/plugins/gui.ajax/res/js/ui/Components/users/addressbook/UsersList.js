@@ -1,4 +1,8 @@
 import UserAvatar from '../avatar/UserAvatar'
+const {IconButton, Checkbox, FlatButton, RaisedButton, ListItem, FontIcon, Avatar, Divider, Subheader, List} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
+const {Loader} = require('pydio').requireLib('boot')
+import EmptyStateView from '../../views/EmptyStateView'
 
 class UsersList extends React.Component{
 
@@ -9,7 +13,7 @@ class UsersList extends React.Component{
 
     render(){
         if(this.props.loading){
-            return <PydioReactUI.Loader style={{flex:1}}/>;
+            return <Loader style={{flex:1}}/>;
         }
         const {item, mode} = this.props;
         const folders = item.collections || [];
@@ -24,25 +28,25 @@ class UsersList extends React.Component{
         const activeTbarColor = this.props.muiTheme.palette.accent2Color;
         const toolbar = (
             <div style={{padding: 10, height:56, backgroundColor:this.state.select?activeTbarColor : '#fafafa', display:'flex', alignItems:'center', transition:DOMUtils.getBeziersTransition()}}>
-                {mode === "selector" && item._parent && <MaterialUI.IconButton iconClassName="mdi mdi-chevron-left" onTouchTap={() => {this.props.onFolderClicked(item._parent)}}/>}
-                {mode === 'book' && item.actions && item.actions.multiple && <MaterialUI.Checkbox style={{width:'initial', marginLeft: this.state.select?7:14}} checked={this.state.select} onCheck={toggleSelect}/>}
+                {mode === "selector" && item._parent && <IconButton iconClassName="mdi mdi-chevron-left" onTouchTap={() => {this.props.onFolderClicked(item._parent)}}/>}
+                {mode === 'book' && total > 0 && item.actions && item.actions.multiple && <Checkbox style={{width:'initial', marginLeft: this.state.select?7:14}} checked={this.state.select} onCheck={toggleSelect}/>}
                 <div style={{flex:1, fontSize:20, color:this.state.select?'white':'rgba(0,0,0,0.87)'}}>{item.label}</div>
-                {mode === 'book' && item.actions && item.actions.create && !this.state.select && <MaterialUI.FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
-                {mode === 'book' && item.actions && item.actions.remove && this.state.select && <MaterialUI.RaisedButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
+                {mode === 'book' && item.actions && item.actions.create && !this.state.select && <FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
+                {mode === 'book' && item.actions && item.actions.remove && this.state.select && <RaisedButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
             </div>
         );
         // PARENT NODE
         if(item._parent && mode === 'book' && item._parent._parent){
             elements.push(
-                <MaterialUI.ListItem
+                <ListItem
                     key={'__parent__'}
                     primaryText={".."}
                     onTouchTap={(e) => {e.stopPropagation(); this.props.onFolderClicked(item._parent)}}
-                    leftAvatar={<MaterialUI.Avatar icon={<MaterialUI.FontIcon className={'mdi mdi-arrow-up'}/>}/>}
+                    leftAvatar={<Avatar icon={<FontIcon className={'mdi mdi-arrow-up'}/>}/>}
                 />
             );
             if(total){
-                elements.push(<MaterialUI.Divider inset={true} key={'parent-divider'}/>);
+                elements.push(<Divider inset={true} key={'parent-divider'}/>);
             }
         }
         // ITEMS
@@ -63,7 +67,7 @@ class UsersList extends React.Component{
                 touchTap = (e)=>{e.stopPropagation(); this.props.onFolderClicked(item) };
                 if(mode === 'selector' && !item._notSelectable){
                     rightIconButton = (
-                        <MaterialUI.IconButton
+                        <IconButton
                             iconClassName={"mdi mdi-account-multiple-plus"}
                             tooltip={"Select this group"}
                             tooltipPosition="bottom-left"
@@ -73,7 +77,7 @@ class UsersList extends React.Component{
                 }
             }else if(mode === 'inner' && this.props.onDeleteAction){
                 rightIconButton = (
-                    <MaterialUI.IconButton
+                    <IconButton
                         iconClassName={"mdi mdi-delete"}
                         tooltip={"Remove"}
                         tooltipPosition="bottom-left"
@@ -91,26 +95,48 @@ class UsersList extends React.Component{
                     this.setState({selection: selection});
                 }
             };
-            elements.push(<MaterialUI.ListItem
+            elements.push(<ListItem
                 key={item.id}
                 primaryText={item.label}
                 onTouchTap={touchTap}
                 disabled={mode === 'inner'}
                 leftAvatar={!this.state.select && fontIcon}
                 rightIconButton={rightIconButton}
-                leftCheckbox={this.state.select && <MaterialUI.Checkbox checked={this.state.selection.indexOf(item) > -1} onCheck={select}/>}
+                leftCheckbox={this.state.select && <Checkbox checked={this.state.selection.indexOf(item) > -1} onCheck={select}/>}
             />);
             if(mode !== 'inner' && index < total - 1){
-                elements.push(<MaterialUI.Divider inset={true} key={item.id + '-divider'}/>);
+                elements.push(<Divider inset={true} key={item.id + '-divider'}/>);
             }
         }.bind(this));
+
+        let emptyState;
+        if(!elements.length){
+            let emptyStateProps = {
+                style               : {backgroundColor: 'rgb(250, 250, 250)'},
+                iconClassName       : 'mdi mdi-account-off',
+                primaryTextId       : this.props.emptyStatePrimaryText || 'No records yet',
+                secondaryTextId     : mode === 'book' ? ( this.props.emptyStateSecondaryText || null ) : null
+            };
+            if(mode === 'book' && item.actions && item.actions.create){
+                emptyStateProps = {
+                    ...emptyStateProps,
+                    actionLabelId: item.actions.create,
+                    actionCallback: createAction
+                };
+            }
+            emptyState = <EmptyStateView {...emptyStateProps}/>;
+        }
+
         return (
             <div style={{flex:1, flexDirection:'column', display:'flex'}} onTouchTap={this.props.onTouchTap}>
-                {mode !== 'inner' && !this.props.noToolbar && toolbar}
-                <MaterialUI.List style={{flex:1, overflowY:mode !== 'inner' ? 'auto' : 'initial'}}>
-                    {this.props.subHeader && <MaterialUI.Subheader>{this.props.subHeader}</MaterialUI.Subheader>}
-                    {elements}
-                </MaterialUI.List>
+                {mode !== 'inner' && (!emptyState || mode !== 'book') && !this.props.noToolbar && toolbar}
+                {!emptyState &&
+                    <List style={{flex: 1, overflowY: mode !== 'inner' ? 'auto' : 'initial'}}>
+                        {this.props.subHeader && <Subheader>{this.props.subHeader}</Subheader>}
+                        {elements}
+                    </List>
+                }
+                {emptyState}
             </div>
         );
     }
@@ -126,6 +152,6 @@ UsersList.propTypes ={
     mode:React.PropTypes.oneOf(['book', 'selector', 'inner'])
 };
 
-UsersList = MaterialUI.Style.muiThemeable()(UsersList);
+UsersList = muiThemeable()(UsersList);
 
 export {UsersList as default}

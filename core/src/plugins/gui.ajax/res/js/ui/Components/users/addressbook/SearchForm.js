@@ -43,7 +43,14 @@ class SearchForm extends React.Component{
                         />
                     </div>
                 </div>
-                <UsersList onItemClicked={this.props.onItemClicked} item={{leafs: this.state.items}} noToolbar={true}/>
+                <UsersList
+                    mode={this.props.mode}
+                    onItemClicked={this.props.onItemClicked}
+                    item={{leafs: this.state.items}}
+                    noToolbar={true}
+                    emptyStatePrimaryText="No results"
+                    emptyStateSecondaryText="Start typing in the search form to find users in the local directory"
+                />
             </div>
         );
 

@@ -10,6 +10,7 @@ import SortColumns from './SortColumns'
 import ListPaginator from './ListPaginator'
 import SimpleReactActionBar from '../views/SimpleReactActionBar'
 import InlineEditor from './InlineEditor'
+import EmptyStateView from '../views/EmptyStateView'
 
 const DOMUtils = require('pydio/util/dom')
 const LangUtils = require('pydio/util/lang')
@@ -66,7 +67,8 @@ let SimpleList = React.createClass({
         HEIGHT_ONE_LINE:50,
         HEIGHT_TWO_LINES:73,
         CLICK_TYPE_SIMPLE:'simple',
-        CLICK_TYPE_DOUBLE:'double'
+        CLICK_TYPE_DOUBLE:'double',
+        PARENT_FOLDER_ICON:'mdi mdi-chevron-left'
     },
 
     getDefaultProps:function(){
@@ -674,7 +676,7 @@ let SimpleList = React.createClass({
                     node: entry.node,
                     key: entry.node.getPath(),
                     id: entry.node.getPath(),
-                    mainIcon: "mdi mdi-arrow-up",
+                    mainIcon: SimpleList.PARENT_FOLDER_ICON,
                     firstLine: "..",
                     className: "list-parent-node",
                     secondLine:this.context.getMessage('react.1'),
@@ -1053,6 +1055,7 @@ let SimpleList = React.createClass({
         }else{
             toolbar = this.props.customToolbar ? this.props.customToolbar : ( !this.props.hideToolbar ? this.renderToolbar() : null );
         }
+
         let inlineEditor;
         if(this.state.inlineEditionForNode){
             inlineEditor = <InlineEditor
@@ -1063,14 +1066,34 @@ let SimpleList = React.createClass({
             />
         }
 
+        let emptyState;
+        if(this.props.emptyStateProps && this.props.node.isLoaded() &&
+            ( !this.state.elements.length || (this.state.elements.length === 1 && this.state.elements[0].parent)) ){
+            let actionProps = {};
+            if(this.state.elements.length === 1 && this.state.elements[0].parent){
+                const parentNode = this.state.elements[0].node;
+                actionProps = {
+                    actionLabelId: 'react.1',
+                    actionIconClassName: SimpleList.PARENT_FOLDER_ICON,
+                    actionCallback: (e) => {
+                        if(this.props.entryHandleClicks) {
+                            this.props.entryHandleClicks(parentNode, SimpleList.CLICK_TYPE_DOUBLE, e);
+                        }
+                    }
+                }
+            }
+            emptyState = <EmptyStateView {...this.props.emptyStateProps} {...actionProps}/> ;
+        }
+
         const elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
         return (
             <div className={containerClasses} onContextMenu={this.contextMenuResponder} tabIndex="0" onKeyDown={this.onKeyDown} style={this.props.style}>
                 {toolbar}
                 {inlineEditor}
                 <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">
+                    {!emptyState &&
                     <Infinite
-                        elementHeight={this.state.elementHeight?this.state.elementHeight:this.props.elementHeight}
+                        elementHeight={this.state.elementHeight ? this.state.elementHeight : this.props.elementHeight}
                         containerHeight={this.state.containerHeight ? this.state.containerHeight : 1}
                         infiniteLoadBeginEdgeOffset={this.state.infiniteLoadBeginBottomOffset}
                         onInfiniteLoad={this.handleInfiniteLoad}
@@ -1079,6 +1102,8 @@ let SimpleList = React.createClass({
                     >
                         {elements}
                     </Infinite>
+                    }
+                    {emptyState}
                 </div>
             </div>
         );

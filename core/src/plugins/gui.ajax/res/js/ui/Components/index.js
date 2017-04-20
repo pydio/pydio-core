@@ -10,6 +10,7 @@ import LabelWithTip from './elements/LabelWithTip'
 import SimpleFigureBadge from './elements/SimpleFigureBadge'
 import SearchBox from './views/SearchBox'
 import ClipboardTextField from './elements/ClipboardTextField'
+import EmptyStateView from './views/EmptyStateView'
 
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
@@ -44,7 +45,7 @@ const PydioComponents = {
     FoldersTree             : FoldersTree,
     ClipboardTextField      : ClipboardTextField,
     LabelWithTip            : LabelWithTip,
-
+    EmptyStateView          : EmptyStateView,
     SimpleFigureBadge       : SimpleFigureBadge,
     SearchBox               : SearchBox,
 
