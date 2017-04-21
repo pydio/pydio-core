@@ -72,13 +72,14 @@
             this._count = data['count'];
             this._child_parameters = data['child_parameters'];
             this._children = [];
+            this._childrenCursor = {};
             if(parentNode){
                 this._parentNode = parentNode;
             }
         }
-        load(groupBy = null){
+        load(groupBy = null, reload=false){
             return new Promise(function(resolve){
-                let user_context;
+                let user_context, append = false;
                 if(ShareNode.CURRENT_USER_CONTEXT){
                     user_context = 'current'
                 }else{
@@ -88,9 +89,16 @@
                 if(groupBy){
                     params[groupBy] = '__GROUP__';
                 }
+                if(!reload && this.hasMore()){
+                    params['page'] = (Math.ceil( (this._childrenCursor[0] + 1) / this._childrenCursor[1]) + 1);
+                    append = true;
+                }
                 PydioApi.getClient().request(params, (transp)=>{
                     const children = transp.responseJSON.data;
-                    this._children = [];
+                    this._childrenCursor = transp.responseJSON.cursor;
+                    if(!append) {
+                        this._children = [];
+                    }
                     Object.keys(children).map((k) => {
                         if(children[k]['child_parameters']){
                             this._children.push(new ShareNode(k, children[k], this));
@@ -113,6 +121,10 @@
         }
         isLeaf(){
             return false;
+        }
+        hasMore(){
+            return (this._childrenCursor && this._childrenCursor.total &&
+                    this._childrenCursor.total > (this._childrenCursor[0] + this._childrenCursor[1]));
         }
     }
 
@@ -186,7 +198,7 @@
                 node = new ShareNode('root', {label:'root', count:0, child_parameters:{}});
             }
             if(!filters){
-                filters = {parent_repository_id:'Workspaces', share_type:'Share Types', user_id:'Users'};
+                filters = {parent_repository_id:'250', share_type:'share_center.238', user_id:'249'};
             }
             this.state = {
                 node: node,
@@ -197,8 +209,8 @@
             };
         }
 
-        load(){
-            this.state.node.load(this.state.filter).then((node)=>{
+        load(reload = false){
+            this.state.node.load(this.state.filter, reload).then((node)=>{
                 this.setState({children: node.getChildren(), selectedChild:null})
             });
         }
@@ -226,21 +238,32 @@
 
         renderSelector(){
             const {filters, filter} = this.state;
+            const {pydio:{MessageHash}} = this.props;
+            const reloadButton = <MaterialUI.IconButton style={{marginTop:22}} iconStyle={{color:'rgba(0,0,0,0.23)'}} iconClassName="mdi mdi-reload" onTouchTap={()=>{this.load(true)}}/>;
             if(!Object.keys(filters).length){
-                return <div style={{color: 'rgba(0,0,0,0.93)', height: 75, lineHeight: '91px'}}>Shares List</div>;
+                return (
+                    <div style={{display:'flex'}}>
+                        <div style={{flex:1, color: 'rgba(0,0,0,0.93)', height: 72, lineHeight: '91px', fontSize:16}}>{MessageHash['share_center.241']}</div>
+                        {reloadButton}
+                    </div>
+                );
             }
+
             return (
-                <MaterialUI.SelectField
-                    floatingLabelText="Group by ..."
-                    fullWidth={true}
-                    value={filter}
-                    onChange={this.selectorChange.bind(this)}
-                    underlineStyle={{display:'none'}}
-                >
-                    {Object.keys(filters).map(function(f){
-                        return <MaterialUI.MenuItem key={f} value={f} primaryText={filters[f]} />;
-                    })}
-                </MaterialUI.SelectField>
+                <div style={{display:'flex'}}>
+                    <MaterialUI.SelectField
+                        floatingLabelText={MessageHash['share_center.240']}
+                        fullWidth={true}
+                        value={filter}
+                        onChange={this.selectorChange.bind(this)}
+                        underlineStyle={{display:'none'}}
+                    >
+                        {Object.keys(filters).map(function(f){
+                            return <MaterialUI.MenuItem key={f} value={f} primaryText={MessageHash[filters[f]]} />;
+                        })}
+                    </MaterialUI.SelectField>
+                    {reloadButton}
+                </div>
             );
         }
 
@@ -275,6 +298,9 @@
                                     />
                                 );
                             })}
+                            {this.state.node.hasMore() &&
+                                <div style={{textAlign:'center'}}><MaterialUI.FlatButton primary={true} label={this.props.pydio.MessageHash['share_center.242']} onTouchTap={this.load.bind(this)}/></div>
+                            }
                         </MaterialUI.List>
                     </MaterialUI.Paper>
                     {this.state.selectedChild && !this.state.selectedChild.isLeaf() &&

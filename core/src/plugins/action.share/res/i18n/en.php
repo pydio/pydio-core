@@ -254,4 +254,10 @@ $mess = array(
     "235" => "Generate unique links to identify users",
     "236" => "Restrict access only to identified users",
     "237" => "Use a random key instead of email in link",
+    "238" => "Share Types",
+    "240" => "Group by...",
+    "241" => "Shares List",
+    "242" => "Load More Results",
+    "243" => "Public Links",
+    "244" => "Shared Folders",
 );

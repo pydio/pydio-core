@@ -3,7 +3,6 @@
 $mess = array(
 // será substituido pelo título da aplicação
 "1" => "%s Download Público",
-// será substituido pelo nome do arquivo a ser baixado
 "2" => "Clique na imagem para fazer o download do <b>%s</b> para o seu computador",
 "3" => "Senha incorreta",
 "4" => "Insira a senha e clique na imagem para fazer o download do <b>%s</b> para o seu computador",
@@ -254,4 +253,11 @@ $mess = array(
 "235" => "Generate unique links to identify users",
 "236" => "Restrict access only to identified users",
 "237" => "Use a random key instead of email in link",
+"238" => "Share Types",
+"240" => "Group by...",
+"241" => "Shares List",
+"242" => "Load More Results",
+"243" => "Public Links",
+"244" => "Shared Folders",
+// será substituido pelo nome do arquivo a ser baixado
 );

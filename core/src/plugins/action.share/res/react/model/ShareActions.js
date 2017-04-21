@@ -47,8 +47,8 @@
                 pydio:pydio,
                 currentUser:true,
                 filters:{
-                    parent_repository_id:"Workspaces",
-                    share_type:"Share Types"
+                    parent_repository_id:"250",
+                    share_type:"share_center.238"
                 }
             });
 

@@ -253,4 +253,10 @@ $mess = array(
 "235" => "Génerer des liens uniques pour chaque utilisateur",
 "236" => "Restreindre l'accès à ces seuls liens",
 "237" => "Utiliser une clé aléatoire plutôt que l'email dans le lien",
+"238" => "Types de partages",
+"240" => "Grouper par...",
+"241" => "Liste des partages",
+"242" => "Charger plus de résultats",
+"243" => "Liens Publics",
+"244" => "Dossiers Partagés",
 );

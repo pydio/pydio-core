@@ -298,16 +298,17 @@ class ShareStore {
             $repoCount = $this->confStorage->simpleStoreCount('share', '', 'serial', $dataLikesRepo, $parentRepository);
             $linksCount = $this->confStorage->simpleStoreCount('share', '', 'serial', $dataLikesMini, $parentRepository);
             $result = [];
+            $mess = LocaleService::getMessages();
             if($repoCount){
                 $result['repository'] = [
-                    'label' => 'Shared Workspaces',
+                    'label' => $mess['share_center.244'],
                     'count' => $repoCount,
                     'child_parameters' => $paramsRepo
                 ];
             }
             if($linksCount){
                 $result['minisite'] = [
-                    'label' => 'Public Links',
+                    'label' => $mess['share_center.243'],
                     'count' => $linksCount,
                     'child_parameters' => $paramsMini
                 ];
@@ -336,6 +337,9 @@ class ShareStore {
                        'child_parameters' => $params
                    ];
                 }
+            }
+            if(count($result) < $total){
+                $cursor['total'] = count($result);
             }
             return $result;
         }
