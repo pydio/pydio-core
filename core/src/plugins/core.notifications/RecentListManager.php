@@ -107,8 +107,10 @@ class RecentListManager
             $node = new AJXP_Node($nodeUrl);
             try{
                 @$node->loadNodeInfo();
+                $repository = $node->getRepository();
+                if(empty($repository)) continue;
                 $repoId = $node->getRepositoryId();
-                $repoLabel = $node->getRepository()->getDisplay();
+                $repoLabel = $repository->getDisplay();
                 $node->mergeMetadata([
                     'recent_access_time' => $time,
                     'recent_access_readable' => StatHelper::relativeDate($time, $mess),

@@ -25,7 +25,7 @@
                     configMap.set(key, value);
                 });
             }catch(e){
-                console.debug(e);
+                //console.debug(e);
             }
             if(pydio && pydio.user && pydio.user.activeRepository){
                 if(!Renderer.__CACHE) Renderer.__CACHE = new Map();

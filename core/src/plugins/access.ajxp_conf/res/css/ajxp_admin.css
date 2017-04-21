@@ -1730,7 +1730,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   height: 48px;
 }
 .react-mui-context .mui-left-nav.admin-main-nav.mui-closed .mui-left-nav-menu {
-  transform: translate3d(-190px, 0, 0);
+  transform: translate3d(-200px, 0, 0);
 }
 .react-mui-context .mui-left-nav.admin-main-nav.mui-closed .mui-left-nav-menu > .mui-paper-container {
   overflow-y: hidden;
