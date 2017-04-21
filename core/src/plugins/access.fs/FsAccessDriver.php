@@ -2415,7 +2415,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
             $search = $header["filename"];
             if(!empty($zipEncoding)){
-                $test = iconv($fsEncoding, $zipEncoding, $header["stored_filename"]);
+                $test = iconv($fsEncoding, $zipEncoding.'//TRANSLIT', $header["stored_filename"]);
                 if($test !== false){
                     $header["stored_filename"] = $test;
                 }
