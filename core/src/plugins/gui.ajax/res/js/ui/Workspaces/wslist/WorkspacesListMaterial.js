@@ -1,5 +1,5 @@
 const React = require('react')
-const {List, Subheader} = require('material-ui')
+const {List, Subheader, Divider} = require('material-ui')
 
 import WorkspaceEntryMaterial from './WorkspaceEntryMaterial'
 
@@ -38,15 +38,22 @@ class WorkspacesListMaterial extends React.Component{
 
         let allEntries;
         if(sharedEntries.length){
-            sharedEntries.unshift(<Subheader>Shared folders</Subheader>);
+            sharedEntries.unshift(<Subheader>Folders shared with me</Subheader>);
         }
         if(inboxEntry){
+            if(sharedEntries.length){
+                sharedEntries.unshift(<Divider/>);
+            }
             sharedEntries.unshift(inboxEntry);
-            sharedEntries.unshift(<Subheader>Files Inbox</Subheader>);
+            sharedEntries.unshift(<Subheader>Files Shared with me</Subheader>);
         }
         if(remoteShares.length){
             remoteShares.unshift(<Subheader>Shares from remote servers</Subheader>)
+            remoteShares.unshift(<Divider/>)
             sharedEntries = sharedEntries.concat(remoteShares);
+        }
+        if(filterByType === 'entries'){
+            entries.unshift(<Subheader>My Workspaces</Subheader>);
         }
         if(filterByType){
             allEntries = filterByType === 'shared' ? sharedEntries : entries

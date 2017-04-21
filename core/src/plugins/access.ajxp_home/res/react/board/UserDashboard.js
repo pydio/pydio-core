@@ -80,9 +80,9 @@ let UserDashboard = React.createClass({
                     }
                     <ConfigLogo style={{height:'100%'}} pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
                 </PydioWorkspaces.UserWidget>
-                <div style={{position:'absolute', top: 110, bottom: 0, right: 250, left: 0, display:'flex', padding: 5}}>
-                    <WorkspacesListCard filterByType="entries" pydio={this.props.pydio} style={{margin:5, flex:1}}/>
-                    <WorkspacesListCard filterByType="shared" pydio={this.props.pydio} style={{margin:5, flex:1}}/>
+                <div style={{position:'absolute', top: 110, bottom: 0, right: 250, left: 0, display:'flex', marginRight: 10}}>
+                    <WorkspacesListCard zDepth={0} filterByType="entries" pydio={this.props.pydio} style={{margin:0, flex:1, borderRight:'1px solid #e0e0e0'}}/>
+                    <WorkspacesListCard zDepth={0} filterByType="shared" pydio={this.props.pydio} style={{margin:0, flex:1}}/>
                 </div>
 
                 <PydioComponents.DynamicGrid
@@ -91,7 +91,7 @@ let UserDashboard = React.createClass({
                     builderNamespaces={["WelcomeComponents"]}
                     pydio={this.props.pydio}
                     cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
-                    rglStyle={{position:'absolute', top: 110, bottom: 0, right: 0, width: 260}}
+                    rglStyle={{position:'absolute', top: 110, bottom: 0, right: 0, width: 260, overflowY:'auto'}}
                 />
             </div>
         );

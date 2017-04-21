@@ -40,8 +40,6 @@ const WorkspacesListCard = React.createClass({
             <MaterialUI.Paper zDepth={1} {...props} transitionEnabled={false} rounded={false}>
                 {this.getCloseButton()}
                 <div  style={{height: '100%', display:'flex', flexDirection:'column'}}>
-                    {blackAndWhiteTitle}
-                    <MaterialUI.Divider/>
                     <PydioWorkspaces.WorkspacesListMaterial
                         className={"vertical_fit filter-" + filterByType}
                         pydio={pydio}

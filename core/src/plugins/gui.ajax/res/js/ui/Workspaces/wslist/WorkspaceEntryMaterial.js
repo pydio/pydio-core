@@ -1,6 +1,7 @@
 const React = require('react')
 const {ListItem, Avatar, FontIcon} = require('material-ui')
 const {muiThemeable} = require('material-ui/styles')
+const Color = require('color')
 
 const Pydio = require('pydio')
 const Repository = require('pydio/model/repository')
@@ -23,15 +24,16 @@ class WorkspaceEntryMaterial extends React.Component{
 
         const {workspace, muiTheme} = this.props;
         let leftAvatar, leftIcon;
-        let backgroundColor = muiTheme.palette.primary1Color;
-        let color = 'white';
+        let color = muiTheme.palette.primary1Color;
+        //let backgroundColor = new Color(muiTheme.palette.primary1Color).lightness(96).rgb().toString();
+        let backgroundColor = '#ECEFF1';
         if(workspace.getOwner() || workspace.getAccessType() === 'inbox'){
-            backgroundColor = MaterialUI.Style.colors.teal500;
-            let icon = workspace.getAccessType() === 'inbox' ? 'file-multiple' : 'folder';
+            color = MaterialUI.Style.colors.teal500;
+            let icon = workspace.getAccessType() === 'inbox' ? 'file-multiple' : 'folder-outline';
             if(workspace.getRepositoryType() === 'remote') icon = 'cloud-outline';
             leftAvatar =  <Avatar backgroundColor={backgroundColor} color={color} icon={<FontIcon className={'mdi mdi-' + icon}/>}/>
         }else{
-            leftAvatar = <Avatar backgroundColor={backgroundColor} color={color}>{workspace.getLettersBadge()}</Avatar>;
+            leftAvatar = <Avatar style={{fontSize:18}} backgroundColor={backgroundColor} color={color}>{workspace.getLettersBadge()}</Avatar>;
         }
         return (
             <ListItem
