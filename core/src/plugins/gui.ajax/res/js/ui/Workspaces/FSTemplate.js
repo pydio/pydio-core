@@ -117,7 +117,7 @@ let FSTemplate = React.createClass({
                 lineHeight: '30px'
             },
             infoPanelStyle : {
-                backgroundColor: appBarColor.lighten(1.31).rgb().toString()
+                backgroundColor: appBarColor.lightness(95).rgb().toString()
             }
         }
 

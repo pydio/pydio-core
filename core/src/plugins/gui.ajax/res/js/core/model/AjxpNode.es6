@@ -41,6 +41,15 @@ export default class AjxpNode extends Observable{
      isLoaded(){
         return this._isLoaded;
     }
+
+    /**
+     * The node is currently loading
+     * @returns Boolean
+     */
+     isLoading(){
+        return this._isLoading;
+    }
+
     /**
      * Changes loaded status
      * @param bool Boolean
@@ -90,13 +99,13 @@ export default class AjxpNode extends Observable{
      * @param iAjxpNodeProvider IAjxpNodeProvider Optionnal
      */
     reload(iAjxpNodeProvider, silentClear = false){
+        this._isLoaded = false;
         this._children.forEach(function(child,key){
             if(!silentClear) child.notify("node_removed");
             child._parentNode = null;
             this._children.delete(key);
             if(!silentClear) this.notify("child_removed", child);
         }, this);
-        this._isLoaded = false;
         this.load(iAjxpNodeProvider);
     }
     /**

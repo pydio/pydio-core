@@ -23,7 +23,7 @@ class EmptyStateView extends Component{
                 justifyContent:'center',
                 height: '100%',
                 width: '100%',
-                backgroundColor:mainColor.lighten(1.35).fade(0.3).rgb().toString(),
+                backgroundColor:mainColor.lightness(97).rgb().toString(),
                 ...style
             },
             centered : {

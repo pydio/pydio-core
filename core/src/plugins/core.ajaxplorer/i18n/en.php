@@ -660,5 +660,11 @@ $mess=array(
 "560" => "Authentication required",
 "561" => "We will redirect you to the Authentication page of the provider. If you are not redirected automatically, press OK to retry...",
 "react.1" => "parent folder",
-"react.2" => "bulk actions"
+"react.2" => "bulk actions",
+"562" => "This folder is empty!",
+"563" => "This workspace is empty!",
+"564" => "Recycle Bin is empty.",
+"565" => "Starting adding files or folders by picking them or dragging directly from your desktop",
+"566" => "You are not allowed to add files here",
+"567" => "Browse Recycle Bin",
 ); 

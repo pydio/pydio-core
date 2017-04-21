@@ -1067,8 +1067,10 @@ let SimpleList = React.createClass({
         }
 
         let emptyState;
-        if(this.props.emptyStateProps && this.props.node.isLoaded() &&
+        const {emptyStateProps, node} = this.props;
+        if(emptyStateProps && this.props.node.isLoaded() && !this.props.node.isLoading() &&
             ( !this.state.elements.length || (this.state.elements.length === 1 && this.state.elements[0].parent)) ){
+
             let actionProps = {};
             if(this.state.elements.length === 1 && this.state.elements[0].parent){
                 const parentNode = this.state.elements[0].node;
@@ -1082,7 +1084,12 @@ let SimpleList = React.createClass({
                     }
                 }
             }
-            emptyState = <EmptyStateView {...this.props.emptyStateProps} {...actionProps}/> ;
+            emptyState = <EmptyStateView {...emptyStateProps} {...actionProps}/> ;
+
+        }else if(emptyStateProps && emptyStateProps.checkEmptyState && emptyStateProps.checkEmptyState(this.props.node)){
+
+            emptyState = <EmptyStateView {...emptyStateProps}/> ;
+
         }
 
         const elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);

@@ -659,6 +659,12 @@ $mess=array(
 "react.1" => "parent folder",
 "react.2" => "bulk actions",
 "375t" => "Are you still there?",
+"562" => "This folder is empty!",
+"563" => "This workspace is empty!",
+"564" => "Recycle Bin is empty.",
+"565" => "Starting adding files or folders by picking them or dragging directly from your desktop",
+"566" => "You are not allowed to add files here",
+"567" => "Browse Recycle Bin",
 /* END SENTENCE */
 /* password strength tester */
 );

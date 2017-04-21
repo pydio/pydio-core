@@ -661,5 +661,11 @@ $mess=array(
 "561" => "Vous allez être redirigé vers la page d'authentification du fournisseur. Si vous n'êtes pas redirigé automaiquement, cliquez sur OK pour réessayer...",
 "react.1" => "Répertoire parent",
 "react.2" => "Actions groupées",
+"562" => "Ce répertoire est vide!",
+"563" => "Ce workspace est vide!",
+"564" => "La corbeille est vide.",
+"565" => "Ajoutez des fichiers ou des dossiers en les glissant depuis votre bureau.",
+"566" => "Vous n'êtes pas autorisé à ajouter des fichiers.",
+"567" => "Ouvrir la corbeille",
 /* END SENTENCE */
 );

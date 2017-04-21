@@ -371,13 +371,56 @@ let MainFilesList = React.createClass({
 
         }
 
+        const {pydio} = this.props;
+        const {contextNode} = this.state;
+        const messages = pydio.MessageHash;
+        const canUpload = (pydio.user && pydio.user.write && pydio.Controller.getActionByName('upload') && (contextNode.getMetadata().get('ajxp_readonly') !== 'true'));
+        const secondary = messages[canUpload ? '565' : '566'];
+        const iconClassName = canUpload ? 'mdi mdi-cloud-upload' : 'mdi mdi-folder-outline';
+        let emptyStateProps = {
+            style           : {backgroundColor: 'transparent'},
+            iconClassName   : iconClassName,
+            primaryTextId   : messages['562'],
+            secondaryTextId : secondary,
+        };
+        if(contextNode.isRoot()){
+            const recyclePath = contextNode.getMetadata().get('repo_has_recycle');
+            emptyStateProps = {
+                style           : {backgroundColor: 'transparent'},
+                iconClassName   : iconClassName,
+                primaryTextId   : messages['563'],
+                secondaryTextId : secondary,
+            };
+            if(recyclePath){
+                emptyStateProps = {
+                    ...emptyStateProps,
+                    checkEmptyState: (node) => { return (node.isLoaded() && node.getChildren().size === 1 && node.getChildren().get(recyclePath) )} ,
+                    actionLabelId: messages['567'],
+                    actionIconClassName: 'mdi mdi-delete',
+                    actionCallback: (e) => {
+                        pydio.goTo(recyclePath);
+                    }
+                };
+            }
+        }else{
+            const recycle = pydio.getContextHolder().getRootNode().getMetadata().get('repo_has_recycle');
+            if(contextNode.getPath() === recycle){
+                emptyStateProps = {
+                    ...emptyStateProps,
+                    iconClassName   : 'mdi mdi-delete-empty',
+                    primaryTextId   : messages['564'],
+                    secondaryTextId : null,
+                }
+            }
+        }
+
         return (
             <PydioComponents.SimpleList
                 ref="list"
                 tableKeys={tableKeys}
                 sortKeys={sortKeys}
                 node={this.state.contextNode}
-                dataModel={this.props.pydio.getContextHolder()}
+                dataModel={pydio.getContextHolder()}
                 className={className}
                 actionBarGroups={["change_main"]}
                 infiniteSliceCount={infiniteSliceCount}
@@ -391,12 +434,7 @@ let MainFilesList = React.createClass({
                 entryRenderActions={this.entryRenderActions}
                 entryHandleClicks={this.entryHandleClicks}
                 horizontalRibbon={this.props.horizontalRibbon}
-                emptyStateProps={{
-                    style:{backgroundColor: 'transparent'},
-                    iconClassName:'mdi mdi-cloud-upload',
-                    primaryTextId:'Hey, this folder is empty!',
-                    secondaryTextId:'Pick files or folders or drag them directly from your desktop to start filling it.',
-                }}
+                emptyStateProps={emptyStateProps}
             />
         );
     }
