@@ -112,7 +112,7 @@ let AdminLeftNav = React.createClass({
 
         const menuHeader = (
             <div onMouseOver={this.leftNavMouseOver} onMouseOut={this.leftNavMouseOut} onScroll={this.leftNavScroll} className="left-nav-menu-scroller">
-                <Menu onChange={this.onMenuChange} width={256} style={{maxWidth:256}} value={contextNode}>{menuItems}</Menu>
+                <Menu onChange={this.onMenuChange} autoWidth={false} width={256} listStyle={{display:'block', maxWidth:256}} value={contextNode}>{menuItems}</Menu>
             </div>
         );
         return <ReactMUI.LeftNav className="admin-main-nav" docked={true} isInitiallyOpen={false} menuItems={[]} ref="leftNav" header={menuHeader}/>
