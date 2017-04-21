@@ -1118,6 +1118,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $this->filterUserSelectionToHidden($ctx, [$destNode->getLabel()]);
                 }else if(isSet($httpVars["filename_new"])){
                     $filename_new = InputFilter::decodeSecureMagic($httpVars["filename_new"]);
+                    $filename_new = rtrim($filename_new);
                     $this->filterUserSelectionToHidden($ctx, [$filename_new]);
                 }
                 $renamedNode = $this->rename($originalNode, $destNode, $filename_new);
@@ -1152,6 +1153,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $parentDir = PathUtils::forwardSlashDirname($newDirPath);
                     $basename = PathUtils::forwardSlashBasename($newDirPath);
                     $basename = substr($basename, 0, $max_length);
+                    $basename = rtrim($basename);
                     $this->filterUserSelectionToHidden($ctx, [$basename]);
                     $parentNode = $selection->nodeForPath($parentDir);
                     try{
@@ -2414,6 +2416,11 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Adding ".$header["stored_filename"]." to archive");
             }
             $search = $header["filename"];
+            $split = explode("/", $header["stored_filename"]);
+            foreach ($split as &$value) {
+                $value = rtrim($value);
+            }
+            $header["stored_filename"] = join("/", $split);
             if(!empty($zipEncoding)){
                 $test = iconv($fsEncoding, $zipEncoding, $header["stored_filename"]);
                 if($test !== false){
