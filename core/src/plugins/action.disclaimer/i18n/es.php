@@ -4,7 +4,6 @@
 */
 
 //	Spanish translation: Salva Gómez <salva.gomez at gmail.com> 2016
-  
 $mess=array(
     "1" => "Renuncia de responsabilidad",
     "2" => "Aceptar renuncia de responsabilidad",

@@ -19,10 +19,14 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1" => "Cifrar Directorio",
-"2" => "Cifrar los datos del directorio",
-"3" => "Descifrar Directorio",
-"4" => "Descifrar los datos del directorio",
-"5" => "Cifrar Directorio",
-"6" => "Cifrar los datos del directorio",
+    "1" => "Cifrar Directorio",
+    "2" => "Cifrar los datos del directorio",
+    "3" => "Descifrar Directorio",
+    "4" => "Descifrar los datos del directorio",
+    "5" => "Cifrar Directorio",
+    "6" => "Cifrar los datos del directorio",
+    "7" => "Introducir la clave criptográfica elegida cuando se encriptó este directorio.",
+    "8" => "Clave Criptográfica",
+    "9" => "Confirmar Clave Criptográfica",
+    "10" => "Elija una clave criptográfica para proteger sus datos. Tenga en cuenta que si pierde la clave, ¡los datos ser perderán para siempre!",
 );

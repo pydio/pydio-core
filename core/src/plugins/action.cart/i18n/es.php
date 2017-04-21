@@ -36,4 +36,7 @@ $mess = array(
     "13"=> "Poner una etiqueta a esta cesta",
     "14"=> "Esto creará un archivo con todos los ficheros y los compartirá. Por favor introduce un nombre para el archivo:",
     "15"=> "Suelta los elementos en la cesta para descargarlos o compartirlos luego",
+    "16"=> "Eliminar de la cesta",
+    "17"=> "Nada seleccionado",
+    "18"=> "Use esta cesta para seleccionar archivos desde cualquier sitio y descargarlos a la vez."
 );

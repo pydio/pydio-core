@@ -23,6 +23,8 @@
 // spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 
 $mess=array(
+"title"=> "Mi Cuenta",
+"desc" => "Gestionar la configuración de mi cuenta, mi libreta de direcciones, intercambios, etc.",
 "1" => "Usuarios compartidos",
 "2" => "Repositorios compartidos",
 "3" => "Archivos públicos",
@@ -100,5 +102,4 @@ $mess=array(
     "72" => "Friday",
     "73" => "Saturday",
     "74" => "Sunday",
-
 );
