@@ -59,6 +59,7 @@ class UsersManager extends AbstractManager
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
      * @return ResponseInterface
+     * @throws PydioException
      */
     public function peopleApiActions(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
 
@@ -70,6 +71,7 @@ class UsersManager extends AbstractManager
                 // Create a user
                 $uLogin = basename($path);
                 $gPath  = dirname($path);
+                if($gPath === '.' || $gPath === '/.'  || empty($gPath)) $gPath = "/";
                 $requestInterface = $requestInterface
                     ->withAttribute("action", "create_user")
                     ->withParsedBody([
