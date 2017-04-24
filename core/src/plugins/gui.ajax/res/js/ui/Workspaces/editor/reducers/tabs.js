@@ -1,4 +1,4 @@
-import { TAB_CREATE, TAB_DELETE, TAB_DELETE_ALL } from '../actions'
+import { TAB_CREATE, TAB_MODIFY, TAB_DELETE, TAB_DELETE_ALL } from '../actions'
 
 
 export default function tabs(state = [], action) {
@@ -12,6 +12,17 @@ export default function tabs(state = [], action) {
                 },
                 ...state
             ]
+        case TAB_MODIFY:
+            return state.map((tab) => {
+                if (tab.id === action.id) {
+                    return {
+                        ...tab,
+                        ...action
+                    }
+                }
+
+                return tab
+            })
         case TAB_DELETE:
             return state.filter(tab => tab.id !== action.id)
         case TAB_DELETE_ALL:

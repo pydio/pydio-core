@@ -20,11 +20,14 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
 
 import {ToolbarGroup, IconButton} from 'material-ui';
 
 import {withControls} from './controls';
 import {getDisplayName} from './utils';
+
+import * as actions from '../Workspaces/editor/actions';
 
 class SelectionModel extends Observable{
 
@@ -99,6 +102,11 @@ class SelectionModel extends Observable{
 
 const withSelection = (filter) => {
     return (Component) => {
+
+        console.log("Connected ", actions)
+
+        const ConnectedComponent = connect(null, actions)(Component)
+        
         return class extends React.Component {
             static get displayName() {
                 return `WithSelection(${getDisplayName(Component)})`
@@ -138,7 +146,7 @@ const withSelection = (filter) => {
                 }
 
                 return (
-                    <Component
+                    <ConnectedComponent
                         {...remainingProps}
 
                         selectionPlaying={playing}
@@ -150,6 +158,8 @@ const withSelection = (filter) => {
                 )
             }
         }
+
+
     }
 }
 

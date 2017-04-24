@@ -15,10 +15,12 @@
 import _ from 'lodash';
 import { Motion, spring, presets } from 'react-motion';
 
+import {getDisplayName} from '../../../../HOCs/utils';
+
 const ANIMATION={stiffness: 400, damping: 30}
 const TARGET=100
 
-const makeMinimise = (Target) => {
+const makeMaximise = (Target) => {
     return class extends React.Component {
         constructor(props) {
             super(props);
@@ -29,6 +31,10 @@ const makeMinimise = (Target) => {
             this.setState({
                 maximised: nextProps.maximised
             })
+        }
+
+        static get displayName() {
+            return `MakeMaximise(${getDisplayName(Target)})`
         }
 
         render() {
@@ -61,4 +67,4 @@ const makeMinimise = (Target) => {
     }
 };
 
-export default makeMinimise;
+export default makeMaximise;
