@@ -3,6 +3,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <?php if(isSet($serverBaseUrl)) echo "<base href='$serverBaseUrl'/>"; ?>
 </head>
 <body bgcolor="ffffff" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
 
@@ -24,7 +25,8 @@ var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
 
 var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
-var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo $secureToken;?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
+//var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo $secureToken;?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
+var uploadUrl = '<?php print($uploadUrlBase); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo $secureToken;?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
 
 var maxFileSize = '<?PHP echo ($UploadMaxSize/1048576) . "mb"; ?>';
 var maxHTML4 = '<?PHP echo $UploadMaxSize; ?>';
@@ -85,6 +87,6 @@ $(function() {
 });
 </script>
 
-<div id="plupload_uploader">Your browser does not support uploads, please install Flash Player or Microsoft Silverlight.</div>
+<div id="plupload_uploader">Cannot load PLUploader plugin.</div>
 </body>
 </html>
