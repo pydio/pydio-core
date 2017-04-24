@@ -1,7 +1,10 @@
+const FuncUtils = require("pydio/util/func")
+const ResourcesManager = require("pydio/http/resources-manager")
+
 /******************************/
 /* REACT DND GENERIC COMPONENTS
  /******************************/
-var Types = {
+const Types = {
     NODE_PROVIDER: 'node',
     SORTABLE_LIST_ITEM:'sortable-list-item'
 };
@@ -48,11 +51,22 @@ DNDActionParameter.STEP_CAN_DROP = 'canDrop';
 DNDActionParameter.STEP_HOVER_DROP = 'hover';
 
 let applyDNDAction = function(source, target, step){
-    const dnd = pydio.Controller.defaultActions.get("dragndrop");
+    const {Controller} = window.pydio;
+    const dnd = Controller.defaultActions.get("dragndrop");
     if(dnd){
-        const dndAction = pydio.Controller.getActionByName(dnd);
+        const dndAction = Controller.getActionByName(dnd);
         dndAction.enable();
-        dndAction.apply(new DNDActionParameter(source, target, step));
+        const params = new DNDActionParameter(source, target, step);
+        const checkModule = dndAction.options.dragndropCheckModule;
+        if(step === DNDActionParameter.STEP_CAN_DROP && checkModule){
+            if(!FuncUtils.getFunctionByName(checkModule, window)) {
+                ResourcesManager.detectModuleToLoadAndApply(checkModule, ()=>{});
+                throw new Error('Cannot find test module, trying to load it');
+            }
+            FuncUtils.executeFunctionByName(dndAction.options.dragndropCheckModule, window, Controller, params);
+        }else{
+            dndAction.apply(params);
+        }
     }else{
         throw new Error('No DND Actions available');
     }
@@ -62,7 +76,7 @@ let applyDNDAction = function(source, target, step){
 /* REACT DND DRAG/DROP NODES
  /***************************/
 
-var nodeDragSource = {
+const nodeDragSource = {
     beginDrag: function (props) {
         // Return the data describing the dragged item
         return { node: props.node };
@@ -72,23 +86,25 @@ var nodeDragSource = {
         if (!monitor.didDrop()) {
             return;
         }
-        var item = monitor.getItem();
-        var dropResult = monitor.getDropResult();
+        const item = monitor.getItem();
+        const dropResult = monitor.getDropResult();
         try{
             applyDNDAction(item.node, dropResult.node, DNDActionParameter.STEP_END_DRAG);
-        }catch(e){}
+        }catch(e){
+
+        }
     }
 };
 
-var nodeDropTarget = {
+const nodeDropTarget = {
 
     hover: function(props, monitor){
     },
 
     canDrop: function(props, monitor){
 
-        var source = monitor.getItem().node;
-        var target = props.node;
+        const source = monitor.getItem().node;
+        const target = props.node;
 
         try{
             applyDNDAction(source, target, DNDActionParameter.STEP_CAN_DROP);
@@ -99,7 +115,7 @@ var nodeDropTarget = {
     },
 
     drop: function(props, monitor){
-        var hasDroppedOnChild = monitor.didDrop();
+        const hasDroppedOnChild = monitor.didDrop();
         if (hasDroppedOnChild) {
             return;
         }

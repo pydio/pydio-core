@@ -417,6 +417,9 @@ export default class Action extends Observable{
                                     FuncUtils.executeFunctionByName(fName, window, manager, otherArguments);
                                 });
                             };
+                            if(this.defaults && (this.defaults['dragndrop'] || this.defaults['ctrldragndrop'])){
+                                this.options.dragndropCheckModule = fName;
+                            }
                         }else if(processNode.firstChild){
 							this.options.callbackCode = processNode.firstChild.nodeValue.trim();
 						}
