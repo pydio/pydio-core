@@ -258,7 +258,7 @@
 	    <action name="user_update_right">
             <processing>
                 <serverCallback methodName="usersAction" restParams="/repository_id/user_id/right" checkParams="true" developerComment="Update a user access right on a given workspace.">
-                    <input_param name="user_id" type="AJXP_USER" mandatory="true" description="ID of the user"/>
+                    <input_param name="user_id" type="string" mandatory="true" description="ID of the user"/>
                     <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
                     <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
                 </serverCallback>

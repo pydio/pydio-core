@@ -149,18 +149,20 @@ class Controller
      * Check if mandatory parameters as defined in the manifests are correct.
      *
      * @static
-     * @param array $parameters
+     * @param ServerRequestInterface $request
      * @param \DOMNode $callbackNode
      * @param \DOMXPath $xPath
      * @throws \Exception
      */
-    public static function checkParams(&$parameters, $callbackNode, $xPath)
+    public static function checkParams(&$request, $callbackNode, $xPath)
     {
         if (!$callbackNode->attributes->getNamedItem('checkParams') || $callbackNode->attributes->getNamedItem('checkParams')->nodeValue != "true") {
             return;
         }
         $inputParams = $xPath->query("input_param", $callbackNode);
         $declaredParams = array();
+        $parameters = $request->getParsedBody();
+        $changes = 0;
         foreach ($inputParams as $param) {
             $name = $param->attributes->getNamedItem("name")->nodeValue;
             $type = $param->attributes->getNamedItem("type")->nodeValue;
@@ -171,11 +173,18 @@ class Controller
             }
             if ($defaultNode != null && !isSet($parameters[$name])) {
                 $parameters[$name] = $defaultNode->nodeValue;
+                $changes ++;
             }
             $declaredParams[] = $name;
         }
         foreach ($parameters as $k => $n) {
-            if(!in_array($k, $declaredParams)) unset($parameters[$k]);
+            if(!in_array($k, $declaredParams)) {
+                $changes ++;
+                unset($parameters[$k]);
+            }
+        }
+        if($changes){
+            $request = $request->withParsedBody($parameters);
         }
     }
 
@@ -243,7 +252,7 @@ class Controller
         foreach ($queries as $cbQuery => $multiple){
             $calls = self::getCallbackNode($xPath, $actionNode, $cbQuery, $actionName, $request->getParsedBody(), $_FILES, $multiple);
             if(!$multiple && count($calls)){
-                self::checkParams($httpVars, $calls[0], $xPath);
+                self::checkParams($request, $calls[0], $xPath);
             }
             foreach ($calls as $call){
                 self::handleRequest($call, $request, $response);
