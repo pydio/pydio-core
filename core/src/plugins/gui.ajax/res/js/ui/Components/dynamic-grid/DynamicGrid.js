@@ -6,8 +6,16 @@ const {PydioContextConsumer} = Pydio.requireLib('boot')
 import Store from './Store'
 import GridBuilder from './GridBuilder'
 
+/**
+ * Automatic layout for presenting draggable cards to users. Used for user and admin dashboard.
+ */
 const CardsGrid = React.createClass({
 
+    /**
+     * Save layouts in the users preference.
+     *
+     * @param {object} allLayouts Responsive layouts passed for saving
+     */
     saveFullLayouts:function(allLayouts){
         const savedPref = this.props.store.getUserPreference('Layout');
         // Compare JSON versions to avoid saving unnecessary changes

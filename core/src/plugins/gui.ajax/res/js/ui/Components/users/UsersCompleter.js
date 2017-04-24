@@ -22,18 +22,52 @@ const {AsyncComponent} = require('pydio/http/resources-manager').requireLib('boo
 const {TextField, AutoComplete, RefreshIndicator, IconButton, Popover} = require('material-ui');
 const React = require('react')
 
+/**
+ * Ready to use autocomplete field that will load users/groups/roles from
+ * the server (using user_list_authorized_users API).
+ * Used for sharing, addressbooks, send email, etc.
+ *
+ * Can also open a "selector-style" adress book.
+ */
 const UsersLoader = React.createClass({
 
     propTypes:{
 
+        /**
+         * Method called to render a commponent, taking a UserObject as input
+         */
         renderSuggestion: React.PropTypes.func.isRequired,
+        /**
+         * Callback when a value is finally selected
+         */
         onValueSelected : React.PropTypes.func.isRequired,
+        /**
+         * Floating Label Text displayed on the field
+         */
         fieldLabel      : React.PropTypes.string.isRequired,
+        /**
+         * Array of values to ignore
+         */
         excludes        : React.PropTypes.array.isRequired,
+        /**
+         * Display only users, no groups nor roles
+         */
         usersOnly       : React.PropTypes.bool,
+        /**
+         * Display users from local directory and/or from remote.
+         */
         usersFrom       : React.PropTypes.oneOf(['local', 'remote', 'any']),
+        /**
+         * Do not propose a "Create user" option
+         */
         existingOnly    : React.PropTypes.bool,
+        /**
+         * Allow free typing
+         */
         freeValueAllowed: React.PropTypes.bool,
+        /**
+         * Will be passed to the root component
+         */
         className       : React.PropTypes.string
     },
 
@@ -46,6 +80,11 @@ const UsersLoader = React.createClass({
         };
     },
 
+    /**
+     * Loads values from server
+     * @param {string} input Currently searched text
+     * @param {Function} callback Called with the values
+     */
     suggestionLoader:function(input, callback){
         const excludes = this.props.excludes;
         const disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
@@ -67,6 +106,10 @@ const UsersLoader = React.createClass({
 
     },
 
+    /**
+     * Called when the field is updated
+     * @param value
+     */
     textFieldUpdate: function(value){
 
         this.setState({searchText: value});
@@ -77,6 +120,11 @@ const UsersLoader = React.createClass({
 
     },
 
+    /**
+     * Debounced call for rendering search
+     * @param value {string}
+     * @param timeout {int}
+     */
     loadBuffered: function(value, timeout){
 
         if(!value && this._emptyValueList){
@@ -104,7 +152,11 @@ const UsersLoader = React.createClass({
 
     },
 
-
+    /**
+     * Called when user selects a value from the list
+     * @param value
+     * @param index
+     */
     onCompleterRequest: function(value, index){
 
         if(index === -1){
@@ -136,15 +188,26 @@ const UsersLoader = React.createClass({
 
     },
 
+    /**
+     * Triggers onValueSelected props callback
+     * @param {Pydio.User} newUser
+     */
     onUserCreated: function(newUser){
         this.props.onValueSelected(newUser);
         this.setState({createUser:null});
     },
 
+    /**
+     * Close user creation form
+     */
     onCreationCancelled:function(){
         this.setState({createUser:null});
     },
 
+    /**
+     * Open address book inside a Popover
+     * @param event
+     */
     openAddressBook:function(event){
         this.setState({
             addressBookOpen: true,
@@ -152,10 +215,17 @@ const UsersLoader = React.createClass({
         });
     },
 
+    /**
+     * Close address book popover
+     */
     closeAddressBook: function(){
         this.setState({addressBookOpen: false});
     },
 
+    /**
+     * Triggered when user clicks on an entry from adress book.
+     * @param item
+     */
     onAddressBookItemSelected: function(item){
         this.props.onValueSelected(item);
     },
