@@ -9,7 +9,7 @@ export default function (pydio) {
 
             if(dndActionParameter.getStep() === DNDActionParameter.STEP_CAN_DROP){
 
-                if(dndActionParameter.getTarget().isLeaf()){
+                if(dndActionParameter.getTarget().isLeaf() || dndActionParameter.getTarget().getPath() === dndActionParameter.getSource().getPath()){
                     throw new Error('Cannot drop');
                 }else {
                     return false;
