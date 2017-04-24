@@ -6,7 +6,8 @@
 
         static download(){
 
-            var userSelection = pydio.getUserSelection();
+            const userSelection = pydio.getUserSelection();
+
             if(!pydio.Parameters.get('multipleFilesDownloadEnabled') && (!userSelection.isUnique() || userSelection.hasDir())){
                 pydio.UI.openComponentInModal('FSActions', 'MultiDownloadDialog', {
                     actionName:'download',
@@ -17,11 +18,11 @@
 
             }
 
-            var agent = navigator.userAgent || '';
-            var agentIsMobile = (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1);
+            const agent = navigator.userAgent || '';
+            const agentIsMobile = (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1);
             const hiddenForm = pydio && pydio.UI && pydio.UI.hasHiddenDownloadForm();
 
-            if(agentIsMobile || !hiddenForm || (userSelection.isUnique() && !userSelection.hasDir )){
+            if(agentIsMobile || !hiddenForm || (userSelection.isUnique() && !userSelection.hasDir() )){
                 // Simple file download, or
                 // no ability to monitor background task, fallback to normal download
                 PydioApi.getClient().downloadSelection(userSelection, 'download');
@@ -30,8 +31,8 @@
 
                 let zipName = PathUtils.getBasename(userSelection.getContextNode().getPath());
                 if(zipName === "") zipName = "Archive";
-                var index=1;
-                var buff = zipName;
+                let index=1;
+                let buff = zipName;
                 while(userSelection.fileNameExists(zipName + ".zip")){
                     zipName = buff + "-" + index; index ++ ;
                 }
