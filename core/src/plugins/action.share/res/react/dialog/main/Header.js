@@ -1,4 +1,5 @@
 const React = require('react');
+const {Textfit} = require('react-textfit');
 const {muiThemeable} = require('material-ui/styles');
 const PathUtils = require('pydio/util/path')
 import ShareContextConsumer from '../ShareContextConsumer'
@@ -20,7 +21,7 @@ let HeaderPanel = React.createClass({
         }
         return (
             <div className="headerPanel" style={{backgroundColor:this.props.muiTheme.palette.primary1Color}}>
-                <div>{this.props.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
+                <Textfit mode="single" max={30}>{this.props.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</Textfit>
             </div>
         );
     }

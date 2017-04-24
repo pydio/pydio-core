@@ -1,5 +1,6 @@
 (function(global){
 
+    const {Textfit} = require('react-textfit');
     const Workspaces = require('pydio/http/resources-manager').requireLib('workspaces');
     const Components = require('pydio/http/resources-manager').requireLib('components');
 
@@ -130,7 +131,7 @@
             return (
                 <div style={style}>
                     <div className={classNames.join(' ')} onClick={click}>
-                        <span className="dl-filename">{name2}</span>
+                        <span className="dl-filename"><Textfit min={12} max={25} perfectFit={false} mode="single">{name2}</Textfit></span>
                         <div className="dl-icon">
                             <span className="mdi mdi-file"/>
                             <span className="mdi mdi-download"/>

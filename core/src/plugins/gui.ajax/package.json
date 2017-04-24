@@ -40,6 +40,7 @@
     "react-router": "^2.7.0",
     "react-select": "^0.6.5",
     "react-tap-event-plugin": "^2.0.1",
+    "react-textfit": "^0.1.9",
     "reactify": "^1.1.1",
     "redux": "*",
     "systemjs": "^0.20.11",

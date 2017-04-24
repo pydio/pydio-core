@@ -46,6 +46,7 @@ const LibRequires = [ // modules we want to require and export
     'react-select',
     'react-dnd',
     'react-dnd-html5-backend',
+    'react-textfit',
     'lodash/function/flow',
     'lodash.debounce',
     'classnames',
