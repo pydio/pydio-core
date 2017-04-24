@@ -24,6 +24,12 @@ export const tabModify = (data) => ({
     ...data
 })
 
+export const TAB_ADD_CONTROLS = 'TAB_ADD_CONTROLS'
+export const tabAddControls = (data) => ({
+    type: TAB_ADD_CONTROLS,
+    ...data
+})
+
 export const TAB_DELETE = 'TAB_DELETE'
 export const tabDelete = (id) => ({
     type: TAB_DELETE,

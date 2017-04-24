@@ -1,5 +1,4 @@
-import { TAB_CREATE, TAB_MODIFY, TAB_DELETE, TAB_DELETE_ALL } from '../actions'
-
+import { TAB_CREATE, TAB_MODIFY, TAB_ADD_CONTROLS, TAB_DELETE, TAB_DELETE_ALL } from '../actions'
 
 export default function tabs(state = [], action) {
 
@@ -18,6 +17,21 @@ export default function tabs(state = [], action) {
                     return {
                         ...tab,
                         ...action
+                    }
+                }
+
+                return tab
+            })
+        case TAB_ADD_CONTROLS:
+            return state.map((tab) => {
+                if (tab.id === action.id) {
+                    const controls = tab.controls
+                    return {
+                        ...tab,
+                        controls: {
+                            ...controls,
+                            ...action
+                        }
                     }
                 }
 

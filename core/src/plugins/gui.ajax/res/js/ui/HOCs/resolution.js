@@ -23,15 +23,15 @@ import ReactDOM from 'react-dom';
 
 import {ToolbarGroup, IconButton} from 'material-ui';
 
-import {withControls} from './controls';
+import { connect } from 'react-redux';
+import * as Actions from '../Workspaces/editor/actions';
 import {getDisplayName} from './utils';
 
 import {URLProvider} from './urls';
 
 const withResolution = (sizes, highResolution, lowResolution) => {
     return (Component) => {
-
-        return class extends React.Component {
+        class WithResolution extends React.Component {
             static get displayName() {
                 return `WithResolution(${getDisplayName(Component)})`
             }
@@ -71,16 +71,17 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                 return highResolution(node)
             }
 
+            renderControls() {
+                const {original} = this.state
+
+                return [
+                    <IconButton onClick={() => this.setState({original: !original})} iconClassName={`mdi mdi-crop-${original ? "square" : "free"}`} />
+                ]
+            }
+
             render() {
                 const {original} = this.state
                 const {controls, ...remainingProps} = this.props
-
-                let newControls = {
-                    ...controls,
-                    resolution: [
-                        <IconButton onClick={() => this.setState({original: !original})} iconClassName={`mdi mdi-crop-${original ? "square" : "free"}`} />
-                    ]
-                }
 
                 return (
                     <ResolutionURLProvider
@@ -93,13 +94,16 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                                 {...remainingProps}
 
                                 src={url}
-                                controls={newControls}
                             />
                         }
                     </ResolutionURLProvider>
                 )
             }
         }
+
+        const mapStateToProps = (state, props) => state.tabs.filter(tab => props.node && tab.id === props.node.getLabel())[0]
+
+        return connect(mapStateToProps)(WithResolution)
     }
 }
 

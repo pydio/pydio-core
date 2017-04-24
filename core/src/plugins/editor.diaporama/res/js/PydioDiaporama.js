@@ -50,8 +50,7 @@ class Image extends Component {
 }
 
 const ExtendedImage = compose(
-    withResize,
-    withMenu
+    withResize
 )(Image)
 
 class ImagePanel extends Component {
@@ -78,7 +77,7 @@ class ImagePanel extends Component {
     }
 
     render() {
-        const {node, src, imgClassName, scale, controls} = this.props
+        const {node, src, imgClassName, scale} = this.props
 
         return (
             <ContainerSizeProvider>
@@ -90,6 +89,7 @@ class ImagePanel extends Component {
                 {({imgWidth, imgHeight}) =>
                     <div style={ImagePanel.styles}>
                         <ExtendedImage
+                            node={node}
                             src={src}
                             className={imgClassName}
                             width={imgWidth}
@@ -97,8 +97,6 @@ class ImagePanel extends Component {
                             scale={scale}
                             containerWidth={containerWidth}
                             containerHeight={containerHeight}
-
-                            controls={controls}
                         />
                     </div>
                 }
@@ -158,7 +156,7 @@ class Editor extends Component {
     }
 
     render() {
-        const {node, src, controls, ...remainingProps} = this.props;
+        const {node, src, ...remainingProps} = this.props;
         const {playing} = this.state || {};
 
         if (!node) return null
@@ -167,7 +165,6 @@ class Editor extends Component {
             <ImagePanel
                 node={node}
                 src={src}
-                controls={controls}
             />
         )
     }

@@ -24,8 +24,9 @@ import ReactDOM from 'react-dom';
 import {ToolbarGroup, ToolbarTitle, DropDownMenu, MenuItem, IconButton, Slider} from 'material-ui';
 import ActionAspectRatio from 'material-ui/svg-icons/action/aspect-ratio'
 
+import { connect } from 'react-redux';
+import * as Actions from '../Workspaces/editor/actions';
 import {getRatio, getDisplayName, getBoundingRect} from './utils';
-import {withControls} from './controls';
 
 class ContainerSizeProvider extends React.Component {
     constructor(props) {
@@ -104,7 +105,7 @@ class ImageSizeProvider extends React.Component {
 }
 
 const withResize = (Component) => {
-    return class extends React.Component {
+    class WithResize extends React.Component {
         static get displayName() {
             return `WithResize(${getDisplayName(Component)})`
         }
@@ -135,33 +136,57 @@ const withResize = (Component) => {
             })
         }
 
-        render() {
-            const {size} = this.state
-            const {controls, ...remainingProps} = this.props
+        componentDidMount() {
+            const {id, controls, dispatch} = this.props
 
+            dispatch(Actions.tabAddControls({
+                id: id,
+                size: this.renderControls()
+            }))
+        }
+
+        renderControls() {
+            const {size} = this.state
             const scale = getRatio[size](this.state)
 
-            let newControls = {
-                ...controls,
-                size: [
-                    <IconButton tooltip="Aspect Ratio" onClick={() => this.setState({size: "contain"})}><ActionAspectRatio /></IconButton>,
-                    <DropDownMenu>
-                        <MenuItem primaryText={`${parseInt(scale * 100)}%`} />
-                        <Slider axis="y" style={{width: "100%", height: 150, display: "flex", justifyContent: "center"}} sliderStyle={{margin: 0}} value={scale} min={0.25} max={4} defaultValue={1} onChange={(_, scale) => this.setState({size: "auto", scale})} />
-                    </DropDownMenu>
-                ]
-            }
+            return [
+                <IconButton tooltip="Aspect Ratio" onClick={() => this.setState({size: "contain"})}><ActionAspectRatio /></IconButton>,
+                <DropDownMenu>
+                    <MenuItem primaryText={`${parseInt(scale * 100)}%`} />
+                    <Slider axis="y" style={{width: "100%", height: 150, display: "flex", justifyContent: "center"}} sliderStyle={{margin: 0}} value={scale} min={0.25} max={4} defaultValue={1} onChange={(_, scale) => this.setState({size: "auto", scale})} />
+                </DropDownMenu>
+            ]
+        }
+
+        render() {
+            const {size} = this.state
+            const {...remainingProps} = this.props
+
+            const scale = getRatio[size](this.state)
 
             return (
                 <Component
                     {...remainingProps}
 
                     scale={scale}
-                    controls={newControls}
                 />
             )
         }
     }
+
+    const mapStateToProps = (state, ownProps) => {
+        const {node} = ownProps
+        const {tabs} = state
+
+        let current = tabs.filter(tab => tab.id === node.getLabel())[0]
+
+        return  {
+            ...ownProps,
+            ...current
+        }
+    }
+
+    return connect(mapStateToProps)(WithResize)
 }
 
 export {withResize}

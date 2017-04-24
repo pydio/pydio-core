@@ -12,12 +12,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-const {Card, CardHeader, CardMedia} = MaterialUI;
+import { Toolbar, ToolbarGroup, Card, CardHeader, CardMedia } from 'material-ui';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 import * as actions from '../../actions';
 
 import makeMaximise from './make-maximise';
+const {SelectionControls, withMenu} = PydioHOCs;
 
 class Tab extends React.Component {
     static get styles() {
@@ -36,7 +38,7 @@ class Tab extends React.Component {
     }
 
     render() {
-        const {id, isActive, style, editorSetActiveTab, ...remainingProps} = this.props
+        const {id, node, editorData, selection, playing, isActive, style, editorSetActiveTab, ...remainingProps} = this.props
 
         const select = () => editorSetActiveTab(id)
 
@@ -49,7 +51,11 @@ class Tab extends React.Component {
             </AnimatedCard>
         ) : (
             <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={true} expanded={isActive} onExpandChange={!isActive ? select : null}>
-                <this.props.child {...remainingProps} style={Tab.styles.child} showControls={true} icon={false} />
+                <Toolbar style={{flexShrink: 0}}>
+                    {selection && <SelectionControls editorData={editorData} node={node} firstChild={true} selection={selection} playing={playing} />}
+                </Toolbar>
+
+                <this.props.child node={node} editorData={editorData} {...remainingProps} style={Tab.styles.child} showControls={true} icon={false} />
             </AnimatedCard>
         )
     }

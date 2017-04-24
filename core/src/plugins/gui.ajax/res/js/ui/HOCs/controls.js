@@ -18,8 +18,9 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import {Component} from 'react'
-import {Toolbar, ToolbarGroup} from 'material-ui'
+import { Component } from 'react'
+import { bindActionCreators } from 'redux'
+import { Toolbar, ToolbarGroup } from 'material-ui'
 
 import {toTitleCase} from './utils'
 
@@ -31,6 +32,12 @@ const withMenu = (WrappedComponent) => {
     return class extends Component {
         static get displayName() {
             return `WithMenu(${getDisplayName(WrappedComponent)})`
+        }
+
+        static get defaultProps() {
+            return {
+                controls: []
+            }
         }
 
         getControlsFromObject(controls, group) {
@@ -48,7 +55,7 @@ const withMenu = (WrappedComponent) => {
         }
 
         render() {
-            const {controls, ...remainingProps} = this.props
+            const {id, controls, dispatch, ...remainingProps} = this.props
 
             const groups = Object.keys(controls)
 
