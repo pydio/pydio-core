@@ -357,7 +357,7 @@ class Controller
         // Do not use call_user_func, it cannot pass parameters by reference.
         if (method_exists($plugInstance, $methodName)) {
             if ($defer == true) {
-                ShutdownScheduler::getInstance()->registerShutdownEventArray(array($plugInstance, $methodName), $variableArgs);
+                ShutdownScheduler::getInstance()->registerShutdownEvent(array($plugInstance, $methodName), $variableArgs);
             } else {
                 call_user_func_array(array($plugInstance, $methodName), $variableArgs);
             }
