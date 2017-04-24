@@ -15,6 +15,7 @@ let PublicLinkSecureOptions = React.createClass({
 
     updateDLExpirationField: function(event){
         var newValue = event.currentTarget.value;
+        if(parseInt(newValue) < 0) newValue = - parseInt(newValue);
         this.props.shareModel.setExpirationFor(this.props.linkData.hash, "downloads", newValue);
     },
 
