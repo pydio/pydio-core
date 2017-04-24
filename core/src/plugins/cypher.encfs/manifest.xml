@@ -28,7 +28,7 @@
         <actions>
             <action name="encfs.cypher_folder_create">
                 <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.5" title="encfs.6" hasAccessKey="false">
-                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
+                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="other" contextMenu="true"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="!metadata.get('ENCFS_clear_folder')"/>
                 </gui>
                 <processing>
@@ -37,7 +37,7 @@
             </action>
             <action name="encfs.cypher_folder">
                 <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.1" title="encfs.2" hasAccessKey="false">
-                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true" actionBarGroup="other"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder_mounted')"/>
                 </gui>
                 <processing>
@@ -50,7 +50,7 @@
             </action>
             <action name="encfs.uncypher_folder">
                 <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.3" title="encfs.4" hasAccessKey="false">
-                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true" actionBarGroup="other"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder') &amp;&amp; !metadata.get('ENCFS_clear_folder_mounted')"/>
                 </gui>
                 <processing>

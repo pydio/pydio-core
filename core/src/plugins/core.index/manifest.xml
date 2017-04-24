@@ -11,10 +11,7 @@
         <actions>
             <action name="index">
                 <gui text="core.index.1" title="core.index.2" iconClass="icon-book" accessKey="folder_access_key">
-                    <context selection="false" dir="true" recycle="hidden"
-                             actionBar="true" contextMenu="true" infoPanel="false"
-                             actionBarGroup="remote" inZip="false">
-                    </context>
+                    <context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="other,more" inZip="false"/>
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true"
                                write="false" adminOnly="false">

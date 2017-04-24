@@ -34,8 +34,7 @@
 			<action name="slideshow_sel">
 				<gui text="234" title="234" accessKey="" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
-						actionBar="false" contextMenu="false" infoPanel="true"
-						actionBarGroup="get">
+						actionBar="false" infoPanel="true" actionBarGroup="get">
 					</context>
 					<selectionContext dir="true" file="true" recycle="true" unique="false" multipleOnly="true" allowedMimes="AJXP_MIMES_IMAGE" behaviour="hidden"/>
                 </gui>

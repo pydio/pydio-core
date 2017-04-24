@@ -1,4 +1,5 @@
 const React = require('react');
+const {TextField} = require('material-ui')
 import ActionDialogMixin from './ActionDialogMixin'
 import CancelButtonProviderMixin from './CancelButtonProviderMixin'
 import SubmitButtonProviderMixin from './SubmitButtonProviderMixin'
@@ -62,14 +63,15 @@ export default React.createClass({
     },
     render: function(){
         return (
-            <div>
+            <div style={{width:'100%'}}>
                 <div className="dialogLegend">{MessageHash[this.props.legendId]}</div>
-                <MaterialUI.TextField
+                <TextField
                     floatingLabelText={MessageHash[this.props.fieldLabelId]}
                     ref="input"
                     onKeyDown={this.submitOnEnterKey}
                     defaultValue={this.props.defaultValue}
                     type={this.props.fieldType}
+                    fullWidth={true}
                 />
             </div>
         );

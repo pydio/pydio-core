@@ -16,10 +16,10 @@
     <registry_contributions>
         <actions>
             <action name="git_history">
-                <gui text="meta.git.1" title="meta.git.2" iconClass="icon-undo" hasAccessKey="false">
+                <gui text="meta.git.1" title="meta.git.2" iconClass="icon-undo" hasAccessKey="false" weight="20">
                     <context selection="true" dir="false" recycle="false" behaviour="hidden"
                         actionBar="true" contextMenu="true" infoPanel="false"
-                        actionBarGroup="more">
+                        actionBarGroup="0_get">
                     </context>
                     <selectionContext dir="false" file="true" recycle="true" unique="true" behaviour="hidden"/></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>

@@ -5,6 +5,7 @@ import MainFilesList from './MainFilesList'
 import EditionPanel from './EditionPanel'
 import InfoPanel from './detailpanes/InfoPanel'
 import LeftPanel from './leftnav/LeftPanel'
+const {withContextMenu} = require('pydio').requireLib('hoc')
 
 let FSTemplate = React.createClass({
 
@@ -48,7 +49,7 @@ let FSTemplate = React.createClass({
             dir:true,
             file:true,
             actionBar:true,
-            actionBarGroup:'display_toolbar',
+            actionBarGroup:'display_toolbar,put',
             contextMenu:true,
             infoPanel:false
         }, {dir:true,file:true}, {}, {});
@@ -126,10 +127,10 @@ let FSTemplate = React.createClass({
         if(this.state.drawerOpen) classes.push('drawer-open');
 
         let mainToolbars = ["info_panel", "info_panel_share"];
-        let mainToolbarsOthers = ["change_main", "more", "change", "remote"];
+        let mainToolbarsOthers = ["change", "other"];
         if(this.state.infoPanelOpen && this.state.infoPanelToggle){
             mainToolbars = ["change_main"];
-            mainToolbarsOthers = ["more", "change", "remote"];
+            mainToolbarsOthers = ["get", "change", "other"];
         }
 
         let homeButton, breadcrumbStyle;
@@ -151,7 +152,7 @@ let FSTemplate = React.createClass({
         const {style, ...props} = this.props
 
         return connectDropTarget(
-            <div style={style} className={classes.join(' ')} onTouchTap={this.closeDrawer}>
+            <div style={style} className={classes.join(' ')} onTouchTap={this.closeDrawer} onContextMenu={this.props.onContextMenu}>
                 <LeftPanel className="left-panel" pydio={props.pydio}/>
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
@@ -215,6 +216,7 @@ let FSTemplate = React.createClass({
 if(window['UploaderModel']){
     FSTemplate = UploaderModel.DropProvider(FSTemplate);
 }
+FSTemplate = withContextMenu(FSTemplate);
 FSTemplate = MaterialUI.Style.muiThemeable()(FSTemplate);
 
 export {FSTemplate as default}

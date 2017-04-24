@@ -5,14 +5,10 @@
         <!-- SHARED ACTIONS -->
         <action name="ls" dirDefault="true">
             <gui text="32" title="32" accessKey="folder_access_key" iconClass="icon-folder-open-alt">
-                <context selection="true" dir="" recycle="false"
-                         actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false"/>
-                <selectionContext dir="true" file="false" recycle="false"
-                                  unique="true" allowedMimes="*">
-                </selectionContext>
+                <context selection="true" dir="" recycle="false"/>
+                <selectionContext dir="true" file="false" recycle="false" unique="true" allowedMimes="*"/>
             </gui>
-            <rightsContext noUser="true" userLogged="only" read="true"
-                           write="false" adminOnly="false">
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false">
             </rightsContext>
             <processing>
                 <clientCallback><![CDATA[
@@ -42,10 +38,7 @@
         </action>
         <action name="edit" fileDefault="true">
             <gui text="ajxp_conf.93" title="301" iconClass="mdi mdi-pencil" accessKey="edit_access_key" hasAccessKey="true">
-                <context selection="true" dir="" recycle="hidden"
-                         actionBar="true" contextMenu="true" infoPanel="true"
-                         actionBarGroup="get" inZip="false">
-                </context>
+                <context selection="true" dir=""/>
                 <selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,group,ajxp_plugin,ajxp_role,ajxp_graphs,datagrid" behaviour="hidden"/>
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
@@ -59,10 +52,7 @@
         </action>
         <action name="delete">
             <gui text="7" title="161" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
-                <context selection="true" dir="" recycle="false"
-                         actionBar="true" contextMenu="true" infoPanel="false"
-                         actionBarGroup="get" inZip="false">
-                </context>
+                <context selection="true" dir=""/>
                 <selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
@@ -92,10 +82,7 @@
 		</action>
         <action name="edit_repository_label">
             <gui text="6" title="158" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
-                <context selection="true" dir="" recycle="hidden" allowedMimes="workspaces_zone"
-                         actionBar="true" contextMenu="true" infoPanel="false"
-                         actionBarGroup="get" inZip="false">
-                </context>
+                <context selection="true" dir="" allowedMimes="workspaces_zone"/>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"/>
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
@@ -217,10 +204,7 @@
         </action>
         <action name="user_update_role" fileDefault="false">
             <gui text="ajxp_conf.94" title="ajxp_conf.82" accessKey="edit_access_key" hasAccessKey="true">
-                <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
-                         actionBar="true" contextMenu="true" infoPanel="true"
-                         actionBarGroup="get" inZip="false">
-                </context>
+                <context selection="true" dir="" behaviour="hidden"/>
                 <selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
@@ -322,7 +306,7 @@
         <!-- PLUGINS ACTIONS -->
         <action name="clear_plugins_cache">
             <gui text="ajxp_conf.129" title="ajxp_conf.130">
-                <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false" actionBar="true" actionBarGroup="get"/>
+                <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false"/>
             </gui>
             <processing>
                 <clientCallback module="PydioCoreActions.Callbacks.clearPluginsCache"/>
@@ -431,10 +415,8 @@
         </action>
         <action name="scheduler_editTask" forbidOverride="true">
             <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="mdi mdi-pencil" hasAccessKey="false">
-                <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
-                         actionBar="true" contextMenu="true" infoPanel="true"
-                         actionBarGroup="get"/>
                 <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                <context selection="true" dir="" allowedMimes="scheduler_zone"/>
             </gui>
             <processing>
                 <clientCallback module="AdminActions.Callbacks.editSchedulerTask"/>

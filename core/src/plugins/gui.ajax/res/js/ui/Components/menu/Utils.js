@@ -43,7 +43,7 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps =
     menuProps = {
         display:'normal',
         width: 216,
-        desktop: false,
+        desktop: true,
         autoWidth: false,
         ...menuProps
     };
@@ -70,9 +70,9 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps =
         }
 
         if(menuProps.display === 'normal'){
-            leftIcon = iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+            leftIcon = iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} /> : null;
         }else if(menuProps.display === 'right'){
-            rightIcon = iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+            rightIcon = iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} /> : null;
         }
         rightIcon = subItems && subItems.length ? <FontIcon className='mdi mdi-menu-right menu-icons'/> : rightIcon;
 

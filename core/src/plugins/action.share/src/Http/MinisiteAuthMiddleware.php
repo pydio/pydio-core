@@ -46,7 +46,10 @@ class MinisiteAuthMiddleware
      * Parse request parameters
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
+     * @param callable $next
      * @return ResponseInterface
+     * @throws AuthRequiredException
+     * @throws PydioException
      */
     public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 

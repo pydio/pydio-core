@@ -53,7 +53,7 @@
                 <gui text="88" title="88" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
                     <context selection="true" dir="" recycle="false"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="get,inline,info_panel">
+                             actionBarGroup="0_get,inline,info_panel">
                     </context>
                     <selectionContext dir="false" file="true" recycle="false" unique="true" enableRoot="false"/></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>

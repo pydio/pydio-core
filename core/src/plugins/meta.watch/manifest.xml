@@ -11,8 +11,8 @@
     <registry_contributions>
         <actions>
             <action name="toggle_watch">
-                <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
+                <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss" weight="10">
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="0_get" contextMenu="true"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="true" enableRoot="true"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>

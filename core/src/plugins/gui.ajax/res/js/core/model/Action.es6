@@ -563,7 +563,12 @@ export default class Action extends Observable{
                         menuItems.push(item);
                         return;
                     }
-                    const action = this.manager.actions.get(item['actionId']);
+                    let action;
+                    if(item['actionId'] instanceof Action){
+                        action = item['actionId'];
+                    }else{
+                        action = this.manager.actions.get(item['actionId']);
+                    }
                     if(action.deny) return;
                     let itemData = {
                         name:action.getKeyedText(),

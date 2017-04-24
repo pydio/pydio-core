@@ -99,7 +99,7 @@
 			<gui text="88" title="88" iconClass="mdi mdi-download" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get,inline,info_panel">
+					actionBarGroup="0_get,inline,info_panel">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" enableRoot="true"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -134,9 +134,9 @@
 				</processing>
 		</action>
 		<action name="compress_ui">
-			<gui text="313" title="314" iconClass="mdi mdi-zip-box" accessKey="" hasAccessKey="false">
+			<gui text="313" title="314" iconClass="mdi mdi-zip-box" accessKey="" hasAccessKey="false" weight="100">
 				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="false" infoPanel="true"
+					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false">
 				</context>
 				<selectionContext dir="true" file="file" recycle="false" unique="false"/></gui>
@@ -149,7 +149,7 @@
         <action name="open_with_unique">
             <gui text="462" title="462" iconClass="mdi mdi-eye-outline" accessKey="preview_access_key" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
-                         actionBar="true" contextMenu="false" infoPanel="false"
+                         actionBar="true" contextMenu="true" infoPanel="false"
                          actionBarGroup="inline,info_panel" inZip="false">
                 </context>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
@@ -162,7 +162,7 @@
             <gui text="316" title="316" iconClass="mdi mdi-eye-outline" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"
-                    actionBarGroup="get,info_panel" inZip="false">
+                    actionBarGroup="0_get,info_panel" inZip="false">
                 </context>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -175,8 +175,8 @@
         </action>
 		<action name="ajxp_link">
 			<gui text="369" title="369" iconClass="mdi mdi-link" hasAccessKey="false">
-				<context selection="true" dir="" recycle="false" actionBar="true" actionBarGroup="remote"
-                         contextMenu="false" infoPanel="true"/>
+				<context selection="true" dir="" recycle="false" actionBar="true" actionBarGroup="other"
+                         contextMenu="true" infoPanel="true"/>
 				<selectionContext dir="true" file="true" recycle="false" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
@@ -234,7 +234,7 @@
 		<action name="restore">
 			<gui text="222" title="223" iconClass="mdi mdi-file-restore" accessKey="restore_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="only"
-					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change_main">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
@@ -249,8 +249,8 @@
 		<action name="rename">
 			<gui text="6" title="158" accessKey="rename_access_key" iconClass="mdi mdi-rename-box" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="change_main" inZip="false">
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change,change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
@@ -288,8 +288,8 @@
 		<action name="move" dragndropDefault="true">
 			<gui text="70" title="160" iconClass="mdi mdi-folder-move" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="change_main" inZip="false">
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change,change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
@@ -305,8 +305,8 @@
 		<action name="delete">
 			<gui text="7" title="161" iconClass="mdi mdi-delete" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="change_main,minisite" inZip="false">
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change,change_main,minisite" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/>
             </gui>
@@ -319,9 +319,9 @@
 				</processing>
 		</action>
         <action name="chmod">
-            <gui text="287" title="287" iconClass="mdi mdi-view-module" accessKey="" hasAccessKey="false">
+            <gui text="287" title="287" iconClass="mdi mdi-view-module" accessKey="" hasAccessKey="false" order="1000">
                 <context selection="true" dir="true" recycle="hidden"  behaviour="hidden"
-                    actionBar="true" contextMenu="false" infoPanel="true"
+                    actionBar="true" contextMenu="true" infoPanel="true"
                     actionBarGroup="change" inZip="false">
                 </context>
                 <selectionContext dir="true" file="true" recycle="false" unique="false" allowedMimes="" behaviour="hidden"/>

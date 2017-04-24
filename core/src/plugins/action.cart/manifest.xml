@@ -47,7 +47,7 @@
             </action>
             <action name="send-selection-to-cart">
                 <gui src="" text="action.cart.1" title="action.cart.2" iconClass="mdi mdi-cart-plus">
-                    <context dir="true" recycle="true" selection="true" actionBar="true" contextMenu="true" actionBarGroup="more"/>
+                    <context dir="true" recycle="true" selection="true" actionBar="true" contextMenu="true" actionBarGroup="other"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="false"  evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>

@@ -19,7 +19,7 @@
             <action name="sl_lock">
                 <gui src="meta_simple_lock/ICON_SIZE/lock.png" iconClass="icon-lock" text="meta.simple_lock.1" title="meta.simple_lock.2">
                     <context dir="false" recycle="false" selection="true" contextMenu="true" actionBar="true"
-                             actionBarGroup="more" />
+                             actionBarGroup="change" />
                     <selectionContext dir="false" file="true" recycle="false" unique="true"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>

@@ -33,7 +33,7 @@
 				<gui text="httpdownloader.9" title="httpdownloader.9" iconClass="icon-bookmark" src="httpdownloader_images/ICON_SIZE/add_bookmarklet.png" accessKey="httpdownloader.3" hasAccessKey="false">
 					<context selection="false" dir="true" recycle="hidden"
 						actionBar="false" contextMenu="false" infoPanel="false"
-						actionBarGroup="remote" inZip="false">
+						actionBarGroup="other" inZip="false">
 					</context>
 				</gui>
 				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>

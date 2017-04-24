@@ -23,14 +23,6 @@
         </client_configs>
 		<actions>
 			<action name="ls" dirDefault="true">
-				<gui text="32" title="32" accessKey="folder_access_key">
-					<context selection="true" dir="" recycle="false"
-						actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
-					</context>
-					<selectionContext dir="true" file="false" recycle="false"
-						unique="true" allowedMimes="*">
-					</selectionContext>
-				</gui>
 				<rightsContext noUser="true" userLogged="only" read="true"
 					write="false" adminOnly="false">
 				</rightsContext>
