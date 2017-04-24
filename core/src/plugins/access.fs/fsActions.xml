@@ -237,7 +237,7 @@
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback module="FSActions.Callbacks.restore"/>
