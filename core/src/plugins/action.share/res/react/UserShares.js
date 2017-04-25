@@ -193,8 +193,8 @@
         constructor(props){
             super(props);
             let {node, filters, currentUser} = props;
-            ShareNode.CURRENT_USER_CONTEXT = currentUser || false;
             if(!node){
+                ShareNode.CURRENT_USER_CONTEXT = currentUser || false;
                 node = new ShareNode('root', {label:'root', count:0, child_parameters:{}});
             }
             if(!filters){
