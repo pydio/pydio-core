@@ -237,6 +237,16 @@ class ConfAccessDriver extends AbstractAccessDriver
                         "icon_class" => "mdi mdi-google-circles-group",
                         "component"  => "AdminPlugins.PluginsManager"
                     )
+                ),
+                "jsdocs"  	   => array(
+                    "ALIAS" => "/config/all",
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "Developer Docs",
+                    "DESCRIPTION" => "Javascript Technical documentation",
+                    "METADATA" => array(
+                        "icon_class" => "mdi mdi-nodejs",
+                        "component"  => "AdminPlugins.JSDocsDashboard"
+                    )
                 )
             )
         )

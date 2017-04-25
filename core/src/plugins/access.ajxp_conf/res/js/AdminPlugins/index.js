@@ -8,6 +8,7 @@ import EditorsDashboard from './editors/EditorsDashboard'
 import UpdaterDashboard from './updater/UpdaterDashboard'
 import CacheServerDashboard from './cache/CacheServerDashboard'
 import DiagnosticDashboard from './diagnostic/DiagnosticDashboard'
+import JSDocsDashboard from './docs/JSDocsDashboard'
 
 window.AdminPlugins = {
 
@@ -20,7 +21,7 @@ window.AdminPlugins = {
     EditorsDashboard                : EditorsDashboard,
     UpdaterDashboard                : UpdaterDashboard,
     CacheServerDashboard            : CacheServerDashboard,
-    DiagnosticDashboard             : DiagnosticDashboard
-
+    DiagnosticDashboard             : DiagnosticDashboard,
+    JSDocsDashboard                 : JSDocsDashboard
 
 };
