@@ -155,8 +155,8 @@ class CommentsMetaManager extends AbstractMetaSource
                     "content"   => $content
                 );
                 $existingFeed[] = $com;
-                if ($feedStore!== false) {
-                    $feedStore->persistMetaObject(
+                if ($feedStore !== false) {
+                    $com['uuid'] = $feedStore->persistMetaObject(
                         $uniqNode->getPath(),
                         base64_encode($content),
                         $uniqNode->getRepositoryId(),
@@ -164,6 +164,7 @@ class CommentsMetaManager extends AbstractMetaSource
                         $uniqNode->getRepository()->getOwner(),
                         $ctx->getUser()->getId(),
                         $ctx->getUser()->getGroupPath());
+
                 } else {
                     $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
                     $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);

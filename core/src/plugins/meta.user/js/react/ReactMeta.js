@@ -349,21 +349,11 @@
         },
 
         renderChip: function(tag) {
+            const chipStyle = {margin:2, backgroundColor:'#F5F5F5'};
             if (this.props.editMode) {
-                return (
-                    <MaterialUI.Chip
-                        key={tag}
-                        style={{margin: 2}}
-                        onRequestDelete={this.handleRequestDelete.bind(this, tag)}
-                    >{tag}</MaterialUI.Chip>
-                );
+                return ( <MaterialUI.Chip key={tag} style={chipStyle} onRequestDelete={this.handleRequestDelete.bind(this, tag)}>{tag}</MaterialUI.Chip> );
             } else {
-                return (
-                    <MaterialUI.Chip
-                        key={tag}
-                        style={{margin: 2}}
-                    >{tag}</MaterialUI.Chip>
-                );
+                return ( <MaterialUI.Chip key={tag} style={chipStyle}>{tag}</MaterialUI.Chip> );
             }
         },
 

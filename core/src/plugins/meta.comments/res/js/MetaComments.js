@@ -23,7 +23,7 @@
                 >{comment.rpath}</a></div>);
             }
             let deleteButton;
-            if(comment.author === pydio.user.id){
+            if(pydio.user && (comment.author === pydio.user.id)){
                 const remove = () => {this.props.removeComment(c)};
                 deleteButton = <div className="delete-comment mdi mdi-close" onTouchTap={remove}/>;
             }
@@ -31,8 +31,8 @@
                 <div key={comment.uuid} className="comment">
                     <div className="date">{comment.hdate}</div>
                     <div className="comment-line">
-                        <PydioComponents.UserAvatar avatarSize={30} pydio={this.props.pydio} userId={comment.author} displayLabel={false}/>
-                        <MaterialUI.Paper zDepth={1} className="content">
+                        <div style={{paddingTop:2}}><PydioComponents.UserAvatar avatarSize={30} pydio={this.props.pydio} userId={comment.author} displayLabel={false}/></div>
+                        <MaterialUI.Paper zDepth={0} style={{backgroundColor: '#F5F5F5'}} className="content">
                             {deleteButton}
                             {contents}
                             {link}
@@ -81,9 +81,15 @@
             }
             if(metaEvent === 'newcomment' && crtPath === currentNode.getPath()){
                 const data = JSON.parse(message.firstChild.nodeValue);
-                let comments = this.state.comments;
-                comments.push(data);
-                this.setState({comments: comments});
+                let comments = this.state.comments || [];
+                let found = false;
+                comments.forEach((el)=> {
+                    if(el.uuid = data.uuid) found = true;
+                });
+                if(!found){
+                    comments.push(data);
+                    this.setState({comments: comments});
+                }
             }else{
                 this.loadComments(currentNode);
             }
@@ -143,12 +149,15 @@
                 get_action: "post_comment",
                 file: this.props.node.getPath(),
                 content: value
-            }, () => {
+            }, (transp) => {
                 let hist = this.state.history;
                 hist.unshift(value);
                 this.setState({value: '', history: hist, historyCursor:-1});
                 if(!this._mqObs){
                     this.loadComments(this.props.node);
+                }else{
+                    const comments = [...this.state.comments, transp.responseJSON];
+                    this.setState({comments});
                 }
             });
         },

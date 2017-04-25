@@ -357,7 +357,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
      * @param string $repositoryOwner
      * @param string $userId
      * @param string $userGroup
-     * @return void
+     * @return int last insert ID
      */
     public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
     {
@@ -367,6 +367,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
         try {
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[index_path],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "meta", "comment", $indexPath, $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+            return dibi::getInsertId();
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist meta", $e->getMessage());
         }
@@ -393,13 +394,23 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         if($recurring){
             $res = dibi::query("SELECT * FROM [ajxp_feed]
                 WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )                
                 ORDER BY %by %lmt %ofs
-            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+            ", "meta", $repositoryId, $indexPath, $userId, $userGroup, array('edate' => $orderDir), $limit, $offset);
         }else{
             $res = dibi::query("SELECT * FROM [ajxp_feed]
                 WHERE [etype] = %s AND [repository_id] = %s AND [index_path] = %s
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )                
                 ORDER BY %by %lmt %ofs
-            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+            ", "meta", $repositoryId, $indexPath, $userId, $userGroup, array('edate' => $orderDir), $limit, $offset);
         }
 
         $data = array();
