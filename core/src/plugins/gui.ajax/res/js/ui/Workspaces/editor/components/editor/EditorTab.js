@@ -15,11 +15,11 @@
 import { Toolbar, ToolbarGroup, Card, CardHeader, CardMedia } from 'material-ui';
 
 import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { compose, bindActionCreators } from 'redux';
 import * as actions from '../../actions';
 
 import makeMaximise from './make-maximise';
-const {ResolutionControls, SizeControls, SelectionControls, withMenu} = PydioHOCs;
+const {ResolutionControls, ContentActions, ContentControls, SizeControls, SelectionControls, withMenu} = PydioHOCs;
 
 class Tab extends React.Component {
     static get styles() {
@@ -38,15 +38,23 @@ class Tab extends React.Component {
     }
 
     render() {
-        const {id, node, editorData, size, resolution, selection, playing, isActive, style, editorSetActiveTab, ...remainingProps} = this.props
+        const {id, node, dispatch, editorData, size, resolution, selection, playing, isActive, style, editorSetActiveTab, tabModify, ...remainingProps} = this.props
 
         const select = () => editorSetActiveTab(id)
+        const editorSetState = (data) => tabModify({id, ...data})
+
+        let actions = {
+            ...ContentActions,
+            ...FuncUtils.getFunctionByName(editorData.editorActions, window)
+        }
+
+        let boundActionCreators = bindActionCreators(actions)
 
         return !isActive ? (
             <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={isActive} expanded={isActive} onExpandChange={!isActive ? select : null}>
                 <CardHeader title={id} actAsExpander={true} showExpandableButton={true} />
                 <CardMedia style={Tab.styles.child} mediaStyle={Tab.styles.child}>
-                    <this.props.child {...remainingProps} style={Tab.styles.child} showControls={false} icon={false} />
+                    <this.props.child {...this.props} style={Tab.styles.child} icon={false} {...boundActionCreators} />
                 </CardMedia>
             </AnimatedCard>
         ) : (
@@ -55,9 +63,18 @@ class Tab extends React.Component {
                     {selection && <SelectionControls editorData={editorData} node={node} firstChild={true} selection={selection} playing={playing} />}
                     {resolution && <ResolutionControls editorData={editorData} node={node} />}
                     {size && <SizeControls editorData={editorData} node={node} />}
+
+                    <ToolbarGroup>
+                        <ContentControls.Save editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.Undo editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.Redo editorData={editorData} node={node} {...boundActionCreators} />
+
+                        <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />
+                    </ToolbarGroup>
                 </Toolbar>
 
-                <this.props.child node={node} editorData={editorData} {...remainingProps} style={Tab.styles.child} showControls={true} icon={false} />
+                <this.props.child {...this.props} style={Tab.styles.child} {...boundActionCreators} />
             </AnimatedCard>
         )
     }

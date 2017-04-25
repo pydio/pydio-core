@@ -158,6 +158,7 @@ export default class Registry{
                 title               : this._pydioObject.MessageHash[xmlNode.getAttribute("title")],
                 icon                : xmlNode.getAttribute("icon"),
                 icon_class          : xmlNode.getAttribute("iconClass"),
+                editorActions       : xmlNode.getAttribute("actions"),
                 editorClass         : xmlNode.getAttribute("className"),
                 mimes               : xmlNode.getAttribute("mimes").split(","),
                 write               : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false),

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.ckeditor" enabled="false" openable="true"  iconClass="icon-underline"
         order="-1" text="319" title="320" icon="ckeditor_images/html_edit.png"
-        className="PydioCKEditor" mimes="html,htm" formId="edit_box" write="true" canWrite="true"
+        actions="PydioCKEditor.Actions" className="PydioCKEditor.Editor" mimes="html,htm" formId="edit_box" write="true" canWrite="true"
         label="CONF_MESSAGE[CKEditor]" description="CONF_MESSAGE[Wysiwyg HTML Editor, requires separate library to be downloaded.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>

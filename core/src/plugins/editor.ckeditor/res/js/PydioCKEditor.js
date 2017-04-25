@@ -207,6 +207,11 @@ let CompositeEditor = compose(withControls(PydioCKEditor.controls), withMenu, wi
 CKEDITOR.basePath = PydioCKEditor.config.basePath
 CKEDITOR.contentsCss = PydioCKEditor.config.basePath + '../../res/css/ckeditor.css'
 // We need to attach the element to window else it won't be found
-window.PydioCKEditor = PydioCKEditor
+window.PydioCKEditor = {
+    Editor: PydioCKEditor,
+    Actions: {
+        onUndo: () => console.log("Whatever dude")
+    }
+}
 
 export default PydioCKEditor
