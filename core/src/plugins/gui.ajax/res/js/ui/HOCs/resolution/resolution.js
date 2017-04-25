@@ -19,15 +19,9 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-
-import {ToolbarGroup, IconButton} from 'material-ui';
-
 import { connect } from 'react-redux';
-import * as Actions from '../Workspaces/editor/actions';
-import {getDisplayName} from './utils';
-
-import {URLProvider} from './urls';
+import {getDisplayName} from '../utils';
+import {Actions, mapStateToProps, ResolutionURLProvider} from './';
 
 const withResolution = (sizes, highResolution, lowResolution) => {
     return (Component) => {
@@ -39,14 +33,6 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             static get propTypes() {
                 return {
                     node: React.PropTypes.instanceOf(AjxpNode).isRequired
-                }
-            }
-
-            constructor(props) {
-                super(props)
-
-                this.state = {
-                    original: true
                 }
             }
 
@@ -71,21 +57,12 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                 return highResolution(node)
             }
 
-            renderControls() {
-                const {original} = this.state
-
-                return [
-                    <IconButton onClick={() => this.setState({original: !original})} iconClassName={`mdi mdi-crop-${original ? "square" : "free"}`} />
-                ]
-            }
-
             render() {
-                const {original} = this.state
-                const {controls, ...remainingProps} = this.props
+                const {resolution = "hi", ...remainingProps} = this.props
 
                 return (
                     <ResolutionURLProvider
-                        urlType={original ? "hi" : "lo"}
+                        urlType={resolution}
                         onHi={() => this.onHi()}
                         onLo={() => this.onLo()}
                     >
@@ -101,12 +78,8 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
         }
 
-        const mapStateToProps = (state, props) => state.tabs.filter(tab => props.node && tab.id === props.node.getLabel())[0]
-
-        return connect(mapStateToProps)(WithResolution)
+        return connect(mapStateToProps, Actions)(WithResolution)
     }
 }
 
-const ResolutionURLProvider = URLProvider(["hi", "lo"])
-
-export {withResolution}
+export {withResolution as default}

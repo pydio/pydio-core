@@ -20,20 +20,16 @@
 
 import {ToolbarGroup, IconButton} from 'material-ui';
 import { connect } from 'react-redux';
-
 import {Actions, mapStateToProps} from './';
 
-const Controls = ({id, node, selection, playing, tabModify, ...remainingProps}) => {
+const Controls = ({id, resolution = "hi", tabModify = () => {}, ...remainingProps}) => {
+    const toggleResolution = () => tabModify({id, resolution: resolution === "hi" ? "lo" : "hi"})
 
-    const handleNodeChange = (newNode) => tabModify({id, title: newNode.getLabel(), node: newNode})
-
-    const togglePlaying = () => tabModify({id, playing: !playing})
-
-    return <ToolbarGroup {...remainingProps}>
-        <IconButton onClick={() => handleNodeChange(selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={!selection.hasPrevious()} />
-        <IconButton onClick={() => togglePlaying()} iconClassName={`mdi mdi-${playing ? "pause" : "play"}`} disabled={!selection.hasPrevious() && !selection.hasNext()} />
-        <IconButton onClick={() => handleNodeChange(selection.next())} iconClassName="mdi mdi-arrow-right" disabled={!selection.hasNext()} />
-    </ToolbarGroup>
+    return (
+        <ToolbarGroup {...remainingProps}>
+            <IconButton onClick={() => toggleResolution()} iconClassName={`mdi mdi-crop-${resolution === "hi" ? "square" : "free"}`} />
+        </ToolbarGroup>
+    )
 }
 
 export default connect(mapStateToProps, Actions)(Controls);
