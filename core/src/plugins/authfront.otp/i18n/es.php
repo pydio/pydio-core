@@ -8,4 +8,6 @@ $mess = [
     "6" => "Tu clave google ya está configurada. Por favor contacta con tu administrado para restaurarla.",
     "7" => "No se puede validar el código, ¿configuraste correctametne tu aplicación Google Authenticator?",
     "8" => "Algo salió mal, tu clave no debe estar vacía.",
+    "9" => "La contraseña de un sólo uso está activa, añada el código al final de su contraseña.",
+    "10"=> "Código Desechable (6 dígitos)",
 ];

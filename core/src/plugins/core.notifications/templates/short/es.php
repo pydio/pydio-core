@@ -20,10 +20,10 @@
 */
 //      spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2016
 $mess=array(
-"file.add" => "Fichero AJXP_NODE_LABEL creado en AJXP_PARENT_PATH",
-"file.delete" => "Fichero AJXP_NODE_LABEL eliminado de AJXP_PARENT_PATH",
-"file.change" => "Fichero AJXP_NODE_LABEL modificado por AJXP_USER",
-"file.view" => "Fichero AJXP_NODE_LABEL consultado por AJXP_USER",
+"file.add" => "Archivo AJXP_NODE_LABEL creado en AJXP_PARENT_PATH",
+"file.delete" => "Archivo AJXP_NODE_LABEL eliminado de AJXP_PARENT_PATH",
+"file.change" => "Archivo AJXP_NODE_LABEL modificado por AJXP_USER",
+"file.view" => "Archivo AJXP_NODE_LABEL consultado por AJXP_USER",
 "file.copy_to" => "AJXP_NODE_LABEL copiado a AJXP_TARGET_FOLDER",
 "file.copy_from" => "AJXP_NODE_LABEL copiado desde AJXP_SOURCE_FOLDER",
 "file.move_to" => "AJXP_NODE_LABEL movido a AJXP_TARGET_FOLDER",

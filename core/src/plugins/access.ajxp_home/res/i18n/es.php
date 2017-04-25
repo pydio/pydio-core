@@ -133,7 +133,7 @@ $mess=array(
             Este video muestra como usar la aplicación APPLICATION_TITLE (disponible en el App Store). El proceso es bastante similar en Android.
 			<ul>
 				<li>Configurar la conexión del servidor</li>
-				<li>Navegar a través de los ficheros</li>
+				<li>Navegar a través de los archivos</li>
 				<li>Mantener los archivos fuera de línea y la interacción con aplicaciones externas</li>
 				<li>Protegiendo la aplicación mediante un código PIN</li>
 				<li>Usando marcadores y el motor de búsqueda</li></ul>",
@@ -154,5 +154,5 @@ $mess=array(
     "88" => "Suelta un archivo aquí desde tu escritorio",
     "89" => "Seleccionado archivo para subir",
     "90" => "Seleccionar workspace de destino",
-    "91" => "Mantenga sus archivos offline con Desktop Sync Client",
+    "91" => "Archivos offline con Desktop Sync Client",
 );

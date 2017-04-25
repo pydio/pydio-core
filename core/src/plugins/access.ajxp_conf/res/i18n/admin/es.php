@@ -183,8 +183,8 @@ $mess=array(
     "user.27" => "Rol Personal del Usuario",
 
 
-    "react.1" => "directorio padre",
-    "react.2" => "acciones en masa",
+    "react.1" => "directorio anterior",
+    "react.2" => "acciones en bloque",
     "react.3" => "Buscar resultado para '%s'",
     "react.4" => "Cerrar Resultados",
     "react.5a" => "leer",
