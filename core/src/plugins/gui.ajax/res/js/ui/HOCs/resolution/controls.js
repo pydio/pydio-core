@@ -20,7 +20,7 @@
 
 import {ToolbarGroup, IconButton} from 'material-ui';
 import { connect } from 'react-redux';
-import {Actions, mapStateToProps} from './';
+import { mapStateToProps, Actions } from './utils';
 
 const Controls = ({id, resolution = "hi", tabModify = () => {}, ...remainingProps}) => {
     const toggleResolution = () => tabModify({id, resolution: resolution === "hi" ? "lo" : "hi"})

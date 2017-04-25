@@ -18,14 +18,9 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-
 import {ToolbarGroup, ToolbarTitle, DropDownMenu, MenuItem, IconButton, Slider} from 'material-ui';
 import ActionAspectRatio from 'material-ui/svg-icons/action/aspect-ratio'
-
-import * as Actions from '../../Workspaces/editor/actions';
-
+import { mapStateToProps, Actions } from './utils';
 import { connect } from 'react-redux';
 import { getDisplayName } from '../utils';
 
@@ -65,7 +60,5 @@ const Controls = ({id, size = "contain", scale = 1, tabModify, ...remainingProps
         </ToolbarGroup>
     )
 }
-
-const mapStateToProps = (state, props) => state.tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getParent() === props.node.getParent())[0]
 
 export default connect(mapStateToProps, Actions)(Controls);

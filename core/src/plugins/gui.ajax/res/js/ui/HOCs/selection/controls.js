@@ -18,22 +18,23 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import {ToolbarGroup, IconButton} from 'material-ui';
+import { ToolbarGroup, IconButton } from 'material-ui';
 import { connect } from 'react-redux';
+import { mapStateToProps, Actions } from './utils';
 
-import {Actions, mapStateToProps} from './';
+const Controls = ({id, selection, playing = false, tabModify, ...remainingProps}) => {
 
-const Controls = ({id, node, selection, playing, tabModify, ...remainingProps}) => {
-
-    const handleNodeChange = (newNode) => tabModify({id, title: newNode.getLabel(), node: newNode})
+    const handleNodeChange = (node) => tabModify({id, title: node.getLabel(), node})
 
     const togglePlaying = () => tabModify({id, playing: !playing})
 
-    return <ToolbarGroup {...remainingProps}>
-        <IconButton onClick={() => handleNodeChange(selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={!selection.hasPrevious()} />
-        <IconButton onClick={() => togglePlaying()} iconClassName={`mdi mdi-${playing ? "pause" : "play"}`} disabled={!selection.hasPrevious() && !selection.hasNext()} />
-        <IconButton onClick={() => handleNodeChange(selection.next())} iconClassName="mdi mdi-arrow-right" disabled={!selection.hasNext()} />
-    </ToolbarGroup>
+    return (
+        <ToolbarGroup {...remainingProps}>
+            <IconButton onClick={() => handleNodeChange(selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={!selection.hasPrevious()} />
+            <IconButton onClick={() => togglePlaying()} iconClassName={`mdi mdi-${playing ? "pause" : "play"}`} disabled={!selection.hasPrevious() && !selection.hasNext()} />
+            <IconButton onClick={() => handleNodeChange(selection.next())} iconClassName="mdi mdi-arrow-right" disabled={!selection.hasNext()} />
+        </ToolbarGroup>
+    )
 }
 
 export default connect(mapStateToProps, Actions)(Controls);

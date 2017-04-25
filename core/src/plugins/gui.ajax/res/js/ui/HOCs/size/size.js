@@ -19,16 +19,10 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-
-import {ToolbarGroup, ToolbarTitle, DropDownMenu, MenuItem, IconButton, Slider} from 'material-ui';
-import ActionAspectRatio from 'material-ui/svg-icons/action/aspect-ratio'
-
 import { connect } from 'react-redux';
-import * as Actions from '../../Workspaces/editor/actions';
-import {getRatio, getDisplayName, getBoundingRect} from '../utils';
-
-import {ImageSizeProvider, ContainerSizeProvider} from './providers';
+import { mapStateToProps, Actions } from './utils';
+import { ImageSizeProvider, ContainerSizeProvider } from './providers';
+import { getRatio, getDisplayName, getBoundingRect } from '../utils';
 
 const withResize = (Component) => {
     class WithResize extends React.Component {
@@ -74,11 +68,6 @@ const withResize = (Component) => {
             )
         }
     }
-
-    const mapStateToProps = (state, props) => ({
-        ...state.tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getPath() === props.node.getPath())[0],
-        ...props
-    })
 
     return connect(mapStateToProps, Actions)(WithResize)
 }

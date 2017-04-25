@@ -19,15 +19,10 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {ToolbarGroup, IconButton} from 'material-ui';
-
-import SelectionModel from './model'
-
-import * as Actions from '../../Workspaces/editor/actions';
-
 import { connect } from 'react-redux';
-import {getDisplayName} from '../utils';
+import { SelectionModel } from './';
+import { getDisplayName } from '../utils';
+import { mapStateToProps, Actions } from './utils';
 
 const withSelection = (filter) => {
     return (Component) => {
@@ -58,17 +53,13 @@ const withSelection = (filter) => {
                 return (
                     <Component
                         {...remainingProps}
-
                         node={node}
-
                         selectionPlaying={playing}
                         onRequestSelectionPlay={() => tabModify({id, node: selection.nextOrFirst(), title: selection.currentNode.getLabel()})}
                     />
                 )
             }
         }
-
-        const mapStateToProps = (state, props) => state.tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getParent() === props.node.getParent())[0]
 
         return connect(mapStateToProps, Actions)(WithSelection)
     }

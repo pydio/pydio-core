@@ -19,14 +19,7 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-
-import {ToolbarGroup, ToolbarTitle, DropDownMenu, MenuItem, IconButton, Slider} from 'material-ui';
-import ActionAspectRatio from 'material-ui/svg-icons/action/aspect-ratio'
-
-import { connect } from 'react-redux';
-import * as Actions from '../../Workspaces/editor/actions';
-import {getRatio, getDisplayName, getBoundingRect} from '../utils';
+import { getBoundingRect } from '../utils';
 
 export class ContainerSizeProvider extends React.Component {
     constructor(props) {
