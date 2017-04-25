@@ -18,28 +18,30 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {ToolbarGroup, IconButton} from 'material-ui';
+ import React from 'react';
+ import ReactDOM from 'react-dom';
+
+ import {ToolbarGroup, ToolbarTitle, DropDownMenu, MenuItem, IconButton, Slider} from 'material-ui';
+ import ActionAspectRatio from 'material-ui/svg-icons/action/aspect-ratio'
 
 import * as Actions from '../../Workspaces/editor/actions';
 
 import { connect } from 'react-redux';
 import { getDisplayName } from '../utils';
 
-const SelectionControls = ({id, node, selection, playing, tabModify, ...remainingProps}) => {
+const Controls = ({id, size, scale, tabModify, ...remainingProps}) => {
 
-    const handleNodeChange = (newNode) => tabModify({id, title: newNode.getLabel(), node: newNode})
-
-    const togglePlaying = () => tabModify({id, playing: !playing})
+    const handleChange = (data) => tabModify({id, ...data})
 
     return <ToolbarGroup {...remainingProps}>
-        <IconButton onClick={() => handleNodeChange(selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={!selection.hasPrevious()} />
-        <IconButton onClick={() => togglePlaying()} iconClassName={`mdi mdi-${playing ? "pause" : "play"}`} disabled={!selection.hasPrevious() && !selection.hasNext()} />
-        <IconButton onClick={() => handleNodeChange(selection.next())} iconClassName="mdi mdi-arrow-right" disabled={!selection.hasNext()} />
+        <IconButton tooltip="Aspect Ratio" onClick={() => handleChange({size: "contain"})}><ActionAspectRatio /></IconButton>,
+        <DropDownMenu>
+            <MenuItem primaryText={`${parseInt(scale * 100)}%`} />
+            <Slider axis="y" style={{width: "100%", height: 150, display: "flex", justifyContent: "center"}} sliderStyle={{margin: 0}} value={scale} min={0.25} max={4} defaultValue={1} onChange={(_, scale) => handleChange({size: "auto", scale})} />
+        </DropDownMenu>
     </ToolbarGroup>
 }
 
 const mapStateToProps = (state, props) => state.tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getParent() === props.node.getParent())[0]
 
-export default connect(mapStateToProps, Actions)(SelectionControls);
+export default connect(mapStateToProps, Actions)(Controls);

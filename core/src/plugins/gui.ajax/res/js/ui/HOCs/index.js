@@ -3,7 +3,7 @@ import {withMenu, withControls} from './controls'
 import withErrors from './errors'
 import withLoader from './loader'
 import {SelectionControls, withSelection} from './selection/index'
-import {ContainerSizeProvider, ImageSizeProvider, withResize} from './size'
+import {SizeControls, SizeProviders, withResize} from './size/index'
 import {withResolution} from './resolution'
 import {URLProvider} from './urls'
 import PaletteModifier from './PaletteModifier'
@@ -22,8 +22,7 @@ const PydioHOCs = {
     Animations,
     PaletteModifier,
     URLProvider,
-    ContainerSizeProvider,
-    ImageSizeProvider
+    SizeProviders
 };
 
 export {PydioHOCs as default}

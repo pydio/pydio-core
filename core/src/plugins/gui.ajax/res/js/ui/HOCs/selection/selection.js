@@ -62,7 +62,7 @@ const withSelection = (filter) => {
                         node={node}
 
                         selectionPlaying={playing}
-                        onRequestSelectionPlay={() => tabModify({id, node: selection.nextOrFirst()})}
+                        onRequestSelectionPlay={() => tabModify({id, node: selection.nextOrFirst(), title: selection.currentNode.getLabel()})}
                     />
                 )
             }

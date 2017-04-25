@@ -19,7 +19,7 @@ import { compose } from 'redux';
 import * as actions from '../../actions';
 
 import makeMaximise from './make-maximise';
-const {SelectionControls, withMenu} = PydioHOCs;
+const {SizeControls, SelectionControls, withMenu} = PydioHOCs;
 
 class Tab extends React.Component {
     static get styles() {
@@ -38,7 +38,7 @@ class Tab extends React.Component {
     }
 
     render() {
-        const {id, node, editorData, selection, playing, isActive, style, editorSetActiveTab, ...remainingProps} = this.props
+        const {id, node, editorData, size, selection, playing, isActive, style, editorSetActiveTab, ...remainingProps} = this.props
 
         const select = () => editorSetActiveTab(id)
 
@@ -53,6 +53,7 @@ class Tab extends React.Component {
             <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={true} expanded={isActive} onExpandChange={!isActive ? select : null}>
                 <Toolbar style={{flexShrink: 0}}>
                     {selection && <SelectionControls editorData={editorData} node={node} firstChild={true} selection={selection} playing={playing} />}
+                    <SizeControls editorData={editorData} node={node} />
                 </Toolbar>
 
                 <this.props.child node={node} editorData={editorData} {...remainingProps} style={Tab.styles.child} showControls={true} icon={false} />
