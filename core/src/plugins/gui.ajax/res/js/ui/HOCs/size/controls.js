@@ -18,28 +18,52 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
- import React from 'react';
- import ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
- import {ToolbarGroup, ToolbarTitle, DropDownMenu, MenuItem, IconButton, Slider} from 'material-ui';
- import ActionAspectRatio from 'material-ui/svg-icons/action/aspect-ratio'
+import {ToolbarGroup, ToolbarTitle, DropDownMenu, MenuItem, IconButton, Slider} from 'material-ui';
+import ActionAspectRatio from 'material-ui/svg-icons/action/aspect-ratio'
 
 import * as Actions from '../../Workspaces/editor/actions';
 
 import { connect } from 'react-redux';
 import { getDisplayName } from '../utils';
 
-const Controls = ({id, size, scale, tabModify, ...remainingProps}) => {
+const Controls = ({id, size = "contain", scale = 1, tabModify, ...remainingProps}) => {
+    const styles = {
+        sliderContainer: {
+            width: "100%",
+            height: 150,
+            display: "flex",
+            justifyContent: "center"
+        },
+        slider: {
+            margin: 0
+        }
+    }
 
     const handleChange = (data) => tabModify({id, ...data})
 
-    return <ToolbarGroup {...remainingProps}>
-        <IconButton tooltip="Aspect Ratio" onClick={() => handleChange({size: "contain"})}><ActionAspectRatio /></IconButton>,
-        <DropDownMenu>
-            <MenuItem primaryText={`${parseInt(scale * 100)}%`} />
-            <Slider axis="y" style={{width: "100%", height: 150, display: "flex", justifyContent: "center"}} sliderStyle={{margin: 0}} value={scale} min={0.25} max={4} defaultValue={1} onChange={(_, scale) => handleChange({size: "auto", scale})} />
-        </DropDownMenu>
-    </ToolbarGroup>
+    return (
+        <ToolbarGroup {...remainingProps}>
+            <IconButton
+                tooltip="Aspect Ratio"
+                onClick={() => handleChange({size: "contain"})}>
+                <ActionAspectRatio />
+            </IconButton>
+            <DropDownMenu>
+                <MenuItem primaryText={`${parseInt(scale * 100)}%`} />
+                <Slider
+                    axis="y"
+                    style={styles.sliderContainer}
+                    sliderStyle={styles.slider}
+                    value={scale}
+                    min={0.25}
+                    max={4}
+                    onChange={(_, scale) => handleChange({size: "auto", scale})} />
+            </DropDownMenu>
+        </ToolbarGroup>
+    )
 }
 
 const mapStateToProps = (state, props) => state.tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getParent() === props.node.getParent())[0]

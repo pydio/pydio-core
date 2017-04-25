@@ -26,7 +26,8 @@ const baseURL = pydio.Parameters.get('ajxpServerAccess')
 const conf = pydio.getPluginConfigs('editor.diaporama')
 const sizes = conf && conf.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700, 1000, 1300]
 
-const {ContainerSizeProvider, ImageSizeProvider, withResolution, withSelection, withResize, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+const {SizeProviders, withResolution, withSelection, withResize, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+const {ImageSizeProvider, ContainerSizeProvider} = SizeProviders
 
 class Image extends Component {
     static get propTypes() {
@@ -49,10 +50,6 @@ class Image extends Component {
     }
 }
 
-const ExtendedImage = compose(
-    withResize
-)(Image)
-
 class ImagePanel extends Component {
     static get propTypes() {
         return {
@@ -70,42 +67,31 @@ class ImagePanel extends Component {
         return {
             display: "flex",
             flex: 1,
-            alignItems: 'center',
             justifyContent: 'center',
             overflow: 'auto'
         }
     }
 
     render() {
-        const {node, src, imgClassName, scale} = this.props
+        const {src, width, height, imgClassName, scale} = this.props
 
         return (
-            <ContainerSizeProvider>
-            {({containerWidth, containerHeight}) =>
-                <ImageSizeProvider
-                    url={src}
-                    node={node}
-                >
-                {({imgWidth, imgHeight}) =>
-                    <div style={ImagePanel.styles}>
-                        <ExtendedImage
-                            node={node}
-                            src={src}
-                            className={imgClassName}
-                            width={imgWidth}
-                            height={imgHeight}
-                            scale={scale}
-                            containerWidth={containerWidth}
-                            containerHeight={containerHeight}
-                        />
-                    </div>
-                }
-                </ImageSizeProvider>
-            }
-            </ContainerSizeProvider>
+            <div style={ImagePanel.styles}>
+                <Image
+                    src={src}
+                    width={width}
+                    height={height}
+                    className={imgClassName}
+                    scale={scale}
+                />
+            </div>
         )
     }
 }
+
+const ExtendedImagePanel = compose(
+    withResize
+)(ImagePanel)
 
 class Editor extends Component {
 
@@ -156,16 +142,33 @@ class Editor extends Component {
     }
 
     render() {
-        const {node, src, ...remainingProps} = this.props;
+        const {node, src, editorData, scale, ...remainingProps} = this.props;
         const {playing} = this.state || {};
 
         if (!node) return null
 
         return (
-            <ImagePanel
-                node={node}
-                src={src}
-            />
+            <ContainerSizeProvider>
+            {({containerWidth, containerHeight}) =>
+                <ImageSizeProvider
+                    url={src}
+                    node={node}
+                >
+                {({imgWidth, imgHeight}) =>
+                    <ExtendedImagePanel
+                        editorData={editorData}
+                        node={node}
+                        src={src}
+                        scale={scale}
+                        width={imgWidth}
+                        height={imgHeight}
+                        containerWidth={containerWidth}
+                        containerHeight={containerHeight}
+                    />
+                }
+                </ImageSizeProvider>
+            }
+            </ContainerSizeProvider>
         )
     }
 }

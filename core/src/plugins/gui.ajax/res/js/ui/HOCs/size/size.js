@@ -28,6 +28,8 @@ import { connect } from 'react-redux';
 import * as Actions from '../../Workspaces/editor/actions';
 import {getRatio, getDisplayName, getBoundingRect} from '../utils';
 
+import {ImageSizeProvider, ContainerSizeProvider} from './providers';
+
 const withResize = (Component) => {
     class WithResize extends React.Component {
         static get displayName() {
@@ -36,6 +38,7 @@ const withResize = (Component) => {
 
         static get propTypes() {
             return {
+                size: React.PropTypes.oneOf(["contain", "cover", "auto"]),
                 containerWidth: React.PropTypes.number.isRequired,
                 containerHeight: React.PropTypes.number.isRequired,
                 width: React.PropTypes.number.isRequired,
@@ -43,44 +46,41 @@ const withResize = (Component) => {
             }
         }
 
-        componentWillReceiveProps(nextProps) {
-            const {scale, containerWidth, width, containerHeight, height} = nextProps
+        static get defaultProps() {
+            return {
+                size: "contain"
+            }
+        }
 
-            this.setState({
+        componentWillReceiveProps(nextProps) {
+            // TODO - change the way the scale is stored
+            const {id, size, scale, tabModify, containerWidth = 1, width = 1, containerHeight = 1, height = 1} = nextProps
+
+            tabModify({id, scale: getRatio[size]({
                 scale,
                 widthRatio: containerWidth / width,
                 heightRatio: containerHeight / height
-            })
-        }
-
-        componentDidMount() {
-            const {id, controls, dispatch} = this.props
-
-            dispatch(Actions.tabAddControls({
-                id: id,
-                size: this.renderControls()
-            }))
+            })})
         }
 
         render() {
-            const {size} = this.props
-            const {...remainingProps} = this.props
-
-            const scale = getRatio[size](this.state)
+            const {scale, ...remainingProps} = this.props
 
             return (
                 <Component
                     {...remainingProps}
-
                     scale={scale}
                 />
             )
         }
     }
 
-    const mapStateToProps = (state, props) => state.tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getParent() === props.node.getParent())[0]
+    const mapStateToProps = (state, props) => ({
+        ...state.tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getPath() === props.node.getPath())[0],
+        ...props
+    })
 
     return connect(mapStateToProps, Actions)(WithResize)
 }
 
-export {withResize}
+export {withResize as default}

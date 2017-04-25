@@ -10,6 +10,7 @@ import PaletteModifier from './PaletteModifier'
 import * as Animations from "./animations";
 
 const PydioHOCs = {
+    SizeControls,
     SelectionControls,
     withControls,
     withContextMenu,
