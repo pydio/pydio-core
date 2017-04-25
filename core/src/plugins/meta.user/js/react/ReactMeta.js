@@ -260,7 +260,13 @@
         },
 
         componentWillReceiveProps: function (nextProps) {
-            if(nextProps.editMode && !this.state.loaded){
+            let {node, value, column} = nextProps;
+            if(node && node !== this.props.node){
+                this.setState({tags: node.getMetadata().get(column.name)});
+            }else if(value){
+                this.setState({tags: value});
+            }
+            if(nextProps.editMode && !this.state.loaded) {
                 this.load();
             }
         },
@@ -356,7 +362,6 @@
                     <MaterialUI.Chip
                         key={tag}
                         style={{margin: 2}}
-                        onTouchTap={this.handleTouchTap}
                     >{tag}</MaterialUI.Chip>
                 );
             }
@@ -378,7 +383,7 @@
             if (this.props.editMode) {
                 autoCompleter = <MaterialUI.AutoComplete
                                     fullWidth={true}
-                                    hintText="Existing or new tag"
+                                    hintText={global.pydio.MessageHash['meta.user.10']}
                                     searchText={this.state.searchText}
                                     onUpdateInput={this.handleUpdateInput}
                                     onNewRequest={this.handleNewRequest}
@@ -562,13 +567,13 @@
                     );
                 }
             }.bind(this));
-
+            const mess = this.props.pydio.MessageHash;
             if(!this.props.editMode && !nonEmptyDataCount){
-                return <div><div style={{color: 'rgba(0,0,0,0.23)', paddingBottom:10}}>No metadata set. Click edit to add some.</div>{data}</div>
+                return <div><div style={{color: 'rgba(0,0,0,0.23)', paddingBottom:10}} onTouchTap={this.props.onRequestEditMode}>{mess['meta.user.11']}</div>{data}</div>
             }else{
                 let legend;
                 if(this.props.multiple){
-                    legend = <div style={{paddingBottom: 16}}>[Multiple Selection] Check the fields that you want to update, value will be applied to all selected files</div>
+                    legend = <div style={{paddingBottom: 16}}><em>{mess['meta.user.12']}</em> {mess['meta.user.13']}</div>
                 }
                 return (<div style={{width: '100%', overflowY: 'scroll'}}>{legend}{data}</div>);
             }
@@ -615,12 +620,13 @@
 
         render: function(){
             let actions = [];
+            const {MessageHash} = this.props.pydio;
 
             if(this.state.editMode){
                 actions.push(
                     <MaterialUI.FlatButton
                         key="cancel"
-                        label={"Cancel"}
+                        label={MessageHash['54']}
                         onClick={()=>{this.reset()}}
                     />
                 );
@@ -628,7 +634,7 @@
             actions.push(
                 <MaterialUI.FlatButton
                     key="edit"
-                    label={this.state.editMode?"Save Meta":"Edit Meta"}
+                    label={this.state.editMode?MessageHash['meta.user.15']:MessageHash['meta.user.14']}
                     onClick={()=>{!this.state.editMode?this.openEditMode():this.saveChanges()}}
                 />
             );
@@ -639,6 +645,8 @@
                         ref="panel"
                         node={this.props.node}
                         editMode={this.state.editMode}
+                        onRequestEditMode={this.openEditMode.bind(this)}
+                        pydio={this.props.pydio}
                     />
                 </PydioWorkspaces.InfoPanelCard>
             );
