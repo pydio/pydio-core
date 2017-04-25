@@ -129,6 +129,7 @@ let AsyncModal = React.createClass({
             }
         } else if(component.getSubmitCallback || component.getCancelCallback || component.getNextCallback) {
             let actions = [];
+            const blur = this.state && this.state.blur;
             if(component.getCancelCallback){
                 actions.push(
                     <FlatButton
@@ -141,7 +142,8 @@ let AsyncModal = React.createClass({
             if(component.getSubmitCallback){
                 actions.push(<FlatButton
                     label={this.props.getMessage('48')}
-                    primary={true}
+                    primary={!blur}
+                    secondary={blur}
                     keyboardFocused={true}
                     onTouchTap={component.getSubmitCallback()}
                 />);
@@ -149,7 +151,8 @@ let AsyncModal = React.createClass({
             if(component.getNextCallback){
                 actions.push(<FlatButton
                     label="Next"
-                    primary={true}
+                    primary={!blur}
+                    secondary={blur}
                     keyboardFocused={true}
                     onTouchTap={component.getNextCallback()}
                 />);
