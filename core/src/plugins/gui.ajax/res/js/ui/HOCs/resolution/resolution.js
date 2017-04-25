@@ -33,8 +33,21 @@ const withResolution = (sizes, highResolution, lowResolution) => {
 
             static get propTypes() {
                 return {
-                    node: React.PropTypes.instanceOf(AjxpNode).isRequired
+                    node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+                    resolution: React.PropTypes.oneOf(["hi", "lo"]).isRequired
                 }
+            }
+
+            static get defaultProps() {
+                return {
+                    resolution: "hi"
+                }
+            }
+
+            componentDidMount() {
+                const {id, resolution, tabModify} = this.props
+
+                tabModify({id, resolution})
             }
 
             onHi() {
@@ -59,7 +72,7 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
 
             render() {
-                const {resolution = "hi", ...remainingProps} = this.props
+                const {resolution, ...remainingProps} = this.props
 
                 return (
                     <ResolutionURLProvider

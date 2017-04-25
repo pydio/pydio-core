@@ -32,7 +32,7 @@ const withResize = (Component) => {
 
         static get propTypes() {
             return {
-                size: React.PropTypes.oneOf(["contain", "cover", "auto"]),
+                size: React.PropTypes.oneOf(["contain", "cover", "auto"]).isRequired,
                 containerWidth: React.PropTypes.number.isRequired,
                 containerHeight: React.PropTypes.number.isRequired,
                 width: React.PropTypes.number.isRequired,
@@ -44,6 +44,12 @@ const withResize = (Component) => {
             return {
                 size: "contain"
             }
+        }
+
+        componentDidMount() {
+            const {id, size, tabModify} = this.props
+
+            tabModify({id, size})
         }
 
         componentWillReceiveProps(nextProps) {

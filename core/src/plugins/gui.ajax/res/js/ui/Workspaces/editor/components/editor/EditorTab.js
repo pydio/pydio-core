@@ -53,8 +53,8 @@ class Tab extends React.Component {
             <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={true} expanded={isActive} onExpandChange={!isActive ? select : null}>
                 <Toolbar style={{flexShrink: 0}}>
                     {selection && <SelectionControls editorData={editorData} node={node} firstChild={true} selection={selection} playing={playing} />}
-                    <ResolutionControls editorData={editorData} node={node} />
-                    <SizeControls editorData={editorData} node={node} />
+                    {resolution && <ResolutionControls editorData={editorData} node={node} />}
+                    {size && <SizeControls editorData={editorData} node={node} />}
                 </Toolbar>
 
                 <this.props.child node={node} editorData={editorData} {...remainingProps} style={Tab.styles.child} showControls={true} icon={false} />
