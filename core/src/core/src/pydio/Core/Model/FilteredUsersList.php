@@ -49,11 +49,17 @@ class FilteredUsersList{
     private $ctx;
 
     /**
+     * @var bool
+     */
+    private $excludeCurrent;
+
+    /**
      * FilteredUsersList constructor.
      * @param ContextInterface $ctx
      */
-    public function __construct(ContextInterface $ctx){
+    public function __construct(ContextInterface $ctx, $excludeCurrent = true){
         $this->ctx = $ctx;
+        $this->excludeCurrent = $excludeCurrent;
     }
 
     /**
@@ -192,9 +198,10 @@ class FilteredUsersList{
 
         $crossUsers = $this->getConf('ALLOW_CROSSUSERS_SHARING');
         $loggedUser = $this->ctx->getUser();
-        $users = array_filter($users, function($userObject) use ($crossUsers, $loggedUser){
+        $excludeCurrent = $this->excludeCurrent;
+        $users = array_filter($users, function($userObject) use ($crossUsers, $loggedUser, $excludeCurrent){
             /** @var UserInterface $userObject */
-            return $userObject->getId() !== $loggedUser->getId()
+            return (!$excludeCurrent || $userObject->getId() !== $loggedUser->getId())
                 && (!$userObject->hasParent() && $crossUsers ) || $userObject->getParent() === $loggedUser->getId();
         });
 

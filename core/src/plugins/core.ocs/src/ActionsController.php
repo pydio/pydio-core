@@ -156,9 +156,10 @@ class ActionsController
         $serverData = $this->configs["TRUSTED_SERVERS"][$trustedServerId];
         $url = $serverData['url'] . '/api/pydio/user_list_authorized_users/' . $searchQuery;
         $params = [
-            'format'=> 'json',
-            'users_only' => 'true',
-            'existing_only' => 'true'
+            'format'            => 'json',
+            'users_only'        => 'true',
+            'existing_only'     => 'true',
+            'exclude_current'   => 'false'
         ];
         $client = new Client();
         $postResponse = $client->post($url, [

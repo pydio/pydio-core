@@ -176,6 +176,7 @@
                     <input_param name="value" type="string" description="Search string: users will be searched starting with this value. Can be empty."/>
                     <input_param name="users_only" type="boolean" description="Whether to return users only or users, groups and roles"/>
                     <input_param name="existing_only" type="boolean" description="If false and value is a non-existing user, will return a Create User ... entry in the list"/>
+                    <input_param name="exclude_current" type="boolean" description="Do not send the currently logged user in the results. True by default" default="true"/>
                     <output type="HTML" description="an UL/LI HTML list of users, groups, roles"/>
                 </serverCallback>
             </processing>

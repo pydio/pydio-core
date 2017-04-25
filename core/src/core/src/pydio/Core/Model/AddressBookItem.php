@@ -85,7 +85,7 @@ class AddressBookItem implements \JsonSerializable, XMLSerializableResponseChunk
         $groupIdString = $type === 'group' ? "data-group='$id'":"";
         $temporaryString = $this->data['temporary'] ? "data-temporary='true'" : "";
         $externalString = $this->data['external'] ? "data-external='true'" : "";
-        $avatarString = $this->data['avatar'] ? "data-external='true'" : "";
+        $avatarString = $this->data['avatar'] ? "data-avatar='".StringHelper::xmlEntities($this->data['avatar'])."'" : "";
 
         return "<li 
             class='complete_".$type."_entry' 
