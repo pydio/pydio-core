@@ -3,6 +3,7 @@
     <client_settings icon="plugins/access.sftp/icon.png" description_template="{SERV}{PATH}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="sftp_access" path="plugins/access.sftp/i18n"/>
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
     </client_settings>
 

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="inodes" enabled="true" label="CONF_MESSAGE[Inodes Workspace]" description="CONF_MESSAGE[Gather various routes into one workspace]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="7.1"/>
+    </plugin_info>
     <client_settings icon="plugins/access.inodes/icon.png" description_template="{SERV}{PATH}" iconClass="icon-sitemap">
     </client_settings>
     <server_settings>

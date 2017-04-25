@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="virtual" enabled="true" label="CONF_MESSAGE[Virtual Workspace]" description="CONF_MESSAGE[Gather various routes into one workspace]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="7.1"/>
+    </plugin_info>
     <client_settings icon="plugins/access.virtual/icon.png" description_template="{SERV}{PATH}" iconClass="icon-sitemap">
+        <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
     </client_settings>
 
 	<class_definition filename="plugins/access.virtual/VirtualAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Virtual\VirtualAccessDriver"/>

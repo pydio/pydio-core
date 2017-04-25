@@ -17,6 +17,7 @@
     </plugin_info>
 	<client_settings icon="plugins/access.sftp_psl/icon.png" description_template="{SFTP_HOST}{PATH}" iconClass="icon-sitemap">
 		<resources>
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
 			<i18n namespace="sftp_psl_access" path="plugins/access.sftp_psl/i18n"/>
 		</resources>
 	</client_settings>
