@@ -210,8 +210,9 @@
         }
 
         load(reload = false){
+            this.setState({loading: true});
             this.state.node.load(this.state.filter, reload).then((node)=>{
-                this.setState({children: node.getChildren(), selectedChild:null})
+                this.setState({children: node.getChildren(), selectedChild:null, loading: false})
             });
         }
 
@@ -237,9 +238,11 @@
         }
 
         renderSelector(){
-            const {filters, filter} = this.state;
+            const {filters, filter, loading} = this.state;
             const {pydio:{MessageHash}} = this.props;
-            const reloadButton = <MaterialUI.IconButton style={{marginTop:22}} iconStyle={{color:'rgba(0,0,0,0.23)'}} iconClassName="mdi mdi-reload" onTouchTap={()=>{this.load(true)}}/>;
+            let buttonStyle = {marginTop: 22};
+            if(loading) buttonStyle['animation'] = 'spin 3.5s infinite linear';
+            const reloadButton = <MaterialUI.IconButton style={buttonStyle} iconStyle={{color:'rgba(0,0,0,0.23)'}} iconClassName="mdi mdi-reload" onTouchTap={()=>{this.load(true)}}/>;
             if(!Object.keys(filters).length){
                 return (
                     <div style={{display:'flex'}}>
@@ -299,7 +302,7 @@
                                 );
                             })}
                             {this.state.node.hasMore() &&
-                                <div style={{textAlign:'center'}}><MaterialUI.FlatButton primary={true} label={this.props.pydio.MessageHash['share_center.242']} onTouchTap={this.load.bind(this)}/></div>
+                                <div style={{textAlign:'center'}}><MaterialUI.FlatButton primary={true} label={this.props.pydio.MessageHash['share_center.242']} onTouchTap={() => {this.load()}}/></div>
                             }
                         </MaterialUI.List>
                     </MaterialUI.Paper>
