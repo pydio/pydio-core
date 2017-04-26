@@ -103,7 +103,9 @@ class MultiAuthDriver extends AbstractAuthDriver
         $contribs = parent::getRegistryContributions($ctx, $extendedVersion);
         if(count($this->drivers)){
             foreach($this->drivers as $dPlugin){
-                $contribs = array_merge($contribs, $dPlugin->getRegistryContributions($ctx));
+                if(method_exists($dPlugin, 'getChildRegistryContributions')){
+                    $contribs = array_merge($contribs, $dPlugin->getChildRegistryContributions($ctx));
+                }
             }
         }
         return $contribs; // parent::getRegistryContributions($ctx, $extendedVersion);
