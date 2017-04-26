@@ -1448,7 +1448,7 @@ div#multiple_download_container div div a:hover {
 .indeterminate-loader {
   left: 0 !important;
   top: 0 !important;
-  z-index: 1022 !important;
+  z-index: 1102 !important;
   height: 2px;
   width: 100%;
   position: absolute;
