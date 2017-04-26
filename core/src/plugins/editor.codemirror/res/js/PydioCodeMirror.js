@@ -130,11 +130,27 @@ window.PydioCodeMirror = {
     Actions: {
         onUndo: ({codemirror}) => codemirror.undo(),
         onRedo: ({codemirror}) => codemirror.redo(),
-        onToggleLineNumbers: () => {
-            console.log(props)
-            EditorActions.tabModify({id, lineNumbers: !lineNumbers})
+        onToggleLineNumbers: ({dispatch, id, lineNumbers}) => dispatch(EditorActions.tabModify({id, lineNumbers: !lineNumbers})),
+        onToggleLineWrapping: ({dispatch, id, lineWrapping}) => dispatch(EditorActions.tabModify({id, lineWrapping: !lineWrapping})),
+        onSearch: ({codemirror, cursor}) => (query) => {
+            let cur = codemirror.getSearchCursor(query, cursor.to);
+
+            if (!cur.find()) {
+                cur = codemirror.getSearchCursor(query, 0);
+                if (!cur.find()) return;
+            }
+
+            codemirror.setSelection(cur.from(), cur.to());
+            codemirror.scrollIntoView({from: cur.from(), to: cur.to()}, 20);
         },
-        onToggleLineWrapping: ({id, lineWrapping}) => EditorActions.tabModify({id, lineNumbers: !lineWrapping})
+        onJumpTo: ({codemirror}) => (line) => {
+            console.log(line)
+            const cur = codemirror.getCursor();
+
+            codemirror.focus();
+            codemirror.setCursor(line - 1, cur.ch);
+            codemirror.scrollIntoView({line: line - 1, ch: cur.ch}, 20);
+        }
     },
     SourceEditor: CodeMirrorLoader
 }

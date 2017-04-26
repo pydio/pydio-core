@@ -71,6 +71,9 @@ class Tab extends React.Component {
 
                         <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />
                         <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />
+
+                        <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />
                     </ToolbarGroup>
                 </Toolbar>
 

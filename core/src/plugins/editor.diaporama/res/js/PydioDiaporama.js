@@ -169,7 +169,7 @@ class Editor extends Component {
                 </ImageSizeProvider>
             }
             </ContainerSizeProvider>
-        )
+    )
     }
 }
 

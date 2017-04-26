@@ -18,7 +18,7 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import { IconButton } from 'material-ui';
+import { IconButton, TextField } from 'material-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import { mapStateToProps } from './utils';
@@ -26,17 +26,20 @@ import { mapStateToProps } from './utils';
 import * as actions from './actions';
 
 const getActions = ({editorData}) => ({...actions, ...FuncUtils.getFunctionByName(editorData.editorActions, window)})
+const handler = (func, props) => () => getActions(props)[func](props)
 
-const Save = connect(mapStateToProps)((props) => <IconButton onClick={() => getActions(props).onSave(props)} iconClassName="mdi mdi-content-save" tooltip={MessageHash[53]} />)
-const Undo = connect(mapStateToProps)((props) => <IconButton onClick={() => getActions(props).onUndo(props)} iconClassName="mdi mdi-undo" tooltip={MessageHash["code_mirror.7"]} />)
-const Redo = connect(mapStateToProps)((props) => <IconButton onClick={() => getActions(props).onRedo(props)} iconClassName="mdi mdi-redo" tooltip={MessageHash["code_mirror.8"]} />)
+const _Save = (props) => <IconButton onClick={handler("onSave", props)} iconClassName="mdi mdi-content-save" tooltip={MessageHash[53]} />
+const _Undo = (props) => <IconButton onClick={handler("onUndo", props)} iconClassName="mdi mdi-undo" tooltip={MessageHash["code_mirror.7"]} />
+const _Redo = (props) => <IconButton onClick={handler("onRedo", props)} iconClassName="mdi mdi-redo" tooltip={MessageHash["code_mirror.8"]} />
+const _ToggleLineNumbers = (props) => <IconButton onClick={handler("onToggleLineNumbers", props)} iconClassName="mdi mdi-format-list-numbers" tooltip={MessageHash["code_mirror.5"]} />
+const _ToggleLineWrapping = (props) => <IconButton onClick={handler("onToggleLineWrapping", props)} iconClassName="mdi mdi-wrap" tooltip={MessageHash["code_mirror.3b"]} />
+const _JumpTo = (props) => <TextField onChange={handler("onJumpTo", props)(10)} hintText="Jump to Line" />
+const _Search = (props) => <TextField onChange={handler("onSearch", props)} hintText="Jump to Line" />
 
-const ToggleLineNumbers = connect(mapStateToProps)((props) => <IconButton onClick={() => getActions(props).onToggleLineNumbers(props)} iconClassName="mdi mdi-format-list-numbers" tooltip={MessageHash["code_mirror.5"]} />)
-const ToggleLineWrapping = connect(mapStateToProps)((props) => <IconButton onClick={() => getActions(props).onToggleLineWrapping(props)} iconClassName="mdi mdi-wrap" tooltip={MessageHash["code_mirror.3b"]} />)
-
-export { Save }
-export { Undo }
-export { Redo }
-
-export { ToggleLineNumbers }
-export { ToggleLineWrapping }
+export const Save = connect(mapStateToProps)(_Save)
+export const Undo = connect(mapStateToProps)(_Undo)
+export const Redo = connect(mapStateToProps)(_Redo)
+export const ToggleLineNumbers = connect(mapStateToProps)(_ToggleLineNumbers)
+export const ToggleLineWrapping = connect(mapStateToProps)(_ToggleLineWrapping)
+export const JumpTo = connect(mapStateToProps)(_JumpTo)
+export const Search = connect(mapStateToProps)(_Search)
