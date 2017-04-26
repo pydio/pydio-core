@@ -1,5 +1,7 @@
+const React = require('react')
 import DownloadApp from './DownloadApp'
 import ColorPaper from '../board/ColorPaper'
+const {asGridItem} = require('pydio').requireLib('components')
 
 class DlAppsPanel extends React.Component{
 
@@ -76,25 +78,18 @@ class DlAppsPanel extends React.Component{
 }
 
 
-const DlAppsCard = React.createClass({
-    mixins: [PydioComponents.DynamicGridItemMixin],
-
-    statics:{
-        gridWidth:2,
-        gridHeight:10,
-        builderDisplayName:'Download Applications',
-        builderFields:[]
-    },
+let DlAppsCard = React.createClass({
 
     render: function(){
         let props = {...this.props};
         return (
-            <ColorPaper {...this.props} style={{...this.props.style,overflow:'visible'}} paletteIndex={1} getCloseButton={this.getCloseButton}>
+            <ColorPaper {...this.props} style={{...this.props.style,overflow:'visible'}} paletteIndex={1} closeButton={props.closeButton}>
                 <DlAppsPanel pydio={this.props.pydio} type="sync" iconColor={'#ffffff'}/>
-                <div style={{fontSize: 16, padding: 16, paddingTop: 0, textAlign:'center'}}>Keep your files offline with Pydio Desktop Client</div>
+                <div style={{fontSize: 16, padding: 16, paddingTop: 0, textAlign:'center'}}>{this.props.pydio.MessageHash['user_home.91']}</div>
             </ColorPaper>
         );
     }
 });
 
+DlAppsCard = asGridItem(DlAppsCard,'Applications Download',{gridWidth:2,gridHeight:10},[]);
 export {DlAppsCard as default}

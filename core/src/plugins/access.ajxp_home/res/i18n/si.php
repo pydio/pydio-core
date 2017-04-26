@@ -145,4 +145,10 @@ $mess=array(
     "76" => "Access the %1 through the top-right menu",
     "77" => "admin dashboard",
     "78" => "Pick a target workspace",
+    "86" => "Play video",
+    "87" => "Recent History",
+    "88" => "Drop a file here from your desktop",
+    "89" => "Selected file for upload",
+    "90" => "Select target workspace",
+    "91" => "Keep your files offline with our Desktop Sync Client",
 );

@@ -1,5 +1,10 @@
+const React = require('react')
+const {Paper} = require('material-ui')
 import Palette from './Palette'
 
+/**
+ * Generic paper with a background color picked from palette
+ */
 class ColorPaper extends React.Component{
 
     render(){
@@ -14,18 +19,31 @@ class ColorPaper extends React.Component{
 
 
         return (
-            <MaterialUI.Paper zDepth={1} {...this.props} transitionEnabled={false} style={style} className={this.props.className}>
-                {this.props.getCloseButton()}
+            <Paper zDepth={1} {...this.props} transitionEnabled={false} style={style} className={this.props.className}>
+                {this.props.getCloseButton ? this.props.getCloseButton() : this.props.closeButton}
                 {this.props.children}
-            </MaterialUI.Paper>
+            </Paper>
         );
     }
 
 }
 
 ColorPaper.propTypes = {
+    /**
+     * Pass the proper style for grid layout
+     */
     style: React.PropTypes.object.isRequired,
-    getCloseButton: React.PropTypes.func.isRequired,
+    /**
+     * Legacy way of passing the close button, use closeButton prop instead
+     */
+    getCloseButton: React.PropTypes.func,
+    /**
+     * Passed by parent, through the asGridItem HOC
+     */
+    closeButton: React.PropTypes.object,
+    /**
+     * An integer to choose which color to pick
+     */
     paletteIndex: React.PropTypes.number.isRequired
 };
 

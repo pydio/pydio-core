@@ -1,17 +1,11 @@
+const React = require('react')
+const ReactQRCode = require('qrcode.react')
+const {asGridItem} = require('pydio').requireLib('components')
+
 import Palette from '../board/Palette'
 import ColorPaper from '../board/ColorPaper'
 
-export default React.createClass({
-
-    mixins: [PydioComponents.DynamicGridItemMixin],
-
-    statics:{
-        gridWidth:2,
-        gridHeight:10,
-        builderDisplayName:'Qr Code',
-        builderFields:[]
-    },
-
+let QRCodeCard = React.createClass({
 
     render: function(){
 
@@ -21,7 +15,7 @@ export default React.createClass({
         }
 
         return (
-            <ColorPaper {...this.props} style={{...this.props.style,display:'flex'}} paletteIndex={2} getCloseButton={this.getCloseButton}>
+            <ColorPaper {...this.props} style={{...this.props.style,display:'flex'}} paletteIndex={2} closeButton={this.props.closeButton}>
                 <div style={{padding: 16, fontSize: 16, paddingRight: 8, overflow:'hidden'}}>{this.props.pydio.MessageHash['user_home.74']}</div>
                 <div className="home-qrCode" style={{display:'flex', justifyContent:'center', alignItems:'center', marginRight:16}}>
                     <ReactQRCode bgColor={Palette[2]} fgColor={'#ffffff'} value={JSON.stringify(jsonData)} size={80}/>
@@ -32,3 +26,7 @@ export default React.createClass({
     }
 
 });
+
+QRCodeCard = asGridItem(QRCodeCard,global.pydio.MessageHash['user_home.72'],{gridWidth:2,gridHeight:10},[]);
+
+export {QRCodeCard as default}

@@ -1,5 +1,7 @@
+const React = require('react')
 const ReactDOM = require('react-dom')
 const {asGridItem} = require('pydio').requireLib('components')
+const {MenuItem, IconMenu} = require('material-ui')
 
 import VideoPlayer from './VideoPlayer'
 import Palette from '../board/Palette'
@@ -7,6 +9,9 @@ import ColorPaper from '../board/ColorPaper'
 
 const PALETTE_INDEX = 4;
 
+/**
+ * Display a list of tutorial videos as a material card
+ */
 let VideoCard = React.createClass({
 
     propTypes:{
@@ -74,15 +79,12 @@ let VideoCard = React.createClass({
             return {__html:MessageHash[id]};
         };
         const menus = this._videos.map(function(item, index){
-            return <MaterialUI.MenuItem key={`videoCardMenuItem_${index}`} primaryText={this.getTitle(item[1])} onTouchTap={() => {this.setState({youtubeId:item[0], contentMessageId:item[1], videoIndex: index})} }/>;
+            return <MenuItem key={`videoCardMenuItem_${index}`} primaryText={this.getTitle(item[1])} onTouchTap={() => {this.setState({youtubeId:item[0], contentMessageId:item[1], videoIndex: index})} }/>;
         }.bind(this));
         let props = {...this.props};
         const {youtubeId, contentMessageId} = this.state;
         props.className += ' video-card';
 
-        const TMP_VIEW_MORE = (
-            <a className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
-        );
         const tint = MaterialUI.Color(Palette[PALETTE_INDEX]).alpha(0.8).toString();
         return (
             <ColorPaper {...props} paletteIndex={PALETTE_INDEX} getCloseButton={() => {return this.props.closeButton}}>
@@ -94,13 +96,13 @@ let VideoCard = React.createClass({
                         <div className="tutorial_next mdi mdi-arrow-right" onClick={this.browse.bind(this, 'next')}/>
                         <div className="tutorial_title">
                             <span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/>
-                            <MaterialUI.IconMenu
+                            <IconMenu
                                 style={{position: 'absolute', bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.43)', padding: 2, borderRadius: '0 0 2px 0'}}
                                 iconStyle={{color:'white'}}
                                 iconButtonElement={<MaterialUI.IconButton iconClassName="mdi mdi-dots-vertical"/>}
-                                anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-                                targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                            >{menus}</MaterialUI.IconMenu>
+                                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                                targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                            >{menus}</IconMenu>
                         </div>
                     </div>
                 </div>

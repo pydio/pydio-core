@@ -144,4 +144,10 @@ $mess=array(
     "76" => "Über das Menü oben rechts können Sie auf die %1 zugreifen",
     "77" => "Einstellungen",
     "78" => "Wählen Sie eine Ziel-Arbeitsumgebung",
+    "86" => "Play video",
+    "87" => "Recent History",
+    "88" => "Drop a file here from your desktop",
+    "89" => "Selected file for upload",
+    "90" => "Select target workspace",
+    "91" => "Keep your files offline with our Desktop Sync Client",
 );

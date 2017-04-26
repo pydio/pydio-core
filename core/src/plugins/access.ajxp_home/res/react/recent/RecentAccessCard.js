@@ -1,24 +1,23 @@
+const React = require('react')
 import Palette from '../board/Palette'
 const Color = require('color')
+const {asGridItem, NodeListCustomProvider} = require('pydio').requireLib('components')
+const {FilePreview} = require('pydio').requireLib('workspaces')
+const {Paper, IconButton} = require('material-ui')
 
 const PALETTE_INDEX = 3;
 
-export default React.createClass({
-
-    mixins: [PydioComponents.DynamicGridItemMixin],
-
-    statics:{
-        gridWidth:5,
-        gridHeight:20,
-        builderDisplayName:'Recently Accessed',
-        builderFields:[]
-    },
+/**
+ * Show a list of recently accessed files or folders.
+ * This list is stored by the server in the user preferences, and served by the feed plugin
+ */
+let RecentAccessCard = React.createClass({
 
     renderIcon: function(node){
         if(node.getPath() === '/' || !node.getPath()){
             return <div className="mimefont-container"><div className="mimefont" style={{fontSize: 14}}>WS</div></div>
         }else{
-            return <PydioWorkspaces.FilePreview node={node} loadThumbnail={true}/>
+            return <FilePreview node={node} loadThumbnail={true}/>
         }
     },
 
@@ -42,7 +41,7 @@ export default React.createClass({
     },
 
     renderAction: function(node, data){
-        return <span style={{position:'relative'}}><MaterialUI.IconButton
+        return <span style={{position:'relative'}}><IconButton
             iconClassName="mdi mdi-chevron-right"
             tooltip="Open ... "
             onTouchTap={() => {this.props.pydio.goTo(node)}}
@@ -64,15 +63,15 @@ export default React.createClass({
 
     render: function(){
         const c = new Color(Palette[PALETTE_INDEX]);
-        const title = <div style={{backgroundColor:c.darken(0.1).toString(),color:'white', padding:'16px 0 16px 12px', fontSize:20}}>Recently Accessed</div>;
+        const title = <div style={{backgroundColor:c.darken(0.1).toString(),color:'white', padding:'16px 0 16px 12px', fontSize:20}}>{this.props.pydio.MessageHash['user_home.87']}</div>;
 
         const displayMode = this.props.displayMode || 'list';
 
         if(displayMode === 'table'){
             return (
-                <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                <Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
                     {this.getCloseButton()}
-                    <PydioComponents.NodeListCustomProvider
+                    <NodeListCustomProvider
                         className="recently-accessed-list table-mode"
                         nodeProviderProperties={{get_action:"load_user_recent_items"}}
                         elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
@@ -85,14 +84,14 @@ export default React.createClass({
                         }}
                         entryRenderActions={this.renderAction}
                     />
-                </MaterialUI.Paper>
+                </Paper>
             );
         }else{
             return (
-                <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
-                    {this.getCloseButton()}
+                <Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                    {this.props.closeButton}
                     {title}
-                    <PydioComponents.NodeListCustomProvider
+                    <NodeListCustomProvider
                         className="recently-accessed-list files-list"
                         style={{backgroundColor:Palette[PALETTE_INDEX]}}
                         nodeProviderProperties={{get_action:"load_user_recent_items"}}
@@ -105,9 +104,12 @@ export default React.createClass({
                         entryRenderSecondLine={this.renderSecondLine}
                         entryRenderIcon={this.renderIcon}
                     />
-                </MaterialUI.Paper>
+                </Paper>
             );
         }
     }
 
 });
+
+RecentAccessCard = asGridItem(RecentAccessCard,global.pydio.MessageHash['user_home.87'],{gridWidth:5,gridHeight:20},[]);
+export {RecentAccessCard as default}

@@ -1,3 +1,4 @@
+const React = require('react')
 import ConfigLogo from './ConfigLogo'
 import WorkspacesListCard from '../workspaces/WorkspacesListCard'
 

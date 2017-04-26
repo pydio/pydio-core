@@ -12,7 +12,7 @@ const WorkspacePickerDialog = React.createClass({
 
     getDefaultProps: function(){
         return {
-            dialogTitle: 'Select the target workspace',
+            dialogTitleId: 'user_home.90',
             dialogSize: 'sm',
             dialogPadding: false,
             dialogIsModal: true,

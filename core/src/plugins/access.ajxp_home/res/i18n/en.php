@@ -46,7 +46,7 @@ $mess=array(
     "60"=>"Mac OS",
     "61"=>"Windows",
 
-    "62"=> "<h2>What is a workspace?</h2>
+    "62"=> "<h2>[How-to] What is a workspace?</h2>
             This video explains what Workspaces are in APPLICATION_TITLE
             <ul>
                 <li>Why are Workspaces central in APPLICATION_TITLE?</li>
@@ -55,7 +55,7 @@ $mess=array(
             </ul>
             ",
 
-    "63"=> "<h2>Upload files to APPLICATION_TITLE</h2>
+    "63"=> "<h2>[How-to] Upload files to APPLICATION_TITLE</h2>
             Get started with APPLICATION_TITLE and see how to upload files
             <ul>
                 <li>Drag and drop files into APPLICATION_TITLE</li>
@@ -65,7 +65,7 @@ $mess=array(
             </ul>
             ",
 
-    "64"=> "<h2>Search, browse and manage your files</h2>
+    "64"=> "<h2>[How-to] Search, browse and manage your files</h2>
             This video shows you various tips to efficiently manage your files in APPLICATION_TITLE
             <ul>
                 <li>Cross-workspaces search bar</li>
@@ -75,7 +75,7 @@ $mess=array(
             </ul>
             ",
 
-    "79"=> "<h2>Sharing files and folders</h2>
+    "79"=> "<h2>[How-to] Sharing files and folders</h2>
             This tutorial shows you how to share files and folders, internally or externally
             <ul>
                 <li>Creating share links for external people</li>
@@ -87,7 +87,7 @@ $mess=array(
             </ul>
             ",
 
-    "80"=> "<h2>Sharing : security features</h2>
+    "80"=> "<h2>[How-to] Sharing : security features</h2>
             This video goes through the various share settings that help you secure your shares
             <ul>
                 <li>Password protection</li>
@@ -96,11 +96,11 @@ $mess=array(
             </ul>
             ",
 
-    "81"=> "<h2>Customize your share links</h2>
+    "81"=> "<h2>[How-to] Customize your share links</h2>
             See how you can customise the URL of your share links to make them look more user-friendly.
             ",
 
-    "82"=> "<h2>Shared links custom rights</h2>
+    "82"=> "<h2>[How-to] Shared links custom rights</h2>
             This video shows you how to manage the permissions attached to your shares
             <ul>
                 <li>Preview</li>
@@ -109,15 +109,15 @@ $mess=array(
             </ul>
             ",
 
-    "83"=> "<h2>Language</h2>
+    "83"=> "<h2>[How-to] Language</h2>
             APPLICATION_TITLE is available in 28 languages. This video shows you how to change the language in APPLICATION_TITLE.
             ",
 
-    "84"=> "<h2>Alerts</h2>
+    "84"=> "<h2>[How-to] Alerts</h2>
             Learn how to set alerts on a file, in order to see when it has been modified or consulted.
             ",
 
-    "85"=> "<h2>Collaborative edition</h2>
+    "85"=> "<h2>[How-to] Collaborative edition</h2>
             This video shows you how to collaborate on office docs, thanks to Collabora online office suite
             <ul>
                 <li>Work on text docs, presentations, spreadsheets</li>
@@ -126,7 +126,7 @@ $mess=array(
             </ul>
             ",
     "65"=> "Discover more on the APPLICATION_TITLE channel!",
-    "66"=>"<h2>Using APPLICATION_TITLE on iOS device</h2>
+    "66"=>"<h2>[How-to] Using APPLICATION_TITLE on iOS device</h2>
                             This video explains how to use the APPLICATION_TITLE application (available on the App Store). Process is quite similar on Android as well.
 <ul><li>Setup the server connection</li>
 <li>Navigating through the files</li>
@@ -146,4 +146,9 @@ $mess=array(
 "77" => "admin dashboard",
 "78" => "Pick a target workspace",
     "86" => "Play video",
+    "87" => "Recent History",
+    "88" => "Drop a file here from your desktop",
+    "89" => "Selected file for upload",
+    "90" => "Select target workspace",
+    "91" => "Keep your files offline with our Desktop Sync Client",
 );

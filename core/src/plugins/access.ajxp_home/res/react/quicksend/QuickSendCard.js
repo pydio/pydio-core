@@ -1,23 +1,13 @@
 import ColorPaper from '../board/ColorPaper'
 const React = require('react')
 const {CardTitle, CircularProgress} = require('material-ui')
-const {DynamicGridItemMixin} = require('pydio').requireLib('components')
+const {asGridItem} = require('pydio').requireLib('components')
 const {FileDropZone} = require('pydio').requireLib('form')
 
 const {NativeFileDropProvider} = require('pydio').requireLib('boot');
 const BinaryDropZone = NativeFileDropProvider(FileDropZone, (items, files, props) => {});
 
 let QuickSend = React.createClass({
-
-    mixins: [DynamicGridItemMixin],
-
-    statics:{
-        gridWidth:2,
-        gridHeight:10,
-        builderDisplayName:'Quick Upload',
-        builderFields:[]
-    },
-
 
     fileDroppedOrPicked: function(event, monitor = null){
 
@@ -46,7 +36,7 @@ let QuickSend = React.createClass({
         this.setState({uploadItems: items});
         this.props.pydio.UI.openComponentInModal('WelcomeComponents', 'WorkspacePickerDialog', {
             onWorkspaceTouchTap: this.targetWorkspaceSelected.bind(this),
-            legend : (files && files[0] ? <div style={{fontSize:13, padding: 16, backgroundColor:'#FFEBEE'}}>Selected file for upload: {files[0].name}</div> : undefined)
+            legend : (files && files[0] ? <div style={{fontSize:13, padding: 16, backgroundColor:'#FFEBEE'}}>{this.props.pydio.MessageHash['user_home.89']}: {files[0].name}</div> : undefined)
         });
     },
 
@@ -72,9 +62,9 @@ let QuickSend = React.createClass({
         const working = this.state && this.state.working;
 
         return (
-            <ColorPaper zDepth={1} {...this.props} paletteIndex={0} getCloseButton={this.getCloseButton} >
+            <ColorPaper zDepth={1} {...this.props} paletteIndex={0} closeButton={this.props.closeButton} >
                 <div style={{display:'flex', alignItems: 'center', height: '100%'}}>
-                    <div style={{padding: 16, fontSize: 16, width: 100}}>Drop a file here from your desktop</div>
+                    <div style={{padding: 16, fontSize: 16, width: 100}}>{this.props.pydio.MessageHash['user_home.88']}</div>
                     <div style={{textAlign:'center', padding:18, flex:1}}>
                         {working &&
                             <CircularProgress size={80} thickness={4} color="white"/>
@@ -100,5 +90,5 @@ let QuickSend = React.createClass({
 
 });
 
-
+QuickSend = asGridItem(QuickSend,'Quick Upload',{gridWidth:2,gridHeight:10},[]);
 export {QuickSend as default}

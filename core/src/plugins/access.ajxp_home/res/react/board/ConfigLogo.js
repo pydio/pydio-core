@@ -1,3 +1,5 @@
+const React = require('react')
+
 class ConfigLogo extends React.Component{
 
     render(){

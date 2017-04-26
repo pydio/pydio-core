@@ -1,3 +1,6 @@
+const React = require('react')
+const {asGridItem} = require('pydio').requireLib('components')
+
 class ThemeableTitle extends React.Component{
 
     render(){
@@ -14,16 +17,7 @@ class ThemeableTitle extends React.Component{
 
 ThemeableTitle = MaterialUI.Style.muiThemeable()(ThemeableTitle);
 
-const WorkspacesListCard = React.createClass({
-
-    mixins: [PydioComponents.DynamicGridItemMixin],
-
-    statics:{
-        gridWidth:3,
-        gridHeight:60,
-        builderDisplayName:'My Workspaces',
-        builderFields:[]
-    },
+let WorkspacesListCard = React.createClass({
 
     render: function(){
         const {pydio, filterByType} = this.props;
@@ -38,7 +32,7 @@ const WorkspacesListCard = React.createClass({
 
         return (
             <MaterialUI.Paper zDepth={1} {...props} transitionEnabled={false} rounded={false}>
-                {this.getCloseButton()}
+                {this.props.closeButton}
                 <div  style={{height: '100%', display:'flex', flexDirection:'column'}}>
                     <PydioWorkspaces.WorkspacesListMaterial
                         className={"vertical_fit filter-" + filterByType}
@@ -55,4 +49,5 @@ const WorkspacesListCard = React.createClass({
     }
 });
 
+WorkspacesListCard = asGridItem(WorkspacesListCard,'My Workspaces',{gridWidth:2,gridHeight:60},[]);
 export {WorkspacesListCard as default}
