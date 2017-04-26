@@ -4,13 +4,9 @@ const {ActionDialogMixin, CancelButtonProviderMixin, SubmitButtonProviderMixin} 
 const PydioApi = require('pydio/http/api');
 
 class Callbacks{
-
     static createLink(){
-
         pydio.UI.openComponentInModal('PydioBrowserActions', 'CreateLinkDialog');
-
     }
-
 }
 
 const CreateLinkDialog = React.createClass({

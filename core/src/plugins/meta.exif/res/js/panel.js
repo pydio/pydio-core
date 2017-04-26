@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
-import {compose} from 'redux';
 
 import {ToolbarGroup, IconButton, FlatButton, Card, CardTitle, CardText, Table, TableBody, TableRow, TableRowColumn} from 'material-ui'
 
-class DetailPanel extends Component {
+class Panel extends Component {
 
     parseValues(node){
         const configs = this.props.pydio.getPluginConfigs('meta.exif');
@@ -113,108 +112,4 @@ class DetailPanel extends Component {
     }
 }
 
-class Editor extends Component {
-
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            data: [],
-            error: ""
-        }
-    }
-
-    static get propTypes() {
-        return {
-            showControls: React.PropTypes.bool.isRequired
-        }
-    }
-
-    static get defaultProps() {
-        return {
-            showControls: false
-        }
-    }
-
-    static get controls() {
-        return {
-            options: {
-                locate: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-crosshairs-gps" tooltip={"Locate on a map"}/>
-            }
-        }
-    }
-
-    componentDidMount() {
-        const callback = (object) => {
-            this.setState(object)
-            typeof this.props.onLoad === 'function' && this.props.onLoad()
-        }
-
-        PydioApi.getClient().request({
-            get_action:'extract_exif',
-            file:this.props.node.getPath(),
-            format:'json'
-        },
-        ({responseJSON}) => responseJSON ? callback({data: responseJSON}) : callback({error: 'Could not load JSON'}),
-        () => callback({error: 'Could not load data'}));
-    }
-
-    openGpsLocator() {
-        const {pydio, node} = this.props
-
-        const editors = pydio.Registry.findEditorsForMime("ol_layer");
-        if (editors.length) {
-            pydio.UI.openCurrentSelectionInEditor(editors[0], this.props.node);
-        }
-    }
-
-    render() {
-        let content;
-
-        const {showControls} = this.props
-        const {data, error} = this.state;
-
-        return (
-            <Viewer
-                {...this.props}
-                onLocate={showControls ? () => this.openGpsLocator() : null}
-                error={error}
-                style={{display: "flex", justifyContent: "space-around", flexFlow: "row wrap"}}
-            >
-                {Object.keys(data).map(key =>
-                    <Card style={{width: "calc(50% - 20px)", margin: 10, overflow: "auto"}}>
-                        <CardTitle key={key+'-head'}>{key}</CardTitle>
-
-                        <CardText>
-                            <Table selectable={false}>
-                                <TableBody displayRowCheckbox={false}>
-                                {Object.keys(data[key]).map(itemKey =>
-                                    <TableRow key={`${key}-${itemKey}`}>
-                                        <TableRowColumn>{itemKey}</TableRowColumn>
-                                        <TableRowColumn>{data[key][itemKey]}</TableRowColumn>
-                                    </TableRow>
-                                )}
-                                </TableBody>
-                            </Table>
-                        </CardText>
-                    </Card>
-                )}
-            </Viewer>
-        );
-    }
-}
-
-const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-
-console.log("Defining ", Editor.controls)
-const Viewer = compose(
-    withControls(Editor.controls),
-    withMenu,
-    withLoader,
-    withErrors
-)(props => <div {...props} />)
-
-window.PydioExif = {
-    Editor: Editor,
-    DetailPanel:DetailPanel
-};
+export default Panel;

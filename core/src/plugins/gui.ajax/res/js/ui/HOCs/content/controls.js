@@ -20,22 +20,21 @@
 
 import { IconButton, TextField } from 'material-ui';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux'
 import { mapStateToProps } from './utils';
+import { handler } from '../utils';
 
-import * as actions from './actions';
+// Controls definitions
+const _Save = (props) => <IconButton onClick={() => handler("onSave", props)} iconClassName="mdi mdi-content-save" />
+const _Undo = (props) => <IconButton onClick={() => handler("onUndo", props)} iconClassName="mdi mdi-undo" />
+const _Redo = (props) => <IconButton onClick={() => handler("onRedo", props)} iconClassName="mdi mdi-redo" />
 
-const getActions = ({editorData}) => ({...actions, ...FuncUtils.getFunctionByName(editorData.editorActions, window)})
-const handler = (func, props) => () => getActions(props)[func](props)
+const _ToggleLineNumbers = (props) => <IconButton onClick={() => handler("onToggleLineNumbers", props)} iconClassName="mdi mdi-format-list-numbers" />
+const _ToggleLineWrapping = (props) => <IconButton onClick={() => handler("onToggleLineWrapping", props)} iconClassName="mdi mdi-wrap" />
 
-const _Save = (props) => <IconButton onClick={handler("onSave", props)} iconClassName="mdi mdi-content-save" tooltip={MessageHash[53]} />
-const _Undo = (props) => <IconButton onClick={handler("onUndo", props)} iconClassName="mdi mdi-undo" tooltip={MessageHash["code_mirror.7"]} />
-const _Redo = (props) => <IconButton onClick={handler("onRedo", props)} iconClassName="mdi mdi-redo" tooltip={MessageHash["code_mirror.8"]} />
-const _ToggleLineNumbers = (props) => <IconButton onClick={handler("onToggleLineNumbers", props)} iconClassName="mdi mdi-format-list-numbers" tooltip={MessageHash["code_mirror.5"]} />
-const _ToggleLineWrapping = (props) => <IconButton onClick={handler("onToggleLineWrapping", props)} iconClassName="mdi mdi-wrap" tooltip={MessageHash["code_mirror.3b"]} />
-const _JumpTo = (props) => <TextField onChange={handler("onJumpTo", props)(10)} hintText="Jump to Line" />
-const _Search = (props) => <TextField onChange={handler("onSearch", props)} hintText="Jump to Line" />
+const _JumpTo = (props) => <TextField onKeyUp={({key, target}) => key === 'Enter' && handler("onJumpTo", props)(target.value)} hintText="Jump to Line" />
+const _Search = (props) => <TextField onKeyUp={({key, target}) => key === 'Enter' && handler("onSearch", props)(target.value)} hintText="Search..." />
 
+// Final export and connection
 export const Save = connect(mapStateToProps)(_Save)
 export const Undo = connect(mapStateToProps)(_Undo)
 export const Redo = connect(mapStateToProps)(_Redo)

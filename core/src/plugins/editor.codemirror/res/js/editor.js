@@ -18,24 +18,25 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import React, {Component} from 'react';
-import {IconButton, TextField} from 'material-ui';
+import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
 import CodeMirrorLoader from './CodeMirrorLoader'
-import {parseQuery} from './Utils';
 
 const {EditorActions} = PydioWorkspaces;
 
-class PydioCodeMirror extends Component {
+class Editor extends React.Component {
 
     constructor(props) {
         super(props)
 
         const {pydio, node, id, dispatch} = this.props
 
-        this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
+        if (typeof dispatch === 'function') {
+            // We have a redux dispatch so we use it
+            this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
+        }
     }
 
     // Static functions
@@ -61,39 +62,6 @@ class PydioCodeMirror extends Component {
             get_action: 'get_content',
             file: url
         }, (transport) => this.setState({content: transport.responseText}));
-    }
-
-    find(query) {
-        const {codemirror, cursor} = this.props
-
-        let cur = codemirror.getSearchCursor(query, cursor.to);
-
-        if (!cur.find()) {
-            cur = codemirror.getSearchCursor(query, 0);
-            if (!cur.find()) return;
-        }
-
-        codemirror.setSelection(cur.from(), cur.to());
-        codemirror.scrollIntoView({from: cur.from(), to: cur.to()}, 20);
-    }
-
-    jumpTo(line) {
-        const {codemirror} = this.props
-        const cur = codemirror.getCursor();
-
-        codemirror.focus();
-        codemirror.setCursor(line - 1, cur.ch);
-        codemirror.scrollIntoView({line: line - 1, ch: cur.ch}, 20);
-    }
-
-    save() {
-        const {pydio} = this.props;
-
-        pydio.ApiClient.postPlainTextContent(this.state.url, this.state.content, (success) => {
-            if (!success) {
-                this.setState({error: "There was an error while saving"})
-            }
-        });
     }
 
     render() {
@@ -124,35 +92,10 @@ let CodeMirrorLoaderWithControls = compose(
     withErrors
 )(CodeMirrorLoader)*/
 
-// We need to attach the element to window else it won't be found
+/* We need to attach the element to window else it won't be found
 window.PydioCodeMirror = {
     PydioEditor: connect()(PydioCodeMirror),
-    Actions: {
-        onUndo: ({codemirror}) => codemirror.undo(),
-        onRedo: ({codemirror}) => codemirror.redo(),
-        onToggleLineNumbers: ({dispatch, id, lineNumbers}) => dispatch(EditorActions.tabModify({id, lineNumbers: !lineNumbers})),
-        onToggleLineWrapping: ({dispatch, id, lineWrapping}) => dispatch(EditorActions.tabModify({id, lineWrapping: !lineWrapping})),
-        onSearch: ({codemirror, cursor}) => (query) => {
-            let cur = codemirror.getSearchCursor(query, cursor.to);
-
-            if (!cur.find()) {
-                cur = codemirror.getSearchCursor(query, 0);
-                if (!cur.find()) return;
-            }
-
-            codemirror.setSelection(cur.from(), cur.to());
-            codemirror.scrollIntoView({from: cur.from(), to: cur.to()}, 20);
-        },
-        onJumpTo: ({codemirror}) => (line) => {
-            console.log(line)
-            const cur = codemirror.getCursor();
-
-            codemirror.focus();
-            codemirror.setCursor(line - 1, cur.ch);
-            codemirror.scrollIntoView({line: line - 1, ch: cur.ch}, 20);
-        }
-    },
     SourceEditor: CodeMirrorLoader
-}
+}*/
 
-export default PydioCodeMirror
+export default connect()(Editor)

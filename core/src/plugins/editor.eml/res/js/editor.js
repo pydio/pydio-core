@@ -18,6 +18,12 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import React from 'react';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+
+const { withSelection } = PydioHOCs;
+
 const styles = {
      chip: {
          margin: 4,
@@ -239,7 +245,7 @@ class Attachment extends React.Component {
     }
 }
 
-class EmlViewer extends React.Component {
+class Editor extends React.Component {
 
     constructor(props) {
         super(props)
@@ -248,11 +254,17 @@ class EmlViewer extends React.Component {
     }
 
     componentWillMount() {
-        this.loadFileContent();
+        this.loadFileContent(this.props);
     }
 
-    loadFileContent() {
-        let {pydio, node, onLoad} = this.props;
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.node !== this.props.node) {
+            this.loadFileContent(nextProps);
+        }
+    }
+
+    loadFileContent(props) {
+        const {pydio, node, onLoad} = props;
 
         pydio.ApiClient.request({
             get_action: 'eml_get_xml_structure',
@@ -267,14 +279,8 @@ class EmlViewer extends React.Component {
             file: node.getPath(),
         }, function (transport) {
             this.parseBody(transport.responseXML)
-
-            onLoad()
         }.bind(this));
-
-        // Should be handled with promises
-        setTimeout(() => onLoad(), 2000)
     }
-
 
     parseBody(xmlDoc) {
         let body = XMLUtils.XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="html"]').firstChild.nodeValue;
@@ -359,4 +365,7 @@ class EmlViewer extends React.Component {
     }
 }
 
-window.EmlViewer = EmlViewer;
+export default compose(
+    connect(),
+    withSelection((node) => node.getMetadata().get('is_image') === '1')
+)(Editor)

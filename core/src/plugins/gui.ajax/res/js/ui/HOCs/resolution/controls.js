@@ -18,18 +18,11 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import {ToolbarGroup, IconButton} from 'material-ui';
+import { IconButton } from 'material-ui';
 import { connect } from 'react-redux';
-import { mapStateToProps, Actions } from './utils';
+import { mapStateToProps } from './utils';
+import { handler } from '../utils';
 
-const Controls = ({id, resolution = "hi", tabModify = () => {}, ...remainingProps}) => {
-    const toggleResolution = () => tabModify({id, resolution: resolution === "hi" ? "lo" : "hi"})
+const _ToggleResolution = (props) => <IconButton onClick={() => handler("onToggleResolution", props)} iconClassName={`mdi mdi-crop-${props.resolution === "hi" ? "square" : "free"}`} />
 
-    return (
-        <ToolbarGroup {...remainingProps}>
-            <IconButton onClick={() => toggleResolution()} iconClassName={`mdi mdi-crop-${resolution === "hi" ? "square" : "free"}`} />
-        </ToolbarGroup>
-    )
-}
-
-export default connect(mapStateToProps, Actions)(Controls);
+export const ToggleResolution = connect(mapStateToProps)(_ToggleResolution);

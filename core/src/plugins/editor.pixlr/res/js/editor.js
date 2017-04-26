@@ -18,7 +18,7 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
- class CustomIframe extends React.Component {
+class CustomIframe extends React.Component {
 
     onUnload(e) {
         let href = this.myIframe.contentDocument.location.href;
@@ -31,17 +31,15 @@
     }
 
     save(pixlrUrl) {
-        let {pydio, node} = this.props;
+        const {pydio, node} = this.props;
 
         pydio.ApiClient.request({
             get_action: 'retrieve_pixlr_image',
             original_file: node.getPath(),
             new_url: pixlrUrl,
         }, function (transport) {
-            console.log(transport.responseXML)
             node.getParent().getMetadata().set('preview_seed', Math.round(Math.random() * new Date().getTime()));
             pydio.fireNodeRefresh(node);
-            // TODO: Close the editor
         });
     }
 
@@ -68,31 +66,32 @@
 }
 
 
-class PixlrEditor extends React.Component {
+class Editor extends React.Component {
 
-    constructor(props) {
-        super(props);
-
-        this.state = {}
+    componentDidMount() {
+        this.loadNode(this.props)
     }
 
-    componentWillMount() {
-        let {pydio, node} = this.props;
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.node !== this.props.node) {
+            this.loadNode(nextProps)
+        }
+    }
+
+    loadNode(props) {
+        const {pydio, node} = props;
 
         this.setState({url: pydio.Parameters.get('ajxpServerAccess')+"&get_action=post_to_server&file=base64encoded:" + HasherUtils.base64_encode(node.getPath()) + "&parent_url=" + HasherUtils.base64_encode(DOMUtils.getUrlFromBase())});
     }
 
     render() {
         return (
-            <PydioComponents.AbstractEditor {...this.props}>
-                <CustomIframe
-                    {...this.props}
-                    url={this.state.url}
-                />
-            </PydioComponents.AbstractEditor>
+            <CustomIframe
+                {...this.props}
+                url={this.state.url}
+            />
         );
     }
-
 }
 
-window.PixlrEditor = PixlrEditor;
+export default Editor

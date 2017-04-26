@@ -18,13 +18,15 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import React, {Component} from 'react';
-import {IconButton, TextField} from 'material-ui';
-import {compose} from 'redux';
+import React from 'react';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import CKEditor from './CKEditor';
 
-class PydioCKEditor extends Component {
+const {EditorActions} = PydioWorkspaces;
+
+class Editor extends React.Component {
     static get propTypes() {
         return {
             showControls: React.PropTypes.bool.isRequired
@@ -34,34 +36,6 @@ class PydioCKEditor extends Component {
     static get defaultProps() {
         return {
             showControls: false
-        }
-    }
-
-    static get propTypes() {
-        return {
-            showControls: React.PropTypes.bool.isRequired
-        }
-    }
-
-    static get defaultProps() {
-        return {
-            showControls: false
-        }
-    }
-
-    static get controls() {
-        return {
-            options: {
-                save: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-content-save" tooltip={MessageHash[53]}/>,
-                undo: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-undo" tooltip={MessageHash["code_mirror.7"]} />,
-                redo: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-redo" tooltip={MessageHash["code_mirror.8"]} />,
-                toggleLineNumbers: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-format-list-numbers" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.5"]} />,
-                toggleLineWrapping: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-wrap" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.3b"]} />
-            },
-            actions: {
-                jumpTo: (handler) => <TextField hintText={MessageHash["code_mirror.6"]} onKeyUp={handler} />,
-                find: (handler) => <TextField hintText={MessageHash["code_mirror.9"]} onKeyUp={handler} />
-            }
         }
     }
 
@@ -85,7 +59,7 @@ class PydioCKEditor extends Component {
         return {
             basePath: `${DOMUtils.getUrlFromBase()}plugins/editor.ckeditor/node_modules/ckeditor/`,
             desktop : {
-                ...PydioCKEditor.base,
+                ...Editor.base,
     			toolbar_Ajxp : [
     				['Source','Preview','Templates'],
     			    ['Undo','Redo','-', 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Print', 'SpellChecker', 'Scayt'],
@@ -104,7 +78,7 @@ class PydioCKEditor extends Component {
     			]
             },
             mobile: {
-                ...PydioCKEditor.base,
+                ...Editor.base,
 				toolbar_Ajxp : [
 				    ['Bold','Italic','Underline', '-', 'NumberedList','BulletedList'],
 				    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
@@ -116,10 +90,11 @@ class PydioCKEditor extends Component {
     constructor(props) {
         super(props)
 
-        const {pydio, node} = this.props
+        const {pydio, node, id, dispatch} = this.props
 
-        this.state = {
-            url: node.getPath()
+        if (typeof dispatch === 'function') {
+            // We have a redux dispatch so we use it
+            this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
         }
     }
 
@@ -127,7 +102,7 @@ class PydioCKEditor extends Component {
     static getPreviewComponent(node, rich = false) {
         if (rich) {
             return {
-                element: PydioCKEditor,
+                element: PydioCKEditor.Editor,
                 props: {
                     node: node,
                     rich: rich
@@ -141,77 +116,44 @@ class PydioCKEditor extends Component {
     }
 
     componentDidMount() {
-        const {pydio} = this.props
+        const {pydio, url} = this.props
 
         pydio.ApiClient.request({
             get_action: 'get_content',
-            file: this.state.url
-        }, (transport) => this.setState({content: transport.responseText}));
-    }
-
-    onSave() {
-        const {pydio} = this.props;
-
-        pydio.ApiClient.postPlainTextContent(this.state.url, this.state.content, (success) => {
-            if (!success) {
-                this.setState({error: "There was an error while saving"})
-            }
-        });
-    }
-
-    hasBeenModified() {
-        return (this.state.originalText != this.state.content)
-    }
-
-    handleChange(event) {
-      this.setState({textContent: event.target.value});
-    }
-
-    buildActions() {
-        let actions = [];
-        let mess = this.props.pydio.MessageHash;
-        actions.push(
-            <MaterialUI.ToolbarGroup
-                firstChild={true}
-                key="left"
-            >
-
-            </MaterialUI.ToolbarGroup>
-        );
-        return actions;
+            file: url
+        }, ({responseText}) => this.setState({content: responseText}))
     }
 
     render() {
-        const {desktop, mobile} = PydioCKEditor.config
+        const {url, content} = this.props
+        const {desktop, mobile} = Editor.config
+
+        if (!content) return null
 
         return (
-            <CompositeEditor
-                {...this.props}
-
-                saveDisabled={!this.hasBeenModified()}
-                onSave={() => this.onSave()}
-
-                onChange={content => this.setState({content})}
-                actions={this.buildActions()}
-                url={this.state.url}
+            <CKEditor
+                url={this.props.url}
+                content={this.props.content}
                 config={window.ajxpMobile ? mobile : desktop}
+                onChange={content => this.setState({content})}
             />
         );
     }
 }
 
-const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+CKEDITOR.basePath = Editor.config.basePath
+CKEDITOR.contentsCss = Editor.config.basePath + '../../res/css/ckeditor.css'
 
-let CompositeEditor = compose(withControls(PydioCKEditor.controls), withMenu, withLoader, withErrors)(CKEditor)
+/*const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-CKEDITOR.basePath = PydioCKEditor.config.basePath
-CKEDITOR.contentsCss = PydioCKEditor.config.basePath + '../../res/css/ckeditor.css'
+//let CompositeEditor = compose(withControls(PydioCKEditor.controls), withMenu, withLoader, withErrors)(CKEditor)
+
 // We need to attach the element to window else it won't be found
 window.PydioCKEditor = {
     Editor: PydioCKEditor,
     Actions: {
         onUndo: () => console.log("Whatever dude")
     }
-}
+}*/
 
-export default PydioCKEditor
+export default connect()(Editor)

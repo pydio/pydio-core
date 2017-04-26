@@ -18,23 +18,18 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import { ToolbarGroup, IconButton } from 'material-ui';
+import { IconButton } from 'material-ui';
 import { connect } from 'react-redux';
-import { mapStateToProps, Actions } from './utils';
+import { mapStateToProps } from './utils';
+import { handler } from '../utils';
 
-const Controls = ({id, selection, playing = false, tabModify, ...remainingProps}) => {
+const _Prev = ({selection, ...props}) => <IconButton onClick={() => handler("onSelectionChange", props)(selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={selection && !selection.hasPrevious()} />
+const _Play = ({playing, ...props}) => <IconButton onClick={() => handler("onTogglePlaying", props)(true)} iconClassName="mdi mdi-play" disabled={playing} />
+const _Pause = ({playing, ...props}) => <IconButton onClick={() => handler("onTogglePlaying", props)(false)} iconClassName="mdi mdi-pause" disabled={!playing} />
+const _Next = ({selection, ...props}) => <IconButton onClick={() => handler("onSelectionChange", props)(selection.next())} iconClassName="mdi mdi-arrow-right" disabled={selection && !selection.hasNext()} />
 
-    const handleNodeChange = (node) => tabModify({id, title: node.getLabel(), node})
-
-    const togglePlaying = () => tabModify({id, playing: !playing})
-
-    return (
-        <ToolbarGroup {...remainingProps}>
-            <IconButton onClick={() => handleNodeChange(selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={!selection.hasPrevious()} />
-            <IconButton onClick={() => togglePlaying()} iconClassName={`mdi mdi-${playing ? "pause" : "play"}`} disabled={!selection.hasPrevious() && !selection.hasNext()} />
-            <IconButton onClick={() => handleNodeChange(selection.next())} iconClassName="mdi mdi-arrow-right" disabled={!selection.hasNext()} />
-        </ToolbarGroup>
-    )
-}
-
-export default connect(mapStateToProps, Actions)(Controls);
+// Final export and connection
+export const Prev = connect(mapStateToProps)(_Prev)
+export const Play = connect(mapStateToProps)(_Play)
+export const Pause = connect(mapStateToProps)(_Pause)
+export const Next = connect(mapStateToProps)(_Next)

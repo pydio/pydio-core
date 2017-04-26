@@ -29,7 +29,7 @@ const Viewer = compose(
     withErrors
 )(({url, style}) => <iframe src={url} style={{...style, width: "100%", height: "100%", border: 0, flex: 1}}></iframe>)
 
-class PydioLibreOffice extends React.Component {
+class Editor extends React.Component {
 
     constructor(props) {
         super(props)
@@ -65,4 +65,4 @@ class PydioLibreOffice extends React.Component {
     }
 }
 
-window.PydioLibreOffice = PydioLibreOffice;
+export default Editor

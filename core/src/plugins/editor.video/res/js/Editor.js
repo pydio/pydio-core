@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,51 +17,108 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-
-import Media from './Media';
+import React, {Component} from 'react'
+import { connect } from 'react-redux'
+import { compose } from 'redux'
+import Player from './Player';
 
 class Editor extends React.Component {
 
-    constructor(props) {
-
-        super(props)
-
-        const {url} = this.props
-
-        this.state = {
-            url: url
+    static get styles() {
+        return {
+            container: {
+                minHeight: 120,
+                flex: 1,
+                padding: 0,
+                width: "100%"
+            }
         }
-
-        this.onReady = this._handleReady.bind(this)
     }
 
-    _handleReady() {
-        typeof this.props.onReady ==='function' && this.props.onReady()
+    static get propTypes() {
+        return {
+            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+            pydio: React.PropTypes.instanceOf(Pydio).isRequired,
+
+            preview: React.PropTypes.bool.isRequired
+        }
     }
 
+    static get defaultProps() {
+        return {
+            preview: false
+        }
+    }
+
+    componentDidMount() {
+        this.loadNode(this.props)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.node !== this.props.node) {
+            this.loadNode(nextProps)
+        }
+    }
+
+    loadNode(props) {
+        const {pydio, node} = props
+
+        this.getSessionId().then((sessionId) => this.setState({
+            url: pydio.Parameters.get('ajxpServerAccess') + '&ajxp_sessid=' + sessionId + '&get_action=read_video_data&file=' + encodeURIComponent(node.getPath())
+        }));
+    }
+
+    // Static functions
+    static getPreviewComponent(node, rich = false) {
+        if (rich) {
+            return {
+                element: PydioVideo,
+                props: {
+                    node: node,
+                    rich: rich
+                }
+            }
+        } else {
+            // We don't have a player for the file icon
+            return null;
+        }
+    }
+
+    // Util functions
+    getSessionId() {
+        const {pydio} = this.props
+
+        return new Promise((resolve, reject) => {
+            pydio.ApiClient.request({
+                get_action: 'get_sess_id'
+            }, function(transport) {
+                resolve(transport.responseText)
+            })
+        });
+    }
+
+    // Plugin Main Editor rendering
     render() {
-        let options = {
-            preload: 'auto',
-            autoplay: false,
-            controls: true,
-            flash: {
-                swf: "plugins/editor.video/node_modules/video.js/dist/video-js.swf"
-            },
-            techOrder: ['flash', 'html5'] // TODO - switch the order when the file is MP4 ??
-        }
+        const {url} = this.state || {}
+
+        // Only display the video when we know the URL
+        const editor = url ? <Player url={url} /> : null;
 
         return (
-            <div style={{position: "relative", padding: 0, margin: 0}}>
-                <Media options={options} src={this.state.url} resize={true} onReady={this.onReady}></Media>
-            </div>
-        )
+            <Viewer style={Editor.styles.container}>{editor}</Viewer>
+        );
     }
 }
 
-Editor.propTypes = {
-    url: React.PropTypes.string.isRequired,
+const {withSelection, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-    onReady: React.PropTypes.func
-}
+let Viewer = compose(
+    withMenu,
+    withLoader,
+    withErrors
+)(props => <div {...props} />)
 
-export default Editor;
+export default compose(
+    connect(),
+    withSelection((node) => true)
+)(Editor)

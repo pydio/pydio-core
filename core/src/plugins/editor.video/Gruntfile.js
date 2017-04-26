@@ -1,4 +1,7 @@
 module.exports = function(grunt) {
+
+    const {Externals} = require('../gui.ajax/res/js/dist/libdefs.js');
+    
     grunt.initConfig({
         babel: {
             options: {},
@@ -17,8 +20,15 @@ module.exports = function(grunt) {
         },
         browserify: {
             ui : {
+                options: {
+                    external: Externals,
+                    browserifyOptions:{
+                        standalone: 'PydioVideo',
+                        debug:true
+                    }
+                },
                 files: {
-                    'res/build/PydioVideo.js':'res/build/PydioVideo/*.js'
+                    'res/build/PydioVideo.js':'res/build/PydioVideo/index.js'
                 }
             }
         },

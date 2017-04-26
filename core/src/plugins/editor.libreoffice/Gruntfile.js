@@ -12,8 +12,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'res/js/',
                         src: ['**/*.js'],
-                        dest: 'res/build',
-                        ext: '.babel.js'
+                        dest: 'res/build/PydioLibreOffice/'
                     }
                 ]
             }
@@ -22,13 +21,14 @@ module.exports = function(grunt) {
             ui : {
                 options: {
                     external:Externals,
-                    browserifyOptions:{
+                    browserifyOptions: {
+                        standalone: 'PydioLibreOffice',
                         debug:true
                     }
                 },
                 files: {
-                    'res/build/PydioLibreOffice.js':'res/build/PydioLibreOffice.babel.js',
-                    'res/build/PydioLibreOfficeActions.js':'res/build/PydioLibreOfficeActions.babel.js'
+                    'res/build/PydioLibreOffice.js':'res/build/PydioLibreOffice/index.js',
+                    'res/build/PydioLibreOfficeActions.js':'res/build/PydioLibreOffice/actions.js'
                 }
             }
         },

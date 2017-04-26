@@ -11,19 +11,14 @@ class Editor extends Component {
     }
 
     componentDidMount() {
-        const {pydio, url, config, onChange} = this.props
+        const {pydio, url, content, config, onChange} = this.props
         const {id} = this.textarea
 
-        pydio.ApiClient.request({
-            get_action: 'get_content',
-            file: url
-        }, ({responseText}) => {
-            this.textarea.value = responseText
+        this.textarea.value = content
 
-            const editor = CKEDITOR.replace(this.textarea, config);
+        const editor = CKEDITOR.replace(this.textarea, config);
 
-            editor.on('change', ({editor}) => onChange(editor.getData()))
-        });
+        editor.on('change', ({editor}) => onChange(editor.getData()))
     }
 
     componentWillUnmount() {

@@ -19,38 +19,37 @@
  */
 
 import React, {Component} from 'react'
-import {compose} from 'redux'
+import { connect } from 'react-redux'
+import { compose } from 'redux'
 
-class PydioPDFJSViewer extends Component {
+class Editor extends Component {
 
-    static get defaultProps() {
-        return {
-            onLoad: () => {}
+    componentDidMount() {
+        this.loadNode(this.props)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.node !== this.props.node) {
+            this.loadNode(nextProps)
         }
     }
 
-    static get styles() {
-        return {}
-    }
-
-    constructor(props) {
-        super(props)
-
+    loadNode(props) {
         const {pydio, node} = props;
 
         let url;
         let base = DOMUtils.getUrlFromBase();
 
-        if(base) {
+        if (base) {
             url = base;
-            if(!url.startsWith('http') && !url.startsWith('https')){
+            if (!url.startsWith('http') && !url.startsWith('https')) {
                 if (!window.location.origin) {
                     // Fix for IE when Pydio is inside an iFrame
                     window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
                 }
                 url = document.location.origin + url;
             }
-        }else{
+        } else {
             // Get the URL for current workspace path.
             url = document.location.href.split('#').shift().split('?').shift();
             if(url[(url.length-1)] == '/'){
@@ -66,9 +65,10 @@ class PydioPDFJSViewer extends Component {
             + '&action=get_content&file=base64encoded:' + HasherUtils.base64_encode(node.getPath())
             + '&fake_file_name=' + encodeURIComponent(PathUtils.getBasename(node.getPath())));
 
-        this.state = {
+        this.setState({
             url: 'plugins/editor.pdfjs/pdfjs/web/viewer.html?file=' + pdfurl
-        }
+        })
+
     }
 
     static getPreviewComponent(node, rich = true) {
@@ -87,18 +87,25 @@ class PydioPDFJSViewer extends Component {
     }
 
     render() {
+        const {url} = this.state || {}
+
+        if (!url) return null
+
         return (
-            <Viewer {...this.props} src={this.state.url} />
+            <iframe {...this.props} src={url} />
         );
     }
 }
 
-const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+const {withSelection, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-let Viewer = compose(
+/*let Viewer = compose(
     withMenu,
     withLoader,
     withErrors
-)(props => <iframe {...props} />)
+)(props => <iframe {...props} />)*/
 
-window.PydioPDFJSViewer = PydioPDFJSViewer;
+export default compose(
+    connect(),
+    withSelection((node) => true)
+)(Editor)

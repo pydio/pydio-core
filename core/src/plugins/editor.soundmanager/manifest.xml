@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.soundmanager" iconClass="mdi mdi-volume-high" mimes="mp3,wav"
         openable="true" formId="smplayer_editor"
-        previewProvider="true" text="sm_editor.2" title="sm_editor.2" className="PydioSoundManager"
+        previewProvider="true" text="sm_editor.2" title="sm_editor.2" className="PydioSoundManager.Editor"
         label="CONF_MESSAGE[Sound Player]" description="CONF_MESSAGE[Uses HTML5 or Flash to play a sound]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">

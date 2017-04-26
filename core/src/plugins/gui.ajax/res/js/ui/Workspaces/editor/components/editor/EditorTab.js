@@ -19,7 +19,7 @@ import { compose, bindActionCreators } from 'redux';
 import * as actions from '../../actions';
 
 import makeMaximise from './make-maximise';
-const {ResolutionControls, ContentActions, ContentControls, SizeControls, SelectionControls, withMenu} = PydioHOCs;
+const {ResolutionActions, ResolutionControls, ContentActions, ContentControls, SizeActions, SizeControls, SelectionActions, SelectionControls, withMenu} = PydioHOCs;
 
 class Tab extends React.Component {
     static get styles() {
@@ -43,9 +43,17 @@ class Tab extends React.Component {
         const select = () => editorSetActiveTab(id)
         const editorSetState = (data) => tabModify({id, ...data})
 
-        let actions = {
+        let actions = {...SizeActions,
+            ...SelectionActions,
+            ...ResolutionActions,
             ...ContentActions,
-            ...FuncUtils.getFunctionByName(editorData.editorActions, window)
+        }
+
+        if (editorData.editorActions) {
+            actions = {
+                ...actions,
+                ...FuncUtils.getFunctionByName(editorData.editorActions, window)
+            }
         }
 
         let boundActionCreators = bindActionCreators(actions)
@@ -60,20 +68,32 @@ class Tab extends React.Component {
         ) : (
             <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={true} expanded={isActive} onExpandChange={!isActive ? select : null}>
                 <Toolbar style={{flexShrink: 0}}>
-                    {selection && <SelectionControls editorData={editorData} node={node} firstChild={true} selection={selection} playing={playing} />}
-                    {resolution && <ResolutionControls editorData={editorData} node={node} />}
-                    {size && <SizeControls editorData={editorData} node={node} />}
+                    <ToolbarGroup>
+                        {actions.onSelectionChange && <SelectionControls.Prev editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onTogglePlaying && <SelectionControls.Play editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onTogglePlaying && <SelectionControls.Pause editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onSelectionChange && <SelectionControls.Next editorData={editorData} node={node} {...boundActionCreators} />}
+                    </ToolbarGroup>
 
                     <ToolbarGroup>
-                        <ContentControls.Save editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Undo editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Redo editorData={editorData} node={node} {...boundActionCreators} />
+                        {actions.onToggleResolution && <ResolutionControls.ToggleResolution editorData={editorData} node={node} {...boundActionCreators} />}
+                    </ToolbarGroup>
 
-                        <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />
+                    <ToolbarGroup>
+                        {actions.onSizeChange && <SizeControls.AspectRatio editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onSizeChange && <SizeControls.Scale editorData={editorData} node={node} {...boundActionCreators} />}
+                    </ToolbarGroup>
 
-                        <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />
+                    <ToolbarGroup>
+                        {actions.onSave && <ContentControls.Save editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onUndo && <ContentControls.Undo editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onRedo && <ContentControls.Redo editorData={editorData} node={node} {...boundActionCreators} />}
+
+                        {actions.onToggleLineNumbers && <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onToggleLineWrapping &&  <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />}
+
+                        {actions.onJumpTo && <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />}
+                        {actions.onSearch && <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />}
                     </ToolbarGroup>
                 </Toolbar>
 

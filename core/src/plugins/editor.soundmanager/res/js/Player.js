@@ -45,10 +45,14 @@ class Player extends React.Component {
     }
 
     componentDidMount() {
-        //soundManager.reboot()
+        soundManager.reboot()
         soundManager.onready(threeSixtyPlayer.init)
         soundManager.onready(this.props.onReady)
         soundManager.beginDelayedInit()
+    }
+
+    componentWillUnmount() {
+        soundManager.reboot()
     }
 
     render() {

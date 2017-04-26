@@ -18,21 +18,30 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import React, {Component} from 'react';
-import {compose} from 'redux';
+import React, {Component} from 'react'
+import { connect } from 'react-redux'
+import { compose } from 'redux'
 import Player from './Player';
 
-class PydioSoundManager extends Component {
+class Editor extends Component {
 
-    constructor(props) {
-        super(props)
+    componentDidMount() {
+        this.loadNode(this.props)
+    }
 
-        const {pydio, node, preview} = props
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.node !== this.props.node) {
+            this.loadNode(nextProps)
+        }
+    }
 
-        this.state = {
+    loadNode(props) {
+        const {pydio, node} = props
+
+        this.setState({
             url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid(),
             mimeType: "audio/" + node.getAjxpMime()
-        }
+        })
     }
 
     // Static functions
@@ -47,17 +56,16 @@ class PydioSoundManager extends Component {
     }
 
     render() {
+        const {mimeType, url} = this.state || {}
+
+        if (!url) return null
 
         return (
-            <ExtendedPlayer rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
-                <a type={this.state.mimeType} href={this.state.url} />
-            </ExtendedPlayer>
+            <Player rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
+                <a type={mimeType} href={url} />
+            </Player>
         );
     }
-}
-
-PydioSoundManager.defaultProps = {
-    onLoad: () => {}
 }
 
 function guid() {
@@ -70,14 +78,14 @@ function s4() {
         .substring(1);
 }
 
-const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+const {withSelection, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-let ExtendedPlayer = compose(
-    withMenu,
-    withErrors
-)(props => <Player {...props} />)
+// let ExtendedPlayer = compose(
+//     withMenu,
+//     withErrors
+// )(props => <Player {...props} />)
 
-// We need to attach the element to window else it won't be found
-window.PydioSoundManager = PydioSoundManager
-
-export default PydioSoundManager
+export default compose(
+    connect(),
+    withSelection((node) => true)
+)(Editor)

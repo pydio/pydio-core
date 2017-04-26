@@ -19,8 +19,8 @@
  */
 
 import React, {Component} from 'react'
-import {compose} from 'redux'
-import {FlatButton, IconButton, Slider, ToolbarGroup, ToolbarSeparator} from 'material-ui'
+import { connect } from 'react-redux'
+import { compose } from 'redux'
 
 const baseURL = pydio.Parameters.get('ajxpServerAccess')
 const conf = pydio.getPluginConfigs('editor.diaporama')
@@ -28,6 +28,8 @@ const sizes = conf && conf.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700
 
 const {SizeProviders, withResolution, withSelection, withResize, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 const {ImageSizeProvider, ContainerSizeProvider} = SizeProviders
+
+const {EditorActions} = PydioWorkspaces;
 
 class Image extends Component {
     static get propTypes() {
@@ -143,7 +145,6 @@ class Editor extends Component {
 
     render() {
         const {node, src, editorData, scale, ...remainingProps} = this.props;
-        const {playing} = this.state || {};
 
         if (!node) return null
 
@@ -174,6 +175,7 @@ class Editor extends Component {
 }
 
 export default compose(
+    connect(),
     withSelection((node) => node.getMetadata().get('is_image') === '1'),
     withResolution(sizes,
         (node) => `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,

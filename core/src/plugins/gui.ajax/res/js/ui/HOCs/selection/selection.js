@@ -22,7 +22,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { SelectionModel } from './';
 import { getDisplayName } from '../utils';
-import { mapStateToProps, Actions } from './utils';
+import { mapStateToProps } from './utils';
 
 const withSelection = (filter) => {
     return (Component) => {
@@ -61,7 +61,7 @@ const withSelection = (filter) => {
             }
         }
 
-        return connect(mapStateToProps, Actions)(WithSelection)
+        return connect(mapStateToProps)(WithSelection)
     }
 }
 

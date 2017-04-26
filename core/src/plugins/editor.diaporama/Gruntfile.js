@@ -28,7 +28,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'res/build/PydioDiaporama.js':'res/build/PydioDiaporama/*.js'
+                    'res/build/PydioDiaporama.js':'res/build/PydioDiaporama/index.js'
                 }
             }
         },

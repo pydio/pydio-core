@@ -1,3 +1,23 @@
+import * as Actions from '../Workspaces/editor/actions';
+
+export { Actions }
+
+import * as contentActions from './content/actions';
+import * as resolutionActions from './resolution/actions';
+import * as selectionActions from './selection/actions';
+import * as sizeActions from './size/actions';
+
+const defaultActions = {
+    ...contentActions,
+    ...resolutionActions,
+    ...selectionActions,
+    ...sizeActions
+}
+
+// Helper functions
+const getActions = ({editorData}) => (editorData.editorActions && {...defaultActions, ...FuncUtils.getFunctionByName(editorData.editorActions, window)} || {...defaultActions})
+export const handler = (func, props) => getActions(props)[func](props)
+
 export const toTitleCase = str => str.replace(/\w\S*/g, (txt) => `${txt.charAt(0).toUpperCase()}${txt.substr(1)}`)
 
 export const getDisplayName = (Component) => {
@@ -18,8 +38,6 @@ export const getBoundingRect = (element) => {
     const margin = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`margin-${key}`])}), {})
     const padding = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`padding-${key}`])}), {})
     const border = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`border-${key}`])}), {})
-
-    console.log(element, style.paddingTop)
 
     keys.reduce((current, key) => console.log(parseInt(style[`margin-${key}`])), {})
 
