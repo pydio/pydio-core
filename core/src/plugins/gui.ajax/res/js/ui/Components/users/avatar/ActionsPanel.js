@@ -44,7 +44,10 @@ class ActionsPanel extends React.Component{
             button: {
                 backgroundColor: this.props.muiTheme.palette.accent2Color,
                 borderRadius: '50%',
-                margin: '0 4px'
+                margin: '0 4px',
+                width: 44,
+                height: 44,
+                padding: 10
             },
             icon : {
                 color: 'white'
@@ -62,8 +65,8 @@ class ActionsPanel extends React.Component{
             actions.push({key:'teams', label:'Add to team', icon:'account-multiple-plus', callback:this.openPicker.bind(this)});
         }
         if(this.props.userEditable){
-            actions.push({key:'edit', label:'Edit user', icon:'pencil', callback:this.props.onEditAction});
-            actions.push({key:'delete', label:'Delete user', icon:'delete', callback:this.props.onDeleteAction});
+            actions.push({key:'edit', label:this.props.team?'Edit Team Label':'Edit user', icon:'pencil', callback:this.props.onEditAction});
+            actions.push({key:'delete', label:this.props.team?'Delete Team':'Delete user', icon:'delete', callback:this.props.onDeleteAction});
         }
 
         return (

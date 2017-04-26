@@ -44,10 +44,12 @@ export default function(PydioComponent, pydio){
 
             let themeCusto = {
                 palette: {
-                    primary1Color       : colors.blueGrey600,
+                    primary1Color       : '#325e74',
                     primary2Color       : colors.deepOrange500,
                     accent1Color        : colors.deepOrange500,
                     accent2Color        : colors.lightBlue500,
+                    avatarsColor        : '#438db3',
+                    sharingColor        : '#4aceb0',
                     ...customPalette
                 }
             };

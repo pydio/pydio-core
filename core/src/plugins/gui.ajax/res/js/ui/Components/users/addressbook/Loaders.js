@@ -63,11 +63,18 @@ class Loaders{
                 child.icon = 'mdi mdi-account-multiple';
                 child.childrenLoader = Loaders.loadGroups;
                 child.itemsLoader = Loaders.loadGroupUsers;
+                if(entry.currentParams && entry.currentParams.alpha_pages){
+                    child.currentParams = {...entry.currentParams};
+                }
             });
             callback(children);
         };
         const path = entry.id.replace('AJXP_GRP_', '');
-        Loaders.listUsers({filter_value:4, group_path:path}, wrapped, entry);
+        let params = {filter_value:4, group_path:path};
+        if(entry.currentParams && !entry.currentParams.alpha_pages){
+            params = {...params, ...entry.currentParams};
+        }
+        Loaders.listUsers(params, wrapped, entry);
     }
 
     static loadExternalUsers(entry, callback){
@@ -76,7 +83,11 @@ class Loaders{
 
     static loadGroupUsers(entry, callback){
         const path = entry.id.replace('AJXP_GRP_', '');
-        Loaders.listUsers({filter_value:1, group_path:path}, callback, entry);
+        let params = {filter_value:1, group_path:path};
+        if(entry.currentParams){
+            params = {...params, ...entry.currentParams};
+        }
+        Loaders.listUsers(params, callback, entry);
     }
 
     static loadTeamUsers(entry, callback){

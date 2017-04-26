@@ -1,23 +1,17 @@
-import UsersList from './UsersList'
-import Loaders from './Loaders'
+const {Component, PropTypes} = require('react')
 
-class SearchForm extends React.Component{
+/**
+ * Ready to use Form + Result List for search users
+ */
+class SearchForm extends Component{
 
     constructor(props, context){
         super(props.context);
-        this.state = {value: '', items: []};
+        this.state = {value: ''};
     }
 
     search(){
-        if(!this.state.value){
-            this.setState({items: []});
-            return;
-        }
-        let params = {value: this.state.value, existing_only:'true'};
-        if(this.props.params){
-            params = {...params, ...this.props.params};
-        }
-        Loaders.listUsers(params, (children) => {this.setState({items:children})});
+        this.props.onSearch(this.state.value);
     }
 
     onChange(event, value){
@@ -27,29 +21,13 @@ class SearchForm extends React.Component{
 
     render(){
 
-        const {mode, item} = this.props;
-
         return (
-            <div style={{flex: 1, display:'flex', flexDirection:'column'}}>
-                <div style={{padding: 10, height:56, backgroundColor:this.state.select?activeTbarColor : '#fafafa', display:'flex', alignItems:'center', transition:DOMUtils.getBeziersTransition()}}>
-                    {mode === "selector" && item._parent && <MaterialUI.IconButton iconClassName="mdi mdi-chevron-left" onTouchTap={() => {this.props.onFolderClicked(item._parent)}}/>}
-                    {mode === 'book' && <div style={{fontSize:20, color:'rgba(0,0,0,0.87)', flex:1}}>{this.props.title}</div>}
-                    <div style={mode === 'book'?{minWidth:320}:{flex:1}}>
-                        <MaterialUI.TextField
-                            fullWidth={true}
-                            value={this.state.value}
-                            onChange={this.onChange.bind(this)}
-                            hintText={this.props.searchLabel}
-                        />
-                    </div>
-                </div>
-                <UsersList
-                    mode={this.props.mode}
-                    onItemClicked={this.props.onItemClicked}
-                    item={{leafs: this.state.items}}
-                    noToolbar={true}
-                    emptyStatePrimaryText="No results"
-                    emptyStateSecondaryText="Start typing in the search form to find users in the local directory"
+            <div style={{minWidth:320, ...this.props.style}}>
+                <MaterialUI.TextField
+                    fullWidth={true}
+                    value={this.state.value}
+                    onChange={this.onChange.bind(this)}
+                    hintText={this.props.searchLabel}
                 />
             </div>
         );
@@ -59,12 +37,18 @@ class SearchForm extends React.Component{
 }
 
 SearchForm.propTypes = {
-    params: React.PropTypes.object,
-    searchLabel: React.PropTypes.string,
-    onItemClicked:React.PropTypes.func,
-    // Required for navigation
-    item: React.PropTypes.object,
-    onFolderClicked:React.PropTypes.func
+    /**
+     * Label displayed in the search field
+     */
+    searchLabel     : PropTypes.string.isRequired,
+    /**
+     * Callback triggered to search
+     */
+    onSearch        : PropTypes.func.isRequired,
+    /**
+     * Will be appended to the root element
+     */
+    style           : PropTypes.object
 };
 
 export {SearchForm as default}

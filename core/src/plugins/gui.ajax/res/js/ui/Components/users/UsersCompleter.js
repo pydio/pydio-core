@@ -293,6 +293,7 @@ const UsersLoader = React.createClass({
                         loaderStyle={{width: 320, height: 420}}
                         onItemSelected={this.onAddressBookItemSelected}
                         usersFrom={this.props.usersFrom}
+                        disableSearch={true}
                     />
                 }
             </div>

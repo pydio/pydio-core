@@ -3,6 +3,8 @@ const {IconButton, Checkbox, FlatButton, RaisedButton, ListItem, FontIcon, Avata
 const {muiThemeable} = require('material-ui/styles')
 const {Loader} = require('pydio').requireLib('boot')
 import EmptyStateView from '../../views/EmptyStateView'
+import AlphaPaginator from './AlphaPaginator'
+import SearchForm from './SearchForm'
 
 class UsersList extends React.Component{
 
@@ -12,13 +14,15 @@ class UsersList extends React.Component{
     }
 
     render(){
-        if(this.props.loading){
-            return <Loader style={{flex:1}}/>;
-        }
-        const {item, mode} = this.props;
+        const {item, mode, paginatorType, loading, enableSearch, showSubheaders} = this.props;
         const folders = item.collections || [];
         const leafs = item.leafs || [];
-        const items = [...folders, ...leafs];
+        const foldersSubHeader = folders.length && (leafs.length || showSubheaders) ? [{subheader:'Groups'}] : [];
+        let usersSubHeader = [];
+        if(showSubheaders || paginatorType){
+            usersSubHeader = [{subheader: paginatorType ? <AlphaPaginator {...this.props} style={{lineHeight: '20px',padding: '14px 0'}} /> : 'Users'}];
+        }
+        const items = [...foldersSubHeader, ...folders, ...usersSubHeader, ...leafs];
         const total = items.length;
         let elements = [];
         const toggleSelect = () => {this.setState({select:!this.state.select, selection:[]})};
@@ -33,6 +37,7 @@ class UsersList extends React.Component{
                 <div style={{flex:1, fontSize:20, color:this.state.select?'white':'rgba(0,0,0,0.87)'}}>{item.label}</div>
                 {mode === 'book' && item.actions && item.actions.create && !this.state.select && <FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
                 {mode === 'book' && item.actions && item.actions.remove && this.state.select && <RaisedButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
+                {enableSearch && <SearchForm searchLabel={this.props.searchLabel} onSearch={this.props.onSearch} style={{flex:1, minWidth: 200}}/>}
             </div>
         );
         // PARENT NODE
@@ -51,8 +56,12 @@ class UsersList extends React.Component{
         }
         // ITEMS
         items.forEach(function(item, index){
+            if(item.subheader){
+                elements.push(<Subheader>{item.subheader}</Subheader>);
+                return;
+            }
             const fontIcon = (
-                <UserAvatar cardSize={40} pydio={this.props.pydio || pydio}
+                <UserAvatar avatarSize={36} pydio={this.props.pydio || pydio}
                     userId={item.id}
                     userLabel={item.label}
                     avatar={item.avatar}
@@ -130,12 +139,13 @@ class UsersList extends React.Component{
         return (
             <div style={{flex:1, flexDirection:'column', display:'flex'}} onTouchTap={this.props.onTouchTap}>
                 {mode !== 'inner' && (!emptyState || mode !== 'book') && !this.props.noToolbar && toolbar}
-                {!emptyState &&
+                {!emptyState && !loading &&
                     <List style={{flex: 1, overflowY: mode !== 'inner' ? 'auto' : 'initial'}}>
                         {this.props.subHeader && <Subheader>{this.props.subHeader}</Subheader>}
                         {elements}
                     </List>
                 }
+                {loading && <Loader style={{flex:1}}/>}
                 {emptyState}
             </div>
         );

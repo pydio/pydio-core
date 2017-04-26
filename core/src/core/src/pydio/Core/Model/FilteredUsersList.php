@@ -54,12 +54,18 @@ class FilteredUsersList{
     private $excludeCurrent;
 
     /**
+     * @var bool
+     */
+    private $alphaPages;
+
+    /**
      * FilteredUsersList constructor.
      * @param ContextInterface $ctx
      */
-    public function __construct(ContextInterface $ctx, $excludeCurrent = true){
+    public function __construct(ContextInterface $ctx, $excludeCurrent = true, $alphaPages = false){
         $this->ctx = $ctx;
         $this->excludeCurrent = $excludeCurrent;
+        $this->alphaPages = $alphaPages;
     }
 
     /**
@@ -329,7 +335,7 @@ class FilteredUsersList{
         $items          = [];
         $mess           = LocaleService::getMessages();
         $allowCreation &= $this->getConf('USER_CREATE_USERS');
-        $searchLimit    = $this->getConf('USERS_LIST_COMPLETE_LIMIT');
+        $searchLimit    = $this->alphaPages ? -1 : $this->getConf('USERS_LIST_COMPLETE_LIMIT');
         $baseGroup      = $this->computeBaseGroup($groupPathFilter, $searchQuery);
 
         if(!empty($searchQuery)) {

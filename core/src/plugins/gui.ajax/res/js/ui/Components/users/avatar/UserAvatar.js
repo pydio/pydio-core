@@ -2,11 +2,15 @@ import GraphPanel from './GraphPanel'
 import ActionsPanel from './ActionsPanel'
 const debounce = require('lodash.debounce')
 const React = require('react')
+const Color = require('color')
 const {FontIcon, Popover, Paper, Avatar, CardTitle} = require('material-ui')
 const {muiThemeable} = require('material-ui/styles')
 const MetaCacheService = require('pydio/http/meta-cache-service')
 const PydioApi = require('pydio/http/api')
 
+/**
+ * Generic component for display a user and her avatar (first letters or photo)
+ */
 class UserAvatar extends React.Component{
 
     constructor(props, context){
@@ -145,22 +149,27 @@ class UserAvatar extends React.Component{
             label = this.props.userLabel || this.props.userId;
         }
 
-        let {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,
+        let {userId, style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,
             labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard, cardSize} = this.props;
         let avatarContent, avatarColor, avatarIcon;
         if(richCard){
             displayAvatar = useDefaultAvatar = displayLabel = true;
         }
         if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
+            let avatarsColor = this.props.muiTheme.palette.avatarsColor;
+            if(this.props.userType === 'group' || userId.indexOf('AJXP_GRP_/') === 0 || userId.indexOf('/AJXP_TEAM/') === 0){
+                avatarsColor = Color(avatarsColor).darken(0.2).toString();
+            }
             if(richCard){
-                avatarIcon  = <FontIcon className="mdi mdi-account" style={{color:this.props.muiTheme.palette.primary1Color}} />;
-                avatarColor = '#ECEFF1';
+                avatarIcon  = <FontIcon className="mdi mdi-account" style={{color:avatarsColor}} />;
+                avatarColor = '#f5f5f5';
             }else{
-                avatarColor     = this.props.muiTheme.palette.primary1Color;
+                avatarColor     = avatarsColor;
                 if(this.props.icon){
                     avatarIcon = <FontIcon className={this.props.icon}/>;
                 }else{
-                    avatarContent   = label.toUpperCase().substring(0,2);
+                    avatarContent = label.split(' ').map((word)=>word[0]).join('').substring(0,2);
+                    if(avatarContent.length < 2) avatarContent =  label.substring(0,2);
                 }
             }
         }

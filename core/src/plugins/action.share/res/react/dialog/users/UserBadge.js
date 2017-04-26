@@ -1,22 +1,18 @@
-const React = require('react')
-const {MenuItem, IconMenu} = require('material-ui')
+const {Component, PropTypes} = require('react')
+const {MenuItem, IconMenu, IconButton} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
+const Color = require('color')
 
-const UserBadge = React.createClass({
-    propTypes: {
-        label: React.PropTypes.string,
-        avatar: React.PropTypes.string,
-        type:React.PropTypes.string,
-        menus: React.PropTypes.object
-    },
+class UserBadge extends Component{
 
-    renderMenu: function(){
+    renderMenu(){
         if (!this.props.menus || !this.props.menus.length) {
             return null;
         }
         const menuItems = this.props.menus.map(function(m){
             let rightIcon;
             if(m.checked){
-                rightIcon = <span className="icon-check"/>;
+                rightIcon = <span className="mdi mdi-check"/>;
             }
             return (
                 <MenuItem
@@ -28,25 +24,28 @@ const UserBadge = React.createClass({
         const iconStyle = {fontSize: 18};
         return(
             <IconMenu
-                iconButtonElement={<MaterialUI.IconButton style={{padding: 16}} iconStyle={iconStyle} iconClassName="icon-ellipsis-vertical"/>}
+                iconButtonElement={<IconButton style={{padding: 16}} iconStyle={iconStyle} iconClassName="icon-ellipsis-vertical"/>}
                 anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                 targetOrigin={{horizontal: 'right', vertical: 'top'}}
             >
                 {menuItems}
             </IconMenu>
         );
-    },
+    }
 
-    render: function () {
+    render() {
         var avatar;
+        let avatarColor = this.props.muiTheme.palette.avatarsColor;
         if(this.props.type == 'group') {
-            avatar = <span className="avatar icon-group"/>;
+            avatarColor = Color(avatarColor).darken(.2).toString();
+            avatar = <span className="avatar mdi mdi-account-multiple" style={{backgroundColor:avatarColor}}/>;
         }else if(this.props.type == 'temporary') {
-            avatar = <span className="avatar icon-plus"/>;
+            avatarColor = Color(avatarColor).lighten(.2).toString();
+            avatar = <span className="avatar mdi mdi-account-plus" style={{backgroundColor:avatarColor}}/>;
         }else if(this.props.type == 'remote_user'){
-            avatar = <span className="avatar icon-cloud"/>;
+            avatar = <span className="avatar mdi mdi-account-network" style={{backgroundColor:avatarColor}}/>;
         }else{
-            avatar = <span className="avatar icon-user"/>;
+            avatar = <span className="avatar mdi mdi-account" style={{backgroundColor:avatarColor}}/>;
         }
         var menu = this.renderMenu();
         return (
@@ -58,6 +57,16 @@ const UserBadge = React.createClass({
             </div>
         );
     }
-});
+}
+
+UserBadge.propTypes = {
+    label   : PropTypes.string,
+    avatar  : PropTypes.string,
+    type    : PropTypes.string,
+    menus   : PropTypes.object,
+    muiTheme: PropTypes.object,
+};
+
+UserBadge = muiThemeable()(UserBadge);
 
 export {UserBadge as default}

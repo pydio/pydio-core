@@ -1,9 +1,20 @@
+/**
+ * Left panel of the address book
+ * Display treeview hierarchy of users, teams, groups.
+ */
 class NestedListItem extends React.Component{
 
+    /**
+     * Triggers this.props.onTouchTap
+     */
     onTouchTap(){
         this.props.onTouchTap(this.props.entry);
     }
 
+    /**
+     * Recursively build other NestedListItem
+     * @param data
+     */
     buildNestedItems(data){
         return data.map(function(entry){
             return (
@@ -17,7 +28,7 @@ class NestedListItem extends React.Component{
     }
 
     render(){
-        const {id, label, icon} = this.props.entry;
+        const {id, label, icon, selected} = this.props.entry;
         const children = this.props.entry.collections || [];
         const nested = this.buildNestedItems(children);
         let fontIcon;
@@ -32,7 +43,7 @@ class NestedListItem extends React.Component{
                 onTouchTap={this.onTouchTap.bind(this)}
                 nestedItems={nested}
                 initiallyOpen={true}
-                leftIcon={fontIcon}
+                leftIcon={false && fontIcon}
                 innerDivStyle={{fontWeight:this.props.selected === this.props.entry.id ? 500 : 400}}
             />
         );
@@ -41,8 +52,17 @@ class NestedListItem extends React.Component{
 }
 
 NestedListItem.propTypes = {
+    /**
+     * Keeps track of the current depth level
+     */
     nestedLevel:React.PropTypes.number,
+    /**
+     * Currently selected node id
+     */
     selected:React.PropTypes.string,
+    /**
+     * Callback triggered when an entry is selected
+     */
     onTouchTap: React.PropTypes.func
 }
 

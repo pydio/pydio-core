@@ -18,6 +18,7 @@ div.user-badge.share-dialog {
       flex-direction: row;
   -ms-flex-align: center;
       align-items: center;
+  line-height: 20px;
 }
 div.user-badge.share-dialog .user-badge-label {
   -ms-flex: 5;

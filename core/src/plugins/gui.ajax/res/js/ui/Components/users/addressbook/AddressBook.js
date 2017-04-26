@@ -2,7 +2,7 @@ import NestedListItem from './NestedListItem'
 import UsersList from './UsersList'
 
 import RightPanelCard from './RightPanelCard'
-import SearchForm from './SearchForm'
+import SearchPanel from './SearchPanel'
 
 import Loaders from './Loaders'
 
@@ -15,19 +15,58 @@ const {Popover, IconButton} = require('material-ui')
 const {muiThemeable} = require('material-ui/styles')
 const Color = require('color')
 
+/**
+ * High level component to browse users, groups and teams, either in a large format (mode='book') or a more compact
+ * format (mode='selector'|'popover').
+ * Address book allows to create external users, teams, and also to browse trusted server directories if Federated Sharing
+ * is active.
+ */
 let AddressBook = React.createClass({
 
     propTypes: {
+        /**
+         * Main instance of pydio
+         */
         pydio           : React.PropTypes.instanceOf(Pydio),
+        /**
+         * Display mode, either large (book) or small picker ('selector', 'popover').
+         */
         mode            : React.PropTypes.oneOf(['book', 'selector', 'popover']).isRequired,
+        /**
+         * Callback triggered in 'selector' mode whenever an item is clicked.
+         */
         onItemSelected  : React.PropTypes.func,
+        /**
+         * Display users only, no teams or groups
+         */
         usersOnly       : React.PropTypes.bool,
+        /**
+         * Choose various user sources, either the local directory or remote ( = trusted ) servers.
+         */
         usersFrom       : React.PropTypes.oneOf(['local', 'remote', 'any']),
+        /**
+         * Disable the search engine
+         */
         disableSearch   : React.PropTypes.bool,
-        muiTheme        : React.PropTypes.object,
+        /**
+         * Theme object passed by muiThemeable() wrapper
+         */
+        muiTheme                    : React.PropTypes.object,
+        /**
+         * Will be passed to the Popover object
+         */
         popoverStyle                : React.PropTypes.object,
+        /**
+         * Used as a button to open the selector in a popover
+         */
         popoverButton               : React.PropTypes.object,
+        /**
+         * Will be passed to the Popover container object
+         */
         popoverContainerStyle       : React.PropTypes.object,
+        /**
+         * Will be passed to the Popover Icon Button.
+         */
         popoverIconButtonStyle      : React.PropTypes.object
     },
 
@@ -44,12 +83,13 @@ let AddressBook = React.createClass({
     getInitialState: function(){
 
         const {pydio, mode, usersOnly, usersFrom, teamsOnly, disableSearch} = this.props;
+        const confConfigs = pydio.getPluginConfigs('core.conf');
 
         let root;
         if(teamsOnly){
             root = {
                 id: 'teams',
-                label: 'Your Teams',
+                label: 'My Teams',
                 childrenLoader: Loaders.loadTeams,
                 _parent: null,
                 _notSelectable: true,
@@ -75,25 +115,26 @@ let AddressBook = React.createClass({
             collections: []
         };
         if(usersFrom !== 'remote'){
-            root.collections.push({
-                id:'ext',
-                label:'Your Users',
-                //icon:'mdi mdi-account-network',
-                itemsLoader: Loaders.loadExternalUsers,
-                _parent:root,
-                _notSelectable:true,
-                actions:{
-                    type    : 'users',
-                    create  : '+ Create User',
-                    remove  : 'Delete User',
-                    multiple: true
-                }
-            });
-
+            if(confConfigs.get('USER_CREATE_USERS')){
+                root.collections.push({
+                    id:'ext',
+                    label:'My Users',
+                    //icon:'mdi mdi-account-network',
+                    itemsLoader: Loaders.loadExternalUsers,
+                    _parent:root,
+                    _notSelectable:true,
+                    actions:{
+                        type    : 'users',
+                        create  : '+ Create User',
+                        remove  : 'Delete User',
+                        multiple: true
+                    }
+                });
+            }
             if(!usersOnly) {
                 root.collections.push({
                     id: 'teams',
-                    label: 'Your Teams',
+                    label: 'My Teams',
                     //icon: 'mdi mdi-account-multiple',
                     childrenLoader: Loaders.loadTeams,
                     _parent: root,
@@ -106,15 +147,34 @@ let AddressBook = React.createClass({
                     }
                 });
             }
-            root.collections.push({
-                id:'AJXP_GRP_/',
-                label:'All Users',
-                //icon:'mdi mdi-account-box',
-                childrenLoader:Loaders.loadGroups,
-                itemsLoader: Loaders.loadGroupUsers,
-                _parent:root,
-                _notSelectable:true
-            });
+            if(confConfigs.get('ALLOW_CROSSUSERS_SHARING')){
+                if(confConfigs.get('CROSSUSERS_ADDRESSBOOK_SEARCH_ONLY')){
+                    if(!disableSearch){
+                        root.collections.push({
+                            id:'search',
+                            label:'Search Users',
+                            //icon:'mdi mdi-account-search',
+                            type:'search',
+                            _parent:root,
+                            _notSelectable: true
+                        });
+                    }
+                }else{
+                    root.collections.push({
+                        id:'AJXP_GRP_/',
+                        label:'All Users',
+                        //icon:'mdi mdi-account-box',
+                        currentParams:{
+                            alpha_pages:true,
+                            value:'a'
+                        },
+                        childrenLoader:Loaders.loadGroups,
+                        itemsLoader: Loaders.loadGroupUsers,
+                        _parent:root,
+                        _notSelectable:true
+                    });
+                }
+            }
         }
 
         const ocsRemotes = pydio.getPluginConfigs('core.ocs').get('TRUSTED_SERVERS');
@@ -142,17 +202,6 @@ let AddressBook = React.createClass({
             if(remotesNodes.collections.length){
                 root.collections.push(remotesNodes);
             }
-        }
-
-        if(!disableSearch){
-            root.collections.push({
-                id:'search',
-                label:'Search Local Users',
-                //icon:'mdi mdi-account-search',
-                type:'search',
-                _parent:root,
-                _notSelectable: true
-            });
         }
 
         return {
@@ -271,6 +320,28 @@ let AddressBook = React.createClass({
         });
     },
 
+    reloadCurrentAtPage: function(letter){
+        this.state.selectedItem.leafLoaded = false;
+        this.state.selectedItem.collectionsLoaded = false;
+        if(letter === -1){
+            this.state.selectedItem.currentParams = null;
+        }else{
+            this.state.selectedItem.currentParams = {alpha_pages:'true', value:letter};
+        }
+        this.onFolderClicked(this.state.selectedItem);
+    },
+
+    reloadCurrentWithSearch: function(value){
+        if(!value){
+            this.reloadCurrentAtPage('a');
+            return;
+        }
+        this.state.selectedItem.leafLoaded = false;
+        this.state.selectedItem.collectionsLoaded = false;
+        this.state.selectedItem.currentParams = {has_search: true, value:value, existing_only:true};
+        this.onFolderClicked(this.state.selectedItem);
+    },
+
     render: function(){
 
         const {mode, muiTheme} = this.props;
@@ -301,8 +372,9 @@ let AddressBook = React.createClass({
                         targetOrigin={{horizontal: 'left', vertical: 'top'}}
                         onRequestClose={this.closePopover}
                         style={{marginLeft: 20, ...popoverStyle}}
+                        zDepth={2}
                     >
-                        <div style={{width: 256, height: 320, ...popoverContainerStyle}}>
+                        <div style={{width: 320, height: 420, ...popoverContainerStyle}}>
                             <AddressBook {...this.props} mode="selector" />
                         </div>
                     </Popover>
@@ -315,7 +387,7 @@ let AddressBook = React.createClass({
         const {selectedItem, root, rightPaneItem, createDialogItem} = this.state;
 
         const leftColumnStyle = {
-            backgroundColor: Color(muiTheme.palette.primary1Color).lighten(1.3).toString(),
+            backgroundColor: Color(muiTheme.palette.primary1Color).lightness(97).rgb().toString(),
             width: 256,
             overflowY:'auto',
             overflowX: 'hidden'
@@ -325,7 +397,7 @@ let AddressBook = React.createClass({
         if(selectedItem.id === 'search'){
 
             centerComponent = (
-                <SearchForm
+                <SearchPanel
                     item={selectedItem}
                     title={"All users"}
                     searchLabel={"Search user(s)"}
@@ -337,7 +409,7 @@ let AddressBook = React.createClass({
         }else if(selectedItem.type === 'remote'){
 
             centerComponent = (
-                <SearchForm
+                <SearchPanel
                     item={selectedItem}
                     params={{trusted_server_id:selectedItem.id}}
                     searchLabel={"Search user(s)"}
@@ -351,14 +423,24 @@ let AddressBook = React.createClass({
 
             let emptyStatePrimary;
             let emptyStateSecondary;
-            console.log(selectedItem.id);
+            let otherProps = {};
             if(selectedItem.id === 'teams'){
                 emptyStatePrimary = 'No teams created';
                 emptyStateSecondary = 'For easily sharing data with many users at once, create your own teams and add users to them.';
             }else if(selectedItem.id === 'ext'){
                 emptyStatePrimary = 'No external users';
                 emptyStateSecondary = 'You can create your own users here, and give them access to specific resources using sharing.';
+            }else if(selectedItem.id.indexOf('AJXP_GRP_/') === 0){
+                otherProps = {
+                    showSubheaders: true,
+                    paginatorType: !(selectedItem.currentParams && selectedItem.currentParams.has_search) && 'alpha',
+                    paginatorCallback: this.reloadCurrentAtPage.bind(this),
+                    enableSearch: !this.props.disableSearch,
+                    searchLabel: 'Search users',
+                    onSearch: this.reloadCurrentWithSearch.bind(this),
+                };
             }
+
 
             centerComponent = (
                 <UsersList
@@ -372,6 +454,7 @@ let AddressBook = React.createClass({
                     emptyStatePrimaryText={emptyStatePrimary}
                     emptyStateSecondaryText={emptyStateSecondary}
                     onTouchTap={this.state.rightPaneItem ? () => { this.setState({rightPaneItem:null}) } : null}
+                    {...otherProps}
                 />);
 
         }
@@ -411,7 +494,7 @@ let AddressBook = React.createClass({
         if(createDialogItem){
             if(createDialogItem.actions.type === 'users'){
                 dialogTitle = 'Create New User';
-                dialogContent = <AsyncComponent
+                dialogContent = <div style={{height:500}}><AsyncComponent
                     namespace="PydioForm"
                     componentName="UserCreationForm"
                     zDepth={0}
@@ -420,7 +503,7 @@ let AddressBook = React.createClass({
                     onUserCreated={this.closeCreateDialogAndReload}
                     onCancel={() => {this.setState({createDialogItem:null})}}
                     pydio={this.props.pydio}
-                />;
+                /></div>;
             }else if(createDialogItem.actions.type === 'teams'){
                 dialogTitle = 'Create New Team';
                 dialogContent = <TeamCreationForm
@@ -436,7 +519,7 @@ let AddressBook = React.createClass({
                     pydio={this.props.pydio}
                     mode="selector"
                     usersOnly={true}
-                    disableSearch={false}
+                    disableSearch={true}
                     onItemSelected={selectUser}
                 />;
             }
@@ -444,7 +527,7 @@ let AddressBook = React.createClass({
 
         let style = this.props.style || {}
         return (
-            <div style={{display:'flex', height: mode === 'selector' ? 320 : 450 , ...style}}>
+            <div style={{display:'flex', height: mode === 'selector' ? 420 : 450 , ...style}}>
                 {leftPanel}
                 {centerComponent}
                 {rightPanel}

@@ -176,6 +176,7 @@
                                 useDefaultAvatar={true}
                                 userId={u.ID}
                                 userLabel={u.LABEL}
+                                userType={u.TYPE}
                                 pydio={pydio}
                                 style={{flex:1, display:'flex', alignItems:'center'}}
                                 labelStyle={{fontSize: 15, paddingLeft: 10}}
