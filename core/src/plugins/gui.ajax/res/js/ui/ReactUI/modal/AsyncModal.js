@@ -317,9 +317,7 @@ let AsyncModal = React.createClass({
             modalContent = <span><CSSBlurBackground/>{modalContent}</span>
 
         }
-
-        console.log('RENDER DIALOG');
-
+        
         return (
             <Dialog
                 ref="dialog"
