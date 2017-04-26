@@ -139,18 +139,19 @@ class UserAvatar extends React.Component{
     render(){
 
         const {user, avatar, graph} = this.state;
+        let {pydio, userId, style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,
+            labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard, cardSize} = this.props;
+
         let {label} = this.state;
         let userType;
         if(user) {
             label = user.label;
-            userType = user.external ? 'External User' : 'Internal User';
+            userType = pydio.MessageHash[user.external ? '589' : '590'];
         }
         if(!label){
             label = this.props.userLabel || this.props.userId;
         }
 
-        let {userId, style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,
-            labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard, cardSize} = this.props;
         let avatarContent, avatarColor, avatarIcon;
         if(richCard){
             displayAvatar = useDefaultAvatar = displayLabel = true;
@@ -257,30 +258,92 @@ class UserAvatar extends React.Component{
 }
 
 UserAvatar.propTypes = {
+    /**
+     * Id of the user to be loaded
+     */
     userId: React.PropTypes.string.isRequired,
+    /**
+     * Pydio instance
+     */
     pydio : React.PropTypes.instanceOf(Pydio),
+    /**
+     * Label of the user, if we already have it (otherwise will be loaded)
+     */
     userLabel:React.PropTypes.string,
+    /**
+     * Icon to be displayed in avatar
+     */
     icon:React.PropTypes.string,
+    /**
+     * Display a rich card or a simple avatar+label chip
+     */
     richCard: React.PropTypes.bool,
+    /**
+     * If not rich, display a rich card as popover on mouseover
+     */
     richOnHover: React.PropTypes.bool,
 
-    // Wll add an action panel to the card
+    /**
+     * Add edit action to the card
+     */
     userEditable: React.PropTypes.bool,
+    /**
+     * Triggered after successful edition
+     */
     onEditAction: React.PropTypes.func,
+    /**
+     * Triggered after deletion
+     */
     onDeleteAction: React.PropTypes.func,
+    /**
+     * Triggered if a reload is required
+     */
     reloadAction: React.PropTypes.func,
 
+    /**
+     * Display label element or not
+     */
     displayLabel: React.PropTypes.bool,
+    /**
+     * Display avatar element or not
+     */
     displayAvatar: React.PropTypes.bool,
+    /**
+     * Display only avatar
+     */
     avatarOnly: React.PropTypes.bool,
+    /**
+     * Use default avatar
+     */
     useDefaultAvatar: React.PropTypes.bool,
+    /**
+     * Avatar size, 40px by default
+     */
     avatarSize:React.PropTypes.number,
 
+    /**
+     * Add class name to root element
+     */
     className: React.PropTypes.string,
+    /**
+     * Add class name to label element
+     */
     labelClassName: React.PropTypes.string,
+    /**
+     * Add class name to avatar element
+     */
     avatarClassName: React.PropTypes.string,
+    /**
+     * Add style to root element
+     */
     style: React.PropTypes.object,
+    /**
+     * Add style to label element
+     */
     labelStyle: React.PropTypes.object,
+    /**
+     * Add style to avatar element
+     */
     avatarStyle: React.PropTypes.object
 };
 

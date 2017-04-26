@@ -1,6 +1,11 @@
+const React = require('react')
 import TeamCard from './TeamCard'
 import UserCard from './UserCard'
+const {Paper} = require('material-ui')
 
+/**
+ * Container for UserCard or TeamCard
+ */
 class RightPanelCard extends React.Component{
 
     render(){
@@ -13,18 +18,36 @@ class RightPanelCard extends React.Component{
         }
 
         return (
-            <MaterialUI.Paper zDepth={2} style={{position:'relative', ...this.props.style}}>{content}</MaterialUI.Paper>
+            <Paper zDepth={2} style={{position:'relative', ...this.props.style}}>{content}</Paper>
         );
     }
 
 }
 
 RightPanelCard.propTypes = {
+    /**
+     * Pydio instance
+     */
     pydio: React.PropTypes.instanceOf(Pydio),
+    /**
+     * Selected item
+     */
     item: React.PropTypes.object,
+    /**
+     * Applies to root container
+     */
     style: React.PropTypes.object,
+    /**
+     * Forwarded to child
+     */
     onRequestClose: React.PropTypes.func,
+    /**
+     * Forwarded to child
+     */
     onDeleteAction: React.PropTypes.func,
+    /**
+     * Forwarded to child
+     */
     onUpdateAction: React.PropTypes.func
 };
 

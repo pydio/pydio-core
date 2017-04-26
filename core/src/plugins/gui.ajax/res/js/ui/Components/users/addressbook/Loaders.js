@@ -46,8 +46,8 @@ class Loaders{
                 child.itemsLoader = Loaders.loadTeamUsers;
                 child.actions = {
                     type    :'team',
-                    create  :'Add User to Team',
-                    remove  :'Remove from Team',
+                    create  :'573',
+                    remove  :'574',
                     multiple: true
                 };
                 child._notSelectable=true;

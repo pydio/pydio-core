@@ -1,7 +1,13 @@
+const React = require('react')
+const {TextField, FlatButton, CardTitle, Divider} = require('material-ui')
 import UsersList from './UsersList'
 import Loaders from './Loaders'
 import ActionsPanel from '../avatar/ActionsPanel'
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 
+/**
+ * Display info about a Team inside a popover-able card
+ */
 class TeamCard extends React.Component{
 
     constructor(props, context){
@@ -9,6 +15,10 @@ class TeamCard extends React.Component{
         this.state = {label: this.props.item.label};
     }
 
+    /**
+     * Use loader to get team participants
+     * @param item
+     */
     loadMembers(item){
         this.setState({loading: true});
         Loaders.childrenAsPromise(item, false).then((children) => {
@@ -36,7 +46,7 @@ class TeamCard extends React.Component{
         this.setState({editMode: false});
     }
     render(){
-        const {item, onDeleteAction, onCreateAction} = this.props;
+        const {item, onDeleteAction, onCreateAction, getMessage} = this.props;
 
         const editProps = {
             team: item,
@@ -50,19 +60,19 @@ class TeamCard extends React.Component{
         if(this.state.editMode){
             title = (
                 <div style={{display:'flex', alignItems:'center', margin: 16}}>
-                    <MaterialUI.TextField style={{flex: 1, fontSize: 24}} fullWidth={true} disabled={false} underlineShow={false} value={this.state.label} onChange={this.onLabelChange.bind(this)}/>
-                    <MaterialUI.FlatButton secondary={true} label="OK" onTouchTap={() => {this.updateLabel()}}/>
+                    <TextField style={{flex: 1, fontSize: 24}} fullWidth={true} disabled={false} underlineShow={false} value={this.state.label} onChange={this.onLabelChange.bind(this)}/>
+                    <FlatButton secondary={true} label={getMessage(48)} onTouchTap={() => {this.updateLabel()}}/>
                 </div>
             );
         }else{
-            title = <MaterialUI.CardTitle title={this.state.label} subtitle={(item.leafs && item.leafs.length ? item.leafs.length + ' team members' : 'No team members')}/>;
+            title = <CardTitle title={this.state.label} subtitle={(item.leafs && item.leafs.length ? getMessage(576).replace('%s', item.leafs.length) : getMessage(577))}/>;
         }
         return (
             <div>
                 {title}
                 <ActionsPanel {...this.props} {...editProps} />
-                <MaterialUI.Divider/>
-                <UsersList subHeader={"Team Members"} onItemClicked={()=>{}} item={item} mode="inner" onDeleteAction={onDeleteAction}/>
+                <Divider/>
+                <UsersList subHeader={getMessage(575)} onItemClicked={()=>{}} item={item} mode="inner" onDeleteAction={onDeleteAction}/>
             </div>
         )
     }
@@ -70,13 +80,32 @@ class TeamCard extends React.Component{
 }
 
 TeamCard.propTypes = {
+    /**
+     * Pydio instance
+     */
     pydio: React.PropTypes.instanceOf(Pydio),
+    /**
+     * Team data object
+     */
     item: React.PropTypes.object,
+    /**
+     * Applied to root container
+     */
     style: React.PropTypes.object,
+    /**
+     * Called to dismiss the popover
+     */
     onRequestClose: React.PropTypes.func,
+    /**
+     * Delete current team
+     */
     onDeleteAction: React.PropTypes.func,
+    /**
+     * Update current team
+     */
     onUpdateAction: React.PropTypes.func
 };
 
+TeamCard = PydioContextConsumer(TeamCard);
 
 export {TeamCard as default}

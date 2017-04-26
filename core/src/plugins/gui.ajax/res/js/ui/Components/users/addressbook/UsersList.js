@@ -1,7 +1,7 @@
 import UserAvatar from '../avatar/UserAvatar'
 const {IconButton, Checkbox, FlatButton, RaisedButton, ListItem, FontIcon, Avatar, Divider, Subheader, List} = require('material-ui')
 const {muiThemeable} = require('material-ui/styles')
-const {Loader} = require('pydio').requireLib('boot')
+const {Loader, PydioContextConsumer} = require('pydio').requireLib('boot')
 import EmptyStateView from '../../views/EmptyStateView'
 import AlphaPaginator from './AlphaPaginator'
 import SearchForm from './SearchForm'
@@ -14,7 +14,9 @@ class UsersList extends React.Component{
     }
 
     render(){
-        const {item, mode, paginatorType, loading, enableSearch, showSubheaders} = this.props;
+
+        const {item, mode, paginatorType, loading, enableSearch, showSubheaders, getMessage} = this.props;
+
         const folders = item.collections || [];
         const leafs = item.leafs || [];
         const foldersSubHeader = folders.length && (leafs.length || showSubheaders) ? [{subheader:'Groups'}] : [];
@@ -35,8 +37,8 @@ class UsersList extends React.Component{
                 {mode === "selector" && item._parent && <IconButton iconClassName="mdi mdi-chevron-left" onTouchTap={() => {this.props.onFolderClicked(item._parent)}}/>}
                 {mode === 'book' && total > 0 && item.actions && item.actions.multiple && <Checkbox style={{width:'initial', marginLeft: this.state.select?7:14}} checked={this.state.select} onCheck={toggleSelect}/>}
                 <div style={{flex:1, fontSize:20, color:this.state.select?'white':'rgba(0,0,0,0.87)'}}>{item.label}</div>
-                {mode === 'book' && item.actions && item.actions.create && !this.state.select && <FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
-                {mode === 'book' && item.actions && item.actions.remove && this.state.select && <RaisedButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
+                {mode === 'book' && item.actions && item.actions.create && !this.state.select && <FlatButton secondary={true} label={getMessage(item.actions.create)} onTouchTap={createAction}/>}
+                {mode === 'book' && item.actions && item.actions.remove && this.state.select && <RaisedButton secondary={true} label={getMessage(item.actions.remove)} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
                 {enableSearch && <SearchForm searchLabel={this.props.searchLabel} onSearch={this.props.onSearch} style={{flex:1, minWidth: 200}}/>}
             </div>
         );
@@ -88,7 +90,7 @@ class UsersList extends React.Component{
                 rightIconButton = (
                     <IconButton
                         iconClassName={"mdi mdi-delete"}
-                        tooltip={"Remove"}
+                        tooltip={getMessage(257)}
                         tooltipPosition="bottom-left"
                         iconStyle={{color: 'rgba(0,0,0,0.13)', hoverColor:'rgba(0,0,0,0.53)'}}
                         onTouchTap={()=>{this.props.onDeleteAction(this.props.item, [item])}}
@@ -129,7 +131,7 @@ class UsersList extends React.Component{
             if(mode === 'book' && item.actions && item.actions.create){
                 emptyStateProps = {
                     ...emptyStateProps,
-                    actionLabelId: item.actions.create,
+                    actionLabelId: getMessage(item.actions.create),
                     actionCallback: createAction
                 };
             }
@@ -162,6 +164,7 @@ UsersList.propTypes ={
     mode:React.PropTypes.oneOf(['book', 'selector', 'inner'])
 };
 
+UsersList = PydioContextConsumer(UsersList);
 UsersList = muiThemeable()(UsersList);
 
 export {UsersList as default}

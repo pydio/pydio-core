@@ -1,8 +1,10 @@
+const {Component, PropTypes} = require('react')
+
 /**
  * Left panel of the address book
  * Display treeview hierarchy of users, teams, groups.
  */
-class NestedListItem extends React.Component{
+class NestedListItem extends Component{
 
     /**
      * Triggers this.props.onTouchTap
@@ -55,15 +57,15 @@ NestedListItem.propTypes = {
     /**
      * Keeps track of the current depth level
      */
-    nestedLevel:React.PropTypes.number,
+    nestedLevel:PropTypes.number,
     /**
      * Currently selected node id
      */
-    selected:React.PropTypes.string,
+    selected:PropTypes.string,
     /**
      * Callback triggered when an entry is selected
      */
-    onTouchTap: React.PropTypes.func
+    onTouchTap:PropTypes.func
 }
 
 export {NestedListItem as default}

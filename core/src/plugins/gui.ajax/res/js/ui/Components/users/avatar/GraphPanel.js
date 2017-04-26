@@ -1,12 +1,19 @@
+const {Component, PropTypes} = require('react')
 import UsersList from '../addressbook/UsersList'
 const {Divider} = require('material-ui')
 const {UsersApi} = require('pydio/http/users-api')
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 
-class GraphPanel extends React.Component{
+
+/**
+ * Display information about user or team relations
+ */
+class GraphPanel extends Component{
 
     render(){
 
-        const {graph, userLabel, pydio} = this.props;
+        const {graph, userLabel, pydio, getMessage} = this.props;
+
         let elements = [];
         if(graph.teams && graph.teams.length){
             const onDeleteAction = function(parentItem, team){
@@ -18,7 +25,7 @@ class GraphPanel extends React.Component{
             elements.push(
                 <div key="teams">
                     <Divider/>
-                    <UsersList subHeader={"User belongs to " + graph.teams.length +" team(s)."} onItemClicked={()=>{}} item={{leafs: graph.teams}} mode="inner" onDeleteAction={onDeleteAction}/>
+                    <UsersList subHeader={getMessage(581).replace('%s', graph.teams.length)} onItemClicked={()=>{}} item={{leafs: graph.teams}} mode="inner" onDeleteAction={onDeleteAction}/>
                 </div>
             )
         }
@@ -26,7 +33,7 @@ class GraphPanel extends React.Component{
             elements.push(
                 <div key="source">
                     {elements.length ? <Divider/> : null}
-                    <div style={{padding: 16}}>{userLabel} has shared  {Object.keys(graph.source).length} item(s) with you.</div>
+                    <div style={{padding: 16}}>{getMessage(601).replace('%1', userLabel).replace('%2', Object.keys(graph.source).length)}</div>
                 </div>
             )
         }
@@ -34,7 +41,7 @@ class GraphPanel extends React.Component{
             elements.push(
                 <div key="target">
                     {elements.length ? <Divider/> : null}
-                    <div style={{padding: 16}}>You have shared  {Object.keys(graph.target).length} item(s) with {userLabel}.</div>
+                    <div style={{padding: 16}}>{getMessage(602).replace('%1', userLabel).replace('%2', Object.keys(graph.target).length)}</div>
                 </div>
             )
         }
@@ -43,4 +50,5 @@ class GraphPanel extends React.Component{
 
 }
 
+GraphPanel = PydioContextConsumer(GraphPanel);
 export {GraphPanel as default}

@@ -1,4 +1,5 @@
 const {Component, PropTypes} = require('react')
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 
 import SearchForm from './SearchForm'
 import UsersList from './UsersList'
@@ -28,7 +29,7 @@ class SearchPanel extends Component{
 
     render(){
 
-        const {mode, item} = this.props;
+        const {mode, item, getMessage} = this.props;
 
         return (
             <div style={{flex: 1, display:'flex', flexDirection:'column'}}>
@@ -42,8 +43,8 @@ class SearchPanel extends Component{
                     onItemClicked={this.props.onItemClicked}
                     item={{leafs: this.state.items}}
                     noToolbar={true}
-                    emptyStatePrimaryText="No results"
-                    emptyStateSecondaryText="Start typing in the search form to find users in the local directory"
+                    emptyStatePrimaryText={getMessage(587)}
+                    emptyStateSecondaryText={getMessage(588)}
                 />
             </div>
         );
@@ -75,4 +76,5 @@ SearchPanel.propTypes = {
     onFolderClicked : PropTypes.func
 };
 
+SearchPanel = PydioContextConsumer(SearchPanel);
 export {SearchPanel as default}

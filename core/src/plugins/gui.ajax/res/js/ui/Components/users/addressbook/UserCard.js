@@ -2,6 +2,10 @@ const React = require('react')
 import UserAvatar from '../avatar/UserAvatar'
 const {AsyncComponent} = require('pydio').requireLib('boot')
 
+/**
+ * Card presentation of a user. Relies on the UserAvatar object,
+ * plus the PydioForm.UserCreationForm when in edit mode.
+ */
 class UserCard extends React.Component{
 
     constructor(props, context){
@@ -56,11 +60,29 @@ class UserCard extends React.Component{
 }
 
 UserCard.propTypes = {
+    /**
+     * Pydio instance
+     */
     pydio: React.PropTypes.instanceOf(Pydio),
+    /**
+     * Team data object
+     */
     item: React.PropTypes.object,
+    /**
+     * Applied to root container
+     */
     style: React.PropTypes.object,
+    /**
+     * Called to dismiss the popover
+     */
     onRequestClose: React.PropTypes.func,
+    /**
+     * Delete current team
+     */
     onDeleteAction: React.PropTypes.func,
+    /**
+     * Update current team
+     */
     onUpdateAction: React.PropTypes.func
 };
 

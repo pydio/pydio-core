@@ -1,4 +1,11 @@
-class TeamCreationForm extends React.Component{
+const {Component, PropTypes} = require('react')
+const {TextField, FlatButton} = require('material-ui')
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
+
+/**
+ * Simple form for creating a team
+ */
+class TeamCreationForm extends Component{
 
     static updateTeamUsers(team, operation, users, callback){
         const teamId = team.id.replace('/AJXP_TEAM/', '');
@@ -40,14 +47,17 @@ class TeamCreationForm extends React.Component{
     }
 
     render(){
+
+        const {getMessage} = this.props;
+
         return (
             <div style={{padding: 20}}>
-                <div>Choose a name for your team, and you will add users to it after creation.</div>
-                <MaterialUI.TextField floatingLabelText="Team Label" value={this.state.value} onChange={this.onChange.bind(this)} fullWidth={true}/>
+                <div>{getMessage(591)}</div>
+                <TextField floatingLabelText={getMessage(578)} value={this.state.value} onChange={this.onChange.bind(this)} fullWidth={true}/>
                 <div>
                     <div style={{textAlign:'right', paddingTop:10}}>
-                        <MaterialUI.FlatButton label={"Create Team"} secondary={true} onTouchTap={this.submitCreationForm.bind(this)} />
-                        <MaterialUI.FlatButton label={pydio.MessageHash[49]} onTouchTap={this.props.onCancel.bind(this)} />
+                        <FlatButton label={getMessage(49)} onTouchTap={this.props.onCancel.bind(this)} />
+                        <FlatButton label={getMessage(579)} secondary={true} onTouchTap={this.submitCreationForm.bind(this)} />
                     </div>
                 </div>
             </div>
@@ -55,9 +65,18 @@ class TeamCreationForm extends React.Component{
     }
 
 }
+
 TeamCreationForm.propTypes = {
-    onTeamCreated: React.PropTypes.func.isRequired,
-    onCancel: React.PropTypes.func.isRequired
+    /**
+     * Callback triggered after team creation succeeded
+     */
+    onTeamCreated   : PropTypes.func.isRequired,
+    /**
+     * Request modal close
+     */
+    onCancel        : PropTypes.func.isRequired
 };
+
+TeamCreationForm = PydioContextConsumer(TeamCreationForm)
 
 export {TeamCreationForm as default}

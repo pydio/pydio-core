@@ -10,7 +10,7 @@ import TeamCreationForm from '../TeamCreationForm'
 
 const React = require('react');
 const Pydio = require('pydio');
-const {AsyncComponent} = Pydio.requireLib('boot')
+const {AsyncComponent, PydioContextConsumer} = Pydio.requireLib('boot')
 const {Popover, IconButton} = require('material-ui')
 const {muiThemeable} = require('material-ui/styles')
 const Color = require('color')
@@ -82,21 +82,21 @@ let AddressBook = React.createClass({
 
     getInitialState: function(){
 
-        const {pydio, mode, usersOnly, usersFrom, teamsOnly, disableSearch} = this.props;
+        const {pydio, mode, usersOnly, usersFrom, teamsOnly, disableSearch, getMessage} = this.props;
         const confConfigs = pydio.getPluginConfigs('core.conf');
 
         let root;
         if(teamsOnly){
             root = {
                 id: 'teams',
-                label: 'My Teams',
+                label: getMessage(568),
                 childrenLoader: Loaders.loadTeams,
                 _parent: null,
                 _notSelectable: true,
                 actions: {
                     type: 'teams',
-                    create: '+ Create Team',
-                    remove: 'Delete Team',
+                    create: '+ ' + getMessage(569),
+                    remove: getMessage(570),
                     multiple: true
                 }
             };
@@ -110,7 +110,7 @@ let AddressBook = React.createClass({
 
         root = {
             id:'root',
-            label:'Address Book',
+            label:getMessage(592),
             type:'root',
             collections: []
         };
@@ -118,15 +118,15 @@ let AddressBook = React.createClass({
             if(confConfigs.get('USER_CREATE_USERS')){
                 root.collections.push({
                     id:'ext',
-                    label:'My Users',
+                    label:getMessage(593),
                     //icon:'mdi mdi-account-network',
                     itemsLoader: Loaders.loadExternalUsers,
                     _parent:root,
                     _notSelectable:true,
                     actions:{
                         type    : 'users',
-                        create  : '+ Create User',
-                        remove  : 'Delete User',
+                        create  : '+ ' + getMessage(484),
+                        remove  : getMessage(582),
                         multiple: true
                     }
                 });
@@ -134,15 +134,15 @@ let AddressBook = React.createClass({
             if(!usersOnly) {
                 root.collections.push({
                     id: 'teams',
-                    label: 'My Teams',
+                    label: getMessage(568),
                     //icon: 'mdi mdi-account-multiple',
                     childrenLoader: Loaders.loadTeams,
                     _parent: root,
                     _notSelectable: true,
                     actions: {
                         type: 'teams',
-                        create: '+ Create Team',
-                        remove: 'Delete Team',
+                        create: '+ ' + getMessage(569),
+                        remove: getMessage(570),
                         multiple: true
                     }
                 });
@@ -152,7 +152,7 @@ let AddressBook = React.createClass({
                     if(!disableSearch){
                         root.collections.push({
                             id:'search',
-                            label:'Search Users',
+                            label:getMessage(583),
                             //icon:'mdi mdi-account-search',
                             type:'search',
                             _parent:root,
@@ -162,7 +162,7 @@ let AddressBook = React.createClass({
                 }else{
                     root.collections.push({
                         id:'AJXP_GRP_/',
-                        label:'All Users',
+                        label:getMessage(584),
                         //icon:'mdi mdi-account-box',
                         currentParams:{
                             alpha_pages:true,
@@ -182,7 +182,7 @@ let AddressBook = React.createClass({
             let remotes = JSON.parse(ocsRemotes);
             let remotesNodes = {
                 id:'remotes',
-                label:'Remote Servers',
+                label:getMessage(594),
                 //icon:'mdi mdi-server',
                 collections:[],
                 _parent:root,
@@ -268,7 +268,7 @@ let AddressBook = React.createClass({
     },
 
     onDeleteAction: function(parentItem, selection){
-        if(!confirm('Are you sure you want to delete these items?')){
+        if(!confirm(this.props.getMessage(278))){
             return;
         }
         switch(parentItem.actions.type){
@@ -344,7 +344,7 @@ let AddressBook = React.createClass({
 
     render: function(){
 
-        const {mode, muiTheme} = this.props;
+        const {mode, muiTheme, getMessage} = this.props;
 
         if(mode === 'popover'){
 
@@ -399,8 +399,8 @@ let AddressBook = React.createClass({
             centerComponent = (
                 <SearchPanel
                     item={selectedItem}
-                    title={"All users"}
-                    searchLabel={"Search user(s)"}
+                    title={getMessage(583)}
+                    searchLabel={getMessage(595)}
                     onItemClicked={this.onUserListItemClicked}
                     onFolderClicked={this.onFolderClicked}
                     mode={mode}
@@ -412,8 +412,8 @@ let AddressBook = React.createClass({
                 <SearchPanel
                     item={selectedItem}
                     params={{trusted_server_id:selectedItem.id}}
-                    searchLabel={"Search user(s)"}
-                    title={"Server '" + selectedItem.label + "'"}
+                    searchLabel={getMessage(595)}
+                    title={getMessage(596).replace('%s', selectedItem.label)}
                     onItemClicked={this.onUserListItemClicked}
                     onFolderClicked={this.onFolderClicked}
                     mode={mode}
@@ -425,18 +425,18 @@ let AddressBook = React.createClass({
             let emptyStateSecondary;
             let otherProps = {};
             if(selectedItem.id === 'teams'){
-                emptyStatePrimary = 'No teams created';
-                emptyStateSecondary = 'For easily sharing data with many users at once, create your own teams and add users to them.';
+                emptyStatePrimary = getMessage(571);
+                emptyStateSecondary = getMessage(572);
             }else if(selectedItem.id === 'ext'){
-                emptyStatePrimary = 'No external users';
-                emptyStateSecondary = 'You can create your own users here, and give them access to specific resources using sharing.';
+                emptyStatePrimary = getMessage(585);
+                emptyStateSecondary = getMessage(586);
             }else if(selectedItem.id.indexOf('AJXP_GRP_/') === 0){
                 otherProps = {
                     showSubheaders: true,
                     paginatorType: !(selectedItem.currentParams && selectedItem.currentParams.has_search) && 'alpha',
                     paginatorCallback: this.reloadCurrentAtPage.bind(this),
                     enableSearch: !this.props.disableSearch,
-                    searchLabel: 'Search users',
+                    searchLabel: getMessage(595),
                     onSearch: this.reloadCurrentWithSearch.bind(this),
                 };
             }
@@ -493,7 +493,7 @@ let AddressBook = React.createClass({
         let dialogTitle, dialogContent;
         if(createDialogItem){
             if(createDialogItem.actions.type === 'users'){
-                dialogTitle = 'Create New User';
+                dialogTitle = getMessage(484);
                 dialogContent = <div style={{height:500}}><AsyncComponent
                     namespace="PydioForm"
                     componentName="UserCreationForm"
@@ -505,7 +505,7 @@ let AddressBook = React.createClass({
                     pydio={this.props.pydio}
                 /></div>;
             }else if(createDialogItem.actions.type === 'teams'){
-                dialogTitle = 'Create New Team';
+                dialogTitle = getMessage(569);
                 dialogContent = <TeamCreationForm
                     onTeamCreated={this.closeCreateDialogAndReload}
                     onCancel={() => {this.setState({createDialogItem:null})}}
@@ -548,5 +548,6 @@ let AddressBook = React.createClass({
 
 });
 
+AddressBook = PydioContextConsumer(AddressBook);
 AddressBook = muiThemeable()(AddressBook);
 export {AddressBook as default}
