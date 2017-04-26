@@ -2,6 +2,7 @@ const React = require('react')
 import AsyncComponent from '../AsyncComponent'
 import PydioContextConsumer from '../PydioContextConsumer'
 const {FlatButton, Dialog} = require('material-ui')
+import CSSBlurBackground from './CSSBlurBackground'
 
 /**
  * Specific AsyncComponent for Modal Dialog
@@ -83,6 +84,8 @@ let AsyncModal = React.createClass({
     },
 
     activateResizeObserver: function(){
+        return;
+
         if(this._resizeObserver) return;
         this._resizeObserver = () => {this.computeBackgroundData()};
         DOMUtils.observeWindowResize(this._resizeObserver);
@@ -90,6 +93,8 @@ let AsyncModal = React.createClass({
     },
 
     deactivateResizeObserver: function(){
+        return;
+
         if(this._resizeObserver){
             DOMUtils.stopObservingWindowResize(this._resizeObserver);
             this._resizeObserver = null;
@@ -109,23 +114,28 @@ let AsyncModal = React.createClass({
         };
         if(componentData && (!componentData instanceof Object || !componentData['namespace'])){
             state['async'] = false;
-            this.initModalFromComponent(componentData);
+            const compState = this.initModalFromComponent(componentData, true);
+            state = {...state, ...compState};
         }
         if(this.refs.modalAsync){
             this.refs.modalAsync.loadFired = false;
         }
         this.setState(state);
+
     },
 
     updateButtons(actions){
         this.setState({actions: actions});
     },
 
-    initModalFromComponent: function(component) {
+    initModalFromComponent: function(component, returnState = false) {
+        let state = {};
+        const prepareState = (s) => { state = {...state, ...s} };
+
         if(component.getButtons) {
             const buttons = component.getButtons(this.updateButtons.bind(this));
             if(buttons && buttons.length){
-                this.setState({actions:buttons});
+                prepareState({actions:buttons});
             }
         } else if(component.getSubmitCallback || component.getCancelCallback || component.getNextCallback) {
             let actions = [];
@@ -157,10 +167,10 @@ let AsyncModal = React.createClass({
                     onTouchTap={component.getNextCallback()}
                 />);
             }
-            this.setState({actions: actions});
+            prepareState({actions: actions});
         }
         if(component.getTitle){
-            this.setState({title: component.getTitle()});
+            prepareState({title: component.getTitle()});
         }
         if(component.getSize){
             const size = component.getSize();
@@ -172,7 +182,7 @@ let AsyncModal = React.createClass({
             if(width.indexOf && width.indexOf('%') > 0){
                 const percent = parseInt(width.replace('%', ''));
                 this._crtPercentSizeObserver = () => {
-                    this.setState({
+                    prepareState({
                         dialogWidth: DOMUtils.getViewportWidth() * percent / 100,
                         dialogHeight: DOMUtils.getViewportHeight() * percent / 100
                     });
@@ -180,30 +190,33 @@ let AsyncModal = React.createClass({
                 DOMUtils.observeWindowResize(this._crtPercentSizeObserver);
                 this._crtPercentSizeObserver();
             }else{
-                this.setState({dialogWidth: width, dialogHeight: 0});
+                prepareState({dialogWidth: width, dialogHeight: 0});
             }
         }
         if(component.getPadding){
-            this.setState({padding: component.getPadding()});
+            prepareState({padding: component.getPadding()});
         }
         if(component.scrollBody && component.scrollBody()){
-            this.setState({scrollBody:true});
+            prepareState({scrollBody:true});
         }else{
-            this.setState({scrollBody:false});
+            prepareState({scrollBody:false});
         }
         if(component.setModal){
             component.setModal(this);
         }
         if(component.isModal){
-            this.setState({modal: component.isModal()});
+            prepareState({modal: component.isModal()});
         }else{
-            this.setState({modal:false});
+            prepareState({modal:false});
         }
         if(component.useBlur){
-            this.setState({blur: component.useBlur()}, () => {this.activateResizeObserver()});
+            prepareState({blur: component.useBlur()});
         }else{
-            this.setState({blur: false}, () => {this.deactivateResizeObserver()});
+            prepareState({blur: false});
         }
+
+        if(returnState) return state;
+        else this.setState(state);
     },
 
     computeBackgroundData: function(){
@@ -301,23 +314,11 @@ let AsyncModal = React.createClass({
             className = className ? className + ' dialogRootBlur' : 'dialogRootBlur';
             dialogRoot = {...dialogRoot, backgroundImage:'url()', backgroundPosition:'center center', backgroundSize:'cover'}
 
-            if(state.backgroundImage){
-                const styleBox = (
-                    <style dangerouslySetInnerHTML={{
-                        __html: [
-                            '.react-mui-context div[data-reactroot].dialogRootBlur > div > div.dialogRootBlur:before {',
-                            '  background-image: '+state.backgroundImage+';',
-                            '  background-size: '+state.backgroundSize+';',
-                            '}'
-                        ].join('\n')
-                    }}>
-                    </style>
-                );
-                modalContent = <span>{styleBox}{modalContent}</span>;
-            }
+            modalContent = <span><CSSBlurBackground/>{modalContent}</span>
 
         }
 
+        console.log('RENDER DIALOG');
 
         return (
             <Dialog
