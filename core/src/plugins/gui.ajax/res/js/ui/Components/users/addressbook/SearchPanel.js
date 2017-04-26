@@ -43,8 +43,8 @@ class SearchPanel extends Component{
                     onItemClicked={this.props.onItemClicked}
                     item={{leafs: this.state.items}}
                     noToolbar={true}
-                    emptyStatePrimaryText={getMessage(587)}
-                    emptyStateSecondaryText={getMessage(588)}
+                    emptyStatePrimaryText={getMessage(587, '')}
+                    emptyStateSecondaryText={getMessage(588, '')}
                 />
             </div>
         );

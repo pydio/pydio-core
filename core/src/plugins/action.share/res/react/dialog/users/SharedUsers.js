@@ -68,7 +68,7 @@ let SharedUsers = React.createClass({
             actionLinks.push(<ActionButton key="invite" callback={this.sendInvitationToAllUsers} mdiIcon="email-outline" messageId="45"/>)
         }
         if(this.props.saveSelectionAsTeam && this.props.users.length > 1 && !this.props.isReadonly()){
-            actionLinks.push(<ActionButton key="team" callback={this.props.saveSelectionAsTeam} mdiIcon="account-multiple-plus" messageId="509"/>)
+            actionLinks.push(<ActionButton key="team" callback={this.props.saveSelectionAsTeam} mdiIcon="account-multiple-plus" messageId="509" messageCoreNamespace={true}/>)
         }
         let rwHeader, usersInput;
         if(this.props.users.length){

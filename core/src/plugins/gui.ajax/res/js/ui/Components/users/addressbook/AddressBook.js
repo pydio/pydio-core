@@ -82,7 +82,8 @@ let AddressBook = React.createClass({
 
     getInitialState: function(){
 
-        const {pydio, mode, usersOnly, usersFrom, teamsOnly, disableSearch, getMessage} = this.props;
+        const {pydio, mode, usersOnly, usersFrom, teamsOnly, disableSearch} = this.props;
+        const getMessage = (id) => {return this.props.getMessage(id, '')};
         const confConfigs = pydio.getPluginConfigs('core.conf');
 
         let root;
@@ -399,8 +400,8 @@ let AddressBook = React.createClass({
             centerComponent = (
                 <SearchPanel
                     item={selectedItem}
-                    title={getMessage(583)}
-                    searchLabel={getMessage(595)}
+                    title={getMessage(583, '')}
+                    searchLabel={getMessage(595, '')}
                     onItemClicked={this.onUserListItemClicked}
                     onFolderClicked={this.onFolderClicked}
                     mode={mode}
@@ -412,8 +413,8 @@ let AddressBook = React.createClass({
                 <SearchPanel
                     item={selectedItem}
                     params={{trusted_server_id:selectedItem.id}}
-                    searchLabel={getMessage(595)}
-                    title={getMessage(596).replace('%s', selectedItem.label)}
+                    searchLabel={getMessage(595, '')}
+                    title={getMessage(596, '').replace('%s', selectedItem.label)}
                     onItemClicked={this.onUserListItemClicked}
                     onFolderClicked={this.onFolderClicked}
                     mode={mode}
@@ -425,18 +426,18 @@ let AddressBook = React.createClass({
             let emptyStateSecondary;
             let otherProps = {};
             if(selectedItem.id === 'teams'){
-                emptyStatePrimary = getMessage(571);
-                emptyStateSecondary = getMessage(572);
+                emptyStatePrimary = getMessage(571, '');
+                emptyStateSecondary = getMessage(572, '');
             }else if(selectedItem.id === 'ext'){
-                emptyStatePrimary = getMessage(585);
-                emptyStateSecondary = getMessage(586);
+                emptyStatePrimary = getMessage(585, '');
+                emptyStateSecondary = getMessage(586, '');
             }else if(selectedItem.id.indexOf('AJXP_GRP_/') === 0){
                 otherProps = {
                     showSubheaders: true,
                     paginatorType: !(selectedItem.currentParams && selectedItem.currentParams.has_search) && 'alpha',
                     paginatorCallback: this.reloadCurrentAtPage.bind(this),
                     enableSearch: !this.props.disableSearch,
-                    searchLabel: getMessage(595),
+                    searchLabel: getMessage(595, ''),
                     onSearch: this.reloadCurrentWithSearch.bind(this),
                 };
             }
@@ -493,7 +494,7 @@ let AddressBook = React.createClass({
         let dialogTitle, dialogContent;
         if(createDialogItem){
             if(createDialogItem.actions.type === 'users'){
-                dialogTitle = getMessage(484);
+                dialogTitle = getMessage(484, '');
                 dialogContent = <div style={{height:500}}><AsyncComponent
                     namespace="PydioForm"
                     componentName="UserCreationForm"
@@ -505,7 +506,7 @@ let AddressBook = React.createClass({
                     pydio={this.props.pydio}
                 /></div>;
             }else if(createDialogItem.actions.type === 'teams'){
-                dialogTitle = getMessage(569);
+                dialogTitle = getMessage(569, '');
                 dialogContent = <TeamCreationForm
                     onTeamCreated={this.closeCreateDialogAndReload}
                     onCancel={() => {this.setState({createDialogItem:null})}}

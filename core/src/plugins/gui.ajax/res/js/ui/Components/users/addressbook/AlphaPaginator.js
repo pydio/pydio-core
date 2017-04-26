@@ -17,7 +17,7 @@ class AlphaPaginator extends Component{
 
         return (
             <div style={style}>
-                {getMessage(249)}:
+                {getMessage(249, '')}:
                 {letters.map((l) => {
 
                     const letterStyle = {
@@ -32,7 +32,7 @@ class AlphaPaginator extends Component{
                         <span
                             key={l}
                             style={letterStyle}
-                            onClick={(e) => {paginatorCallback(l)}}>{l === -1 ? getMessage(597) : l}
+                            onClick={(e) => {paginatorCallback(l)}}>{l === -1 ? getMessage(597, '') : l}
                             </span>
                     )
                 })}
