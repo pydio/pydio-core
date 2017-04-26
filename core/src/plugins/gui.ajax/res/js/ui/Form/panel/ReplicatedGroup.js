@@ -25,7 +25,7 @@ class ReplicatedGroup extends Component{
         const instanceValue = subValues[firstParam['name']] || <span style={{color: 'rgba(0,0,0,0.33)'}}>Empty Value</span>;
 
         return (
-            <Paper style={{marginBottom: 10}}>
+            <Paper style={{marginLeft: 2, marginRight: 2, marginBottom: 10}}>
                 <div style={{display:'flex', alignItems: 'center'}}>
                     <div>{<IconButton iconClassName={'mdi mdi-chevron-' + (this.state.toggled ? 'up' : 'down')} onTouchTap={()=>{this.setState({toggled:!this.state.toggled})}}/>}</div>
                     <div style={{flex: 1, fontSize:16}}>{instanceValue}</div>

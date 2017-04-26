@@ -1,4 +1,6 @@
 const React = require('react')
+import Manager from '../manager/Manager'
+const {AsyncComponent} = require('pydio').requireLib('boot')
 
 /**
  * Display a form companion linked to a given input.
@@ -27,7 +29,7 @@ export default React.createClass({
                         Pydio Companion
                     </div>
                     <div className="helper-content">
-                        <PydioReactUI.AsyncComponent
+                        <AsyncComponent
                             {...this.props.helperData}
                             namespace={pluginHelperNamespace}
                             componentName="Helper"
@@ -36,7 +38,7 @@ export default React.createClass({
                     </div>
                 </div>);
         }
-        return <div className={'pydio-form-helper' + (helper?' helper-visible':' helper-empty')}>{helper}</div>;
+        return <div className={'pydio-form-helper' + (helper?' helper-visible':' helper-empty')} style={{zIndex:1}}>{helper}</div>;
     }
 
 });
