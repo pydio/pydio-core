@@ -229,11 +229,11 @@ let Dashboard = React.createClass({
             }
         }
         const emptyToolbar = <div></div>;
-        let importButton = <IconButton {...fontIconStyle} iconClassName="mdi mdi-file-excel" primary={false} tooltip={"+ Import Users"} onTouchTap={this.openUsersImporter}/>;
+        let importButton = <IconButton {...fontIconStyle} iconClassName="mdi mdi-file-excel" primary={false} tooltip={this.context.getMessage('171', 'ajxp_conf')} onTouchTap={this.openUsersImporter}/>;
         if(!ResourcesManager.moduleIsAvailable('EnterprisePeople')){
             let disabled = {style:{...fontIconStyle.style}, iconStyle:{...fontIconStyle.iconStyle}};
             disabled.style.backgroundColor = 'rgba(0,0,0,0.23)';
-            importButton = <IconButton {...disabled} iconClassName="mdi mdi-file-excel" primary={false} tooltip={"+ Import Users"} disabled={true}/>;
+            importButton = <IconButton {...disabled} iconClassName="mdi mdi-file-excel" primary={false} tooltip={this.context.getMessage('171', 'ajxp_conf')} disabled={true}/>;
         }
         const leftPanelIndex = this.state.leftPanelIndex || 0;
 
