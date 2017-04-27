@@ -30,7 +30,8 @@ export default class Registry{
         this._extensionsRegistry = {"editor":[], "uploader":[]};
         this._resourcesRegistry = {};
         this._pydioObject = pydioObject;
-        this._stateLoading = false;
+        this._xPathLoading = false;
+        this._globalLoading = false;
     }
 
     /**
@@ -48,12 +49,14 @@ export default class Registry{
      * @param repositoryId
      */
     load(xPath = null, completeFunc = null, repositoryId = null){
-        if(this._stateLoading){
+        if( (xPath === null && this._globalLoading) || (xPath && this._xPathLoading === xPath) ){
             return;
         }
-        this._stateLoading = true;
+        if(xPath) this._xPathLoading = xPath;
+        else this._globalLoading = true;
         const onComplete = function(transport){
-            this._stateLoading = false;
+            if(xPath) this._xPathLoading = false
+            else this._globalLoading = false;
             if(transport.responseXML == null || transport.responseXML.documentElement == null) return;
             if(transport.responseXML.documentElement.nodeName == "ajxp_registry"){
                 this._registry = transport.responseXML.documentElement;

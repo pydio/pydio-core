@@ -631,10 +631,11 @@ abstract class AbstractUser implements UserInterface
             $stretchedParentUserRole = RolesService::limitedRoleFromParent($this->parentUser);
             if ($stretchedParentUserRole !== null) {
                 $this->parentRole = $stretchedParentUserRole->override($this->parentRole);  //$this->parentRole->override($stretchedParentUserRole);
-                // REAPPLY SPECIFIC "SHARED" ROLES
+                // REAPPLY SPECIFIC "SHARED" ROLES & "OWNED" ROlES ( = teams )
                 foreach ($this->roles as $role) {
-                    if(! $role->autoAppliesTo("shared")) continue;
-                    $this->parentRole = $role->override($this->parentRole);
+                    if($role->autoAppliesTo("shared") || $role->hasOwner()) {
+                        $this->parentRole = $role->override($this->parentRole);
+                    }
                 }
             }
             $this->mergedRole = $this->personalRole->override($this->parentRole);  // $this->parentRole->override($this->personalRole);
