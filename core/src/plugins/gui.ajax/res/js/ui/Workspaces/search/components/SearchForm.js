@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 import FilePreview from '../../FilePreview'
 import AdvancedSearch from './AdvancedSearch'
 
-import {Subheader, DropDownMenu, DatePicker, TextField, Toggle, FlatButton} from 'material-ui';
+import {Subheader, DropDownMenu, DatePicker, TextField, Toggle, FlatButton, CircularProgress} from 'material-ui';
 
 import _ from 'lodash';
 
@@ -22,7 +22,8 @@ class SearchForm extends Component {
         this.state = {
             values: {},
             display: 'closed',
-            dataModel: basicDataModel
+            dataModel: basicDataModel,
+            loading: false
         }
 
         this.setMode = _.debounce(this.setMode, 500)
@@ -79,16 +80,22 @@ class SearchForm extends Component {
             return
         }
 
-        const query = {
+        // Refresh data model
+        const newDM = PydioDataModel.RemoteDataModelFactory({
             get_action : crossWorkspace ? 'multisearch' : 'search',
             query: queryString,
-            limit: crossWorkspace ? 5 : (display !== 'small' ? 9 : 100)
-        }
-
-        // Refresh data model
+            limit: crossWorkspace ? 5 : (display !== 'small' ? 9 : 100),
+            connexion_discrete: true
+        });
+        newDM.getRootNode().observeOnce("loaded", () => {
+            this.setState({loading: false});
+        });
         this.setState({
-            dataModel: PydioDataModel.RemoteDataModelFactory(query)
-        }, () => this.refs.results.reload()) // TODO - we shoudln't need to reload here - SimpleList should handle cases such as those
+            loading     : true,
+            dataModel   : newDM
+        }, () => {
+            this.refs.results.reload();
+        });
     }
 
 
@@ -105,8 +112,13 @@ class SearchForm extends Component {
             };
         }
 
+        const nodeClicked = (node)=>{
+            this.props.pydio.goTo(node);
+            this.setState({display:'closed'});
+        };
+
         return (
-            <div ref="root" className={"top_search_form " + this.state.display}>
+            <div ref="root" className={"top_search_form " + this.state.display} style={this.props.style}>
                 <MainSearch
                     mode={this.state.display}
                     title={this.state.display === 'advanced' ? 'Advanced' : 'Search...'}
@@ -116,8 +128,8 @@ class SearchForm extends Component {
                     onChange={(values) => this.update(values)}
                     onSubmit={() => this.submit()}
                     hintText={this.props.crossWorkspace ? "Search inside all workspaces..." : "Search inside this workspace"}
+                    loading={this.state.loading}
                 />
-
                 {this.state.display === 'advanced' &&
                     <AdvancedSearch
                         {...this.props}
@@ -137,7 +149,8 @@ class SearchForm extends Component {
                         entryRenderSecondLine={renderSecondLine}
                         presetDataModel={this.state.dataModel}
                         heightAutoWithMax={this.state.display === 'small' ? 500  : 412}
-                        nodeClicked={(node)=>{this.props.pydio.goTo(node);this.setState({display:'closed'})}}
+                        openCollection={nodeClicked}
+                        nodeClicked={nodeClicked}
                         defaultGroupBy={this.props.crossWorkspace?'repository_id':null}
                         groupByLabel={this.props.crossWorkspace?'repository_display':null}
                     />
@@ -234,6 +247,10 @@ class MainSearch extends Component {
                         onChange={(e) => this.onChange(e.target.value)}
                         onKeyPress={(e) => (e.key === 'Enter' ? this.onChange(e.target.value) : null)}
                     />
+                }
+
+                {this.props.loading &&
+                    <div style={{position:'absolute', right: 13, top: 13}} ><CircularProgress size={20} thickness={3}/></div>
                 }
 
                 <span className="search-advanced-button" onClick={this.props.onAdvanced}>Advanced search</span>

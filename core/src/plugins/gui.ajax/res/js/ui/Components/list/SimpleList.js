@@ -509,8 +509,9 @@ let SimpleList = React.createClass({
         }
         let containerHeight = this.refs.infiniteParent.clientHeight;
         if(this.props.heightAutoWithMax){
+            const number = this.indexedElements ? this.indexedElements.length : this.props.node.getChildren().size;
             const elementHeight = this.state.elementHeight?this.state.elementHeight:this.props.elementHeight;
-            containerHeight = Math.min(this.props.node.getChildren().size * elementHeight ,this.props.heightAutoWithMax);
+            containerHeight = Math.min(number * elementHeight ,this.props.heightAutoWithMax);
         }
         if(!containerHeight && !retries ){
             global.setTimeout(function(){

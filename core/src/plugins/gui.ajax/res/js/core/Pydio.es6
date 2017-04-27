@@ -269,29 +269,25 @@ class Pydio extends Observable{
             // Default
             this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
         }
-        this._contextHolder.setRootNode(rootNode);
-        rootNode.observeOnce('first_load', function(){
-            this._contextHolder.notify('context_changed', rootNode);
-        }.bind(this));
-        this.repositoryId = repositoryId;
 
-        if(this._initLoadRep){
-            if(this._initLoadRep != "" && this._initLoadRep != "/"){
-                const copy = this._initLoadRep.valueOf();
+        const initLoadRep = (this._initLoadRep && this._initLoadRep !== '/') ? this._initLoadRep.valueOf() : null;
+        let firstLoadObs = () => {};
+        if(initLoadRep){
+            firstLoadObs = () => {
+                this.goTo(initLoadRep);
                 this._initLoadRep = null;
-                rootNode.observeOnce("first_load", function(){
-                    setTimeout(function(){
-                        this.goTo(copy);
-                        this.skipLsHistory = false;
-                    }.bind(this), 1000);
-                }.bind(this));
-            }else{
                 this.skipLsHistory = false;
             }
         }else{
             this.skipLsHistory = false;
         }
 
+        this._contextHolder.setRootNode(rootNode);
+        rootNode.observeOnce('first_load', function(){
+            this._contextHolder.notify('context_changed', rootNode);
+            firstLoadObs();
+        }.bind(this));
+        this.repositoryId = repositoryId;
         rootNode.load();
     }
 

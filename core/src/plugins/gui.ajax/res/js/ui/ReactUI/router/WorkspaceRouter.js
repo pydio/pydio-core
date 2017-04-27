@@ -9,8 +9,12 @@ const WorkspaceRouterWrapper = (pydio) => {
             const repositories = pydio.user ? pydio.user.getRepositoriesList() : new Map()
             const active = pydio.user ? pydio.user.getActiveRepository() : null
 
-            pydio._initLoadRep = "/" + splat
-            repositories.forEach((repository) => repository.slug === slug && active !== repository.getId() && pydio.triggerRepositoryChange(repository.getId()))
+            repositories.forEach((repository) => {
+                if(repository.slug === slug && active !== repository.getId()) {
+                    pydio._initLoadRep = "/" + splat;
+                    pydio.triggerRepositoryChange(repository.getId());
+                }
+            })
         }
 
         componentWillMount() {

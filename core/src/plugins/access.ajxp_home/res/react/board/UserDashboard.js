@@ -71,8 +71,9 @@ let UserDashboard = React.createClass({
                     {...uWidgetProps}
                 >
                     {enableSearch &&
-                    <div style={{flex:10, display:'flex', justifyContent:'center'}}>
+                    <div style={{flex:10}}>
                         <PydioWorkspaces.SearchForm
+                            style={{margin: '10px auto'}}
                             crossWorkspace={true}
                             pydio={this.props.pydio}
                             groupByField="repository_id"

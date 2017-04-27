@@ -1356,6 +1356,9 @@ div#multiple_download_container div div a:hover {
   font-weight: 500;
   cursor: pointer;
 }
+.react-mui-context .top_search_form.small .search-results .material-list-entry.list-group-header {
+  margin-top: 0;
+}
 .react-mui-context .top_search_form.small .search-results .material-list-entry.material-list-entry-1-lines {
   border-bottom: 1px solid rgba(0, 0, 0, 0.13);
 }
