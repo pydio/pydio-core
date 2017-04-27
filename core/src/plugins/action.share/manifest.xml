@@ -38,7 +38,7 @@
     <registry_contributions>
         <actions>
             <action name="share_react">
-                <gui text="292" title="292" src="share.png" iconClass="mdi mdi-share-variant" hasAccessKey="false">
+                <gui text="292" title="292" iconClass="mdi mdi-share-variant" hasAccessKey="false">
                     <context selection="true" dir="true" recycle="hidden" actionBar="true" actionBarGroup="0_get,info_panel_share" contextMenu="true"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')"/>
                 </gui>
@@ -49,7 +49,7 @@
                 </processing>
             </action>
             <action name="share-edit-shared">
-                <gui src="share.png" iconClass="mdi mdi-share-variant" text="share_center.125" title="share_center.126">
+                <gui iconClass="mdi mdi-share-variant" text="share_center.125" title="share_center.126">
                     <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="0_get,info_panel_share" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>

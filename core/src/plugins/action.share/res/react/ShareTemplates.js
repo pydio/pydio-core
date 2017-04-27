@@ -3,6 +3,7 @@
     const {Textfit} = require('react-textfit');
     const Workspaces = require('pydio/http/resources-manager').requireLib('workspaces');
     const Components = require('pydio/http/resources-manager').requireLib('components');
+    const Color = require('color');
 
     const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = Workspaces;
     const {ButtonMenu, Toolbar, ListPaginator, ReactEditorOpener} = Components;
@@ -173,18 +174,16 @@
 
         render: function(){
 
-            const Color = MaterialUI.Color;
-
             const styles = {
                 appBarStyle : {
                     zIndex: 1,
-                    backgroundColor: this.props.muiTheme.appBar.color
+                    backgroundColor: this.props.muiTheme.palette.primary1Color
                 },
                 buttonsStyle : {
                     color: this.props.muiTheme.appBar.textColor
                 },
                 iconButtonsStyle :{
-                    color: Color(this.props.muiTheme.appBar.color).darken(0.4).toString()
+                    color: Color(this.props.muiTheme.palette.primary1Color).darken(0.4).toString()
                 },
                 raisedButtonStyle : {
                     height: 30
@@ -213,7 +212,7 @@
 
             return (
                 <div className="vertical_fit vertical_layout" style={style}>
-                    <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false} style={{zIndex:1}}>
+                    <MaterialUI.Paper zDepth={1} rounded={false} style={styles.appBarStyle}>
                         {minisiteMode !== 'embed' &&
                             <div id="workspace_toolbar">
                                 <Breadcrumb {...this.props} rootStyle={{padding: 8}}/>
