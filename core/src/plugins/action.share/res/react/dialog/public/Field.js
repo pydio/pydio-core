@@ -92,8 +92,8 @@ let PublicLinkField = React.createClass({
             return (
                 <Paper zDepth={0} rounded={false} className={"public-link-container edit-link"}>
                     <div style={{display:'flex', alignItems:'center'}}>
-                        <span style={{fontSize:16, color:'rgba(0,0,0,0.4)'}}>{PathUtils.getDirname(publicLink) + '/ '}</span>
-                        <TextField style={{flex:1, marginRight: 16}} onChange={this.changeLink} value={this.state.customLink !== undefined ? this.state.customLink : this.props.linkData['hash']}/>
+                        <span style={{fontSize:16, color:'rgba(0,0,0,0.4)', display: 'inline-block', maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{PathUtils.getDirname(publicLink) + '/ '}</span>
+                        <TextField style={{flex:1, marginRight: 10, marginLeft: 10}} onChange={this.changeLink} value={this.state.customLink !== undefined ? this.state.customLink : this.props.linkData['hash']}/>
                         <FloatingActionButton mini={true} iconClassName="mdi mdi-check" onTouchTap={this.toggleEditMode} />
                     </div>
                     <div className="section-legend">{this.props.getMessage('194')}</div>

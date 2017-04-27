@@ -1,5 +1,8 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+First pre-beta build for Pydio 8
+
+----
 7.0.4 is a bugfix and security release for 7 branch.
 
 Make sure checking db version test does not break everything (if there is a missing table for example).
