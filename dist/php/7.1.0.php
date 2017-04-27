@@ -38,9 +38,9 @@ if(!function_exists('updatePluginConfig')){
 
     function updatePluginConfig($pluginId, $parameterName, $parameterValue){
 
-        $p = AJXP_PluginsService::getInstance()->getPluginById($pluginId);
+        $p = \Pydio\Core\PluginFramework\PluginsService::getInstance()->getPluginById($pluginId);
         $options = $p->getConfigs();
-        $confDriver = ConfService::getConfStorageImpl();
+        $confDriver = \Pydio\Core\Services\ConfService::getConfStorageImpl();
         $options[$parameterName] = $parameterValue;
         $confDriver->savePluginConfig($pluginId, $options);
         echo "<div class='upgrade_result success'>- Migrated option $parameterName to $parameterValue (plugin $pluginId)</div>";
