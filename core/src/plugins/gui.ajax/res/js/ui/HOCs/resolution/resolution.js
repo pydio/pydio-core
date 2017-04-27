@@ -76,7 +76,7 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
 
             render() {
-                const {resolution, ...remainingProps} = this.props
+                const {node, resolution, ...remainingProps} = this.props
 
                 return (
                     <ResolutionURLProvider
@@ -84,11 +84,12 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                         onHi={() => this.onHi()}
                         onLo={() => this.onLo()}
                     >
-                        {url =>
+                        {src =>
                             <Component
                                 {...remainingProps}
 
-                                src={url}
+                                node={node}
+                                src={src}
                             />
                         }
                     </ResolutionURLProvider>

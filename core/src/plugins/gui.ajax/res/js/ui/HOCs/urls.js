@@ -21,16 +21,20 @@ export const URLProvider = (urls = []) => {
             super(props)
 
             this.state = {
-                url: ""
+                url: this.getUrl(props)
             }
         }
 
         componentWillReceiveProps(nextProps) {
-            const fn =  nextProps[`on${toTitleCase(nextProps.urlType)}`]
-
             this.setState({
-                url: fn()
+                url: this.getUrl(nextProps)
             })
+        }
+
+        getUrl(props) {
+            const fn =  props[`on${toTitleCase(props.urlType)}`]
+
+            return fn()
         }
 
         render() {

@@ -22,7 +22,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { mapStateToProps } from './utils';
 import { ImageSizeProvider, ContainerSizeProvider } from './providers';
-import { Actions, getRatio, getDisplayName, getBoundingRect } from '../utils';
+import { Actions as EditorActions, getRatio, getDisplayName, getBoundingRect } from '../utils';
 
 const withResize = (Component) => {
     class WithResize extends React.Component {
@@ -61,7 +61,7 @@ const withResize = (Component) => {
         loadSize(props) {
             const {id, size, scale, dispatch, containerWidth, width, containerHeight, height} = props
 
-            dispatch(Actions.tabModify({
+            const state = {
                 id,
                 size,
                 scale: getRatio[size]({
@@ -69,11 +69,15 @@ const withResize = (Component) => {
                     widthRatio: containerWidth / width,
                     heightRatio: containerHeight / height
                 })
-            }))
+            }
+
+            this.setState(state)
+            dispatch(EditorActions.tabModify({id, ...state}))
         }
 
         render() {
-            const {scale, ...remainingProps} = this.props
+            const {scale} = this.state
+            const {...remainingProps} = this.props
 
             return (
                 <Component

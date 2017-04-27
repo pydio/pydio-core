@@ -6,8 +6,6 @@ import { Provider, connect } from 'react-redux';
 import * as actions from './editor/actions';
 import {Editor, reducers} from './editor';
 
-const store = createStore(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
-
 class EditionPanel extends React.Component {
 
     constructor(props) {
@@ -35,8 +33,6 @@ class EditionPanel extends React.Component {
         const {pydio, tabCreate, editorModify, editorSetActiveTab} = this.props
 
         const {node = {}, editorData} = object
-
-        console.log(editorData)
 
         let tabId = tabCreate({
             id: node.getLabel(),
@@ -82,9 +78,7 @@ class EditionPanel extends React.Component {
 class EditionProvider extends React.Component {
     render () {
         return (
-            <Provider store={store}>
-                <EditionPanel {...this.props} />
-            </Provider>
+            <EditionPanel {...this.props} />
         )
     }
 }

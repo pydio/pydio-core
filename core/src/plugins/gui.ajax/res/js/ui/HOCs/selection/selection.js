@@ -21,12 +21,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import SelectionModel from './model';
-import { getDisplayName } from '../utils';
+import { Actions as EditorActions, getDisplayName } from '../utils';
 import { mapStateToProps } from './utils';
 
 const withSelection = (getSelection) => {
     return (Component) => {
         class WithSelection extends React.Component {
+            constructor(props) {
+                super(props)
+
+                const {node, id, dispatch} = this.props
+
+                if (typeof dispatch === 'function') {
+                    // We have a redux dispatch so we use it
+                    this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
+                }
+            }
+
             static get displayName() {
                 return `WithSelection(${getDisplayName(Component)})`
             }
@@ -40,11 +51,11 @@ const withSelection = (getSelection) => {
             componentDidMount() {
                 const {id, node, tabModify} = this.props
 
-                getSelection(node).then(({selection, currentIndex}) => tabModify({id, selection: new SelectionModel(selection, currentIndex)}))
+                getSelection(node).then(({selection, currentIndex}) => this.setState({id, selection: new SelectionModel(selection, currentIndex)}))
             }
 
             render() {
-                const {selection, playing, tabModify, ...remainingProps} = this.props
+                const {selection, playing, dispatch, ...remainingProps} = this.props
 
                 if (!selection) return null
 
@@ -53,7 +64,7 @@ const withSelection = (getSelection) => {
                         {...remainingProps}
                         node={selection.current()}
                         selectionPlaying={playing}
-                        onRequestSelectionPlay={() => tabModify({id, node: selection.nextOrFirst(), title: selection.currentNode.getLabel()})}
+                        onRequestSelectionPlay={() => this.setState({id, node: selection.nextOrFirst(), title: selection.currentNode.getLabel()})}
                     />
                 )
             }

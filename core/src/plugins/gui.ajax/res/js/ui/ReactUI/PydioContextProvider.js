@@ -1,7 +1,13 @@
-import {Component, PropTypes} from 'react';
-const Pydio = require('pydio');
-import {colors, getMuiTheme} from 'material-ui/styles';
-import {MuiThemeProvider} from 'material-ui';
+import { Component, PropTypes } from 'react';
+import Pydio from 'pydio';
+import { colors, getMuiTheme } from 'material-ui/styles';
+import { MuiThemeProvider } from 'material-ui';
+import { createStore } from 'redux';
+import { Provider, connect } from 'react-redux';
+
+import {reducers} from '../Workspaces/editor';
+
+const store = createStore(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 let MainProvider = MuiThemeProvider
 let DND;
@@ -64,7 +70,9 @@ export default function(PydioComponent, pydio){
 
             return (
                 <MainProvider muiTheme={theme}>
-                    <PydioComponent {...this.props}/>
+                    <Provider store={store}>
+                        <PydioComponent {...this.props}/>
+                    </Provider>
                 </MainProvider>
             );
         }

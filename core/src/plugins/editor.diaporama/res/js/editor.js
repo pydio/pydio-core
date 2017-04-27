@@ -21,79 +21,15 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
+import { ImageContainer } from './components'
 
 const baseURL = pydio.Parameters.get('ajxpServerAccess')
 const conf = pydio.getPluginConfigs('editor.diaporama')
 const sizes = conf && conf.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700, 1000, 1300]
-
-const {SizeProviders, withResolution, withSelection, withResize, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-const {ImageSizeProvider, ContainerSizeProvider} = SizeProviders
-
-const {EditorActions} = PydioWorkspaces;
-
-class Image extends Component {
-    static get propTypes() {
-        return {
-            scale: React.PropTypes.number
-        }
-    }
-
-    static get styles() {
-        return {
-            transformOrigin: "50% 0",
-            boxShadow: DOMUtils.getBoxShadowDepth(1)
-        }
-    }
-
-    render() {
-        const {width, height, scale, ...remainingProps} = this.props
-
-        return <img {...remainingProps} style={{...Image.styles, width, height, transform: `scale(${scale})`}} />
-    }
-}
-
-class ImagePanel extends Component {
-    static get propTypes() {
-        return {
-            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
-            src: React.PropTypes.string.isRequired,
-            imgClassName: React.PropTypes.string
-        }
-    }
-
-    static get IMAGE_PANEL_MARGIN() {
-        return 10
-    }
-
-    static get styles() {
-        return {
-            display: "flex",
-            flex: 1,
-            justifyContent: 'center',
-            overflow: 'auto'
-        }
-    }
-
-    render() {
-        const {src, width, height, imgClassName, scale} = this.props
-
-        return (
-            <div style={ImagePanel.styles}>
-                <Image
-                    src={src}
-                    width={width}
-                    height={height}
-                    className={imgClassName}
-                    scale={scale}
-                />
-            </div>
-        )
-    }
-}
-
-const ExtendedImagePanel = compose(
-    withResize
-)(ImagePanel)
+const { SizeProviders, URLProvider, withResolution, withSelection, withResize } = PydioHOCs;
+const { ImageSizeProvider, ContainerSizeProvider } = SizeProviders
+const ThumbnailURLProvider = URLProvider(["thumbnail"]);
+const ExtendedImageContainer = withResize(ImageContainer)
 
 class Editor extends Component {
 
@@ -151,12 +87,9 @@ class Editor extends Component {
         return (
             <ContainerSizeProvider>
             {({containerWidth, containerHeight}) =>
-                <ImageSizeProvider
-                    url={src}
-                    node={node}
-                >
+                <ImageSizeProvider url={src}node={node}>
                 {({imgWidth, imgHeight}) =>
-                    <ExtendedImagePanel
+                    <ExtendedImageContainer
                         editorData={editorData}
                         node={node}
                         src={src}
@@ -175,7 +108,6 @@ class Editor extends Component {
 }
 
 const getSelectionFilter = (node) => node.getMetadata().get('is_image') === '1'
-
 const getSelection = (node) => new Promise((resolve, reject) => {
     let selection = [];
 

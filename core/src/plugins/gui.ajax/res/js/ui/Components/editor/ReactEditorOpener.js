@@ -62,7 +62,7 @@ class ReactEditorOpener extends React.Component {
         }
 
         // Getting HOC of the class
-        return <EditorClass {...this.props} />
+        return <EditorClass.Editor {...this.props} />
     }
 }
 

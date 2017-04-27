@@ -127,7 +127,11 @@ let FilePreview = React.createClass({
 
     loadPreviewFromEditor: function(editorClass, node){
 
-        if(editorClass.getCoveringBackgroundSource){
+        console.log(this.props.richPreview)
+        this.setState({
+            preview: this.props.richPreview ? editorClass.Panel : editorClass.Badge
+        })
+        /*if(editorClass.getCoveringBackgroundSource){
             let image = new Image();
             let bgUrl = editorClass.getCoveringBackgroundSource(node);
 
@@ -162,7 +166,7 @@ let FilePreview = React.createClass({
                     preview: component
                 })
             }.bind(this))
-        }
+        }*/
 
     },
 
@@ -172,7 +176,13 @@ let FilePreview = React.createClass({
 
     render: function(){
 
-        const {preview, element} = this.state;
+        const {preview: EditorClass, element} = this.state;
+
+        if (!EditorClass) return null
+
+        return (
+            <EditorClass {...this.props} />
+        )
 
         if (preview) {
             return (
