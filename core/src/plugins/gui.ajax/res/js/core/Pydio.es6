@@ -12,9 +12,15 @@ import PathUtils from './util/PathUtils'
 import LangUtils from './util/LangUtils'
 import ActivityMonitor from './util/ActivityMonitor'
 
+/**
+ * This is the main class for launching the whole framework,
+ * with or without a UI.
+ * It can be launched by PydioBootstrap or directly by giving the right parameters.
+ */
 class Pydio extends Observable{
 
     /**
+     * Pydio Constructor takes a Map of start parameters.
      *
      * @param parameters {Map}
      */
@@ -66,6 +72,9 @@ class Pydio extends Observable{
         return this.user;
     }
 
+    /**
+     * Refresh user/preferences registry part
+     */
     refreshUserData(){
         this.observeOnce("registry_part_loaded", (event) => {
             if(event !== "user/preferences") return;

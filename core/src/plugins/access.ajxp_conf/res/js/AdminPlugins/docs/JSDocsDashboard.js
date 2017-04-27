@@ -41,7 +41,7 @@ class JSDocsPanel extends Component{
 
             const parts = key.split('/');
             const classPath = parts.shift();
-            let title = parts.pop().replace('.js', '');
+            let title = parts.pop().replace('.js', '').replace('.es6', '');
             if(search && title.indexOf(search) === -1){
                 return;
             }else if(search && title.indexOf(search) > -1){
@@ -97,7 +97,7 @@ class ClassPanel extends Component{
         const largeColumn = {width: '35%'};
 
         let props = [], methods = [];
-        if(data.props){
+        if(data.props && path.indexOf('core/') !== 0){
             Object.keys(data.props).forEach((pName) => {
                 const pData = data.props[pName];
                 props.push(
@@ -121,7 +121,7 @@ class ClassPanel extends Component{
                         <TableRowColumn style={{fontSize: 16}}>{mData.name}</TableRowColumn>
                         <TableRowColumn style={largeColumn}>{mData.description}</TableRowColumn>
                         <TableRowColumn>{params}</TableRowColumn>
-                        <TableRowColumn>{mData.returns}</TableRowColumn>
+                        <TableRowColumn>{mData.returns && mData.returns.type ? mData.returns.type.name : ''}</TableRowColumn>
                     </TableRow>
                 );
             });
