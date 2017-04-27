@@ -1,23 +1,23 @@
-class SelectionModel extends Observable{
+class SelectionModel extends Observable {
 
-    constructor(node, filter = () => true){
+    constructor(node, filter = () => true, buildSelection = null{
         super();
         this.currentNode = node;
         this.filter = filter
         this.selection = [];
-        this.buildSelection();
+        this.buildSelection = buildSelection;
     }
 
-    buildSelection(){
+    buildSelection() {
         let currentIndex;
         let child;
         let it = this.currentNode.getParent().getChildren().values();
-        while(child = it.next()){
-            if(child.done) break;
+        while (child = it.next()) {
+            if (child.done) break;
             let node = child.value;
             if (this.filter(node)) {
                 this.selection.push(node);
-                if(node === this.currentNode){
+                if (node === this.currentNode) {
                     this.currentIndex = this.selection.length - 1;
                 }
             }

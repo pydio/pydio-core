@@ -72,7 +72,7 @@ class Image extends Component {
 
     render() {
         const {scale, ...remainingProps} = this.props
-        
+
         return (
             <img src={url} className={imageClassName} style={{...ImagePanel.styles, transform: `scale(${scale})`}} />
         )
@@ -118,17 +118,6 @@ class ImagePanel extends Component {
         )
     }
 }
-
-let ExtendedImagePanel = compose(
-    withResize,
-    withResolution(sizes,
-        (node) => `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
-        (node, dimension) => `${baseURL}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
-    ),
-    withMenu,
-    withLoader,
-    withErrors
-)(ImagePanel)
 
 class Editor extends Component {
 
@@ -195,27 +184,27 @@ class Editor extends Component {
     }
 
     render() {
-        const {node, url, controls, ...remainingProps} = this.props;
-        const {playing} = this.state || {};
+        const {node, src, editorData, scale, ...remainingProps} = this.props;
+
+        if (!node) return null
 
         return (
             <ContainerSizeProvider>
             {({containerWidth, containerHeight}) =>
                 <ImageSizeProvider
-                    url={url}
+                    url={src}
                     node={node}
                 >
                 {({imgWidth, imgHeight}) =>
                     <ExtendedImagePanel
+                        editorData={editorData}
                         node={node}
-                        url={url}
-
+                        src={src}
+                        scale={scale}
+                        width={imgWidth}
+                        height={imgHeight}
                         containerWidth={containerWidth}
                         containerHeight={containerHeight}
-                        imgWidth={imgWidth}
-                        imgHeight={imgHeight}
-
-                        controls={controls}
                     />
                 }
                 </ImageSizeProvider>
@@ -226,7 +215,12 @@ class Editor extends Component {
 }
 
 export default compose(
-    withSelection((node) => node.getMetadata().get('is_image') === '1')
+    connect(),
+    withSelection((node) => node.getMetadata().get('is_image') === '1'),
+    withResolution(sizes,
+        (node) => `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
+        (node, dimension) => `${baseURL}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
+    )
 )(Editor)
 
 /*
