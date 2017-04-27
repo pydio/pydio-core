@@ -2,7 +2,7 @@
   "name": "core.mailer",
   "version": "6.5.1",
   "description": "",
-  "source_path":"js",
+  "source_path":"res/react",
   "main": "index.js",
   "author": "Abstrium SAS",
   "license": "AGPL",

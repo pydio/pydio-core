@@ -10,8 +10,6 @@
             <i18n namespace="notification.tpl.block" path="plugins/core.notifications/templates/block"/>
             <i18n namespace="notification.tpl.location" path="plugins/core.notifications/templates/location"/>
             <i18n namespace="notification_center" path="plugins/core.notifications/res/i18n"/>
-            <css file="plugins/core.notifications/res/css/notification_center.css" autoload="true"/>
-            <img_library alias="notification_center" path="plugins/core.notifications/res/img"/>
             <js className="PydioNotifications" file="plugins/core.notifications/res/build/PydioNotifications.js" depends="React,PydioComponents"/>
         </resources>
     </client_settings>

@@ -1,7 +1,7 @@
 {
   "name": "meta.watch",
   "version": "8.0.0",
-  "description": "Sample action",
+  "description": "File watches",
   "source_path": "res/js",
   "main": "index.js",
   "scripts": {
