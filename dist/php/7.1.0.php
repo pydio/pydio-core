@@ -49,22 +49,4 @@ if(!function_exists('updatePluginConfig')){
 
 }
 
-if(!function_exists('blockAllXHRInPage')){
-
-    function blockAllXHRInPage(){
-        print '
-        <script type="text/javascript">
-            (function(open) {
-                parent.XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-                    console.error("XHR Call to "+url+" blocked by upgrade process!");
-                };                                                
-            })(parent.XMLHttpRequest.prototype.open);      
-        </script>
-        <div class="upgrade_result success">Blocking all XHR in page: OK</div>
-    ';
-    }
-
-}
-
-blockAllXHRInPage();
 updatePluginConfig('gui.ajax', 'GUI_THEME', 'material');
