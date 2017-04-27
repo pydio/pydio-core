@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
   val blob DEFAULT NULL
 );
 
+CREATE UNIQUE INDEX (prefs_unique) ON ajxp_user_prefs(`login`,`name`);
+
 CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
   rid integer NOT NULL primary key autoincrement,
   login text NOT NULL,
