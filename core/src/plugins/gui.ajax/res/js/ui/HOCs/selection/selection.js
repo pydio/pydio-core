@@ -20,11 +20,11 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { SelectionModel } from './';
+import SelectionModel from './model';
 import { getDisplayName } from '../utils';
 import { mapStateToProps } from './utils';
 
-const withSelection = (filter) => {
+const withSelection = (getSelection) => {
     return (Component) => {
         class WithSelection extends React.Component {
             static get displayName() {
@@ -33,27 +33,25 @@ const withSelection = (filter) => {
 
             static get propTypes() {
                 return {
-                    node: React.PropTypes.instanceOf(AjxpNode).isRequired,
-                    filter: React.PropTypes.func
+                    node: React.PropTypes.instanceOf(AjxpNode).isRequired
                 }
             }
 
             componentDidMount() {
-                const {id, node, filter, tabModify} = this.props
+                const {id, node, tabModify} = this.props
 
-                tabModify({
-                    id,
-                    selection: new SelectionModel(node, filter)
-                })
+                getSelection(node).then(({selection, currentIndex}) => tabModify({id, selection: new SelectionModel(selection, currentIndex)}))
             }
 
             render() {
-                const {id, node, selection, playing, tabModify, ...remainingProps} = this.props
+                const {selection, playing, tabModify, ...remainingProps} = this.props
+
+                if (!selection) return null
 
                 return (
                     <Component
                         {...remainingProps}
-                        node={node}
+                        node={selection.current()}
                         selectionPlaying={playing}
                         onRequestSelectionPlay={() => tabModify({id, node: selection.nextOrFirst(), title: selection.currentNode.getLabel()})}
                     />

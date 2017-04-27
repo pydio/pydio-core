@@ -97,7 +97,21 @@ const Viewer = compose(
     withErrors
 )(props => <div {...props} />)
 
+const getSelectionFilter = (node) => node.getMetadata().get('is_image') === '1'
+
+const getSelection = (node) => new Promise((resolve, reject) => {
+    let selection = [];
+
+    node.getParent().getChildren().forEach((child) => selection.push(child));
+    selection = selection.filter(getSelectionFilter)
+
+    resolve({
+        selection,
+        currentIndex: selection.reduce((currentIndex, current, index) => current === node && index || currentIndex, 0)
+    })
+})
+
 export default compose(
-    connect(),
-    withSelection((node) => node.getMetadata().get('is_image') === '1')
+    withSelection(getSelection),
+    connect()
 )(Editor)

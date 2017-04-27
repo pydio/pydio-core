@@ -50,6 +50,10 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                 tabModify({id, resolution})
             }
 
+            componentWillReceiveProps() {
+
+            }
+
             onHi() {
                 const {node} = this.props
 

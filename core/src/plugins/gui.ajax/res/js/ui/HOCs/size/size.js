@@ -42,25 +42,34 @@ const withResize = (Component) => {
 
         static get defaultProps() {
             return {
-                size: "contain"
+                size: "contain",
+                containerWidth: 1,
+                containerHeight: 1,
+                width: 1,
+                height: 1
             }
         }
 
         componentDidMount() {
-            const {id, size, tabModify} = this.props
-
-            tabModify({id, size})
+            this.loadSize(this.props)
         }
 
         componentWillReceiveProps(nextProps) {
-            // TODO - change the way the scale is stored
-            const {id, size, scale, tabModify, containerWidth = 1, width = 1, containerHeight = 1, height = 1} = nextProps
+            this.loadSize(nextProps)
+        }
 
-            tabModify({id, scale: getRatio[size]({
-                scale,
-                widthRatio: containerWidth / width,
-                heightRatio: containerHeight / height
-            })})
+        loadSize(props) {
+            const {id, size, scale, dispatch, containerWidth, width, containerHeight, height} = props
+
+            dispatch(Actions.tabModify({
+                id,
+                size,
+                scale: getRatio[size]({
+                    scale,
+                    widthRatio: containerWidth / width,
+                    heightRatio: containerHeight / height
+                })
+            }))
         }
 
         render() {
@@ -75,7 +84,7 @@ const withResize = (Component) => {
         }
     }
 
-    return connect(mapStateToProps, Actions)(WithResize)
+    return connect(mapStateToProps)(WithResize)
 }
 
 export {withResize as default}
