@@ -59,22 +59,6 @@ class UserDashboardDriver extends AbstractAccessDriver
     }
 
     /**
-     * @param ContextInterface $ctx
-     * @param \DOMNode $contribNode
-     */
-    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
-        $disableAddressBook = $this->getContextualOption($ctx, "DASH_DISABLE_ADDRESS_BOOK") === true;
-        if($contribNode->nodeName == "client_configs" && $disableAddressBook){
-            // remove template_part for orbit_content
-            $xPath=new DOMXPath($contribNode->ownerDocument);
-            $tplNodeList = $xPath->query('component_config[@className="AjxpTabulator::userdashboard_main_tab"]', $contribNode);
-            if(!$tplNodeList->length) return ;
-            $contribNode->removeChild($tplNodeList->item(0));
-        }
-        parent::parseSpecificContributions($ctx, $contribNode);
-    }
-
-    /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
      * @throws \Exception

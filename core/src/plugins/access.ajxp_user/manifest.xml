@@ -6,21 +6,6 @@
 		</resources>
 	</client_settings>
 	<registry_contributions>
-		<client_configs>
-            <component_config className="AjxpTabulator::userdashboard_main_tab">
-                <additional_tab id="my-users-pane"
-                                tabInfo='{"id":"contacts","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'
-                                paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
-                        <div class="title-flex">
-                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]<div class="legend">AJXP_MESSAGE[user_dash.49]</div></h3>
-                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"address_book","toolbarsList":["change","address_book"],"submenuOffsetTop":2}'></div>
-                        </div>
-                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
-                    </div>
-                ]]></additional_tab>
-            </component_config>
-        </client_configs>
 		<actions>
 			<action name="ls" dirDefault="true">
 				<rightsContext noUser="true" userLogged="only" read="true"

@@ -9,6 +9,7 @@
     <server_settings>
         <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="CONF_MESSAGE[Disable Address Book]" description="CONF_MESSAGE[Do not display address book in user account panel.]"/>
     </server_settings>
+    <class_definition classname="Pydio\Action\UserActionsPlugin" filename="plugins/action.user/UserActionsPlugin.php"/>
 	<registry_contributions>
 		<actions>
 			<action name="open_user_dashboard">
