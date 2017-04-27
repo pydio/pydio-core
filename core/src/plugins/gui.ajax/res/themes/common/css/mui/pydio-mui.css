@@ -439,12 +439,6 @@
 .react-mui-context [class*=" mdi-"] {
   font-family: "Material Design Icons";
 }
-.react-mui-context .mui-tabs-container .mui-tab-item-container {
-  background-color: #424242 !important;
-}
-.react-mui-context .mui-tabs-container .mui-ink-bar {
-  background-color: #ff9e80;
-}
 .react-mui-context {
   /*
   html,

@@ -10,7 +10,7 @@ module.exports = {
                 overwrite: false,
                 cwd: 'node_modules/material-ui-legacy/src',
                 src: ['less'],
-                dest : 'res/mui/'
+                dest : 'res/themes/common/css/mui/'
             }
         ]
     }

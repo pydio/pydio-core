@@ -54,7 +54,6 @@
                 depends="React,PydioComponents,PydioHOCs,PydioTasks"
                 expose="workspaces"
             />
-            <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>
     </client_settings>
 	<server_settings>
