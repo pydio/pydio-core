@@ -174,25 +174,10 @@ class SqlUser extends AbstractUser
 
         // Try/Catch DibiException
         try {
-            /*
-             * @TODO AT UPDATE TIME
-             *
-             * SELECT * from ajxp_user_prefs
-Where Exists(
-            Select 1
-            From ajxp_user_prefs As S2
-            Where S2.login = ajxp_user_prefs.login AND S2.name = ajxp_user_prefs.name
-                And S2.rid > ajxp_user_prefs.rid
-            Having Count(*) > 0
-            )
-             * ==> DELETE DUPLICATE ROWS
-             */
-
 
             if(empty($prefValue)){
 
                 dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
-//                $this->log('DELETE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
                 unset($this->prefs[$prefName]); // Update the internal array only if successful.
 
             }else{

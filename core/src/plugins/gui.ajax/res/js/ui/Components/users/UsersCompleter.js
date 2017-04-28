@@ -21,6 +21,7 @@ import AddressBook from './addressbook/AddressBook'
 const {AsyncComponent} = require('pydio/http/resources-manager').requireLib('boot')
 const {TextField, AutoComplete, RefreshIndicator, IconButton, Popover} = require('material-ui');
 const React = require('react')
+const FuncUtils = require('pydio/util/func')
 
 /**
  * Ready to use autocomplete field that will load users/groups/roles from
@@ -232,20 +233,14 @@ const UsersLoader = React.createClass({
 
     render: function(){
 
-        const {dataSource} = this.state;
+        const {dataSource, createUser} = this.state;
         const containerStyle = {position:'relative', overflow: 'visible'};
 
-        if(this.state.createUser){
+        /*
+        if(createUser){
 
             return (
                 <div style={containerStyle}>
-                    <TextField
-                        floatingLabelText={this.props.fieldLabel}
-                        value={global.pydio.MessageHash[485] + ' (' + this.state.createUser + ')'}
-                        disabled={true}
-                        fullWidth={true}
-                        underlineShow={!this.props.underlineHide}
-                    />
                     <div style={{position: 'absolute', top: 73, left: 0, right: 0, zIndex: 10}}>
                         <AsyncComponent
                             namespace={"PydioForm"}
@@ -261,32 +256,46 @@ const UsersLoader = React.createClass({
             );
 
         }
+        */
 
         return (
-            <div style={containerStyle}>
-                <AutoComplete
-                    filter={MaterialUI.AutoComplete.noFilter}
-                    dataSource={dataSource}
-                    searchText={this.state.searchText}
-                    onUpdateInput={this.textFieldUpdate}
-                    className={this.props.className}
-                    openOnFocus={true}
-                    floatingLabelText={this.props.fieldLabel}
-                    underlineShow={!this.props.underlineHide}
-                    fullWidth={true}
-                    onNewRequest={this.onCompleterRequest}
-                    listStyle={{maxHeight: 350, overflowY: 'auto'}}
-                    onFocus={() => {this.loadBuffered(this.state.searchText, 100)}}
-                />
-                <div style={{position:'absolute', right:4, bottom: 14, height: 20, width: 20}}>
-                    <RefreshIndicator
-                        size={20}
-                        left={0}
-                        top={0}
-                        status={this.state.loading ? 'loading' : 'hide' }
+            <div style={containerStyle} ref={(el)=>{this._popoverAnchor = el;}}>
+                {!createUser &&
+                    <AutoComplete
+                        filter={MaterialUI.AutoComplete.noFilter}
+                        dataSource={dataSource}
+                        searchText={this.state.searchText}
+                        onUpdateInput={this.textFieldUpdate}
+                        className={this.props.className}
+                        openOnFocus={true}
+                        floatingLabelText={this.props.fieldLabel}
+                        underlineShow={!this.props.underlineHide}
+                        fullWidth={true}
+                        onNewRequest={this.onCompleterRequest}
+                        listStyle={{maxHeight: 350, overflowY: 'auto'}}
+                        onFocus={() => {this.loadBuffered(this.state.searchText, 100)}}
                     />
-                </div>
-                {this.props.showAddressBook &&
+                }
+                {createUser &&
+                    <TextField
+                        floatingLabelText={this.props.fieldLabel}
+                        value={global.pydio.MessageHash[485] + ' (' + this.state.createUser + ')'}
+                        disabled={true}
+                        fullWidth={true}
+                        underlineShow={!this.props.underlineHide}
+                    />
+                }
+                {!createUser &&
+                    <div style={{position:'absolute', right:4, bottom: 14, height: 20, width: 20}}>
+                        <RefreshIndicator
+                            size={20}
+                            left={0}
+                            top={0}
+                            status={this.state.loading ? 'loading' : 'hide' }
+                        />
+                    </div>
+                }
+                {this.props.showAddressBook && !createUser &&
                     <AddressBook
                         mode="popover"
                         pydio={this.props.pydio}
@@ -296,6 +305,27 @@ const UsersLoader = React.createClass({
                         disableSearch={true}
                     />
                 }
+                <Popover
+                    open={createUser}
+                    anchorEl={this._popoverAnchor}
+                    anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                    targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                    onRequestClose={this.onCreationCancelled}
+                    canAutoPosition={false}
+                >
+                    {createUser &&
+                        <AsyncComponent
+                            namespace={"PydioForm"}
+                            componentName={"UserCreationForm"}
+
+                            style={{width:350, height: 320}}
+                            newUserName={this.state.createUser}
+                            onUserCreated={this.onUserCreated}
+                            onCancel={this.onCreationCancelled}
+                            pydio={this.props.pydio}
+                        />
+                    }
+                </Popover>
             </div>
         );
 

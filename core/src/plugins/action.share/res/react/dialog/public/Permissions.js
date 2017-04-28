@@ -59,6 +59,7 @@ let PublicLinkPermissions = React.createClass({
                                     label={p.LABEL}
                                     onCheck={this.changePermission}
                                     checked={this.props.shareModel.getPublicLinkPermission(linkId, p.NAME)}
+                                    labelStyle={{whiteSpace:'nowrap'}}
                                 />
                             </div>
                         );

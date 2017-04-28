@@ -29,7 +29,7 @@ class UserAvatar extends React.Component{
                 this._userLoggedObs = this.loadLocalData.bind(this);
                 this.props.pydio.observe('user_logged', this._userLoggedObs);
             }
-        }else{
+        }else if(this.props.userType === 'user'){
             this.cache = MetaCacheService.getInstance();
             this.cache.registerMetaStream('user_public_data', 'EXPIRATION_MANUAL_TRIGGER');
             this.cache.registerMetaStream('user_public_data-rich', 'EXPIRATION_MANUAL_TRIGGER');
@@ -139,16 +139,14 @@ class UserAvatar extends React.Component{
     render(){
 
         const {user, avatar, graph} = this.state;
-        let {pydio, userId, style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,
-            labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard, cardSize} = this.props;
+        let {pydio, userId, userType, icon, style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,
+            labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard, cardSize, muiTheme} = this.props;
 
         let {label} = this.state;
-        let userType;
+        let userTypeLabel;
         if(user) {
             label = user.label;
-            userType = pydio.MessageHash[user.external ? '589' : '590'];
-        }
-        if(!label){
+        }else if(!label){
             label = this.props.userLabel || this.props.userId;
         }
 
@@ -157,17 +155,38 @@ class UserAvatar extends React.Component{
             displayAvatar = useDefaultAvatar = displayLabel = true;
         }
         if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
-            let avatarsColor = this.props.muiTheme.palette.avatarsColor;
-            if(this.props.userType === 'group' || userId.indexOf('AJXP_GRP_/') === 0 || userId.indexOf('/AJXP_TEAM/') === 0){
+            let avatarsColor = muiTheme.palette.avatarsColor;
+            if(userType === 'group' || userType === 'team' || userId.indexOf('AJXP_GRP_/') === 0 || userId.indexOf('/AJXP_TEAM/') === 0){
                 avatarsColor = Color(avatarsColor).darken(0.2).toString();
             }
+            let iconClassName;
+            switch (userType){
+                case 'group':
+                    iconClassName = 'mdi mdi-account-multiple';
+                    userTypeLabel = '289'
+                    break;
+                case 'team':
+                    iconClassName = 'mdi mdi-account-multiple-outline';
+                    userTypeLabel = '603'
+                    break;
+                case 'remote':
+                    iconClassName = 'mdi mdi-account-network';
+                    userTypeLabel = '604'
+                    break;
+                default:
+                    iconClassName = 'mdi mdi-account';
+                    userTypeLabel = (user ?  (user.external ? '589' : '590') : '288');
+                    break;
+            }
+            if(icon) iconClassName = icon;
+            if(userTypeLabel) userTypeLabel = pydio.MessageHash[userTypeLabel];
             if(richCard){
-                avatarIcon  = <FontIcon className="mdi mdi-account" style={{color:avatarsColor}} />;
+                avatarIcon  = <FontIcon className={iconClassName} style={{color:avatarsColor}} />;
                 avatarColor = '#f5f5f5';
             }else{
                 avatarColor     = avatarsColor;
-                if(this.props.icon){
-                    avatarIcon = <FontIcon className={this.props.icon}/>;
+                if(iconClassName){
+                    avatarIcon = <FontIcon className={iconClassName}/>;
                 }else{
                     avatarContent = label.split(' ').map((word)=>word[0]).join('').substring(0,2);
                     if(avatarContent.length < 2) avatarContent =  label.substring(0,2);
@@ -245,7 +264,7 @@ class UserAvatar extends React.Component{
                 {displayLabel && !richCard && <div
                     className={labelClassName}
                     style={labelStyle}>{label}</div>}
-                {displayLabel && richCard && <CardTitle title={label} subtitle={userType}/>}
+                {displayLabel && richCard && <CardTitle style={{textAlign:'center'}} title={label} subtitle={userTypeLabel}/>}
                 {richCard && user && <ActionsPanel {...this.state} {...this.props} reloadAction={reloadAction} onEditAction={onEditAction}/>}
                 {graph && <GraphPanel graph={graph} {...this.props} userLabel={label} reloadAction={reloadAction} onEditAction={onEditAction}/>}
                 {this.props.children}
@@ -270,6 +289,10 @@ UserAvatar.propTypes = {
      * Label of the user, if we already have it (otherwise will be loaded)
      */
     userLabel:React.PropTypes.string,
+    /**
+     * Type of user
+     */
+    userType: React.PropTypes.oneOf(['user', 'group', 'remote', 'team']),
     /**
      * Icon to be displayed in avatar
      */
@@ -351,6 +374,7 @@ UserAvatar.defaultProps = {
     displayLabel: true,
     displayAvatar: true,
     avatarSize: 40,
+    userType:'user',
     className: 'user-avatar-widget',
     avatarClassName:'user-avatar',
     labelClassName:'user-label'

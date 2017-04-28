@@ -52,10 +52,15 @@ let MainPanel = React.createClass({
 
     modelUpdated: function(eventData){
         if(this.isMounted()){
+            const {modelFirstLoad} = this.state;
+            let afterState;
+            if(modelFirstLoad){
+                afterState = () => {this.setState({modelFirstLoad: false})};
+            }
             this.setState({
                 status: eventData.status,
                 model:eventData.model
-            });
+            }, afterState);
         }
     },
 
@@ -63,7 +68,8 @@ let MainPanel = React.createClass({
         return {
             status: 'idle',
             mailerData: false,
-            model: new ShareModel(this.props.pydio, this.props.selection.getUniqueNode(), this.props.selection)
+            model: new ShareModel(this.props.pydio, this.props.selection.getUniqueNode(), this.props.selection),
+            modelFirstLoad: true
         };
     },
 
@@ -160,22 +166,25 @@ let MainPanel = React.createClass({
     },
 
     render: function(){
-        const {model} = this.state;
+        const {model, modelFirstLoad} = this.state;
         const buttonStyle = {textTransform:'none'};
-        var panels = [];
-        var showMailer = ShareModel.mailerActive() ? this.showMailer : null;
-        var auth = ShareModel.getAuthorizations(this.props.pydio);
+        const showMailer = ShareModel.mailerActive() ? this.showMailer : null;
+        const auth = ShareModel.getAuthorizations(this.props.pydio);
+        let panels = [], hasPublicLink, initialSelectedIndex;
+
         if((model.getNode().isLeaf() && auth.file_public_link) || (!model.getNode().isLeaf() && auth.folder_public_link)){
-            var publicLinks = model.getPublicLinks();
+            const publicLinks = model.getPublicLinks();
+            let linkData;
             if(publicLinks.length){
-                var linkData = publicLinks[0];
+                linkData = publicLinks[0];
             }
             let pubLabel = this.getMessage(121);
             if(model.hasPublicLink()){
                 pubLabel = <span>{pubLabel} <span className="mdi mdi-check"></span></span>
+                hasPublicLink = true;
             }
             panels.push(
-                <Tab key="public-link" label={pubLabel} buttonStyle={buttonStyle}>
+                <Tab key="public-link" value="public-link" label={pubLabel} buttonStyle={buttonStyle}>
                     <PublicLinkPanel
                         showMailer={showMailer}
                         linkData={linkData}
@@ -188,11 +197,9 @@ let MainPanel = React.createClass({
             );
         }
         if( (model.getNode().isLeaf() && auth.file_workspaces) || (!model.getNode().isLeaf() && auth.folder_workspaces)){
-            var users = model.getSharedUsers();
-            var ocsUsers = model.getOcsLinks();
-            var totalUsers = users.length + ocsUsers.length;
+            const totalUsers = model.getSharedUsers().length + model.getOcsLinks().length;
             panels.push(
-                <Tab key="target-users" label={this.getMessage(249, '') + (totalUsers?' ('+totalUsers+')':'')} buttonStyle={buttonStyle}>
+                <Tab key="target-users" value="target-users" label={this.getMessage(249, '') + (totalUsers?' ('+totalUsers+')':'')} buttonStyle={buttonStyle}>
                     <UsersPanel
                         showMailer={showMailer}
                         shareModel={model}
@@ -201,10 +208,13 @@ let MainPanel = React.createClass({
                     />
                 </Tab>
             );
+            if(modelFirstLoad && !hasPublicLink && totalUsers){
+                initialSelectedIndex = 'target-users';
+            }
         }
         if(panels.length > 0){
             panels.push(
-                <Tab key="share-permissions" label={this.getMessage(486, '')} buttonStyle={buttonStyle}>
+                <Tab key="share-permissions" value="share-permissions" label={this.getMessage(486, '')} buttonStyle={buttonStyle}>
                     <AdvancedPanel
                         showMailer={showMailer}
                         pydio={this.props.pydio}
@@ -250,16 +260,10 @@ let MainPanel = React.createClass({
                 model={this.state.model}
                 panels={panels}
                 mailer={mailer}
+                initialSelectedIndex={initialSelectedIndex}
             />
         );
 
-        return(
-            <div className="react_share_form" style={{width: 420, display:'flex', flexDirection:'column'}}>
-                <HeaderPanel {...this.props} shareModel={this.state.model}/>
-                <Tabs {...tabStyles} >{panels}</Tabs>
-                {mailer}
-            </div>
-        );
     }
 
 });
@@ -288,7 +292,7 @@ class Content extends React.Component{
         return(
             <div className="react_share_form" style={{width: 420, display:'flex', flexDirection:'column'}}>
                 <HeaderPanel {...this.props} shareModel={this.props.model}/>
-                <Tabs {...tabStyles} >{this.props.panels}</Tabs>
+                <Tabs value={this.props.initialSelectedIndex} {...tabStyles} >{this.props.panels}</Tabs>
                 {this.props.mailer}
             </div>
         );

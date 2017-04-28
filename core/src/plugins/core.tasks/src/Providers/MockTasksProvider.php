@@ -126,17 +126,15 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
      * @param Repository $repository
      * @return \Pydio\Tasks\Task[]
      */
-    public function getCurrentRunningTasks($user = null, $repository = null)
-    {
-        // TODO: Implement getCurrentRunningTasks() method.
+    public function getCurrentRunningTasks($user = null, $repository = null){
+        return [];
     }
 
     /**
      * @return Task[]
      */
-    public function getScheduledTasks()
-    {
-        // TODO: Implement getScheduledTasks() method.
+    public function getScheduledTasks(){
+        return [];
     }
 
     /**
@@ -144,7 +142,6 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
      * @return Task[]
      */
     public function getChildrenTasks($taskId){
-
     }
 
 }

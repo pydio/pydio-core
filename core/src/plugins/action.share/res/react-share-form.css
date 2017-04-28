@@ -254,29 +254,17 @@ div.react_share_form .public-link-container.edit-link .mui-text-field {
   font-size: 20px;
   width: 100px;
 }
-div#react_share_form .public-link-container .custom-link-button.icon-edit-sign,
-div.react_share_form .public-link-container .custom-link-button.icon-edit-sign,
 div#react_share_form .public-link-container .copy-link-button,
 div.react_share_form .public-link-container .copy-link-button {
   font-size: 24px;
   cursor: pointer;
   display: block;
-  padding-left: 7px;
-  float: right;
-  margin-top: 16px;
-}
-div#react_share_form .public-link-container .custom-link-button.icon-edit-sign:hover,
-div.react_share_form .public-link-container .custom-link-button.icon-edit-sign:hover,
-div#react_share_form .public-link-container .copy-link-button:hover,
-div.react_share_form .public-link-container .copy-link-button:hover {
-  color: #47b092;
-}
-div#react_share_form .public-link-container .copy-link-button,
-div.react_share_form .public-link-container .copy-link-button {
+  padding: 4px 7px;
   font-size: 16px !important;
   position: absolute;
-  top: -1px;
-  right: 4px;
+  top: 10px;
+  right: 0;
+  background-color: white;
 }
 div#react_share_form .public-link-container .copy-link-button:hover,
 div.react_share_form .public-link-container .copy-link-button:hover {

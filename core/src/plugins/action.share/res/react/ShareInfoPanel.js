@@ -167,21 +167,22 @@
             const {pydio} = this.props;
             if(users.length){
                 sharedUsersEntries = users.map(function(u){
-                    var rights = [];
+                    let rights = [];
                     if(u.RIGHT.indexOf('r') !== -1) rights.push(global.MessageHash["share_center.31"]);
                     if(u.RIGHT.indexOf('w') !== -1) rights.push(global.MessageHash["share_center.181"]);
+                    const userType = (u.TYPE === 'team' ? 'team' : (u.TYPE === 'group'  ? 'group' : 'user'))
                     return (
                         <div key={u.ID} className="uUserEntry" title={rights.join(' & ')} style={{padding:'10px 0'}}>
                             <PydioComponents.UserAvatar
                                 useDefaultAvatar={true}
                                 userId={u.ID}
                                 userLabel={u.LABEL}
-                                userType={u.TYPE}
+                                userType={userType}
                                 pydio={pydio}
                                 style={{flex:1, display:'flex', alignItems:'center'}}
                                 labelStyle={{fontSize: 15, paddingLeft: 10}}
-                                avatarSize={26}
-                                richOnHover={u.TYPE !== 'group' && u.ID.indexOf('/AJXP_TEAM/')!== 0}
+                                avatarSize={30}
+                                richOnHover={true}
                             />
                         </div>
                     );
@@ -190,8 +191,8 @@
             const ocsLinks = this.state.model.getOcsLinks();
             if(ocsLinks.length){
                 remoteUsersEntries = ocsLinks.map(function(link){
-                    var i = link['invitation'];
-                    var status;
+                    const i = link['invitation'];
+                    let status;
                     if(!i){
                         status = '214';
                     }else {
@@ -206,9 +207,18 @@
                     status = this.getMessage(status);
 
                     return (
-                        <div key={"remote-"+link.hash} className="uUserEntry">
-                            <span className="uLabel">{i.USER} @ {i.HOST}</span>
-                            <span className="uStatus">{status}</span>
+                        <div key={"remote-"+link.hash} className="uUserEntry" style={{padding:'10px 0'}}>
+                            <PydioComponents.UserAvatar
+                                useDefaultAvatar={true}
+                                userId={"remote-"+link.hash}
+                                userLabel={i.USER + '@'+ i.HOST}
+                                userType={'remote'}
+                                pydio={pydio}
+                                style={{flex:1, display:'flex', alignItems:'center'}}
+                                labelStyle={{fontSize: 15, paddingLeft: 10}}
+                                avatarSize={30}
+                                richOnHover={true}
+                            />
                         </div>
                     );
                 }.bind(this));

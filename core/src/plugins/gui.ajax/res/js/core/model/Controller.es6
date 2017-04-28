@@ -312,7 +312,7 @@ export default class Controller extends Observable{
                 selection:false,
                 dir:true,
                 actionBar:true,
-                actionBarGroup:'get',
+                actionBarGroup:'',
                 contextMenu:false,
                 infoPanel:false
 

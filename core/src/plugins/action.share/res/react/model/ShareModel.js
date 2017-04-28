@@ -23,6 +23,8 @@
         initLoad(){
             if(this._node.getMetadata().get('ajxp_shared')){
                 this.load();
+            }else{
+                this._setStatus('loaded');
             }
         }
 
@@ -238,12 +240,21 @@
         }
 
         saveSelectionAsTeam(teamName){
-            var userIds = [];
-            this.getSharedUsers().map(function(e){
-                if(e.TYPE == 'user') userIds.push(e.ID);
+            let userIds = [], commonRight;
+            this.getSharedUsers().map((e) => {
+                if(e.TYPE === 'user' || e.TYPE === 'tmp_user') {
+                    userIds.push(e.ID);
+                    if(commonRight === undefined) commonRight = e.RIGHT;
+                    else if(commonRight !== e.RIGHT) commonRight = false;
+                }
             });
-            PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, function(){
-                // Flatten Team?
+            PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, (jsonResponse) => {
+                const {message, error, insertId} = jsonResponse;
+                if(error){
+                    this._pydio.displayMessage('ERROR', error);
+                }else{
+                    this._pydio.displayMessage('SUCCESS', message);
+                }
             });
         }
 
@@ -270,8 +281,8 @@
             this._setStatus('modified');
         }
         _globalsAsParameters(params){
-            params['repo_label'] = this.getGlobal("label");
-            params['repo_description'] = this.getGlobal("description");
+            params['repo_label'] = this.getGlobal("label") || '';
+            params['repo_description'] = this.getGlobal("description") || '';
             params['self_watch_folder'] = this.getGlobal("watch") ? 'true' : 'false';
         }
 
@@ -513,7 +524,6 @@
 
         /****************************/
         /* PUBLIC LINKS TEMPLATE    */
-        /* TODO: INFER FROM DEFAULT PUBLIC LINK
         /****************************/
         getTemplate(linkId){
             if(this._pendingData["links"] && this._pendingData["links"][linkId] && this._pendingData["links"][linkId]["layout"]){

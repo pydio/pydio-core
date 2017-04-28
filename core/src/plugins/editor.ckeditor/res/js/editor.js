@@ -134,7 +134,7 @@ class Editor extends React.Component {
             <CKEditor
                 url={this.props.url}
                 content={this.props.content}
-                config={window.ajxpMobile ? mobile : desktop}
+                config={this.props.pydio.UI.MOBILE_EXTENSIONS ? mobile : desktop}
                 onChange={content => this.setState({content})}
             />
         );

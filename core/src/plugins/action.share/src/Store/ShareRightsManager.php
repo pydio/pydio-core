@@ -376,8 +376,10 @@ class ShareRightsManager
                 $TYPE = "group";
             }else{
                 $role = RolesService::getRole($rId);
+                if(empty($role)) continue;
                 $LABEL = $role->getLabel();
-                $TYPE = 'group';
+                if($role->hasOwner()) $TYPE = "team";
+                else $TYPE = 'group';
             }
 
             if(empty($LABEL)) $LABEL = $rId;
@@ -390,7 +392,7 @@ class ShareRightsManager
             if($WATCH) $entry["WATCH"] = $WATCH;
             if($HIDDEN) $entry["HIDDEN"] = true;
             if($AVATAR !== false) $entry["AVATAR"] = $AVATAR;
-            if($TYPE == "group"){
+            if($TYPE === "group" || $TYPE === "team"){
                 $sharedGroups[$entry["ID"]] = $entry;
             } else {
                 $sharedEntries[$entry["ID"]] = $entry;

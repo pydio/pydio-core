@@ -604,17 +604,12 @@ abstract class AbstractConfDriver extends Plugin
      */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        $httpVars = $requestInterface->getParsedBody();
-        $action = $requestInterface->getAttribute("action");
         /** @var ContextInterface $ctx */
-        $ctx    = $requestInterface->getAttribute("ctx");
-        $loggedUser = $ctx->getUser();
-
-        foreach ($httpVars as $getName=>$getValue) {
-            $$getName = InputFilter::securePath($getValue);
-        }
-
-        $mess = LocaleService::getMessages();
+        $ctx            = $requestInterface->getAttribute("ctx");
+        $httpVars       = $requestInterface->getParsedBody();
+        $action         = $requestInterface->getAttribute("action");
+        $loggedUser     = $ctx->getUser();
+        $mess           = LocaleService::getMessages();
 
         switch ($action) {
             //------------------------------------
@@ -622,9 +617,11 @@ abstract class AbstractConfDriver extends Plugin
             //------------------------------------
             case "switch_repository":
 
-                if (!isSet($repository_id)) {
+
+                if (!isSet($httpVars['repository_id'])) {
                     break;
                 }
+                $repository_id = InputFilter::sanitize($httpVars['repository_id'], InputFilter::SANITIZE_ALPHANUM);
                 UsersService::getRepositoryWithPermission($ctx->getUser(), $repository_id);
                 SessionService::switchSessionRepositoryId($repository_id);
                 PluginsService::getInstance($ctx->withRepositoryId($repository_id));

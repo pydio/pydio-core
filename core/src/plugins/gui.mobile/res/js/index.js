@@ -1,5 +1,2 @@
 import Template from './MobileExtensions'
-
-window.MobileExtensions = {
-    Template: Template
-}
+export default {Template}

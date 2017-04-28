@@ -105,7 +105,7 @@ let PublicLinkSecureOptions = React.createClass({
         const linkId = this.props.linkData.hash;
         const passContainer = this.renderPasswordContainer();
         const crtLinkDLAllowed = this.props.shareModel.getPublicLinkPermission(linkId, 'download');
-        const dlLimitValue = this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads');
+        let dlLimitValue = this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads');
         const expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
         const auth = ShareModel.getAuthorizations(this.props.pydio);
         const today = new Date();
@@ -117,8 +117,8 @@ let PublicLinkSecureOptions = React.createClass({
             maxDate.setDate(today.getDate() + parseInt(auth.max_expiration));
         }
         if(parseInt(auth.max_downloads) > 0){
-            // todo: limit the field values by default?
             maxDownloads = parseInt(auth.max_downloads);
+            dlLimitValue = Math.min(dlLimitValue, maxDownloads);
         }
         if(expirationDateValue){
             if(expirationDateValue < 0){
@@ -177,7 +177,7 @@ let PublicLinkSecureOptions = React.createClass({
                             type="number"
                             disabled={this.props.isReadonly()}
                             floatingLabelText={this.props.getMessage(dlExpired?'22b':'22')}
-                            value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
+                            value={dlLimitValue > 0 ? dlLimitValue : ''}
                             onChange={this.updateDLExpirationField}
                             fullWidth={true}
                             style={{flex: 1}}
