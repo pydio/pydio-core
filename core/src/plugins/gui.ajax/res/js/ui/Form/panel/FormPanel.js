@@ -9,20 +9,12 @@ import FormManager from '../manager/Manager'
 
 
 /**
- * Main form constructor
- * @param parameters Set of Pydio StandardForm parameters
- * @param values Set of values (object)
- * @param onParameterChange Trigger unitary function when one form input changes.
- * @param onChange Send all form values onchange, including eventually the removed ones (for dynamic panels)
- * @param disabled
- * @param binary_context a string added to image inputs upload/downlaod operations
- * @param depth  by default 0, subform will see their zDepth increased by one.
- * @param header Add an additional header component (added inside first subpanel)
- * @param footer  Add an additional footer component (added inside last subpanel).
- * @param additionalPanes Add full panes at the top or the bottom
- * @param tabs group form panels in tabs instead of displaying multiple papers.
- * @param setHelperData Pass helper data
- * @param checkHasHelper Function to check if a given parameter has an associated helper.
+ * Form Panel is a ready to use form builder inherited for Pydio's legacy parameters formats ('standard form').
+ * It is very versatile and can basically take a set of parameters defined in the XML manifests (or defined manually
+ * in JS) and display them as a user form.
+ * It is a controlled component: it takes a {values} object and triggers back an onChange() function.
+ *
+ * See also Manager class to get some utilitary functions to parse parameters and extract values for the form.
  */
 export default React.createClass({
 
@@ -31,32 +23,94 @@ export default React.createClass({
     _parametersMetadata:null,
 
     propTypes:{
+        /**
+         * Array of Pydio StandardForm parameters
+         */
         parameters:React.PropTypes.array.isRequired,
+        /**
+         * Object containing values for the parameters
+         */
         values:React.PropTypes.object,
+        /**
+         * Trigger unitary function when one form input changes.
+         */
         onParameterChange:React.PropTypes.func,
+        /**
+         * Send all form values onchange, including eventually the removed ones (for dynamic panels)
+         */
         onChange:React.PropTypes.func,
+        /**
+         * Triggered when the form globabally switches between valid and invalid state
+         * Triggered once at form construction
+         */
         onValidStatusChange:React.PropTypes.func,
+        /**
+         * Disable the whole form at once
+         */
         disabled:React.PropTypes.bool,
+        /**
+         * String added to the image inputs for upload/download operations
+         */
         binary_context:React.PropTypes.string,
+        /**
+         * 0 by default, subforms will have their zDepth value increased by one
+         */
         depth:React.PropTypes.number,
 
-        /* Display Options */
+        /**
+         * Add an additional header component (added inside first subpanel)
+         */
         header:React.PropTypes.object,
+        /**
+         * Add an additional footer component (added inside last subpanel)
+         */
         footer:React.PropTypes.object,
+        /**
+         * Add other arbitrary panels, either at the top or the bottom
+         */
         additionalPanes:React.PropTypes.shape({
             top:React.PropTypes.array,
             bottom:React.PropTypes.array
         }),
+        /**
+         * An array of tabs containing groupNames. Groups will be splitted
+         * accross those tabs
+         */
         tabs:React.PropTypes.array,
+        /**
+         * Fired when a the active tab changes
+         */
         onTabChange:React.PropTypes.func,
+        /**
+         * A bit like tabs, but using accordion-like layout
+         */
         accordionizeIfGroupsMoreThan:React.PropTypes.number,
+        /**
+         * Forward an event when scrolling the form
+         */
         onScrollCallback:React.PropTypes.func,
+        /**
+         * Restrict to a subset of field groups
+         */
         limitToGroups:React.PropTypes.array,
+        /**
+         * Ignore some specific fields types
+         */
         skipFieldsTypes:React.PropTypes.array,
 
         /* Helper Options */
+        /**
+         * Pass pointers to the Pydio Companion container
+         */
         setHelperData:React.PropTypes.func,
+        /**
+         * Function to check if the companion is active or none and if a parameter
+         * has helper data
+         */
         checkHasHelper:React.PropTypes.func,
+        /**
+         * Test for parameter
+         */
         helperTestFor:React.PropTypes.string
 
     },
