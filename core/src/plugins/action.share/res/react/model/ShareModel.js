@@ -251,9 +251,9 @@
             PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, (jsonResponse) => {
                 const {message, error, insertId} = jsonResponse;
                 if(error){
-                    pydio.displayMessage('ERROR', error);
+                    this._pydio.displayMessage('ERROR', error);
                 }else{
-                    pydio.displayMessage('SUCCESS', message);
+                    this._pydio.displayMessage('SUCCESS', message);
                 }
             });
         }
