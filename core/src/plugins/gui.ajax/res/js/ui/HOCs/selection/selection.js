@@ -57,7 +57,13 @@ const withSelection = (getSelection) => {
             render() {
                 const {id, selection, playing, dispatch, ...remainingProps} = this.props
 
-                if (!selection) return null
+                if (!selection) {
+                    return (
+                        <Component
+                            {...remainingProps}
+                        />
+                    )
+                }
 
                 return (
                     <Component
