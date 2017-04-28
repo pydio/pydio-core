@@ -88,7 +88,7 @@ class GenericInfoCard extends React.Component {
                 <InfoPanelCard {...this.props} primaryToolbars={["info_panel", "info_panel_share"]}>
                     <FilePreview
                         key={this.props.node.getPath()}
-                        style={{height:200}}
+                        style={{height: 200, padding: 0}}
                         node={this.props.node}
                         loadThumbnail={true}
                         richPreview={true}

@@ -23,11 +23,12 @@ module.exports = function(grunt) {
                 options: {
                     external: Externals,
                     browserifyOptions:{
+                        standalone: 'PydioSoundManager',
                         debug:true
                     }
                 },
                 files: {
-                    'res/build/PydioSoundManager.js':'res/build/PydioSoundManager/*.js'
+                    'res/build/PydioSoundManager.js':'res/build/PydioSoundManager/index.js'
                 }
             }
         },

@@ -19,6 +19,8 @@ import InfoRootNode from './detailpanes/RootNode'
 import GenericInfoCard from './detailpanes/GenericInfoCard'
 import FileInfoCard from './detailpanes/FileInfoCard'
 
+import * as EditorActions from './editor/actions'
+
 const classes = {
     OpenNodesModel,
     MainFilesList,
@@ -37,7 +39,8 @@ const classes = {
     InfoPanelCard,
     InfoRootNode,
     FileInfoCard,
-    GenericInfoCard
+    GenericInfoCard,
+    EditorActions
 }
 
 export {classes as default}

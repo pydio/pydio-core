@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.exif" openable="true" text="editor.exif.1" iconClass="mdi mdi-camera" title="editor.exif.2"
-        className="PydioExif.Editor" mimes="jpg,jpeg"
+        actions="PydioExif.Actions" className="PydioExif" mimes="jpg,jpeg"
         formId="exif_box" label="CONF_MESSAGE[EXIF Extractor]"
         description="CONF_MESSAGE[Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data.]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">

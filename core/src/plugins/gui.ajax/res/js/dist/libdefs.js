@@ -43,6 +43,7 @@ const LibRequires = [ // modules we want to require and export
     'react-draggable',
     'react-grid-layout',
     'react-chartjs',
+    'react-redux',
     'react-select',
     'react-dnd',
     'react-dnd-html5-backend',

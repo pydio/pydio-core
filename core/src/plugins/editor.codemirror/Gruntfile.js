@@ -21,13 +21,14 @@ module.exports = function(grunt) {
         browserify: {
             ui : {
                 options: {
-                    external:Externals,
+                    external: Externals,
                     browserifyOptions:{
+                        standalone: 'PydioCodeMirror',
                         debug:true
                     }
                 },
                 files: {
-                    'res/build/PydioCodeMirror.js':'res/build/PydioCodeMirror/*.js'
+                    'res/build/PydioCodeMirror.js':'res/build/PydioCodeMirror/index.js'
                 }
             }
         },

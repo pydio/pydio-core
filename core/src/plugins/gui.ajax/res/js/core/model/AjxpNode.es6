@@ -428,4 +428,15 @@ export default class AjxpNode extends Observable{
         return "";
     }
 
+    buildRandomSeed(ajxpNode) {
+       var mtimeString = "&time_seed=" + this._metadata.get("ajxp_modiftime");
+       if (this.getParent()){
+           var preview_seed = this.getParent().getMetadata().get('preview_seed');
+           if(preview_seed){
+               mtimeString += "&rand="+preview_seed;
+           }
+       }
+       return mtimeString;
+   }
+
 }
