@@ -127,14 +127,14 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
      * @return \Pydio\Tasks\Task[]
      */
     public function getCurrentRunningTasks($user = null, $repository = null){
-        return []
+        return [];
     }
 
     /**
      * @return Task[]
      */
     public function getScheduledTasks(){
-        return []
+        return [];
     }
 
     /**
