@@ -1,5 +1,7 @@
+const React = require('react')
 import FilePreview from './FilePreview'
 const ReactDOM = require('react-dom')
+const {IconButton} = require('material-ui')
 
 class ComponentConfigsParser {
 
@@ -209,7 +211,16 @@ let MainFilesList = React.createClass({
          return <ReactMUI.FontIcon className="icon-ellipsis-vertical" tooltip="Info" onClick={selectFolder}/>;
          }*/
         let content = null;
-        if(node.getMetadata().get('overlay_class')){
+        const mobile = this.props.pydio.UI.MOBILE_EXTENSIONS;
+        const dm = this.props.pydio.getContextHolder();
+        if(mobile){
+            const ContextMenuModel = require('pydio/model/context-menu');
+            return <IconButton iconClassName="mdi mdi-dots-vertical" tooltip="Info" onClick={(event) => {
+                event.stopPropagation();
+                dm.setSelectedNodes([node]);
+                ContextMenuModel.getInstance().openNodeAtPosition(node, event.clientX, event.clientY);
+            }}/>;
+        }else if(node.getMetadata().get('overlay_class')){
             let elements = node.getMetadata().get('overlay_class').split(',').map(function(c){
                 return <span key={c} className={c + ' overlay-class-span'}></span>;
             });
@@ -221,14 +232,15 @@ let MainFilesList = React.createClass({
 
     entryHandleClicks: function(node, clickType, event){
         let dm = this.props.pydio.getContextHolder();
-        if(!clickType || clickType == PydioComponents.SimpleList.CLICK_TYPE_SIMPLE){
+        const mobile = this.props.pydio.UI.MOBILE_EXTENSIONS;
+        if(!mobile && ( !clickType || clickType === PydioComponents.SimpleList.CLICK_TYPE_SIMPLE )){
             if(event && event.shiftKey && dm.getSelectedNodes().length){
                 const newSelection = this.refs.list.computeSelectionFromCurrentPlusTargetNode(dm.getSelectedNodes(), node);
                 dm.setSelectedNodes(newSelection);
             }else{
                 dm.setSelectedNodes([node]);
             }
-        }else if(clickType == PydioComponents.SimpleList.CLICK_TYPE_DOUBLE){
+        }else if(mobile || clickType === PydioComponents.SimpleList.CLICK_TYPE_DOUBLE){
             if(node.isLeaf()){
                 dm.setSelectedNodes([node]);
                 this.props.pydio.Controller.fireAction("open_with_unique");

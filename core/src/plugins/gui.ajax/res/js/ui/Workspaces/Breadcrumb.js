@@ -2,6 +2,8 @@ const React = require('react')
 const PydioNode = require('pydio/model/node')
 const {muiThemeable} = require('material-ui/styles')
 const LangUtils = require('pydio/util/lang')
+const {Textfit} = require('react-textfit')
+
 
 let Breadcrumb = React.createClass({
 
@@ -36,7 +38,9 @@ let Breadcrumb = React.createClass({
                 fontSize: 22,
                 lineHeight:'24px',
                 padding: 20,
-                color: this.props.muiTheme.appBar.textColor
+                color: this.props.muiTheme.appBar.textColor,
+                maxWidth: '70%',
+                flex:1
             }
         };
         if(!pydio.user){
@@ -57,11 +61,11 @@ let Breadcrumb = React.createClass({
             i++;
         }.bind(this));
         return (
-            <div className="react_breadcrumb" style={mainStyle}>
-                {this.props.startWithSeparator && <span className="separator"> / </span>}
+            <Textfit mode="single" perfectFit={false} min={12} max={22} className="react_breadcrumb" style={mainStyle}>
+                 {this.props.startWithSeparator && <span className="separator"> / </span>}
                 <span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span>
                 {segments}
-            </div>
+            </Textfit>
         );
     }
 

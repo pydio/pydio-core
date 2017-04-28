@@ -96,6 +96,8 @@ let FSTemplate = React.createClass({
     render: function () {
 
         const connectDropTarget = this.props.connectDropTarget || function(c){return c;};
+        const mobile = this.props.pydio.UI.MOBILE_EXTENSIONS;
+
         /*
         var isOver = this.props.isOver;
         var canDrop = this.props.canDrop;
@@ -180,14 +182,17 @@ let FSTemplate = React.createClass({
                                 secondary={true}
                                 controller={props.pydio.Controller}
                             />
-                            <PydioComponents.Toolbar
-                                {...props}
-                                id="main-toolbar"
-                                toolbars={mainToolbars}
-                                groupOtherList={mainToolbarsOthers}
-                                renderingType="button"
-                                buttonStyle={styles.buttonsStyle}
-                            />
+                            {!mobile &&
+                                <PydioComponents.Toolbar
+                                    {...props}
+                                    id="main-toolbar"
+                                    toolbars={mainToolbars}
+                                    groupOtherList={mainToolbarsOthers}
+                                    renderingType="button"
+                                    buttonStyle={styles.buttonsStyle}
+                                />
+                            }
+                            {mobile && <span style={{flex:1}}></span>}
                             <PydioComponents.ListPaginator
                                 id="paginator-toolbar"
                                 dataModel={props.pydio.getContextHolder()}
@@ -214,7 +219,7 @@ let FSTemplate = React.createClass({
 
                 <EditionPanel {...props}/>
 
-                <span className="context-menu"><PydioComponents.ContextMenu/></span>
+                <span className="context-menu"><PydioComponents.ContextMenu pydio={this.props.pydio}/></span>
             </div>
         );
     }
