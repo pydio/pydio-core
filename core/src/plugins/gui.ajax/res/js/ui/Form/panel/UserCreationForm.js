@@ -1,5 +1,5 @@
 const React = require('react')
-const {Paper, FlatButton} = require('material-ui');
+const {Paper, FlatButton, Divider} = require('material-ui');
 const {User, UsersApi} = require('pydio/http/users-api')
 import Manager from '../manager/Manager'
 import FormPanel from './FormPanel'
@@ -127,15 +127,17 @@ class UserCreationForm extends React.Component{
     render(){
         const pydio = this.props.pydio;
         return (
-            <Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth : 2} style={{height: 250, overflowY: 'auto', ...this.props.style}}>
+            <Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth : 2} style={{height: 250, display:'flex', flexDirection:'column', ...this.props.style}}>
                 <FormPanel
                     className="reset-pydio-forms"
                     depth={-1}
                     parameters={this.getParameters()}
                     values={this.state.values}
                     onChange={this.onValuesChange.bind(this)}
+                    style={{overflowY: 'auto', flex:1}}
                 />
-                <div style={{padding:16, textAlign:'right', paddingTop:0}}>
+                <Divider style={{flexShrink:0}}/>
+                <div style={{padding:8, textAlign:'right'}}>
                     <FlatButton label={this.props.editMode ? pydio.MessageHash[519] : pydio.MessageHash[484]} secondary={true} onTouchTap={this.submitCreationForm.bind(this)} />
                     <FlatButton label={pydio.MessageHash[49]} onTouchTap={this.cancelCreationForm.bind(this)} />
                 </div>
