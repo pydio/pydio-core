@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.zoho" order="5" enabled="false" openable="true" text="zoho_editor.1" iconClass="mdi mdi-file-document" title="zoho_editor.2" canWrite="true"
-        description="CONF_MESSAGE[Zoho editor]" label="CONF_MESSAGE[Office Docs]" actions="PydioZoho.Actions" className="PydioZoho.Editor" mimes="xls,xlsx,ods,sxc,csv,tsv,ppt,pptx,pps,odp,sxi,doc,docx,rtf,odt,sxw"
+        description="CONF_MESSAGE[Zoho editor]" label="CONF_MESSAGE[Office Docs]" actions="PydioZoho.Actions" className="PydioZoho" mimes="xls,xlsx,ods,sxc,csv,tsv,ppt,pptx,pps,odp,sxi,doc,docx,rtf,odt,sxw"
         formId="zoho_box" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.zoho/ZohoEditor.php" classname="Pydio\Editor\Office\ZohoEditor"/>
     <server_settings>
