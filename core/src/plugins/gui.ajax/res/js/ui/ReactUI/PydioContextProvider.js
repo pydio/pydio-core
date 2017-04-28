@@ -5,9 +5,9 @@ import { MuiThemeProvider } from 'material-ui';
 import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
 
-import {reducers} from '../Workspaces/editor';
+const { EditorReducers } = Pydio.requireLib('hoc');
 
-const store = createStore(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+const store = createStore(EditorReducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 let MainProvider = MuiThemeProvider
 let DND;

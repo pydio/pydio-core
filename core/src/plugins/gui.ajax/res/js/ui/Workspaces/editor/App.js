@@ -135,4 +135,3 @@ function mapStateToProps(state, ownProps) {
 const ConnectedApp = connect(mapStateToProps, EditorActions)(App)
 
 export default ConnectedApp;
-export {default as reducers} from './reducers';

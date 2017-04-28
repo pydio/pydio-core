@@ -56,11 +56,11 @@ class Editor extends React.Component {
     }
 
     componentDidMount() {
-        const {pydio, url} = this.props
+        const {pydio, node} = this.props
 
         pydio.ApiClient.request({
             get_action: 'get_content',
-            file: url
+            file: node.getPath()
         }, (transport) => this.setState({content: transport.responseText}));
     }
 
@@ -82,20 +82,5 @@ class Editor extends React.Component {
         )
     }
 }
-
-/*const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-
-let CodeMirrorLoaderWithControls = compose(
-    withControls(PydioCodeMirror.controls),
-    withMenu,
-    withLoader,
-    withErrors
-)(CodeMirrorLoader)*/
-
-/* We need to attach the element to window else it won't be found
-window.PydioCodeMirror = {
-    PydioEditor: connect()(PydioCodeMirror),
-    SourceEditor: CodeMirrorLoader
-}*/
 
 export default connect()(Editor)

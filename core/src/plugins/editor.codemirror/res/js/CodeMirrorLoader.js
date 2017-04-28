@@ -80,7 +80,7 @@ class CodeMirrorLoader extends React.Component {
     render() {
 
         // If Code Mirror library is not loaded, do not go further
-        if (!this.state.codemirrorInstance) return null
+        if (!this.state.codemirrorInstance || !this.props.content) return null
 
         return (
             <CodeMirror

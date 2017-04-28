@@ -1,6 +1,7 @@
+import Pydio from 'pydio'
 import { parseQuery } from './utils';
 
-const { EditorActions } = PydioWorkspaces;
+const { EditorActions } = Pydio.requireLib('hoc');
 
 // Actions definitions
 export const onSave = ({pydio, url, content, dispatch, id}) => {

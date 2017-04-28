@@ -9,11 +9,13 @@ import {ResolutionActions, ResolutionControls, withResolution} from './resolutio
 import {URLProvider} from './urls'
 import PaletteModifier from './PaletteModifier'
 import * as Animations from "./animations";
-import {EditorActions} from "./editor/index";
+import reducers from './editor/reducers/index'
+import * as actions from './editor/actions';
 
 const PydioHOCs = {
     ContentActions,
-    EditorActions,
+    EditorActions: actions,
+    EditorReducers: reducers,
     ContentControls,
     ResolutionActions,
     ResolutionControls,

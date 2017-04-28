@@ -1,9 +1,9 @@
+import Pydio from 'pydio'
 import OpenNodesModel from './OpenNodesModel'
-
 import { connect } from 'react-redux';
+import {Editor} from './editor';
 
-import * as actions from './editor/actions';
-import {Editor, reducers} from './editor';
+const { EditorActions } = Pydio.requireLib('hoc')
 
 class EditionPanel extends React.Component {
 
@@ -114,10 +114,8 @@ class EditionPanel extends React.Component {
     }
 }
 
-EditionPanel = connect(null, actions)(EditionPanel)
-
 EditionPanel.PropTypes = {
     pydio: React.PropTypes.instanceOf(Pydio)
 }
 
-export default connect(null, actions)(EditionPanel)
+export default connect(null, EditorActions)(EditionPanel)
