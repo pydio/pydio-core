@@ -19,11 +19,8 @@
  */
 
 import React, {Component} from 'react'
-import { connect } from 'react-redux'
-import { compose } from 'redux'
 
-class Editor extends Component {
-
+class Viewer extends Component {
     componentDidMount() {
         this.loadNode(this.props)
     }
@@ -71,39 +68,16 @@ class Editor extends Component {
 
     }
 
-    static getPreviewComponent(node, rich = true) {
-        if(rich && window.pydio.getPluginConfigs('editor.pdfjs').get('PDFJS_USE_PREVIEW')) {
-            return {
-                element: PydioPDFJSViewer,
-                props: {
-                    style: {width:'100%', height:250},
-                    node: node,
-                    rich: rich
-                }
-            }
-        }else{
-            return null;
-        }
-    }
-
     render() {
         const {url} = this.state || {}
 
         if (!url) return null
 
         return (
-            <iframe {...this.props} src={url} />
+            <iframe {...this.props} style={{width: "100%", height: "100%", border: 0}} src={url} />
         );
     }
 }
-
-const {withSelection, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-
-/*let Viewer = compose(
-    withMenu,
-    withLoader,
-    withErrors
-)(props => <iframe {...props} />)*/
 
 const editors = pydio.Registry.getActiveExtensionByType("editor")
 const conf = editors.filter(({id}) => id === 'editor.pdfjs')[0]
@@ -122,7 +96,7 @@ const getSelection = (node) => new Promise((resolve, reject) => {
     })
 })
 
-export default compose(
-    withSelection(getSelection),
-    connect()
-)(Editor)
+const {withSelection} = PydioHOCs;
+
+export const Panel = Viewer
+export const Editor = withSelection(getSelection)(Viewer)

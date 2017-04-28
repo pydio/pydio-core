@@ -50,6 +50,7 @@ class Badge extends Component {
                     {...remainingProps}
                     node={node}
                     src={src}
+                    style={{alignItems: "center"}}
                 />
             }
             </ThumbnailURLProvider>

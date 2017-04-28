@@ -76,7 +76,7 @@ const withResize = (Component) => {
         }
 
         render() {
-            const {scale} = this.state
+            const {scale} = this.state || {}
             const {...remainingProps} = this.props
 
             return (

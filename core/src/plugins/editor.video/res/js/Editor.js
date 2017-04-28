@@ -22,7 +22,7 @@ import { connect } from 'react-redux'
 import { compose } from 'redux'
 import Player from './Player';
 
-class Editor extends React.Component {
+class Viewer extends React.Component {
 
     static get styles() {
         return {
@@ -68,22 +68,6 @@ class Editor extends React.Component {
         }));
     }
 
-    // Static functions
-    static getPreviewComponent(node, rich = false) {
-        if (rich) {
-            return {
-                element: PydioVideo,
-                props: {
-                    node: node,
-                    rich: rich
-                }
-            }
-        } else {
-            // We don't have a player for the file icon
-            return null;
-        }
-    }
-
     // Util functions
     getSessionId() {
         const {pydio} = this.props
@@ -105,18 +89,12 @@ class Editor extends React.Component {
         const editor = url ? <Player url={url} /> : null;
 
         return (
-            <Viewer style={Editor.styles.container}>{editor}</Viewer>
+            <div style={Viewer.styles.container}>{editor}</div>
         );
     }
 }
 
-const {withSelection, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-
-let Viewer = compose(
-    withMenu,
-    withLoader,
-    withErrors
-)(props => <div {...props} />)
+const {withSelection} = PydioHOCs;
 
 const editors = pydio.Registry.getActiveExtensionByType("editor")
 const conf = editors.filter(({id}) => id === 'editor.video')[0]
@@ -135,7 +113,9 @@ const getSelection = (node) => new Promise((resolve, reject) => {
     })
 })
 
-export default compose(
+export const Panel = Viewer
+
+export const Editor = compose(
     withSelection(getSelection),
     connect()
-)(Editor)
+)(Viewer)

@@ -1,7 +1,6 @@
 import OpenNodesModel from './OpenNodesModel'
 
-import { createStore } from 'redux';
-import { Provider, connect } from 'react-redux';
+import { connect } from 'react-redux';
 
 import * as actions from './editor/actions';
 import {Editor, reducers} from './editor';
@@ -34,28 +33,68 @@ class EditionPanel extends React.Component {
 
         const {node = {}, editorData} = object
 
-        let tabId = tabCreate({
-            id: node.getLabel(),
-            title: node.getLabel(),
-            url: node.getPath(),
-            icon: PydioWorkspaces.FilePreview,
-            child: PydioComponents.ReactEditorOpener,
-            pydio,
-            node,
-            editorData,
-            registry: pydio.Registry
-        }).id
+        pydio.Registry.loadEditorResources(
+            editorData.resourcesManager,
+            () => {
 
-        editorSetActiveTab(tabId)
+                let EditorClass = null
 
-        editorModify({
-            open: true,
-            isPanelActive: true
-        })
+                if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+                    this.setState({
+                        error: "Cannot find editor component (" + editorData.editorClass + ")!"
+                    })
+                    return
+                }
+
+                let tabId = tabCreate({
+                    id: node.getLabel(),
+                    title: node.getLabel(),
+                    url: node.getPath(),
+                    icon: PydioWorkspaces.FilePreview,
+                    Editor: EditorClass.Editor,
+                    Controls: EditorClass.Controls,
+                    pydio,
+                    node,
+                    editorData,
+                    registry: pydio.Registry
+                }).id
+
+                editorSetActiveTab(tabId)
+
+                editorModify({
+                    open: true,
+                    isPanelActive: true
+                })
+            }
+        )
     }
 
     _handleNodeRemoved(index) {
     }
+
+    /*componentDidMount() {
+        const {editorData, registry} = this.props
+
+        registry.loadEditorResources(
+            editorData.resourcesManager,
+            () => this.setState({ready: true})
+        );
+    }
+
+    render() {
+        const {editorData} = this.props
+        const {ready} = this.state
+
+        if (!ready) return null
+
+        let EditorClass = null
+        if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+            return <div>{"Cannot find editor component (" + editorData.editorClass + ")!"}</div>
+        }
+
+        // Getting HOC of the class
+        return <EditorClass.Editor {...this.props} />
+    }*/
 
     render() {
         let style = {
@@ -75,18 +114,10 @@ class EditionPanel extends React.Component {
     }
 }
 
-class EditionProvider extends React.Component {
-    render () {
-        return (
-            <EditionPanel {...this.props} />
-        )
-    }
-}
-
 EditionPanel = connect(null, actions)(EditionPanel)
 
 EditionPanel.PropTypes = {
     pydio: React.PropTypes.instanceOf(Pydio)
 }
 
-export {EditionProvider as default}
+export default connect(null, actions)(EditionPanel)

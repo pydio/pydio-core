@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.imagick" enabled="false" openable="true" order="11" iconClass="mdi mdi-camera-burst" previewProvider="true"
-        text="328" title="329" className="PydioImagick.Editor"
+        text="328" title="329" className="PydioImagick"
         mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf,cr2,ai" label="CONF_MESSAGE[Image Magick]"
         description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">

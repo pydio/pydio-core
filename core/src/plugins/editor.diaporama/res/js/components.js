@@ -29,8 +29,9 @@ export class Image extends Component {
 
     static get styles() {
         return {
-            transformOrigin: "50% 0",
-            boxShadow: DOMUtils.getBoxShadowDepth(1)
+            margin: 0,
+            transformOrigin: "50% 0"
+            //boxShadow: DOMUtils.getBoxShadowDepth(1)
         }
     }
 

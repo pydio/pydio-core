@@ -19,7 +19,7 @@ import { compose, bindActionCreators } from 'redux';
 import * as actions from '../../actions';
 
 import makeMaximise from './make-maximise';
-const {ResolutionActions, ResolutionControls, ContentActions, ContentControls, SizeActions, SizeControls, SelectionActions, SelectionControls, withMenu} = PydioHOCs;
+const {ResolutionActions, ContentActions, SizeActions, SelectionActions, withMenu} = PydioHOCs;
 
 class Tab extends React.Component {
     static get styles() {
@@ -37,13 +37,13 @@ class Tab extends React.Component {
         }
     }
 
-    render() {
-        const {id, node, dispatch, editorData, size, resolution, selection, playing, isActive, style, editorSetActiveTab, tabModify, ...remainingProps} = this.props
+    renderControls(Controls, Actions) {
 
-        const select = () => editorSetActiveTab(id)
-        const editorSetState = (data) => tabModify({id, ...data})
+        const {node, editorData} = this.props
+        const {SelectionControls, ResolutionControls, SizeControls, ContentControls} = Controls
 
-        let actions = {...SizeActions,
+        let actions = {
+            ...SizeActions,
             ...SelectionActions,
             ...ResolutionActions,
             ...ContentActions,
@@ -52,52 +52,67 @@ class Tab extends React.Component {
         if (editorData.editorActions) {
             actions = {
                 ...actions,
-                ...FuncUtils.getFunctionByName(editorData.editorActions, window)
+                ...Actions
             }
         }
 
         let boundActionCreators = bindActionCreators(actions)
 
+        return (
+            <Toolbar style={{flexShrink: 0}}>
+                {SelectionControls &&
+                    <ToolbarGroup>
+                        <SelectionControls.Prev editorData={editorData} node={node} {...boundActionCreators} />
+                        <SelectionControls.Play editorData={editorData} node={node} {...boundActionCreators} />
+                        <SelectionControls.Pause editorData={editorData} node={node} {...boundActionCreators} />
+                        <SelectionControls.Next editorData={editorData} node={node} {...boundActionCreators} />
+                    </ToolbarGroup>
+                }
+                {ResolutionControls &&
+                    <ToolbarGroup>
+                        <ResolutionControls.ToggleResolution editorData={editorData} node={node} {...boundActionCreators} />
+                    </ToolbarGroup>
+                }
+                {SizeControls &&
+                    <ToolbarGroup>
+                        <SizeControls.AspectRatio editorData={editorData} node={node} {...boundActionCreators} />
+                        <SizeControls.Scale editorData={editorData} node={node} {...boundActionCreators} />
+                    </ToolbarGroup>
+                }
+                {ContentControls &&
+                    <ToolbarGroup>
+                        <ContentControls.Save editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.Undo editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.Redo editorData={editorData} node={node} {...boundActionCreators} />
+
+                        <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />
+
+                        <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />
+                        <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />
+                    </ToolbarGroup>
+                }
+            </Toolbar>
+        )
+    }
+
+    render() {
+        const {Editor, Controls, Actions, id, isActive, editorSetActiveTab, style, ...remainingProps} = this.props
+
+        const select = () => editorSetActiveTab(id)
+
         return !isActive ? (
             <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={isActive} expanded={isActive} onExpandChange={!isActive ? select : null}>
                 <CardHeader title={id} actAsExpander={true} showExpandableButton={true} />
                 <CardMedia style={Tab.styles.child} mediaStyle={Tab.styles.child}>
-                    <this.props.child {...this.props} style={Tab.styles.child} icon={false} {...boundActionCreators} />
+                    <Editor {...this.props} style={Tab.styles.child} icon={false} />
                 </CardMedia>
             </AnimatedCard>
         ) : (
             <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={true} expanded={isActive} onExpandChange={!isActive ? select : null}>
-                <Toolbar style={{flexShrink: 0}}>
-                    <ToolbarGroup>
-                        {actions.onSelectionChange && <SelectionControls.Prev editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onTogglePlaying && <SelectionControls.Play editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onTogglePlaying && <SelectionControls.Pause editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onSelectionChange && <SelectionControls.Next editorData={editorData} node={node} {...boundActionCreators} />}
-                    </ToolbarGroup>
+                {Controls && this.renderControls(Controls, Actions)}
 
-                    <ToolbarGroup>
-                        {actions.onToggleResolution && <ResolutionControls.ToggleResolution editorData={editorData} node={node} {...boundActionCreators} />}
-                    </ToolbarGroup>
-
-                    <ToolbarGroup>
-                        {actions.onSizeChange && <SizeControls.AspectRatio editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onSizeChange && <SizeControls.Scale editorData={editorData} node={node} {...boundActionCreators} />}
-                    </ToolbarGroup>
-
-                    <ToolbarGroup>
-                        {actions.onSave && <ContentControls.Save editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onUndo && <ContentControls.Undo editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onRedo && <ContentControls.Redo editorData={editorData} node={node} {...boundActionCreators} />}
-
-                        {actions.onToggleLineNumbers && <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onToggleLineWrapping &&  <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />}
-
-                        {actions.onJumpTo && <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />}
-                        {actions.onSearch && <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />}
-                    </ToolbarGroup>
-                </Toolbar>
-
-                <this.props.child {...this.props} style={Tab.styles.child} {...boundActionCreators} />
+                <Editor {...this.props} style={Tab.styles.child} />
             </AnimatedCard>
         )
     }

@@ -20,6 +20,7 @@
 
 import React from 'react';
 import { getBoundingRect } from '../utils';
+import _ from 'lodash';
 
 export class ContainerSizeProvider extends React.Component {
     constructor(props) {
@@ -66,28 +67,34 @@ export class ImageSizeProvider extends React.Component {
     constructor(props) {
         super(props)
 
+        const {node} = this.props
+        const meta = node.getMetadata()
+
         this.state = {
-            imgWidth: 200,
-            imgHeight: 200
+            imgWidth: meta.has('image_width') && parseInt(meta.get('image_width')) || 200,
+            imgHeight: meta.has('image_height') && parseInt(meta.get('image_height')) || 200
         }
+
+        this.updateSize = (imgWidth, imgHeight) => this.setState({imgWidth, imgHeight})
+        this.getImageSize = _.throttle(DOMUtils.imageLoader, 100)
     }
 
     componentWillReceiveProps(nextProps) {
         const {url, node} = nextProps
-
-        const that = this
         const meta = node.getMetadata()
 
-        DOMUtils.imageLoader(url, function() {
+        const update = this.updateSize
+
+        this.getImageSize(url, function() {
             if (!meta.has('image_width')){
                 meta.set("image_width", this.width);
                 meta.set("image_height", this.height);
             }
 
-            that.setState({imgWidth: this.width, imgHeight: this.height})
+            update(this.width, this.height)
         }, function() {
             if (meta.has('image_width')) {
-                that.setState({imgWidth: meta.get('image_width'), imgHeight: meta.get('image_height')})
+                update(meta.get('image_width'), meta.get('image_height'))
             }
         })
     }

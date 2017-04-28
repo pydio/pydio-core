@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.pdfjs" openable="true" iconClass="mdi mdi-file-pdf-box" order="10" text="pdf_viewer.1" title="pdf_viewer.2" previewProvider="true"
-        className="PydioPDFJS.Editor" mimes="pdf" label="CONF_MESSAGE[PDF Viewer]"
+        className="PydioPDFJS" mimes="pdf" label="CONF_MESSAGE[PDF Viewer]"
         description="CONF_MESSAGE[JavaScript PDF viewer]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
