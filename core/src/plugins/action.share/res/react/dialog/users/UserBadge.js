@@ -34,11 +34,14 @@ class UserBadge extends Component{
     }
 
     render() {
-        var avatar;
+        let avatar;
         let avatarColor = this.props.muiTheme.palette.avatarsColor;
         if(this.props.type == 'group') {
             avatarColor = Color(avatarColor).darken(.2).toString();
-            avatar = <span className="avatar mdi mdi-account-multiple" style={{backgroundColor:avatarColor}}/>;
+            avatar = <span className="avatar mdi mdi-account-multiple" style={{backgroundColor: avatarColor}}/>;
+        }else if(this.props.type == 'team') {
+            avatarColor = Color(avatarColor).darken(.2).toString();
+            avatar = <span className="avatar mdi mdi-account-multiple-outline" style={{backgroundColor:avatarColor}}/>;
         }else if(this.props.type == 'temporary') {
             avatarColor = Color(avatarColor).lighten(.2).toString();
             avatar = <span className="avatar mdi mdi-account-plus" style={{backgroundColor:avatarColor}}/>;
@@ -47,7 +50,7 @@ class UserBadge extends Component{
         }else{
             avatar = <span className="avatar mdi mdi-account" style={{backgroundColor:avatarColor}}/>;
         }
-        var menu = this.renderMenu();
+        const menu = this.renderMenu();
         return (
             <div className={"share-dialog user-badge user-type-" + this.props.type}>
                 {avatar}

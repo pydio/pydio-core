@@ -702,5 +702,7 @@ $mess=array(
 "600" => "Editer l'utilisateur",
 "601" => "%1 a partagé %2 elément(s) avec vous.",
 "602" => "Vous avez partagé %2 elément(s) avec %1.",
+"603" => "Equipe",
+"604" => "Utilisateur distant",
 /* END SENTENCE */
 );

@@ -23,6 +23,8 @@
         initLoad(){
             if(this._node.getMetadata().get('ajxp_shared')){
                 this.load();
+            }else{
+                this._setStatus('loaded');
             }
         }
 
@@ -238,12 +240,21 @@
         }
 
         saveSelectionAsTeam(teamName){
-            var userIds = [];
-            this.getSharedUsers().map(function(e){
-                if(e.TYPE == 'user') userIds.push(e.ID);
+            let userIds = [], commonRight;
+            this.getSharedUsers().map((e) => {
+                if(e.TYPE === 'user' || e.TYPE === 'tmp_user') {
+                    userIds.push(e.ID);
+                    if(commonRight === undefined) commonRight = e.RIGHT;
+                    else if(commonRight !== e.RIGHT) commonRight = false;
+                }
             });
-            PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, function(){
-                // Flatten Team?
+            PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, (jsonResponse) => {
+                const {message, error, insertId} = jsonResponse;
+                if(error){
+                    pydio.displayMessage('ERROR', error);
+                }else{
+                    pydio.displayMessage('SUCCESS', message);
+                }
             });
         }
 

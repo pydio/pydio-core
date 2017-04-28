@@ -705,6 +705,8 @@ $mess=array(
 "600" => "Edit user",
 "601" => "%1 has shared %2 item(s) with you.",
 "602" => "You have shared %2 item(s) with %1.",
+"603" => "Team",
+"604" => "Remote User",
 /* 文章はここまで */
 /* 文章終了 */
 );

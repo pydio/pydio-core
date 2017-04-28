@@ -37,11 +37,20 @@ let SharedUsers = React.createClass({
         this.props.onUserUpdate('add', newEntry.ID, newEntry);
     },
     completerRenderSuggestion: function(userObject){
+        let type = (userObject.getType() === 'team' || userObject.getId().indexOf('/AJXP_TEAM/') === 0 ? 'team' : (
+                        userObject.getGroup() ? 'group' : (
+                            userObject.getTemporary()? 'temporary' : (
+                                userObject.getExternal()? 'tmp_user':'user'
+                                )
+                            )
+                        )
+                    );
+
         return (
             <UserBadge
                 label={(userObject.getExtendedLabel() || userObject.getLabel())}
                 avatar={userObject.getAvatar()}
-                type={userObject.getGroup() ? 'group' : (userObject.getTemporary()?'temporary' : (userObject.getExternal()?'tmp_user':'user'))}
+                type={type}
             />
         );
     },
@@ -49,7 +58,7 @@ let SharedUsers = React.createClass({
     render: function(){
         // sort by group/user then by ID;
         const userEntries = this.props.users.sort(function(a,b) {
-            return (b.TYPE == "group") ? 1 : ((a.TYPE == "group") ? -1 : (a.ID > b.ID) ? 1 : ((b.ID > a.ID) ? -1 : 0));
+            return (b.TYPE === 'group' || b.TYPE === 'team') ? 1 : ((a.TYPE === 'group' || a.TYPE === 'team') ? -1 : (a.ID > b.ID) ? 1 : ((b.ID > a.ID) ? -1 : 0));
         } ).map(function(u){
             return <SharedUserEntry
                 userEntry={u}
