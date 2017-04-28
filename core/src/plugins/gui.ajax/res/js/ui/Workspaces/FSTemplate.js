@@ -1,3 +1,8 @@
+const React = require('react')
+const Color = require('color')
+const {withContextMenu} = require('pydio').requireLib('hoc')
+const Action = require('pydio/model/action')
+
 import MessagesProviderMixin from './MessagesProviderMixin'
 import Breadcrumb from './Breadcrumb'
 import {SearchForm} from './search'
@@ -5,7 +10,6 @@ import MainFilesList from './MainFilesList'
 import EditionPanel from './EditionPanel'
 import InfoPanel from './detailpanes/InfoPanel'
 import LeftPanel from './leftnav/LeftPanel'
-const {withContextMenu} = require('pydio').requireLib('hoc')
 
 let FSTemplate = React.createClass({
 
@@ -33,7 +37,7 @@ let FSTemplate = React.createClass({
         if(keysOnly){
             return ['toggle_info_panel'];
         }
-        var multiAction = new Action({
+        const multiAction = new Action({
             name:'toggle_info_panel',
             icon_class:'mdi mdi-information',
             text_id:341,
@@ -91,9 +95,11 @@ let FSTemplate = React.createClass({
 
     render: function () {
 
-        var connectDropTarget = this.props.connectDropTarget || function(c){return c;};
+        const connectDropTarget = this.props.connectDropTarget || function(c){return c;};
+        /*
         var isOver = this.props.isOver;
         var canDrop = this.props.canDrop;
+        */
 
         const Color = MaterialUI.Color;
         const appBarColor = Color(this.props.muiTheme.appBar.color);
