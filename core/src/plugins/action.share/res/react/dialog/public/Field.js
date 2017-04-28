@@ -7,6 +7,7 @@ const QRCode = require('qrcode.react');
 const Clipboard = require('clipboard');
 import ActionButton from '../main/ActionButton'
 const PathUtils = require('pydio/util/path')
+const LangUtils = require('pydio/util/lang')
 
 let PublicLinkField = React.createClass({
 
@@ -27,7 +28,9 @@ let PublicLinkField = React.createClass({
         this.setState({editLink: !this.state.editLink});
     },
     changeLink:function(event){
-        this.setState({customLink: event.target.value});
+        let value = event.target.value;
+        value = LangUtils.computeStringSlug(value);
+        this.setState({customLink: value});
     },
     clearCopyMessage:function(){
         global.setTimeout(function(){
@@ -92,7 +95,7 @@ let PublicLinkField = React.createClass({
             return (
                 <Paper zDepth={0} rounded={false} className={"public-link-container edit-link"}>
                     <div style={{display:'flex', alignItems:'center'}}>
-                        <span style={{fontSize:16, color:'rgba(0,0,0,0.4)', display: 'inline-block', maxWidth: 240, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{PathUtils.getDirname(publicLink) + '/ '}</span>
+                        <span style={{fontSize:16, color:'rgba(0,0,0,0.4)', display: 'inline-block', maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{PathUtils.getDirname(publicLink) + '/ '}</span>
                         <TextField style={{flex:1, marginRight: 10, marginLeft: 10}} onChange={this.changeLink} value={this.state.customLink !== undefined ? this.state.customLink : this.props.linkData['hash']}/>
                         <FloatingActionButton mini={true} iconClassName="mdi mdi-check" onTouchTap={this.toggleEditMode} />
                     </div>
