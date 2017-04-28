@@ -22,7 +22,7 @@ let LabelDescriptionPanel = React.createClass({
                     floatingLabelStyle={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}
                     name="label"
                     onChange={this.updateLabel}
-                    value={this.props.shareModel.getGlobal('label')}
+                    value={this.props.shareModel.getGlobal('label') || ''}
                     fullWidth={true}
                 />
             );
@@ -36,7 +36,7 @@ let LabelDescriptionPanel = React.createClass({
                     floatingLabelStyle={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}
                     name="description"
                     onChange={this.updateDescription}
-                    value={this.props.shareModel.getGlobal('description')}
+                    value={this.props.shareModel.getGlobal('description') || ''}
                     fullWidth={true}
                 />
             </div>

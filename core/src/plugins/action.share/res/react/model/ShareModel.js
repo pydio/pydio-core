@@ -281,8 +281,8 @@
             this._setStatus('modified');
         }
         _globalsAsParameters(params){
-            params['repo_label'] = this.getGlobal("label");
-            params['repo_description'] = this.getGlobal("description");
+            params['repo_label'] = this.getGlobal("label") || '';
+            params['repo_description'] = this.getGlobal("description") || '';
             params['self_watch_folder'] = this.getGlobal("watch") ? 'true' : 'false';
         }
 
