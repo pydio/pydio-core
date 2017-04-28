@@ -1,4 +1,6 @@
-import { TAB_CREATE, TAB_MODIFY, TAB_ADD_CONTROLS, TAB_DELETE, TAB_DELETE_ALL } from '../actions'
+import Pydio from 'pydio';
+const { EditorActions } = Pydio.requireLib('hoc');
+const { EDITOR_SET_ACTIVE_TAB, EDITOR_MODIFY } = EditorActions;
 
 export default function tabs(state = [], action) {
 

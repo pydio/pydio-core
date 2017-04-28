@@ -11,13 +11,13 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import Pydio from 'pydio';
 import { connect } from 'react-redux';
-import * as actions from './actions'
-
-import {Editor} from './components/editor';
-import {Menu} from './components/menu';
-
+import { Editor } from './components/editor';
+import { Menu } from './components/menu';
 import makeEditorOpen from './make-editor-open';
+
+const { EditorActions } = Pydio.requireLib('hoc');
 
 class App extends React.Component {
 
@@ -132,7 +132,7 @@ function mapStateToProps(state, ownProps) {
         positionTarget: editor.menu && editor.menu.rect
     }
 }
-const ConnectedApp = connect(mapStateToProps, actions)(App)
+const ConnectedApp = connect(mapStateToProps, EditorActions)(App)
 
 export default ConnectedApp;
 export {default as reducers} from './reducers';

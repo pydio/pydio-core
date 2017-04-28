@@ -21,7 +21,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import SelectionModel from './model';
-import { Actions as EditorActions, getDisplayName } from '../utils';
+import { EditorActions, getDisplayName } from '../utils';
 import { mapStateToProps } from './utils';
 
 const withSelection = (getSelection) => {

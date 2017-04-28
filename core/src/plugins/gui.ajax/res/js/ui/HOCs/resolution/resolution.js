@@ -20,7 +20,7 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { Actions, getDisplayName } from '../utils';
+import { EditorActions, getDisplayName } from '../utils';
 import { ResolutionURLProvider } from './';
 import { mapStateToProps } from './utils';
 
@@ -97,7 +97,7 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
         }
 
-        return connect(mapStateToProps, Actions)(WithResolution)
+        return connect(mapStateToProps, EditorActions)(WithResolution)
     }
 }
 

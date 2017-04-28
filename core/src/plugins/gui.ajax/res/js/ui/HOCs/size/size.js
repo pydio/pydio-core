@@ -22,7 +22,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { mapStateToProps } from './utils';
 import { ImageSizeProvider, ContainerSizeProvider } from './providers';
-import { Actions as EditorActions, getRatio, getDisplayName, getBoundingRect } from '../utils';
+import { EditorActions, getRatio, getDisplayName, getBoundingRect } from '../utils';
 
 const withResize = (Component) => {
     class WithResize extends React.Component {

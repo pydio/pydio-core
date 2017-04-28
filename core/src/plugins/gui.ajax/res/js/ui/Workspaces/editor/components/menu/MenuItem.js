@@ -11,10 +11,11 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import Pydio from 'pydio';
 import { connect } from 'react-redux';
-import * as actions from '../../actions';
+import { FloatingActionButton } from 'material-ui';
 
-const {FloatingActionButton} = MaterialUI;
+const { EditorActions } = Pydio.requireLib('hoc');
 
 class MenuItem extends React.PureComponent {
 
@@ -76,6 +77,6 @@ function mapStateToProps(state, ownProps) {
     }
 }
 
-const ConnectedMenuItem = connect(mapStateToProps, actions)(MenuItem)
+const ConnectedMenuItem = connect(mapStateToProps, EditorActions)(MenuItem)
 
 export default ConnectedMenuItem

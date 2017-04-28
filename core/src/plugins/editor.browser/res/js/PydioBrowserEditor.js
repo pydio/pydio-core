@@ -20,9 +20,7 @@
 
 import React, {Component} from 'react';
 
-import {compose} from 'redux';
-
-class PydioBrowserEditor extends Component {
+class Editor extends Component {
 
     static get styles() {
         return {
@@ -107,17 +105,11 @@ class PydioBrowserEditor extends Component {
 
     render() {
         return (
-            <CompositeEditor style={PydioBrowserEditor.styles.iframe} src={this.state.frameSrc} />
+            <iframe  style={Editor.styles.iframe} src={this.state.frameSrc} />
         )
     }
 }
 
-const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-
-let CompositeEditor = compose(
-    withMenu,
-    withLoader,
-    withErrors
-)(props => <iframe {...props} />)
-
-window.PydioBrowserEditor = PydioBrowserEditor;
+window.PydioBrowserEditor = {
+    Editor: Editor
+}

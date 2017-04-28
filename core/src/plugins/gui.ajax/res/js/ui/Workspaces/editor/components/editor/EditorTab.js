@@ -12,14 +12,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import Pydio from 'pydio'
 import { Toolbar, ToolbarGroup, Card, CardHeader, CardMedia } from 'material-ui';
-
 import { connect } from 'react-redux';
 import { compose, bindActionCreators } from 'redux';
-import * as actions from '../../actions';
-
 import makeMaximise from './make-maximise';
-const {ResolutionActions, ContentActions, SizeActions, SelectionActions, withMenu} = PydioHOCs;
+
+const { EditorActions, ResolutionActions, ContentActions, SizeActions, SelectionActions, withMenu } = Pydio.requireLib('hoc');
 
 class Tab extends React.Component {
     static get styles() {
@@ -132,6 +131,6 @@ function mapStateToProps(state, ownProps) {
 
 const AnimatedCard = makeMaximise(Card)
 
-const EditorTab = connect(mapStateToProps, actions)(Tab)
+const EditorTab = connect(mapStateToProps, EditorActions)(Tab)
 
 export default EditorTab

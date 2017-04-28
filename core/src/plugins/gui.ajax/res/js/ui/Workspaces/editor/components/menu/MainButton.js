@@ -11,12 +11,12 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+import Pydio from 'pydio'
 import { connect } from 'react-redux';
-import * as actions from '../../actions';
-
-const {FloatingActionButton} = MaterialUI;
-
+import { FloatingActionButton } from 'material-ui';
 import makeRotate from './make-rotate';
+
+const { EditorActions } = Pydio.requireLib('hoc');
 
 class Button extends React.Component {
 
@@ -44,6 +44,6 @@ function mapStateToProps(state, ownProps) {
     }
 }
 
-const ConnectedButton = connect(mapStateToProps, actions)(AnimatedButton)
+const ConnectedButton = connect(mapStateToProps, EditorActions)(AnimatedButton)
 
 export default ConnectedButton
