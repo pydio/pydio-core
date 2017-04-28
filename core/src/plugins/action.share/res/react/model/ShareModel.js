@@ -524,7 +524,6 @@
 
         /****************************/
         /* PUBLIC LINKS TEMPLATE    */
-        /* TODO: INFER FROM DEFAULT PUBLIC LINK
         /****************************/
         getTemplate(linkId){
             if(this._pendingData["links"] && this._pendingData["links"][linkId] && this._pendingData["links"][linkId]["layout"]){

@@ -1,4 +1,7 @@
 module.exports = function(grunt) {
+
+    const {Externals} = require('../gui.ajax/res/js/dist/libdefs.js');
+
     grunt.initConfig({
         copy: {
             smartbannercss: {
@@ -25,6 +28,13 @@ module.exports = function(grunt) {
         },
         browserify: {
             mobile: {
+                options: {
+                    external: Externals,
+                    browserifyOptions:{
+                        standalone: 'MobileExtensions',
+                        debug:true
+                    }
+                },
                 files: {
                     'res/build/mobile-build.js': 'res/build/index.js'
                 }
@@ -35,7 +45,7 @@ module.exports = function(grunt) {
                 files: [
                     "res/**/*"
                 ],
-                tasks: ['babel'],
+                tasks: ['babel', 'browserify'],
                 options: {
                     spawn: false
                 }
