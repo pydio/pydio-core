@@ -2855,6 +2855,10 @@
   overflow: auto;
   padding-bottom: 24px;
 }
+.react-mui-context .pydio-form-panel h1 {
+  font-size: 25px;
+  line-height: 25px;
+}
 .react-mui-context .pydio-form-panel .pydio-form-panel {
   width: auto;
 }

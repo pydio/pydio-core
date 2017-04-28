@@ -21,5 +21,6 @@ const Navigation = {
 
 import SplashDialog from './dialog/SplashDialog'
 import PasswordDialog from './dialog/PasswordDialog'
+import CreateRepositoryDialog from './dialog/CreateRepositoryDialog'
 
-export {Callbacks, Navigation, SplashDialog, PasswordDialog}
+export {Callbacks, Navigation, SplashDialog, PasswordDialog, CreateRepositoryDialog}

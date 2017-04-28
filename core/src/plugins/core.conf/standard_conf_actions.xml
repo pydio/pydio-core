@@ -41,20 +41,6 @@
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
 				<clientCallback module="PydioCoreActions.Callbacks.userCreateRepository"/>
-				<clientForm id="user_create_repository_form"><![CDATA[
-					<div id="user_create_repository_form" action="user_create_repository" box_width="420" box_padding="0">
-					    <div id="user_tpl_container" style="position:relative;width:418px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
-						<div id="user_templates_selector" style="position:absolute;width:420px;"><div class="panelHeader">AJXP_MESSAGE[419]</div></div>
-						<div id="user_template_parameters" style="position:absolute;left:420px;width:420px;">
-						    <div id="user_tpl_params_title" class="panelHeader panelHeaderWithIcon"></div>
-						    <div style="padding:5px;">
-						        <div class="dialogLegend" style="clear:left;">AJXP_MESSAGE[422]</div>
-						        <div id="user_tpl_params_parameters"></div>
-						    </div>
-						</div>
-						</div>
-					</div>
-				]]></clientForm>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
