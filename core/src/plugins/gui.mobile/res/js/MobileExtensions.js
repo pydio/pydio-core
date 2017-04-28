@@ -35,7 +35,7 @@ class MobileExtensions extends Component{
             }
             //, theme: '' // put platform type ('ios', 'android', etc.) here to force single theme on all device
             // , icon: '' // full path to icon image if not using website icon image
-            , force: 'android' // Uncomment for platform emulation
+            //, force: 'android' // Uncomment for platform emulation
         });
 
     }

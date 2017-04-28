@@ -227,6 +227,7 @@
                         </div>
                     </MaterialUI.Paper>
                     {this.props.children}
+                    <span className="context-menu"><PydioComponents.ContextMenu pydio={this.props.pydio}/></span>
                 </div>
             );
 
