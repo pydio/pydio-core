@@ -55,7 +55,7 @@ const withSelection = (getSelection) => {
             }
 
             render() {
-                const {selection, playing, dispatch, ...remainingProps} = this.props
+                const {id, selection, playing, dispatch, ...remainingProps} = this.props
 
                 if (!selection) return null
 
@@ -64,7 +64,7 @@ const withSelection = (getSelection) => {
                         {...remainingProps}
                         node={selection.current()}
                         selectionPlaying={playing}
-                        onRequestSelectionPlay={() => this.setState({id, node: selection.nextOrFirst(), title: selection.currentNode.getLabel()})}
+                        onRequestSelectionPlay={() => this.setState({id, node: selection.nextOrFirst(), title: selection.current().getLabel()})}
                     />
                 )
             }

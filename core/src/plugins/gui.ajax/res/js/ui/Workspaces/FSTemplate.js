@@ -43,7 +43,7 @@ let FSTemplate = React.createClass({
             hasAccessKey:false,
             subMenu:false,
             subMenuUpdateImage:false,
-            callback: () => {this.setState({infoPanelToggle: !this.state.infoPanelToggle}, this.resizeAfterTransition.bind(this));}
+            callback: () => {this.setState({infoPanelToggle: !this.state.infoPanelToggle}, () => this.resizeAfterTransition());}
         }, {
             selection:true,
             dir:true,
@@ -74,7 +74,7 @@ let FSTemplate = React.createClass({
     },
 
     infoPanelContentChange(numberOfCards){
-        this.setState({infoPanelOpen: (numberOfCards > 0)}, this.resizeAfterTransition.bind(this))
+        this.setState({infoPanelOpen: (numberOfCards > 0)}, () => this.resizeAfterTransition())
     },
 
     openDrawer: function(event){
@@ -207,7 +207,7 @@ let FSTemplate = React.createClass({
                 />
 
                 <EditionPanel {...props}/>
-                
+
                 <span className="context-menu"><PydioComponents.ContextMenu/></span>
             </div>
         );

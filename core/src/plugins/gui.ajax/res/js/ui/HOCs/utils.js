@@ -39,8 +39,6 @@ export const getBoundingRect = (element) => {
     const padding = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`padding-${key}`])}), {})
     const border = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`border-${key}`])}), {})
 
-    keys.reduce((current, key) => console.log(parseInt(style[`margin-${key}`])), {})
-
     const rect = element.getBoundingClientRect();
 
     const res = {
