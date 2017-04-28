@@ -30,7 +30,7 @@ class CodeMirror extends React.Component {
         const codeMirrorInstance = this.getCodeMirrorInstance();
 
         const info = codeMirrorInstance.findModeByExtension(this.props.name.split('.').pop()) || {};
-		const {mode, spec} = info;
+		const {mode = "", spec} = info;
 
 		this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode);
 

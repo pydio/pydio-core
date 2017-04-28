@@ -13,17 +13,15 @@
  */
 
 // IMPORT
+import Pydio from 'pydio'
 import Draggable from 'react-draggable';
 import { connect } from 'react-redux';
-import * as actions from '../../actions';
-
-const {Paper} = MaterialUI;
-
+import { Paper } from 'material-ui';
 import Tab from './EditorTab';
 import Toolbar from './EditorToolbar';
-
 import makeMinimise from './make-minimise';
 
+const { EditorActions } = Pydio.requireLib('hoc');
 const MAX_ITEMS = 4;
 
 // MAIN COMPONENT
@@ -179,7 +177,7 @@ function mapStateToProps(state, ownProps) {
         isActive: editor.isPanelActive
     }
 }
-const ConnectedEditor = connect(mapStateToProps, actions)(Editor)
+const ConnectedEditor = connect(mapStateToProps, EditorActions)(Editor)
 
 // EXPORT
 export default ConnectedEditor

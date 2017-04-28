@@ -1,5 +1,5 @@
-import { Actions } from '../utils';
+import { EditorActions } from '../utils';
 
 // Actions definitions
-export const onSelectionChange = ({dispatch, id}) => (node) => dispatch(Actions.tabModify({id, title: node.getLabel(), node}))
-export const onTogglePlaying = ({dispatch, id}) => (playing) => dispatch(Actions.tabModify({id, playing}))
+export const onSelectionChange = ({dispatch, id}) => (node) => dispatch(EditorActions.tabModify({id, title: node.getLabel(), node}))
+export const onTogglePlaying = ({dispatch, id}) => (playing) => dispatch(EditorActions.tabModify({id, playing}))

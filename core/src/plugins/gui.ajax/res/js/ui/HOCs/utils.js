@@ -1,6 +1,6 @@
-import * as Actions from '../Workspaces/editor/actions';
+import * as EditorActions from './editor/actions';
 
-export { Actions }
+export { EditorActions }
 
 import * as contentActions from './content/actions';
 import * as resolutionActions from './resolution/actions';

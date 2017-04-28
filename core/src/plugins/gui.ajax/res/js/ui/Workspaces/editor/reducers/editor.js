@@ -1,4 +1,6 @@
-import { EDITOR_SET_ACTIVE_TAB, EDITOR_MODIFY } from '../actions'
+import Pydio from 'pydio';
+const { EditorActions } = Pydio.requireLib('hoc');
+const { EDITOR_SET_ACTIVE_TAB, EDITOR_MODIFY } = EditorActions;
 
 export default function editor(state = {}, action) {
 
