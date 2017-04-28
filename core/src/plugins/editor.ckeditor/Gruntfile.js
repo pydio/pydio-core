@@ -23,11 +23,12 @@ module.exports = function(grunt) {
                 options: {
                     external:Externals,
                     browserifyOptions:{
-                        debug:true
+                        debug:true,
+                        standalone: 'PydioCKEditor'
                     }
                 },
                 files: {
-                    'res/build/PydioCKEditor.js':'res/build/PydioCKEditor/*.js'
+                    'res/build/PydioCKEditor.js':'res/build/PydioCKEditor/index.js'
                 }
             }
         },

@@ -12,7 +12,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'res/js/',
                         src: ['**/*.js'],
-                        dest: 'res/build/TextEditor/',
+                        dest: 'res/build/PydioText/',
                         ext: '.js'
                     }
                 ]
@@ -23,11 +23,12 @@ module.exports = function(grunt) {
                 options: {
                     external: Externals,
                     browserifyOptions:{
+                        standalone: 'PydioText',
                         debug:true
                     }
                 },
                 files: {
-                    'res/build/TextEditor.js':'res/build/TextEditor/*.js'
+                    'res/build/PydioText.js':'res/build/PydioText/*.js'
                 }
             }
         },

@@ -1,20 +1,38 @@
-import {withMenu, withControls} from './actions'
+import withContextMenu from './context-menu'
+import {withMenu, withControls} from './controls'
 import withErrors from './errors'
 import withLoader from './loader'
-import withResize from './resize'
+import {ContentActions, ContentControls} from './content/index'
+import {SelectionProviders, SelectionActions, SelectionControls, withSelection} from './selection/index'
+import {SizeActions, SizeControls, SizeProviders, withResize} from './size/index'
+import {ResolutionActions, ResolutionControls, withResolution} from './resolution/index'
+import {URLProvider} from './urls'
 import PaletteModifier from './PaletteModifier'
-import withContextMenu from './context-menu'
 import * as Animations from "./animations";
 
+
 const PydioHOCs = {
-    withMenu,
+    ContentActions,
+    ContentControls,
+    ResolutionActions,
+    ResolutionControls,
+    SizeActions,
+    SizeControls,
+    SelectionProviders,
+    SelectionActions,
+    SelectionControls,
     withControls,
+    withContextMenu,
     withErrors,
     withLoader,
-    withContextMenu,
+    withMenu,
     withResize,
+    withResolution,
+    withSelection,
+    Animations,
     PaletteModifier,
-    Animations
+    URLProvider,
+    SizeProviders
 };
 
 export {PydioHOCs as default}

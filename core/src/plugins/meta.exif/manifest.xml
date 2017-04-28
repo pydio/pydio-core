@@ -17,7 +17,7 @@
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">
-                <infoPanel mime="jpg,jpeg,tiff,riff" theme="material" reactComponent="PydioExif.DetailPanel" weight="-10"/>
+                <infoPanel mime="jpg,jpeg,tiff,riff" theme="material" reactComponent="PydioExif.Panel" weight="-10"/>
 			</component_config>
 		</client_configs>
 		<actions>

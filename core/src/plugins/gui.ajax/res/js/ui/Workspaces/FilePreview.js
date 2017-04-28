@@ -1,23 +1,36 @@
-const React = require('react');
-const {muiThemeable} = require('material-ui/styles')
+import {PureComponent, PropTypes} from 'react';
+import {muiThemeable} from 'material-ui/styles';
 
-let FilePreview = React.createClass({
+class FilePreview extends PureComponent {
+    static get propTypes() {
+        return {
+            node            : PropTypes.instanceOf(AjxpNode).isRequired,
+            loadThumbnail   : PropTypes.bool,
+            richPreview     : PropTypes.bool,
+            // This will apply default styles and mimefontStyles
+            rounded         : PropTypes.bool,
+            roundedSize     : PropTypes.number,
+            // Additional styling
+            style           : PropTypes.object,
+            mimeFontStyle   : PropTypes.object
+        }
+    }
 
-    propTypes: {
-        node            : React.PropTypes.instanceOf(AjxpNode),
-        loadThumbnail   : React.PropTypes.bool,
-        richPreview     : React.PropTypes.bool,
-        // This will apply default styles and mimefontStyles
-        rounded         : React.PropTypes.bool,
-        roundedSize     : React.PropTypes.number,
-        // Additional styling
-        style           : React.PropTypes.object,
-        mimeFontStyle   : React.PropTypes.object
-    },
+    static get defaultProps() {
+        return {richPreview: false}
+    }
 
-    getStyles: function(){
+    constructor(props) {
+        super(props)
 
+        this.state = {
+            loading: false
+        }
+    }
+
+    getStyles() {
         const color = this.props.muiTheme.palette.primary1Color;
+
         let roundedStyle = {
             root: {
                 backgroundColor: '#ECEFF1',
@@ -41,38 +54,29 @@ let FilePreview = React.createClass({
         let rootStyle = this.props.rounded ? roundedStyle.root : {};
         let mimefontStyle = this.props.rounded ? roundedStyle.mimefont : {};
 
-        if(this.props.rounded && this.props.roundedSize){
+        if (this.props.rounded && this.props.roundedSize) {
             rootStyle.height = rootStyle.width = rootStyle.lineHeight = this.props.roundedSize;
             rootStyle.lineHeight = this.props.roundedSize + 'px';
         }
-        if(this.props.style){
+        if (this.props.style) {
             rootStyle = {...rootStyle, ...this.props.style};
         }
-        if(this.props.mimeFontStyle){
+        if (this.props.mimeFontStyle) {
             mimefontStyle = {...mimefontStyle, ...this.props.mimeFontStyle};
         }
 
         return {rootStyle: rootStyle, mimeFontStyle: mimefontStyle};
+    }
 
-    },
-
-    getInitialState: function(){
-        return {loading: false, element: null}
-    },
-
-    getDefaultProps: function(){
-        return {richPreview: false}
-    },
-
-    insertPreviewNode: function(previewNode){
+    insertPreviewNode(previewNode) {
         this._previewNode = previewNode;
         let containerNode = this.refs.container;
         containerNode.innerHTML = '';
         containerNode.className='richPreviewContainer';
         containerNode.appendChild(this._previewNode);
-    },
+    }
 
-    destroyPreviewNode: function(){
+    destroyPreviewNode() {
         if(this._previewNode) {
             this._previewNode.destroyElement();
             if(this._previewNode.parentNode) {
@@ -80,31 +84,33 @@ let FilePreview = React.createClass({
             }
             this._previewNode = null;
         }
-    },
+    }
 
-    componentDidMount: function(){
+    componentDidMount() {
         this.loadCoveringImage();
-    },
+    }
 
-    componentWillUnmount: function(){
+    componentWillUnmount() {
         this.destroyPreviewNode();
-    },
+    }
 
-    componentWillReceiveProps: function(nextProps){
+    componentWillReceiveProps(nextProps) {
         if(nextProps.node.getPath() !== this.props.node.getPath()){
             this.destroyPreviewNode();
             this.loadCoveringImage();
             return;
         }
+
         if(this._previewNode){
             return;
         }
+
         if(nextProps.loadThumbnail !== this.props.loadThumbnail && nextProps.loadThumbnail){
             this.loadCoveringImage(true);
         }
-    },
+    }
 
-    loadCoveringImage: function(force = false){
+    loadCoveringImage(force = false) {
         if(!this.props.loadThumbnail && !force){
             return;
         }
@@ -117,74 +123,28 @@ let FilePreview = React.createClass({
         let editorClassName = editors[0].editorClass;
 
         pydio.Registry.loadEditorResources(editors[0].resourcesManager, function(){
-            let component = FuncUtils.getFunctionByName(editorClassName, global);
-            if(component && this.isMounted()){
+            let component = FuncUtils.getFunctionByName(editorClassName, window);
+
+            if(component){
                 this.loadPreviewFromEditor(component, node);
             }
         }.bind(this));
+    }
 
-    },
+    loadPreviewFromEditor(editorClass, node) {
+        this.setState({
+            EditorClass: this.props.richPreview ? editorClass.Panel : editorClass.Badge
+        })
+    }
 
-    loadPreviewFromEditor: function(editorClass, node){
-
-        if(editorClass.getCoveringBackgroundSource){
-            let image = new Image();
-            let bgUrl = editorClass.getCoveringBackgroundSource(node);
-
-            let loader = function(){
-                if(!this.isMounted()) return;
-                bgUrl = bgUrl.replace('(', '\\(').replace(')', '\\)').replace('\'', '\\\'');
-                let style = {
-                    backgroundImage:'url(' + bgUrl + ')',
-                    backgroundSize : 'cover',
-                    backgroundPosition: 'center center'
-                };
-
-                const {rootStyle} = this.getStyles();
-                let element = (<div className="covering-bg-preview" style={{...style, ...rootStyle}}></div>);
-
-                this.setState({loading: false, element: element});
-            }.bind(this);
-
-            this.setState({loading: true});
-
-            image.src = bgUrl;
-            if(image.readyState && image.readyState === 'complete'){
-                loader();
-            }else{
-                image.onload = loader();
-            }
-        } else if (editorClass.getPreviewComponent) {
-            const promise = editorClass.getPreviewComponent(node, this.props.richPreview)
-
-            Promise.resolve(promise).then(function (component) {
-                this.setState({
-                    preview: component
-                })
-            }.bind(this))
-        }
-
-    },
-
-    shouldComponentUpdate: function(){
-        return !!!this._previewNode;
-    },
-
-    render: function(){
-
-        const {preview, element} = this.state;
-
-        if (preview) {
-            return (
-                <preview.element {...preview.props} pydio={window.pydio} preview={true} />
-            )
-        }else if(element){
-            return element;
-        }
-
+    render() {
         const {node} = this.props;
-        if (!node) {
-            return null
+        const {EditorClass, element} = this.state;
+
+        if (EditorClass) {
+            return (
+                <EditorClass pydio={pydio} {...this.props} preview={true} />
+            )
         }
 
         const {rootStyle, mimeFontStyle} = this.getStyles();
@@ -198,8 +158,6 @@ let FilePreview = React.createClass({
             </div>
         );
     }
-});
+}
 
-FilePreview = muiThemeable()(FilePreview);
-
-export {FilePreview as default}
+export default muiThemeable()(FilePreview)
