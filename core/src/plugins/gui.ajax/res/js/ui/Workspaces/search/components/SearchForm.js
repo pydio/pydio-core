@@ -26,7 +26,7 @@ class SearchForm extends Component {
             loading: false
         }
 
-        this.setMode = _.debounce(this.setMode, 500)
+        this.setMode = _.debounce(this.setMode, 250);
         this.update = _.debounce(this.update, 500)
         this.submit = _.debounce(this.submit, 500)
     }
@@ -113,8 +113,9 @@ class SearchForm extends Component {
         }
 
         const nodeClicked = (node)=>{
+            console.log(node);
             this.props.pydio.goTo(node);
-            this.setState({display:'closed'});
+            this.setMode('closed');
         };
 
         return (
@@ -175,13 +176,15 @@ class MainSearch extends Component {
                 background: "#ffffff",
                 width: "100%",
                 height: "36px",
-                border: "none"
+                border: "none",
+                transition:'all .25s'
             },
             input: {
                 padding: "0 10px",
                 border: 0
             },
             hint: {
+                transition:'all .25s',
                 width: "100%",
                 padding: "0 10px",
                 bottom: 0,
@@ -192,6 +195,16 @@ class MainSearch extends Component {
             },
             underline: {
                 display: "none"
+            },
+            closedMode: {
+                main: {
+                    background: 'rgba(255,255,255,.1)',
+                    boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px',
+                    borderRadius: 2
+                },
+                hint: {
+                    color: 'rgba(255, 255, 255, 0.64)',
+                }
             }
         }
     }
@@ -225,7 +238,12 @@ class MainSearch extends Component {
     }
 
     render() {
-        const {main, input, hint, underline} = MainSearch.styles
+        const {mode, onOpen, onClose, hintText, loading} = this.props;
+        let {main, input, hint, underline, closedMode} = MainSearch.styles
+        if(mode === 'closed'){
+            main = {...main, ...closedMode.main};
+            hint = {...hint, ...closedMode.hint};
+        }
 
         return (
             <div className="search-input">
@@ -241,15 +259,15 @@ class MainSearch extends Component {
                         inputStyle={input}
                         hintStyle={hint}
                         underlineStyle={underline}
-                        onFocus={this.props.onOpen}
-                        onBlur={this.props.mode === 'small' ? this.props.onClose : null}
-                        hintText={this.props.hintText}
-                        onChange={(e) => this.onChange(e.target.value)}
+                        onFocus={onOpen}
+                        onBlur={mode === 'small' ? onClose : null}
+                        hintText={<span><span className="mdi mdi-magnify"/> {hintText}</span>}
+                        onChange={(e,v) => this.onChange(v)}
                         onKeyPress={(e) => (e.key === 'Enter' ? this.onChange(e.target.value) : null)}
                     />
                 }
 
-                {this.props.loading &&
+                {loading &&
                     <div style={{position:'absolute', right: 13, top: 13}} ><CircularProgress size={20} thickness={3}/></div>
                 }
 

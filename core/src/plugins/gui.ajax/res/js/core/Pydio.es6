@@ -305,11 +305,14 @@ class Pydio extends Observable{
      * @param nodeOrPath AjxpNode|String A node or a path
      */
     goTo(nodeOrPath){
+        let gotoNode;
         let path;
         if(typeof(nodeOrPath) == "string"){
             path = nodeOrPath;
+            gotoNode = new AjxpNode(nodeOrPath);
         }else{
-            path = nodeOrPath.getPath();
+            gotoNode = nodeOrPath;
+            path = gotoNode.getPath();
             if(nodeOrPath.getMetadata().has("repository_id") && nodeOrPath.getMetadata().get("repository_id") != this.repositoryId
                 && nodeOrPath.getAjxpMime() != "repository" && nodeOrPath.getAjxpMime() != "repository_editable"){
                 if(this.user){
@@ -320,21 +323,23 @@ class Pydio extends Observable{
                 return;
             }
         }
-
         const current = this._contextHolder.getContextNode();
         if(current && current.getPath() == path){
             return;
         }
-        let gotoNode;
         if(path === "" || path === "/") {
             this._contextHolder.requireContextChange(this._contextHolder.getRootNode());
             return;
         }else{
-            gotoNode = new AjxpNode(path);
             gotoNode = gotoNode.findInArbo(this._contextHolder.getRootNode());
             if(gotoNode){
                 // Node is already here
-                this._contextHolder.requireContextChange(gotoNode);
+                if(gotoNode.isLeaf()){
+                    this._contextHolder.setPendingSelection(PathUtils.getBasename(path));
+                    this._contextHolder.requireContextChange(gotoNode.getParent());
+                }else{
+                    this._contextHolder.requireContextChange(gotoNode);
+                }
             }else{
                 // Check on server if it does exist, then load
                 this._contextHolder.loadPathInfoAsync(path, function(foundNode){
