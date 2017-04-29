@@ -38,6 +38,7 @@
     "react-motion": "*",
     "react-redux": "*",
     "react-router": "^2.7.0",
+    "react-scrollbar": "^0.5.1",
     "react-select": "^0.6.5",
     "react-tap-event-plugin": "^2.0.1",
     "react-textfit": "^0.1.9",

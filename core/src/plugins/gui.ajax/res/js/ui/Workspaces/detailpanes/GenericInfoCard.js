@@ -1,3 +1,4 @@
+import React from 'react'
 import InfoPanelCard from './InfoPanelCard'
 import FilePreview from '../FilePreview'
 
@@ -5,16 +6,12 @@ class GenericInfoCard extends React.Component {
 
     constructor(props) {
         super(props)
+        this.state = this.build(props);
 
-        this.build(props)
-
-        this.state = {
-            ready: false
-        }
     }
 
     componentWillReceiveProps(nextProps) {
-        this.build(nextProps)
+        this.setState(this.build(nextProps));
     }
 
     build(props) {
@@ -29,15 +26,14 @@ class GenericInfoCard extends React.Component {
             isLeaf = node.isLeaf()
             isDir = !isLeaf;
         } else {
-            return
+            return {ready: false};
         }
-
-        this.setState({
+        return {
             isMultiple,
             isLeaf,
             isDir,
             ready: true
-        })
+        };
     }
 
     render() {

@@ -1,3 +1,4 @@
+import React from 'react'
 import InfoPanelCard from './InfoPanelCard'
 
 export default React.createClass({

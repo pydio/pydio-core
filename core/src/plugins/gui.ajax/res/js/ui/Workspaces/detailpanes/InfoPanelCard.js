@@ -1,6 +1,4 @@
-/**
- * Default InfoPanel Card
- */
+import React from 'react'
 
 const styles = {
     card: {
@@ -8,6 +6,9 @@ const styles = {
     }
 };
 
+/**
+ * Default InfoPanel Card
+ */
 let InfoPanelCard = React.createClass({
 
     propTypes: {

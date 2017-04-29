@@ -11,6 +11,7 @@ import PaletteModifier from './PaletteModifier'
 import * as Animations from "./animations";
 import reducers from './editor/reducers/index'
 import * as actions from './editor/actions';
+import withVerticalScroll from './scrollbar/withVerticalScroll';
 
 const PydioHOCs = {
     ContentActions,
@@ -32,6 +33,7 @@ const PydioHOCs = {
     withResize,
     withResolution,
     withSelection,
+    withVerticalScroll,
     Animations,
     PaletteModifier,
     URLProvider,

@@ -1,4 +1,6 @@
+import React from 'react';
 import {compose} from 'redux';
+const {Animations, withVerticalScroll} = require('pydio').requireLib('hoc')
 
 const originStyles = {translateX: 600}
 const targetStyles = {translateX: 0}
@@ -6,11 +8,10 @@ const targetStyles = {translateX: 0}
 let Template = ({id, style, children}) => {
     return <div id={id} style={style}>{children}</div>
 }
-//Template = PydioHOCs.Animations.makeTransition(Template, originStyles, targetStyles)
+
 Template = compose(
-    PydioHOCs.Animations.makeAsync,
-    //PydioHOCs.Animations.makeStaggered(originStyles, targetStyles),
-    PydioHOCs.Animations.makeTransition(originStyles, targetStyles),
+    Animations.makeAsync,
+    Animations.makeTransition(originStyles, targetStyles),
 )(Template)
 
 class InfoPanel extends React.Component {
@@ -19,6 +20,7 @@ class InfoPanel extends React.Component {
         super(props)
 
         let initTemplates = ConfigsParser.parseConfigs();
+        this._updateExpected = true;
 
         this.state = {
             templates:initTemplates,
@@ -26,9 +28,24 @@ class InfoPanel extends React.Component {
         };
     }
 
+    shouldComponentUpdate(){
+        return this._updateExpected;
+    }
+
     componentDidMount() {
-        this._updateHandler = () => this.setState({displayData: this.selectionToTemplates()});
-        this._componentConfigHandler = () => this.setState({templates:ConfigsParser.parseConfigs()});
+        this._updateHandler = () => {
+            this._updateExpected = true;
+            this.setState({displayData: this.selectionToTemplates()}, ()=> {
+                this._updateExpected = false;
+                //if(this.context.scrollArea) setTimeout(() => this.context.scrollArea.refresh(), 750);
+            });
+        }
+        this._componentConfigHandler = () => {
+            this._updateExpected = true;
+            this.setState({templates:ConfigsParser.parseConfigs()}, () => {
+                this._updateExpected = false;
+            })
+        };
 
         this.props.pydio.observe("actions_refreshed", this._updateHandler );
         this.props.pydio.observe("registry_loaded", this._componentConfigHandler );
@@ -111,9 +128,8 @@ class InfoPanel extends React.Component {
                 />
             );
         });
-
         return (
-            <Template id="info_panel" style={this.props.style}>{templates}</Template>
+            <Template style={this.props.style}>{templates}</Template>
         );
     }
 }
@@ -123,6 +139,12 @@ InfoPanel.propTypes = {
     pydio:React.PropTypes.instanceOf(Pydio).isRequired,
     style: React.PropTypes.object
 }
+
+InfoPanel.contextTypes = {
+    scrollArea: React.PropTypes.object
+};
+
+InfoPanel = withVerticalScroll(InfoPanel, {id: "info_panel"})
 
 class ConfigsParser {
 

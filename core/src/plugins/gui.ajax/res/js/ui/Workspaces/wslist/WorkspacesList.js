@@ -1,8 +1,10 @@
+import React from 'react'
+import Pydio from 'pydio'
+const {withVerticalScroll} = Pydio.requireLib('hoc')
 import WorkspaceEntry from './WorkspaceEntry'
-const React = require('react')
-const XMLUtils = require('pydio/util/xml')
+import XMLUtils from 'pydio/util/xml'
 
-export default React.createClass({
+let WorkspacesList = React.createClass({
 
     propTypes:{
         pydio                   : React.PropTypes.instanceOf(Pydio),
@@ -117,3 +119,7 @@ export default React.createClass({
         );
     }
 });
+
+WorkspacesList = withVerticalScroll(WorkspacesList);
+
+export {WorkspacesList as default}

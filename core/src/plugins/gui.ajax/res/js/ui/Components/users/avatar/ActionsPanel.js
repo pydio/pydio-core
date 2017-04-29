@@ -4,7 +4,7 @@ const {UsersApi} = require('pydio/http/users-api')
 const ResourcesManager = require('pydio/http/resources-manager')
 const {IconButton, Popover} = require('material-ui')
 const {muiThemeable} = require('material-ui/styles')
-const {PydioContextConsumer} = require('pydio').requireLib('boot')
+const {PydioContextConsumer, AsyncComponent} = require('pydio').requireLib('boot')
 
 class ActionsPanel extends React.Component{
 
