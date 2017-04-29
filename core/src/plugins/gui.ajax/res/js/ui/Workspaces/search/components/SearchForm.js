@@ -202,6 +202,9 @@ class MainSearch extends Component {
                     boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px',
                     borderRadius: 2
                 },
+                input: {
+                    color: 'rgba(255, 255, 255, 0.64)',
+                },
                 hint: {
                     color: 'rgba(255, 255, 255, 0.64)',
                 }
@@ -243,6 +246,7 @@ class MainSearch extends Component {
         if(mode === 'closed'){
             main = {...main, ...closedMode.main};
             hint = {...hint, ...closedMode.hint};
+            input = {...input, ...closedMode.input};
         }
 
         return (
