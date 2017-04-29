@@ -1,4 +1,5 @@
-const { EditorActions } = PydioWorkspaces;
+import Pydio from 'pydio'
+const { EditorActions } = Pydio.requireLib('hoc')
 
 // Actions definitions
 export const onSave = ({pydio, url, content, dispatch, id}) => {

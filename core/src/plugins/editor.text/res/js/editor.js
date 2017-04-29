@@ -17,12 +17,12 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-
+import Pydio from 'pydio'
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 
-const {EditorActions} = PydioWorkspaces;
+const {EditorActions} = Pydio.requireLib('hoc')
 
 class Editor extends Component {
 

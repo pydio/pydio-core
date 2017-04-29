@@ -18,13 +18,13 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import Pydio from 'pydio'
 import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import CodeMirrorLoader from './CodeMirrorLoader';
 
-import CodeMirrorLoader from './CodeMirrorLoader'
-
-const {EditorActions} = PydioWorkspaces;
+const {EditorActions} = Pydio.requireLib('hoc');
 
 class Editor extends React.Component {
 

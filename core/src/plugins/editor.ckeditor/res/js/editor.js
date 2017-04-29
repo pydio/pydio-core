@@ -18,13 +18,13 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import Pydio from 'pydio'
+const { EditorActions } = Pydio.requireLib('hoc')
 import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
 import CKEditor from './CKEditor';
-
-const {EditorActions} = PydioWorkspaces;
 
 class Editor extends React.Component {
     static get propTypes() {
