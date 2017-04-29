@@ -1,5 +1,6 @@
 const React = require('react')
 const Infinite = require('react-infinite')
+import ScrollArea from 'react-scrollbar'
 
 import MessagesConsumerMixin from '../util/MessagesConsumerMixin'
 import {ListEntry} from './ListEntry'
@@ -132,15 +133,20 @@ let SimpleList = React.createClass({
         }else{
 
             let att = column['sortAttribute']?column['sortAttribute']:column.name;
-            let dir = 'asc';
-            if(this.state && this.state.sortingInfo && this.state.sortingInfo.attribute === att){
-                dir = this.state.sortingInfo.direction === 'asc' ? 'desc' : 'asc';
+            let sortingInfo;
+            const {sortingInfo: {attribute, direction}} = this.state;
+            if(attribute === att && direction){
+                if(direction === 'asc') {
+                    // Switch direction
+                    sortingInfo = { attribute : att, sortType  : column.sortType, direction : 'desc' };
+                } else {
+                    // Reset sorting
+                    sortingInfo = this.props.defaultSortingInfo || {};
+                }
+            }else{
+                sortingInfo = { attribute : att, sortType  : column.sortType, direction : 'asc' };
             }
-            this.setState({sortingInfo:{
-                attribute : att,
-                sortType  : column.sortType,
-                direction : dir
-            }}, function(){
+            this.setState({sortingInfo}, function(){
                 this.rebuildLoadedElements();
                 if(stateSetCallback){
                     stateSetCallback();
@@ -294,7 +300,7 @@ let SimpleList = React.createClass({
             elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
             infiniteLoadBeginBottomOffset:200,
             filterNodes:nextProps.filterNodes ? nextProps.filterNodes : this.props.filterNodes,
-            sortingInfo: nextProps.defaultSortingInfo || this.state.sortingInfo || null
+            sortingInfo: this.state.sortingInfo || nextProps.defaultSortingInfo || null
         }, () => {if (nextProps.node.isLoaded()) this.updateInfiniteContainerHeight()});
         if(!nextProps.autoRefresh&& this.refreshInterval){
             window.clearInterval(this.refreshInterval);
@@ -829,54 +835,57 @@ let SimpleList = React.createClass({
         }
 
         if(this.state && this.state.sortingInfo && !this.remoteSortingInfo()){
-            let sortingInfo = this.state.sortingInfo;
-            let sortingMeta = sortingInfo.attribute;
-            let sortingDirection = sortingInfo.direction;
-            let sortingType = sortingInfo.sortType;
-            this.indexedElements.sort(function(a, b){
-                if (a.parent){
-                    return -1;
-                }
-                let aMeta = a.node.getMetadata().get(sortingMeta) || "";
-                let bMeta = b.node.getMetadata().get(sortingMeta) || "";
-                let res;
-                if(sortingType === 'number'){
-                    aMeta = parseFloat(aMeta);
-                    bMeta = parseFloat(bMeta);
-                    res  = (sortingDirection === 'asc' ? aMeta - bMeta : bMeta - aMeta);
-                }else if(sortingType === 'string'){
-                    res = (sortingDirection === 'asc'? aMeta.localeCompare(bMeta) : bMeta.localeCompare(aMeta));
-                }
-                if(res === 0){
-                    // Resort by label to make it stable
-                    let labComp = a.node.getLabel().localeCompare(b.node.getLabel());
-                    res = (sortingDirection === 'asc' ? labComp : -labComp);
-                }
-                return res;
-            });
+            const {sortingInfo:{attribute, direction, sortType}} = this.state;
+            let sortFunction;
+            if(sortType === 'file-natural'){
+                sortFunction = (a, b) => {
+                    if (a.parent){
+                        return -1;
+                    }
+                    const nodeA = a.node;
+                    const nodeB = b.node;
+                    // Recycle always last
+                    if(nodeA.isRecycle()) return 1;
+                    if(nodeB.isRecycle()) return -1;
+                    // Folders first
+                    const aLeaf = nodeA.isLeaf();
+                    const bLeaf = nodeB.isLeaf();
+                    let res = (aLeaf && !bLeaf ? 1 : ( !aLeaf && bLeaf ? -1 : 0));
+                    if(res !== 0) return res;
+                    res = nodeA.getLabel().localeCompare(nodeB.getLabel());
+                    return res;
+                };
+            }else{
+                sortFunction = (a, b) => {
+                    if (a.parent){
+                        return -1;
+                    }
+                    let aMeta = a.node.getMetadata().get(attribute) || "";
+                    let bMeta = b.node.getMetadata().get(attribute) || "";
+                    let res;
+                    if(sortType === 'number'){
+                        aMeta = parseFloat(aMeta);
+                        bMeta = parseFloat(bMeta);
+                        res  = (direction === 'asc' ? aMeta - bMeta : bMeta - aMeta);
+                    }else if(sortType === 'string'){
+                        res = (direction === 'asc'? aMeta.localeCompare(bMeta) : bMeta.localeCompare(aMeta));
+                    }
+                    if(res === 0){
+                        // Resort by label to make it stable
+                        let labComp = a.node.getLabel().localeCompare(b.node.getLabel());
+                        res = (direction === 'asc' ? labComp : -labComp);
+                    }
+                    return res;
+                };
+            }
+            this.indexedElements.sort(sortFunction);
         }
 
         if(this.props.elementPerLine > 1){
             end = end * this.props.elementPerLine;
             start = start * this.props.elementPerLine;
         }
-        const nodes = this.indexedElements.slice(start, end);
-        if(!nodes.length && theNode.getMetadata().get('paginationData')){
-            /*
-             //INFINITE SCROLLING ACCROSS PAGE. NOT SURE IT'S REALLY UX FRIENDLY FOR BIG LISTS OF USERS.
-             //BUT COULD BE FOR E.G. LOGS
-             var pData = theNode.getMetadata().get('paginationData');
-             var total = parseInt(pData.get("total"));
-             var current = parseInt(pData.get("current"));
-             if(current < total){
-             pData.set("new_page", current+1);
-             }
-             this.dm.requireContextChange(theNode);
-             */
-            return [];
-        }else{
-            return nodes; //this.buildElementsFromNodeEntries(nodes, theShowSelector);
-        }
+        return this.indexedElements.slice(start, end);
     },
 
     rebuildLoadedElements: function(){
@@ -1099,7 +1108,7 @@ let SimpleList = React.createClass({
                 {toolbar}
                 {inlineEditor}
                 <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">
-                    {!emptyState &&
+                    {!emptyState && !this.props.verticalScroller &&
                     <Infinite
                         elementHeight={this.state.elementHeight ? this.state.elementHeight : this.props.elementHeight}
                         containerHeight={this.state.containerHeight ? this.state.containerHeight : 1}
@@ -1110,6 +1119,17 @@ let SimpleList = React.createClass({
                     >
                         {elements}
                     </Infinite>
+                    }
+                    {!emptyState && this.props.verticalScroller &&
+                        <ScrollArea
+                            speed={0.8}
+                            horizontalScroll={false}
+                            style={{height:this.state.containerHeight}}
+                            verticalScrollbarStyle={{borderRadius: 10, width: 6}}
+                            verticalContainerStyle={{width: 8}}
+                        >
+                            <div>{elements}</div>
+                        </ScrollArea>
                     }
                     {emptyState}
                 </div>

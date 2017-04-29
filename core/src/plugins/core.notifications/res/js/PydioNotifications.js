@@ -176,7 +176,7 @@
                         <PydioComponents.NodeListCustomProvider
                             pydio={pydio}
                             className="files-list"
-                            elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 20}
+                            elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 2}
                             heightAutoWithMax={root ? 420 : 320}
                             presetDataModel={this.state.dataModel}
                             actionBarGroups={[]}
@@ -188,6 +188,7 @@
                             entryRenderSecondLine={renderSecondLine}
                             nodeClicked={nodeClicked}
                             defaultSortingInfo={{attribute : 'event_time',sortType:'number',direction : 'desc'}}
+                            verticalScroller={true}
                         />
                     </Template>
                 </PydioWorkspaces.InfoPanelCard>

@@ -1162,6 +1162,12 @@ div#multiple_download_container div div a:hover {
   vertical-align: top;
   font-size: 11px;
 }
+.react-mui-context .scrollarea > .scrollbar-container {
+  opacity: 0 !important;
+}
+.react-mui-context .scrollarea:hover > .scrollbar-container {
+  opacity: .3 !important;
+}
 .user-widget {
   height: 110px;
   width: 250px;

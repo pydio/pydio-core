@@ -195,21 +195,6 @@ let MainFilesList = React.createClass({
     },
 
     entryRenderActions: function(node){
-        // This would be for mobile actions
-        /*
-         if(node.isLeaf()){
-         return null;
-         let pushNodeToEditor = function(){
-
-         };
-         return <ReactMUI.FontIcon className="icon-ellipsis-vertical" tooltip="Info" onClick={pushNodeToEditor}/>;
-         }else{
-         let selectFolder = function(e){
-         e.stopPropagation();
-         this.props.pydio.getContextHolder().setSelectedNodes([node]);
-         }.bind(this);
-         return <ReactMUI.FontIcon className="icon-ellipsis-vertical" tooltip="Info" onClick={selectFolder}/>;
-         }*/
         let content = null;
         const mobile = this.props.pydio.UI.MOBILE_EXTENSIONS;
         const dm = this.props.pydio.getContextHolder();
@@ -447,6 +432,7 @@ let MainFilesList = React.createClass({
                 entryHandleClicks={this.entryHandleClicks}
                 horizontalRibbon={this.props.horizontalRibbon}
                 emptyStateProps={emptyStateProps}
+                defaultSortingInfo={{sortType:'file-natural',attribute:'',direction:'asc'}}
             />
         );
     }

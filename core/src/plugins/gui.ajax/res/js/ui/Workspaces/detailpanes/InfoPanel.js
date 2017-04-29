@@ -37,13 +37,14 @@ class InfoPanel extends React.Component {
             this._updateExpected = true;
             this.setState({displayData: this.selectionToTemplates()}, ()=> {
                 this._updateExpected = false;
-                //if(this.context.scrollArea) setTimeout(() => this.context.scrollArea.refresh(), 750);
+                if(this.context.scrollArea) setTimeout(() => this.context.scrollArea.refresh(), 750);
             });
         }
         this._componentConfigHandler = () => {
             this._updateExpected = true;
             this.setState({templates:ConfigsParser.parseConfigs()}, () => {
                 this._updateExpected = false;
+                if(this.context.scrollArea) setTimeout(() => this.context.scrollArea.refresh(), 750);
             })
         };
 
