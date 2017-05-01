@@ -32,7 +32,7 @@
                     </context>
                     <selectionContext dir="false" file="true" recycle="false" unique="true" image="true" editable="true"></selectionContext>
                 </gui>
-
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="true"/>
                 <processing>
                     <clientCallback module="TimestampActions.Callbacks.getTimestamp"/>
                     <serverCallback methodName="switchAction"></serverCallback>
