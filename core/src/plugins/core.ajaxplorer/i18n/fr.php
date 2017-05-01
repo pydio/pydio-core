@@ -704,5 +704,15 @@ $mess=array(
 "602" => "Vous avez partagé %2 elément(s) avec %1.",
 "603" => "Equipe",
 "604" => "Utilisateur distant",
+"605" => "Plus d'options de recherche",
+"606" => "Moins d'options de recherche",
+"607" => "Chercher dans tous les workspaces",
+"608" => "Répertoire courant",
+"609" => "Tout le workspace",
+"610" => "Tous les worskpaces",
+"611" => "Tapez pour commencer à chercher",
+"612" => "Personnalisée",
+"613" => "Plus gros que...",
+"614" => "Plus petit que...",
 /* END SENTENCE */
 );

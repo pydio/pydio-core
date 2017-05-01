@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 
 import {TextField, Toggle} from 'material-ui';
 
@@ -25,7 +26,7 @@ class SearchFileFormatPanel extends Component {
 
     render() {
 
-        const {inputStyle, ...props} = this.props
+        const {inputStyle, getMessage, ...props} = this.props
 
         return (
             <div>
@@ -33,16 +34,16 @@ class SearchFileFormatPanel extends Component {
                     style={inputStyle}
                     name="toggleFolder"
                     value="ajxp_folder"
-                    label="Folders Only"
+                    label={getMessage(502)}
                     onToggle={(e, toggled) => this.setState({folder: toggled})}
                 />
                 {!this.state.folder &&
                     <TextField
                         style={inputStyle}
                         className="mui-text-field"
-                        hintText="Extension"
+                        hintText={getMessage(500)}
                         floatingLabelFixed={true}
-                        floatingLabelText="File extension"
+                        floatingLabelText={getMessage(500)}
                         onChange={(e) => this.setState({ext: e.target.value})}
                     />
                 }
@@ -51,4 +52,5 @@ class SearchFileFormatPanel extends Component {
     }
 }
 
+SearchFileFormatPanel = PydioContextConsumer(SearchFileFormatPanel)
 export default SearchFileFormatPanel

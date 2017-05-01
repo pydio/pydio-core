@@ -1,4 +1,5 @@
 import React from 'react';
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 
 import {Subheader, DropDownMenu, MenuItem, DatePicker, TextField, Toggle, FlatButton} from 'material-ui';
 
@@ -74,7 +75,7 @@ class SearchDatePanel extends React.Component {
         const today = new Date();
 
         const {dropdownLabel, dropdownUnderline, dropdownIcon, datePickerGroup, datePicker, dateInput, dateClose} = SearchDatePanel.styles
-        const {inputStyle} = this.props
+        const {inputStyle, getMessage} = this.props
         const {value, startDate, endDate} = this.state;
 
         return (
@@ -94,7 +95,7 @@ class SearchDatePanel extends React.Component {
                             style={datePicker}
                             value={startDate}
                             onChange={(e, date) => this.setState({startDate: date})}
-                            hintText={"From..."}
+                            hintText={getMessage(491)}
                             autoOk={true}
                             maxDate={endDate || today}
                             defaultDate={startDate}
@@ -105,7 +106,7 @@ class SearchDatePanel extends React.Component {
                             style={datePicker}
                             value={endDate}
                             onChange={(e, date) => this.setState({endDate: date})}
-                            hintText={"To..."}
+                            hintText={getMessage(492)}
                             autoOk={true}
                             minDate={startDate}
                             maxDate={today}
@@ -119,11 +120,10 @@ class SearchDatePanel extends React.Component {
     }
 }
 
-const DatePickerFeed = ({pydio, children}) => {
-    const getMessage = (messageId) => pydio.MessageHash[messageId];
+let DatePickerFeed = ({pydio, getMessage, children}) => {
 
     const items = [
-        {payload: 'custom', text: 'Custom Dates'},
+        {payload: 'custom', text: getMessage('612')},
         {payload: 'AJXP_SEARCH_RANGE_TODAY', text: getMessage('493')},
         {payload: 'AJXP_SEARCH_RANGE_YESTERDAY', text: getMessage('494')},
         {payload: 'AJXP_SEARCH_RANGE_LAST_WEEK', text: getMessage('495')},
@@ -134,4 +134,6 @@ const DatePickerFeed = ({pydio, children}) => {
     return children(items)
 }
 
+SearchDatePanel = PydioContextConsumer(SearchDatePanel)
+DatePickerFeed = PydioContextConsumer(DatePickerFeed)
 export default SearchDatePanel

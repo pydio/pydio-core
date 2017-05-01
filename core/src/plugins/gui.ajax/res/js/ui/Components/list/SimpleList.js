@@ -18,7 +18,8 @@ const LangUtils = require('pydio/util/lang')
 const PydioDataModel = require('pydio/model/data-model')
 
 /**
- * Main List component
+ * Generic List component, using Infinite for cell virtualization, pagination, various
+ * displays, etc... It provides many hooks for rendering cells on-demand.
  */
 let SimpleList = React.createClass({
 

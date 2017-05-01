@@ -707,6 +707,16 @@ $mess=array(
 "602" => "You have shared %2 item(s) with %1.",
 "603" => "Team",
 "604" => "Remote User",
+"605" => "More search options",
+"606" => "Less search options",
+"607" => "Search inside all workspaces",
+"608" => "Current folder",
+"609" => "Whole workspace",
+"610" => "All worskpaces",
+"611" => "Start typing to search",
+"612" => "Custom range",
+"613" => "Greater than...",
+"614" => "Smaller than...",
 /* 文章はここまで */
 /* 文章終了 */
 );

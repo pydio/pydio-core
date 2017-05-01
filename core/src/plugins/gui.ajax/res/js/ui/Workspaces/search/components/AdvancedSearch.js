@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import _ from 'lodash';
 
 import {Subheader, TextField} from 'material-ui';
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 
 import DatePanel from './DatePanel';
 import FileFormatPanel from './FileFormatPanel';
@@ -75,11 +76,11 @@ class AdvancedSearch extends Component {
 
         const {text} = AdvancedSearch.styles
 
-        const {pydio, onChange} = this.props
+        const {pydio, onChange, getMessage} = this.props
 
         return (
             <div className="search-advanced">
-                <Subheader>User Metadata</Subheader>
+                <Subheader>{getMessage(489)}</Subheader>
                 <AdvancedMetaFields {...this.props}>
                     {fields =>
                         <div>
@@ -88,18 +89,20 @@ class AdvancedSearch extends Component {
                     }
                 </AdvancedMetaFields>
 
-                <Subheader>Modification Date</Subheader>
+                <Subheader>{getMessage(490)}</Subheader>
                 <DatePanel pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
 
-                <Subheader>File format</Subheader>
+                <Subheader>{getMessage(498)}</Subheader>
                 <FileFormatPanel pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
 
-                <Subheader>Bytesize ranges</Subheader>
+                <Subheader>{getMessage(503)}</Subheader>
                 <FileSizePanel pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
             </div>
         )
     }
 }
+
+AdvancedSearch = PydioContextConsumer(AdvancedSearch);
 
 class AdvancedMetaFields extends Component {
 
@@ -130,7 +133,7 @@ class AdvancedMetaFields extends Component {
         const {options} = this.state
         const {metaColumns, reactColumnRenderers} = {...options}
 
-        const generic = {basename: 'Filename'}
+        const generic = {basename: this.props.getMessage(1)}
 
         // Looping through the options to check if we have a special renderer for any
         const specialRendererKeys = Object.keys({...reactColumnRenderers})

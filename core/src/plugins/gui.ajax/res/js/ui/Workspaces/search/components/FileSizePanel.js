@@ -1,4 +1,5 @@
 import React from 'react';
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 
 import {TextField} from 'material-ui';
 
@@ -32,24 +33,24 @@ class SearchFileSizePanel extends React.Component {
 
     render() {
 
-        const {inputStyle, ...props} = this.props
+        const {inputStyle, getMessage, ...props} = this.props
 
         return (
             <div>
                 <TextField
                     ref="from"
                     style={inputStyle}
-                    hintText="1Mo,1Go,etc"
+                    hintText={getMessage(504)}
                     floatingLabelFixed={true}
-                    floatingLabelText="Size greater than..."
+                    floatingLabelText={getMessage(613)}
                     onChange={this.onChange.bind(this)}
                 />
                 <TextField
                     ref="to"
                     style={inputStyle}
-                    hintText="1Mo,1Go,etc"
+                    hintText={getMessage(504)}
                     floatingLabelFixed={true}
-                    floatingLabelText="Size bigger than..."
+                    floatingLabelText={getMessage(614)}
                     onChange={this.onChange.bind(this)}
                 />
             </div>
@@ -57,4 +58,5 @@ class SearchFileSizePanel extends React.Component {
     }
 }
 
+SearchFileSizePanel = PydioContextConsumer(SearchFileSizePanel)
 export default SearchFileSizePanel
