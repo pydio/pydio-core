@@ -78,7 +78,8 @@ export default React.createClass({
             lineHeight: '28px',
             textAlign: 'center',
             cursor: 'pointer',
-            borderRadius: '50%'
+            borderRadius: '50%',
+            ...this.props.buttonStyle
         };
 
 

@@ -217,7 +217,7 @@ let MainFilesList = React.createClass({
 
     entryHandleClicks: function(node, clickType, event){
         let dm = this.props.pydio.getContextHolder();
-        const mobile = this.props.pydio.UI.MOBILE_EXTENSIONS;
+        const mobile = this.props.pydio.UI.MOBILE_EXTENSIONS || this.props.horizontalRibbon;
         if(!mobile && ( !clickType || clickType === PydioComponents.SimpleList.CLICK_TYPE_SIMPLE )){
             if(event && event.shiftKey && dm.getSelectedNodes().length){
                 const newSelection = this.refs.list.computeSelectionFromCurrentPlusTargetNode(dm.getSelectedNodes(), node);
