@@ -1,4 +1,4 @@
-import {Editor, Panel} from './editor'
+import {Editor, Panel} from './Editor'
 import * as Controls from './controls'
 
 export {Editor}
