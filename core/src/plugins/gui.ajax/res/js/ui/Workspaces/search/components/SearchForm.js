@@ -2,8 +2,12 @@ import React, {Component} from 'react'
 
 import FilePreview from '../../FilePreview'
 import AdvancedSearch from './AdvancedSearch'
+import Textfit from 'react-textfit'
+import Pydio from 'pydio'
+import LangUtils from 'pydio/util/lang'
+const {EmptyStateView} = Pydio.requireLib('components')
 
-import {Subheader, DropDownMenu, DatePicker, TextField, Toggle, FlatButton, CircularProgress} from 'material-ui';
+import {Paper, Subheader, FontIcon, TextField, FlatButton, CircularProgress, IconMenu, MenuItem, IconButton, DropDownMenu} from 'material-ui';
 
 import _ from 'lodash';
 
@@ -23,7 +27,9 @@ class SearchForm extends Component {
             values: {},
             display: 'closed',
             dataModel: basicDataModel,
-            loading: false
+            empty: true,
+            loading: false,
+            searchScope: 'folder'
         }
 
         this.setMode = _.debounce(this.setMode, 250);
@@ -65,7 +71,7 @@ class SearchForm extends Component {
     }
 
     submit() {
-        const {display, values} = this.state
+        const {display, values, searchScope} = this.state
         const {crossWorkspace} = this.props
 
         let queryString = ''
@@ -81,18 +87,23 @@ class SearchForm extends Component {
         }
 
         // Refresh data model
-        const newDM = PydioDataModel.RemoteDataModelFactory({
-            get_action : crossWorkspace ? 'multisearch' : 'search',
+        let dmParams = {
+            get_action : crossWorkspace || searchScope === 'all' ? 'multisearch' : 'search',
             query: queryString,
-            limit: crossWorkspace ? 5 : (display !== 'small' ? 9 : 100),
-            connexion_discrete: true
-        });
+            limit: (crossWorkspace  || searchScope === 'all') ? 5 : (display === 'small' ? 9 : 100),
+            connexion_discrete: true,
+        };
+        if(searchScope === 'folder'){
+            dmParams.current_dir = this.props.pydio.getContextHolder().getContextNode().getPath();
+        }
+        const newDM = PydioDataModel.RemoteDataModelFactory(dmParams);
         newDM.getRootNode().observeOnce("loaded", () => {
             this.setState({loading: false});
         });
         this.setState({
             loading     : true,
-            dataModel   : newDM
+            dataModel   : newDM,
+            empty       : false
         }, () => {
             this.refs.results.reload();
         });
@@ -101,71 +112,139 @@ class SearchForm extends Component {
 
     render() {
 
+        const {crossWorkspace, pydio} = this.props;
+        const {searchScope, display, loading, dataModel, empty, values} = this.state;
+
         let renderSecondLine = null, renderIcon = null, elementHeight = 49;
-        if (this.state.display !== 'small') {
+        if (display !== 'small') {
             elementHeight = PydioComponents.SimpleList.HEIGHT_TWO_LINES + 10;
-            renderSecondLine = function(node){
-                return <div>{node.getPath()}</div>
+            renderSecondLine = (node) => {
+                let path = node.getPath();
+                if(searchScope === 'folder'){
+                    const crtFolder = pydio.getContextHolder().getContextNode().getPath();
+                    if(path.indexOf(crtFolder) === 0){
+                        path = './' + LangUtils.trimLeft(path.substr(crtFolder.length), '/');
+                    }
+                }
+                return <div>{path}</div>
             };
-            renderIcon = function(node, entryProps = {}){
+            renderIcon = (node, entryProps = {}) => {
                 return <FilePreview loadThumbnail={!entryProps['parentIsScrolling']} node={node}/>;
             };
         }
 
         const nodeClicked = (node)=>{
-            console.log(node);
-            this.props.pydio.goTo(node);
+            pydio.goTo(node);
             this.setMode('closed');
         };
 
+        const searchScopeChanged = (value) =>{
+            if(display === 'small') {
+                setTimeout(()=>this.setMode('small'), 250);
+            }
+            this.setState({searchScope:value});
+            this.submit();
+        };
+
+        let style = this.props.style;
+        let zDepth = 2;
+        if(display === 'closed'){
+            zDepth = 0;
+            style = {...style, backgroundColor: 'transparent'};
+        }
+
         return (
-            <div ref="root" className={"top_search_form " + this.state.display} style={this.props.style}>
+            <Paper ref="root" zDepth={zDepth} className={"top_search_form " + display} style={style}>
                 <MainSearch
-                    mode={this.state.display}
-                    title={this.state.display === 'advanced' ? 'Advanced' : 'Search...'}
+                    mode={display}
+                    title={display === 'advanced' ? 'Advanced Search' : null}
                     onOpen={() => this.setMode("small")}
+                    showAdvanced={!this.props.crossWorkspace}
                     onAdvanced={() => this.setMode("advanced")}
                     onClose={() => this.setMode("closed")}
+                    onMore={() => this.setMode("more")}
                     onChange={(values) => this.update(values)}
                     onSubmit={() => this.submit()}
-                    hintText={this.props.crossWorkspace ? "Search inside all workspaces..." : "Search inside this workspace"}
-                    loading={this.state.loading}
+                    hintText={this.props.crossWorkspace || searchScope === 'all' ? "Search inside all workspaces..." : "Search ..."}
+                    loading={loading}
+                    scopeSelectorProps={this.props.crossWorkspace ? null : {
+                        value:searchScope,
+                        onChange:searchScopeChanged
+                    }}
                 />
-                {this.state.display === 'advanced' &&
+                {display === 'advanced' &&
                     <AdvancedSearch
                         {...this.props}
-                        value={this.state.values.basename}
+                        value={values.basename}
                         onChange={(values) => this.update(values)}
                         onSubmit={() => this.submit()}
                     />
                 }
 
                 <div className="search-results">
+                    {empty &&
+                        <EmptyStateView
+                            iconClassName=""
+                            primaryTextId="Start typing to search"
+                            style={{minHeight: 180, backgroundColor: 'transparent'}}
+                        />
+                    }
                     <PydioComponents.NodeListCustomProvider
                         ref="results"
-                        className={this.state.display !== 'small' ? 'files-list' : null}
+                        className={display !== 'small' ? 'files-list' : null}
                         elementHeight={elementHeight}
                         entryRenderIcon={renderIcon}
                         entryRenderActions={function() {return null}}
                         entryRenderSecondLine={renderSecondLine}
-                        presetDataModel={this.state.dataModel}
-                        heightAutoWithMax={this.state.display === 'small' ? 500  : 412}
+                        presetDataModel={dataModel}
+                        heightAutoWithMax={display === 'small' ? 500  : 412}
                         openCollection={nodeClicked}
                         nodeClicked={nodeClicked}
-                        defaultGroupBy={this.props.crossWorkspace?'repository_id':null}
-                        groupByLabel={this.props.crossWorkspace?'repository_display':null}
+                        defaultGroupBy={(crossWorkspace || searchScope ==='all') ? 'repository_id' : null }
+                        groupByLabel={(crossWorkspace || searchScope ==='all') ? 'repository_display' : null }
+                        emptyStateProps={{
+                            iconClassName:"",
+                            primaryTextId:"No results",
+                            style:{minHeight: (display === 'small' ? 180  : 412), backgroundColor: 'transparent'}
+                        }}
                     />
 
-                    {this.state.display === 'small' &&
-                        <div className="search-more-container">
-                            <FlatButton secondary={true} label={"Show more..."} onFocus={() => this.setMode("small")} onTouchTap={() => this.setMode("more")} onClick={() => this.setMode("more")} />
+                    {display === 'small' &&
+                        <div style={{display:'flex', alignItems:'center', padding:5, paddingLeft: 0, backgroundColor:'#f5f5f5'}}>
+                            {!this.props.crossWorkspace &&  <MenuScopeSelector style={{flex: 1, maxWidth:170}} labelStyle={{paddingLeft: 8}} value={searchScope} onChange={searchScopeChanged} onTouchTap={() => this.setMode('small')}/>}
+                            <FlatButton style={{marginTop:4}} primary={true} label={"More..."} onFocus={() => this.setMode("small")} onTouchTap={() => this.setMode("more")} onClick={() => this.setMode("more")} />
                         </div>
                     }
                 </div>
 
-            </div>
+            </Paper>
         );
     }
+}
+
+class MenuScopeSelector extends Component {
+
+    render(){
+        return (
+
+            <DropDownMenu
+                value={this.props.value}
+                onChange={(e,i,v) => {this.props.onChange(v)}}
+                onTouchTap={this.props.onTouchTap}
+                autoWidth={true}
+                style={this.props.style}
+                underlineStyle={{display:'none'}}
+                labelStyle={this.props.labelStyle}
+            >
+                <MenuItem value={'folder'} primaryText="Current folder"/>
+                <MenuItem value={'ws'} primaryText="Current workspace"/>
+                <MenuItem value={'all'} primaryText="All workspaces"/>
+            </DropDownMenu>
+
+        );
+    }
+
+
 }
 
 class MainSearch extends Component {
@@ -175,23 +254,29 @@ class MainSearch extends Component {
             main: {
                 background: "#ffffff",
                 width: "100%",
-                height: "36px",
+                height: 36,
                 border: "none",
-                transition:'all .25s'
+                transition:'all .25s',
+                display:'flex'
             },
             input: {
-                padding: "0 10px",
+                padding: "0 4px",
                 border: 0
             },
             hint: {
                 transition:'all .25s',
                 width: "100%",
-                padding: "0 10px",
+                padding: "0 4px",
                 bottom: 0,
                 lineHeight: "36px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis"
+            },
+            magnifier: {
+                padding: '7px 0 0 8px',
+                fontSize: 23,
+                color: 'rgba(0, 0, 0, 0.33)'
             },
             underline: {
                 display: "none"
@@ -202,11 +287,15 @@ class MainSearch extends Component {
                     boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px',
                     borderRadius: 2
                 },
+                magnifier: {
+                    fontSize: 18,
+                    color: 'rgba(255, 255, 255, 0.64)'
+                },
                 input: {
-                    color: 'rgba(255, 255, 255, 0.64)',
+                    color: 'rgba(255, 255, 255, 0.64)'
                 },
                 hint: {
-                    color: 'rgba(255, 255, 255, 0.64)',
+                    color: 'rgba(255, 255, 255, 0.64)'
                 }
             }
         }
@@ -241,41 +330,58 @@ class MainSearch extends Component {
     }
 
     render() {
-        const {mode, onOpen, onClose, hintText, loading} = this.props;
-        let {main, input, hint, underline, closedMode} = MainSearch.styles
+        const {title, mode, onOpen, onAdvanced, onMore, onClose, hintText, loading, scopeSelectorProps, showAdvanced} = this.props;
+        let {main, input, hint, underline, magnifier, closedMode} = MainSearch.styles
         if(mode === 'closed'){
             main = {...main, ...closedMode.main};
             hint = {...hint, ...closedMode.hint};
             input = {...input, ...closedMode.input};
+            magnifier = {...magnifier, ...closedMode.magnifier};
         }
 
         return (
             <div className="search-input">
-                <div className="panel-header">
-                    <span className="panel-header-label">{this.props.title}</span>
+                <div className="panel-header" style={{display:'flex'}}>
+                    {scopeSelectorProps &&
+                        <span>
+                            <MenuScopeSelector style={{marginTop:-16, marginLeft:-26}} labelStyle={{color: 'white'}} {...scopeSelectorProps}/>
+                        </span>
+                    }
+                    <span style={{flex:1}}></span>
+                    {showAdvanced &&
+                        <FlatButton style={{textTransform:'none', color:'white', fontSize:15, marginTop:-5, padding:'0 16px'}} onTouchTap={mode === 'advanced' ? onMore : onAdvanced}>{mode === 'advanced' ? '- Less search options' : '+ More search options'}</FlatButton>
+                    }
+                    {mode === 'advanced' && loading &&
+                        <div style={{marginRight: 10}} ><CircularProgress size={20} thickness={3}/></div>
+                    }
                     <span className="panel-header-close mdi mdi-close" onClick={this.props.onClose}></span>
                 </div>
 
-                {this.props.mode !== 'advanced' &&
-                    <TextField
-                        ref={(input) => this.input = input}
-                        style={main}
-                        inputStyle={input}
-                        hintStyle={hint}
-                        underlineStyle={underline}
-                        onFocus={onOpen}
-                        onBlur={mode === 'small' ? onClose : null}
-                        hintText={<span><span className="mdi mdi-magnify"/> {hintText}</span>}
-                        onChange={(e,v) => this.onChange(v)}
-                        onKeyPress={(e) => (e.key === 'Enter' ? this.onChange(e.target.value) : null)}
-                    />
+                {mode !== 'advanced' &&
+                    <div style={main}>
+
+                        <FontIcon className="mdi mdi-magnify" style={magnifier}/>
+
+                        <TextField
+                            ref={(input) => this.input = input}
+                            style={{flex: 1, height:main.height}}
+                            inputStyle={input}
+                            hintStyle={hint}
+                            fullWidth={true}
+                            underlineShow={false}
+                            onFocus={onOpen}
+                            onBlur={mode === 'small' ? onClose : null}
+                            hintText={hintText}
+                            onChange={(e,v) => this.onChange(v)}
+                            onKeyPress={(e) => (e.key === 'Enter' ? this.onChange(e.target.value) : null)}
+                        />
+
+                        {loading &&
+                            <div style={{marginTop:9, marginRight: 9}} ><CircularProgress size={20} thickness={3}/></div>
+                        }
+                    </div>
                 }
 
-                {loading &&
-                    <div style={{position:'absolute', right: 13, top: 13}} ><CircularProgress size={20} thickness={3}/></div>
-                }
-
-                <span className="search-advanced-button" onClick={this.props.onAdvanced}>Advanced search</span>
             </div>
         )
     }

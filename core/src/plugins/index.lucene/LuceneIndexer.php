@@ -31,6 +31,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -208,17 +209,30 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 $query = "ajxp_scope:shared AND ($query)";
                 $this->logDebug("Query : $query");
             } else {
-                $index->setDefaultSearchField("basename");
-                $query = $this->filterSearchRangesKeywords($textQuery);
+                $textQuery = $this->filterSearchRangesKeywords($textQuery);
+                $query = "basename:".$textQuery;
             }
+
             $this->setDefaultAnalyzer(
                 $this->getContextualOption($ctx, "QUERY_ANALYSER"),
                 intval($this->getContextualOption($ctx, "WILDCARD_LIMITATION"))
             );
-            if ($query == "*") {
+
+            if (isSet($httpVars["current_dir"]) && !empty($httpVars["current_dir"]) && $httpVars["current_dir"] !== "/") {
+                $dir = InputFilter::sanitize($httpVars["current_dir"], InputFilter::SANITIZE_DIRNAME);
+                $mangledDir = str_replace("/", "AJXPFAKESEP", $dir);
+                $dirQuery = new \Zend_Search_Lucene_Search_Query_Wildcard(new \Zend_Search_Lucene_Index_Term($mangledDir .'*', 'node_path'));
+                \Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength(0);
+                $tQL = \Zend_Search_Lucene::getTermsPerQueryLimit();
+                $stringQuery = \Zend_Search_Lucene_Search_QueryParser::parse($query);
+                $query = new \Zend_Search_Lucene_Search_Query_Boolean([$stringQuery, $dirQuery], [true, true]);
+            }else{
+                $query = \Zend_Search_Lucene_Search_QueryParser::parse($query);
+            }
+
+            if ($query === "basename:*") {
                 $index->setDefaultSearchField("ajxp_node");
-                $query = "yes";
-                $hits = $index->find($query);
+                $hits = $index->find("yes");
             } else {
                 if(isSet($httpVars["limit"])){
                     $limit = intval($httpVars["limit"]);
@@ -565,6 +579,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 $newIndex->delete($newDocId);
                 $childrenHits = $this->getIndexedChildrenDocuments($newIndex, $newNode);
                 foreach ($childrenHits as $hit) {
+                    $check = $hit->node_path;
                     $newIndex->delete($hit->id);
                 }
             }

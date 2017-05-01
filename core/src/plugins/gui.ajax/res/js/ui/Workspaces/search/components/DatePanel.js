@@ -47,13 +47,22 @@ class SearchDatePanel extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState != this.state) {
-            const {value, startDate, endDate} = this.state
+            let {value, startDate, endDate} = this.state
 
             if (value === 'custom') {
                 if (!startDate && !endDate) {
                     this.props.onChange({ajxp_modiftime: null})
                 } else {
-                    this.props.onChange({ajxp_modiftime: `[${startDate || 'XXX'} TO ${endDate || 'XXX'}]`})
+                    if(!startDate) startDate = new Date(0);
+                    if(!endDate) {
+                        // Next year
+                        endDate = new Date();
+                        endDate.setFullYear(endDate.getFullYear()+1);
+                    }
+                    const format = (d) => {
+                        return d.getFullYear() + "" + ("0"+(d.getMonth()+1)).slice(-2) + "" +  ("0" + d.getDate()).slice(-2);
+                    }
+                    this.props.onChange({ajxp_modiftime: '['+format(startDate)+' TO '+format(endDate)+']'})
                 }
             } else {
                 this.props.onChange({ajxp_modiftime: value})
