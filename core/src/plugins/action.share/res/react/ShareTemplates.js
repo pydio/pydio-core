@@ -151,7 +151,8 @@
 
         childContextTypes: {
             messages:React.PropTypes.object,
-            getMessage:React.PropTypes.func
+            getMessage:React.PropTypes.func,
+            showSearchForm: React.PropTypes.bool
         },
 
         getChildContext: function() {
@@ -204,7 +205,7 @@
                 }
             }
 
-            const {minisiteMode} = this.props;
+            const {minisiteMode, showSearchForm} = this.props;
 
             if(!this.props.pydio.user){
                 return <div className="vertical_fit vertical_layout" style={style}/>;
@@ -214,8 +215,9 @@
                 <div className="vertical_fit vertical_layout" style={style}>
                     <MaterialUI.Paper zDepth={1} rounded={false} style={styles.appBarStyle}>
                         {minisiteMode !== 'embed' &&
-                            <div id="workspace_toolbar">
-                                <Breadcrumb {...this.props} rootStyle={{padding: 8}}/>
+                            <div id="workspace_toolbar" style={{display:'flex'}}>
+                                <Breadcrumb {...this.props} rootStyle={{padding: (showSearchForm ? 14 : 8), maxWidth:null}}/>
+                                {showSearchForm && <SearchForm {...this.props} uniqueSearchScope="ws"/>}
                             </div>
                         }
                         <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
@@ -244,7 +246,7 @@
         render: function(){
 
             return (
-                <StandardLayout {...this.props}>
+                <StandardLayout {...this.props} showSearchForm={this.props.pydio.getPluginConfigs('action.share').get('SHARED_FOLDER_SHOW_SEARCH')}>
                     <MainFilesList ref="list" {...this.props}/>
                     <EditionPanel {...this.props}/>
                 </StandardLayout>

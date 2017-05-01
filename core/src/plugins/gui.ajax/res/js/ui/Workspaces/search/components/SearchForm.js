@@ -36,7 +36,7 @@ class SearchForm extends Component {
             dataModel: basicDataModel,
             empty: true,
             loading: false,
-            searchScope: 'folder'
+            searchScope:  props.uniqueSearchScope || 'folder'
         }
 
         this.setMode = _.debounce(this.setMode, 250);
@@ -174,7 +174,7 @@ class SearchForm extends Component {
                     onSubmit={() => this.submit()}
                     hintText={ getMessage(this.props.crossWorkspace || searchScope === 'all' ? 607 : 87 ) + "..."}
                     loading={loading}
-                    scopeSelectorProps={this.props.crossWorkspace ? null : {
+                    scopeSelectorProps={this.props.crossWorkspace || this.props.uniqueSearchScope ? null : {
                         value:searchScope,
                         onChange:searchScopeChanged
                     }}
@@ -218,7 +218,7 @@ class SearchForm extends Component {
 
                     {display === 'small' &&
                         <div style={{display:'flex', alignItems:'center', padding:5, paddingLeft: 0, backgroundColor:'#f5f5f5'}}>
-                            {!this.props.crossWorkspace &&  <SearchScopeSelector style={{flex: 1, maxWidth:170}} labelStyle={{paddingLeft: 8}} value={searchScope} onChange={searchScopeChanged} onTouchTap={() => this.setMode('small')}/>}
+                            {!this.props.crossWorkspace && !this.props.uniqueSearchScope &&  <SearchScopeSelector style={{flex: 1, maxWidth:170}} labelStyle={{paddingLeft: 8}} value={searchScope} onChange={searchScopeChanged} onTouchTap={() => this.setMode('small')}/>}
                             <FlatButton style={{marginTop:4}} primary={true} label={getMessage(456)} onFocus={() => this.setMode("small")} onTouchTap={() => this.setMode("more")} onClick={() => this.setMode("more")} />
                         </div>
                     }
