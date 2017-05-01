@@ -85,15 +85,15 @@ let PublicLinkPanel = React.createClass({
             publicLinkField = (
                 <div>
                     <div className="section-legend" style={{marginTop:20}}>{this.props.getMessage('215')}</div>
-                    <div>
-                        <div style={{float:'left'}}>
+                    <div style={{display:'flex', alignItems:'baseline'}}>
+                        <div style={{flex:1}}>
                             <ValidPassword
                                 attributes={{label:this.props.getMessage('23')}}
                                 value={this.state.temporaryPassword}
                                 onChange={this.updateTemporaryPassword}
                             />
                         </div>
-                        <div style={{marginLeft:7,marginTop: 26,float:'left'}}>
+                        <div style={{marginLeft:7,marginTop: 26}}>
                             <RaisedButton label={this.props.getMessage('92')} secondary={true} onClick={this.enableLinkWithPassword}/>
                         </div>
                     </div>
