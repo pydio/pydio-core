@@ -299,7 +299,15 @@
                     </div>
                     <MaterialUI.Divider/>
                     <div style={{padding:'0 20px'}}>
-                        <MaterialUI.TextField fullWidth={true} underlineShow={false} floatingLabelText={this.getMessage('7')} value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
+                        <MaterialUI.TextField
+                            fullWidth={true}
+                            underlineShow={false}
+                            floatingLabelText={this.getMessage('7')}
+                            value={this.state.message}
+                            multiLine={true}
+                            onChange={this.updateMessage}
+                            rowsMax={6}
+                        />
                     </div>
                     {this.props.additionalPaneBottom}
                     <MaterialUI.Divider/>

@@ -476,7 +476,7 @@
             }
         }
 
-        handleDropEventResults(items, files, targetNode, accumulator = null){
+        handleDropEventResults(items, files, targetNode, accumulator = null, filterFunction = (item)=>true ){
 
             let oThis = this;
 
@@ -495,11 +495,13 @@
                         entry.file(function(File) {
                             if(File.size == 0) return;
                             let uploadItem = new UploadItem(File, targetNode);
+                            if(!filterFunction(uploadItem)) return;
                             if(!accumulator) oThis.pushFile(uploadItem);
                             else accumulator.push(uploadItem);
                         }, error );
                     } else if (entry.isDirectory) {
                         let folderItem = new FolderItem(entry.fullPath, targetNode);
+                        if(!filterFunction(folderItem)) continue;
                         if(!accumulator) oThis.pushFolder(folderItem);
                         else accumulator.push(folderItem);
 
@@ -508,12 +510,14 @@
                             fileEntry.file(function(File) {
                                 if(File.size == 0) return;
                                 let uploadItem = new UploadItem(File, targetNode, relativePath);
+                                if(!filterFunction(uploadItem)) return;
                                 if(!accumulator) oThis.pushFile(uploadItem);
                                 else accumulator.push(uploadItem);
 
                             }, error );
                         }, function(folderEntry){
                             let folderItem = new FolderItem(folderEntry.fullPath, targetNode);
+                            if(!filterFunction(uploadItem)) return;
                             if(!accumulator) oThis.pushFolder(folderItem);
                             else accumulator.push(folderItem);
                         }, error );
@@ -526,6 +530,7 @@
                         return;
                     }
                     let uploadItem = new UploadItem(files[j], targetNode);
+                    if(!filterFunction(uploadItem)) continue;
                     if(!accumulator) oThis.pushFile(uploadItem);
                     else accumulator.push(uploadItem);
                 }
@@ -672,14 +677,14 @@
 
     }
 
-    const DropProvider = function(PydioComponent){
+    const DropProvider = function(PydioComponent, filterFunction = (item)=>true ){
 
         const {NativeFileDropProvider} = require('pydio').requireLib('boot');
         return NativeFileDropProvider(PydioComponent, (items, files) => {
             const {pydio} = global;
             const ctxNode = pydio.getContextHolder().getContextNode();
             const storeInstance = UploaderStore.getInstance();
-            storeInstance.handleDropEventResults(items, files, ctxNode);
+            storeInstance.handleDropEventResults(items, files, ctxNode, null, filterFunction);
             if(!storeInstance.getAutoStart()){
                 pydio.getController().fireAction('upload');
             }

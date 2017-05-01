@@ -67,7 +67,7 @@ export default React.createClass({
                 className = undefined;
                 confirmError = '   ';
             }
-            const overflow = {overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', width:'130%'};
+            const overflow = {overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', width:'100%'};
             if(this.props.className){
                 className = this.props.className + ' ' + className;
             }
@@ -77,7 +77,8 @@ export default React.createClass({
                     <div key="sep" style={{width: 20}}></div>,
                     <MaterialUI.TextField
                         key="confirm"
-                        floatingLabelText={'Please Confirm Password'}
+                        floatingLabelText={this.getMessage(199)}
+                        floatingLabelShrinkStyle={{...overflow, width:'130%'}}
                         floatingLabelStyle={overflow}
                         className={className}
                         value={this.state.confirmValue}
@@ -96,6 +97,7 @@ export default React.createClass({
                     <div style={{display:'flex', marginTop:-16}}>
                         <MaterialUI.TextField
                             floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
+                            floatingLabelShrinkStyle={{...overflow, width:'130%'}}
                             floatingLabelStyle={overflow}
                             className={className}
                             value={this.state.value}
