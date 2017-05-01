@@ -34,8 +34,8 @@ let SimpleList = React.createClass({
         heightAutoWithMax   : React.PropTypes.number,
         containerHeight     : React.PropTypes.number,
         observeNodeReload   : React.PropTypes.bool,
-        groupByFields       : React.PropTypes.array,
         defaultGroupBy      : React.PropTypes.string,
+        defaultGroupByLabel : React.PropTypes.string,
 
         skipParentNavigation: React.PropTypes.bool,
         skipInternalDataModel:React.PropTypes.bool,
@@ -280,9 +280,6 @@ let SimpleList = React.createClass({
             filterNodes         : this.props.filterNodes,
             sortingInfo         : this.props.defaultSortingInfo || null
         };
-        if(this.props.defaultGroupBy){
-            state.groupBy = this.props.defaultGroupBy;
-        }
         if(this.props.elementHeight instanceof Object){
             state.elementHeight = this.computeElementHeightResponsive();
         }
@@ -748,9 +745,9 @@ let SimpleList = React.createClass({
 
                 }else if(this.props.tableKeys){
 
-                    if(this.state && this.state.groupBy){
+                    if(this.props.defaultGroupBy){
                         data['tableKeys'] = LangUtils.deepCopy(this.props.tableKeys);
-                        delete data['tableKeys'][this.state.groupBy];
+                        delete data['tableKeys'][this.props.defaultGroupBy];
                     }else{
                         data['tableKeys'] = this.props.tableKeys;
                     }
@@ -777,8 +774,8 @@ let SimpleList = React.createClass({
         if(!this.indexedElements || this.indexedElements.length !== theNode.getChildren().size) {
             this.indexedElements = [];
             let groupBy, groupByLabel, groups, groupKeys, groupLabels;
-            if(this.state && this.state.groupBy){
-                groupBy = this.state.groupBy;
+            if(this.props.defaultGroupBy){
+                groupBy = this.props.defaultGroupBy;
                 groupByLabel = this.props.groupByLabel || false;
                 groups = {}, groupKeys = [], groupLabels = {};
             }
@@ -1039,9 +1036,9 @@ let SimpleList = React.createClass({
         let toolbar;
         if(this.props.tableKeys){
             let tableKeys;
-            if(this.state && this.state.groupBy){
+            if(this.props.defaultGroupBy){
                 tableKeys = LangUtils.deepCopy(this.props.tableKeys);
-                delete tableKeys[this.state.groupBy];
+                delete tableKeys[this.props.defaultGroupBy];
             }else{
                 tableKeys = this.props.tableKeys;
             }
