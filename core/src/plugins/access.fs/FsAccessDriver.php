@@ -1233,7 +1233,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $recursive = $httpVars["recursive"];
                 $recur_apply_to = $httpVars["recur_apply_to"];
                 foreach ($nodes as $node) {
-                    $this->chmod($node, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
+                    $this->chmod($node, $chmod_value, ($recursive==="on"), ($recursive==="on"?$recur_apply_to:"both"), $changedFiles);
+                    clearstatcache(true, $node->getUrl());
+                    $node->loadNodeInfo(true);
                 }
                 $logMessage= new UserMessage("Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders");
                 $this->logInfo("Chmod", [

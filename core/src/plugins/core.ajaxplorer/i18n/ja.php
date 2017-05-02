@@ -717,6 +717,8 @@ $mess=array(
 "612" => "Custom range",
 "613" => "Greater than...",
 "614" => "Smaller than...",
+"615" => "Execute",
+"616" => "Mask",
 /* 文章はここまで */
 /* 文章終了 */
 );

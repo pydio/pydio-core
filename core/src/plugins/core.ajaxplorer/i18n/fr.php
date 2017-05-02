@@ -714,5 +714,7 @@ $mess=array(
 "612" => "Personnalisée",
 "613" => "Plus gros que...",
 "614" => "Plus petit que...",
+"615" => "Execution",
+"616" => "Masque",
 /* END SENTENCE */
 );

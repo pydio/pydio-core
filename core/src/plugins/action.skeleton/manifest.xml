@@ -3,7 +3,7 @@
     <server_settings>
         <global_param name="SHOW_CUSTOM_FOOTER" type="boolean" label="CONF_MESSAGE[Custom Footer]" description="CONF_MESSAGE[Show a custom footer div]" mandatory="false" default="false"/>
         <global_param name="CUSTOM_FOOTER_CONTENT" type="textarea" label="CONF_MESSAGE[Footer Content]" description="CONF_MESSAGE[Display this content in the footer]" mandatory="false" default="Your custom footer content"/>
-        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="CONF_MESSAGE[Button Target Url]" description="CONF_MESSAGE[The target URL of the button that will be added to the application]" mandatory="true" default="http://www.ajaxplorer.info"/>
+        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="CONF_MESSAGE[Button Target Url]" description="CONF_MESSAGE[The target URL of the button that will be added to the application]" mandatory="true" default="https://pydio.com"/>
     </server_settings>
 
     <client_settings>
@@ -16,17 +16,12 @@
 
 	<registry_contributions>
 		<client_configs uuidAttr="name">
-			<template name="bottom" element="ajxp_desktop" position="bottom"><![CDATA[
-				<div id="optional_bottom_div" style="font-family:arial;padding:10px;">This CDATA section will be overriden by the PHP part of the plugin</div>
-			]]></template>
-			<template name="head" element="ajxp_desktop" position="top"><![CDATA[
-				<div id="optional_header_div" style="background-color: #999; color: white;font-family:arial;padding:10px;">Your custom header content</div>
-			]]></template>
+            <template name="skeleton_bottom" element="ajxp_desktop" position="bottom" theme="material" namespace="SkeletonActions" component="Template"/>
 		</client_configs>
         <actions>
             <action name="my_skeleton_button">
                 <gui text="skeleton.1" title="skeleton.2" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
+                    <context selection="false" dir="" recycle="hidden" actionBar="true" actionBarGroup="change_main"/>
                 </gui>
                 <processing>
                     <clientCallback module="SkeletonActions.Callbacks.alertButton"/>
@@ -34,16 +29,10 @@
             </action>
             <action name="my_skeleton_button_frame">
                 <gui text="skeleton.4" title="skeleton.5" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
+                    <context selection="false" dir="" recycle="hidden" actionBar="true" actionBarGroup="change_main"/>
                 </gui>
                 <processing>
                     <clientCallback module="SkeletonActions.Callbacks.frameButton"/>
-                    <clientForm id="my_skeleton_form"><![CDATA[
-                        <div id="my_skeleton_form" box_width="450">
-                            <h3>AJXP_MESSAGE[skeleton.6]</h3>
-                            <div id="loaded_content"><p align="center">AJXP_MESSAGE[skeleton.7]</p></div>
-                        </div>
-                    ]]></clientForm>
                     <serverCallback methodName="receiveAction" pluginId="action.skeleton"/>
                 </processing>
             </action>

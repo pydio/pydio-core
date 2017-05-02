@@ -13,7 +13,6 @@ let PermissionsDialog = React.createClass({
 
     componentWillMount: function() {
         let nodes = this.props.selection;
-        console.log(this.props.selection);
         this.setState({
             permissions: this.props.selection.getUniqueNode().getMetadata().get('file_perms'),
             uPermissions: [false, false, false],  // USER
@@ -74,7 +73,6 @@ let PermissionsDialog = React.createClass({
         perm[column] = !perm[column];
         let newState = {}
         newState[row] = perm
-        console.log(row, perm);
         this.setState(newState, () => {
             this.setState({permissions: this.getChmodValue()});
         });
@@ -110,12 +108,11 @@ let PermissionsDialog = React.createClass({
         }
     },
     submit: function() {
-        console.log(this.props.selection.getUniqueNode().getPath());
         PydioApi.getClient().request({
             get_action:'chmod',
             file: this.props.selection.getUniqueNode().getPath(),
             chmod_value: this.state.permissions,
-            recursive: this.state.recursive,
+            recursive: this.state.recursive ? 'on' : '',
             recur_apply_to: this.state.recursiveRange,
         }, function (transport) {
             this.dismiss();
@@ -134,9 +131,9 @@ let PermissionsDialog = React.createClass({
                     >
                         <MaterialUI.TableRow>
                             <MaterialUI.TableHeaderColumn></MaterialUI.TableHeaderColumn>
-                            <MaterialUI.TableHeaderColumn tooltip="R">Read</MaterialUI.TableHeaderColumn>
-                            <MaterialUI.TableHeaderColumn tooltip="W">Write</MaterialUI.TableHeaderColumn>
-                            <MaterialUI.TableHeaderColumn tooltip="X">Execute</MaterialUI.TableHeaderColumn>
+                            <MaterialUI.TableHeaderColumn tooltip="R">{MessageHash[361]}</MaterialUI.TableHeaderColumn>
+                            <MaterialUI.TableHeaderColumn tooltip="W">{MessageHash[362]}</MaterialUI.TableHeaderColumn>
+                            <MaterialUI.TableHeaderColumn tooltip="X">{MessageHash[615]}</MaterialUI.TableHeaderColumn>
                         </MaterialUI.TableRow>
                     </MaterialUI.TableHeader>
                     <MaterialUI.TableBody
@@ -163,14 +160,14 @@ let PermissionsDialog = React.createClass({
                     </MaterialUI.TableBody>
                 </MaterialUI.Table>
                 <div style={{display: 'flex', alignItems: 'baseline'}}>
-                    <p>Permission mask:</p>
+                    <p>{MessageHash[616]}</p>
                     <MaterialUI.TextField value={this.state.permissions} onChange={this.onTextFieldChange} style={{marginLeft: 4, width: 50}} type='number' />
-                    <p style={{marginLeft: 20}}>Recursivity:</p>
+                    <p style={{marginLeft: 20}}>{MessageHash[291]}</p>
                     <MaterialUI.DropDownMenu value={this.state.dropDownValue} onChange={this.onDropDownMenuChange} style={{marginLeft: -10}}>
-                        <MaterialUI.MenuItem value={1} primaryText="None" />
-                        <MaterialUI.MenuItem value={2} primaryText="Files" />
-                        <MaterialUI.MenuItem value={3} primaryText="Folders" />
-                        <MaterialUI.MenuItem value={4} primaryText="All" />
+                        <MaterialUI.MenuItem value={1} primaryText={MessageHash[441]} />
+                        <MaterialUI.MenuItem value={2} primaryText={MessageHash[265]} />
+                        <MaterialUI.MenuItem value={3} primaryText={MessageHash[130]} />
+                        <MaterialUI.MenuItem value={4} primaryText={MessageHash[597]} />
                     </MaterialUI.DropDownMenu>
                 </div>
 
