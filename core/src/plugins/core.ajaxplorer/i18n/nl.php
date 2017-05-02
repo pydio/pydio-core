@@ -718,5 +718,7 @@ $mess=array(
 "612" => "Custom range",
 "613" => "Greater than...",
 "614" => "Smaller than...",
+"615" => "Execute",
+"616" => "Mask",
 /* END SENTENCE */
 );
