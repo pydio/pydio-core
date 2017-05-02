@@ -361,7 +361,7 @@
             let tags;
             if (this.state.tags) {
                 tags = this.state.tags.split(",").map(function(tag){
-                    tag = LangUtils.trim(tag);
+                    tag = LangUtils.trim(tag, ' ');
                     if(!tag) return null;
                     return (this.renderChip(tag));
                 }.bind(this));
