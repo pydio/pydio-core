@@ -127,10 +127,9 @@ class RepositoryXML
                 if($loggedUser != null && $loggedUser->getId() == $uId){
                     $currentUserIsOwner = true;
                 }
-                $label = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
-                $ownerLabel = $label;
+                $ownerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
             }
-            $isSharedString =  'owner="'. StringHelper::xmlEntities($label) .'"';
+            $isSharedString =  'owner="'. StringHelper::xmlEntities($ownerLabel) .'"';
         }
         if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
             $streamString .= " userScope=\"true\"";
