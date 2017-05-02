@@ -3414,10 +3414,9 @@
   opacity: 0;
 }
 .react-mui-context .material-list .material-list-entry:hover {
-  background-color: rgba(0, 0, 0, 0.03) !important;
+  /*background-color: rgba(0, 0, 0, 0.03) !important;*/
 }
 .react-mui-context .material-list .material-list-entry.selected {
-  background-color: white !important;
   color: #ff6e40;
 }
 .react-mui-context .material-list .material-list-entry.selected .material-list-line-1 {

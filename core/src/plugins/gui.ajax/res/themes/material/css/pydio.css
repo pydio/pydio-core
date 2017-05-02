@@ -100,7 +100,6 @@ input {
   background: transparent;
 }
 .selected {
-  background-color: #CCC !important;
   text-decoration: none;
 }
 .selected-focus,
@@ -367,7 +366,6 @@ div.dialogBox div#element_overlay {
   height: 100%;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container {
-  background-color: #ECEFF1;
   border-radius: 50%;
   margin: 15px 15px;
   height: 40px;
@@ -379,14 +377,10 @@ div.dialogBox div#element_overlay {
       align-items: center;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont {
-  color: #607D8B;
   font-size: 24px;
   text-align: center;
   -ms-flex: 1;
       flex: 1;
-}
-.react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont.mdi-folder {
-  color: #5c7885;
 }
 .react-mui-context .material-list.files-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 {
   line-height: 22px;
@@ -419,7 +413,7 @@ div.dialogBox div#element_overlay {
   color: #ffc107;
 }
 .react-mui-context .material-list.files-list .material-list-entry.selected {
-  background-color: #E3F2FD !important;
+  /*background-color: #E3F2FD !important;*/
   color: inherit;
   border-bottom-color: transparent;
 }
@@ -442,7 +436,7 @@ div.dialogBox div#element_overlay {
   color: rgba(0, 0, 0, 0.63);
 }
 .react-mui-context .material-list.files-list .material-list-entry.list-parent-node .material-list-icon .mui-font-icon {
-  background-color: rgba(84, 110, 122, 0.45);
+  /*          background-color: fade(@applicationPrimaryColor, 45);*/
   color: white !important;
   margin: 15px;
   width: 40px;
@@ -473,7 +467,6 @@ div.dialogBox div#element_overlay {
   font-size: 17px;
   margin-top: -2px;
   margin-right: 10px;
-  color: #607D8B;
 }
 .react-mui-context .material-list.files-list.table-mode span.cell.cell-ajxp_label > span span:last-child {
   display: inline;
@@ -517,7 +510,6 @@ div.dialogBox div#element_overlay {
   margin: 0;
 }
 .react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-icon div.mimefont-container {
-  background-color: #ECEFF1;
   border-radius: 50%;
   margin: 0 0;
   height: 100%;
@@ -531,7 +523,6 @@ div.dialogBox div#element_overlay {
   padding-bottom: 26px;
 }
 .react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-icon div.mimefont-container div.mimefont {
-  color: #607D8B;
   font-size: 40px;
   text-align: center;
   -ms-flex: 1;
@@ -560,7 +551,7 @@ div.dialogBox div#element_overlay {
   padding: 0 4px;
 }
 .react-mui-context .material-list.files-list.material-list-grid .material-list-entry.selected .mimefont-container {
-  background-color: #E3F2FD !important;
+  /*background-color: @selectionMainTint !important;*/
 }
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry {
   padding: 0.5px 1px;
@@ -577,7 +568,7 @@ div.dialogBox div#element_overlay {
   padding-bottom: 0;
 }
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry:hover {
-  background-color: #E3F2FD !important;
+  /*background-color: @selectionMainTint !important;*/
 }
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry:hover .material-list-text {
   display: block;
@@ -1897,7 +1888,6 @@ div.menu.desktop a span.ajxp_icon_span {
   -ms-flex-align: center;
       align-items: center;
   font-size: 60px;
-  color: #546e7a;
 }
 #info_panel .panelCard .panelContent div.mimefont-container div.mimefont {
   -ms-flex: 1;

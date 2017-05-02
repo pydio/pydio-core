@@ -108,7 +108,7 @@ input {
   background: transparent;
 }
 .selected {
-  background-color: #CCC !important;
+/*  background-color: #CCC !important;*/
   text-decoration: none;
 }
 .selected-focus,

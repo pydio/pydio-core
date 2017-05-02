@@ -2,6 +2,8 @@ import ReactDOM from 'react-dom';
 import { Types, collect, collectDrop, nodeDragSource, nodeDropTarget } from '../util/DND';
 import { DragSource, DropTarget, flow } from 'react-dnd';
 import { Checkbox, FontIcon } from 'material-ui';
+import { muiThemeable } from 'material-ui/styles';
+import Color from 'color';
 
 /**
  * Material List Entry
@@ -59,6 +61,23 @@ class ListEntry extends React.Component {
                 additionalClassName += ' ajxp_mime_' + node.getAjxpMime() + ' ';
             }
         }
+        let additionalStyle = {
+            transition:'background-color .25s'
+        };
+        if(this.state && this.state.hover){
+            additionalStyle = {
+                ...additionalStyle,
+                backgroundColor: 'rgba(0,0,0,0.05)',
+                borderBottom: '1px solid transparent'
+            };
+        }
+        if(selected){
+            const selectionColor = this.props.muiTheme.palette.accent2Color;
+            additionalStyle = {
+                ...additionalStyle,
+                backgroundColor: Color(selectionColor).lightness(95).toString()
+            };
+        }
 
         const {connectDragSource, connectDropTarget, firstLine, secondLine, thirdLine, style, actions} = this.props
 
@@ -73,7 +92,9 @@ class ListEntry extends React.Component {
                 onClick={this.onClick.bind(this)}
                 onDoubleClick={showSelector? null : this.onDoubleClick.bind(this)}
                 className={additionalClassName + "material-list-entry material-list-entry-" + (thirdLine?3:secondLine?2:1) + "-lines"+ (selected? " selected":"")}
-                style={style}>
+                onMouseOver={()=>{this.setState({hover:true})}}
+                onMouseOut={()=>{this.setState({hover:false})}}
+                style={{...style, ...additionalStyle}}>
                 {selector}
                 <div className={"material-list-icon" + ((mainIcon || iconCell)?"":" material-list-icon-none")}>
                     {icon}
@@ -114,6 +135,8 @@ ListEntry.propTypes = {
     className:React.PropTypes.string,
     style: React.PropTypes.object
 }
+
+ListEntry = muiThemeable()(ListEntry);
 
 let DragDropListEntry = flow(
     DragSource(Types.NODE_PROVIDER, nodeDragSource, collect),
