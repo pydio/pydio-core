@@ -63,6 +63,28 @@ let UserDashboard = React.createClass({
         const uWidgetProps = this.props.userWidgetProps || {};
         const wsListProps = this.props.workspacesListProps || {};
 
+        let wsListsContainerStyle = {
+            position:'absolute',
+            top: 110,
+            bottom: 0,
+            right: 250,
+            left: 0,
+            display:'flex',
+            marginRight: 10
+        };
+        let rglStyle = {
+            position:'absolute',
+            top: 110,
+            bottom: 0,
+            right: 0,
+            width: 260,
+            overflowY:'auto'
+        }
+        if(this.props.pydio.UI.MOBILE_EXTENSIONS){
+            wsListsContainerStyle = {...wsListsContainerStyle, display:'bloc', marginRight:0, right: 0};
+            rglStyle = {...rglStyle, transform:'translateX(260px)'};
+        }
+
         return (
             <div className="left-panel expanded vertical_fit vertical_layout" style={{...this.props.style, backgroundColor: lightColor}}>
                 <PydioWorkspaces.UserWidget
@@ -82,7 +104,8 @@ let UserDashboard = React.createClass({
                     }
                     <ConfigLogo style={{height:'100%'}} pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
                 </PydioWorkspaces.UserWidget>
-                <div style={{position:'absolute', top: 110, bottom: 0, right: 250, left: 0, display:'flex', marginRight: 10}}>
+
+                <div style={wsListsContainerStyle}>
                     <WorkspacesListCard zDepth={0} filterByType="entries" pydio={this.props.pydio} style={{margin:0, flex:1, borderRight:'1px solid #e0e0e0'}}/>
                     <WorkspacesListCard zDepth={0} filterByType="shared" pydio={this.props.pydio} style={{margin:0, flex:1}}/>
                 </div>
@@ -93,7 +116,7 @@ let UserDashboard = React.createClass({
                     builderNamespaces={["WelcomeComponents"]}
                     pydio={this.props.pydio}
                     cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
-                    rglStyle={{position:'absolute', top: 110, bottom: 0, right: 0, width: 260, overflowY:'auto'}}
+                    rglStyle={rglStyle}
                 />
             </div>
         );

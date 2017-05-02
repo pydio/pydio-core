@@ -228,7 +228,7 @@ class Connexion{
             }
             return response;
 
-        }).catch(function(error) {
+        }).catch((error) => {
             if(this._pydio){
                 this._pydio.displayMessage('ERROR', 'Network error ' + error.message);
             }
