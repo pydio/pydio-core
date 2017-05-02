@@ -1,6 +1,6 @@
 <img src="plugins/gui.ajax/PydioLogo250.png"/>
 <div style="padding-left:10px;"><div style="font-size:0.8em;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
-Copyright 2007-2016 Abstrium SAS
+Copyright 2007-2017 Abstrium SAS
 The latest code can be found at https://pydio.com/.
 </div>
 ++ Getting Help ++
@@ -35,55 +35,87 @@ along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ++ Contributors ++
-Cyril Russo : public links generation
-Panni (support for folder upload using jumploader, support for contextmenu in Opera)
-German : panzaeron
-Catalon : Joan
-Other translators : see mention in translation files
-Shorten.multi plugin by Miguelon
-Ultreia many fixes
-Thomas Nicot (UX or Orbit Theme): http://resetandplay.com/
-Others bugfixes and translations:
-Tran The Cuong, Nicolas Pouliquen, Pär Strindevall, Martin Schaible, Lawrence Ho,
-Arnold van Blanken, Marco De Pardi, Anael Mobilia, Dmitri Bosenko, Florian Vogt,
-Gerrit Pannek, Max Ruman, Stefan Huber, Christian Foellmann, John Regan, Sylvain Mandon,
-Gerald Me, Matthieu Simon, Florian Huwyler, Aaron Guggisberg, Stefan Wüthrich, Teki Imai,
-Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy, Lukasz Lis.
-Garnetius
+Charles du Jeu, Greg Hecquet, c12simple, DepaMarco, Etienne CHAMPETIER, mtskar, Stage Nex, isma91, tran,
+Mathieu Baudier, Jaroslav Lichtblau, Salva-G, Thomas Cresson, Martin Schaible, Mathieu Simon, huzergackl,
+leobouilloux, Ellega, Jesus Perez (Ultreia), Nicolas, Axel Otterstätter, Florian Vogt, kainv, garnetius,
+Huzergackl, Frederico Passos, John Regan, Anael Mobilia, fdecourt, root, DutchCloud4Work, Levente Huszko,
+Letreguilly, GeraldST, leo, Danilo Reihardt, Dmitri Bosenko, Daniel Nauck, Nikita Rousseau, Noxx, andypmuc,
+Destroyer, lkho, Leo Marcotte, Afterster, BlackLionPT, Piter Dias, Ismail Aydogmus, David Perrin, Konstantin Dmitriev,
+Gerard, Florian, Gossler Karoly, Kyle Tuck, Martin Wittwer, Sergey Spivak, ghecquet, kluckow, smandon, wehr, Łukasz Lis,
+Robert McKenney, Adam Dobrawy, Joubert, Stefan Huber, Steve Ludovicy, Jesús Pérez (Ultreia), Uggy, Vorlif, adrianbj, Jason Grant,
+Infthitbox, ImaiTeki, elangenhan, Günter Kits, GoZOo, user, Gerrit Pannek, 7omate, josh4trunks, Flauschbaellchen, Ács Sándor,
+Eric Cappannelli, Chuso Pérez, leomarcotte, Christian Foellmann, millsdude, mquandalle, Arnold van Blanken, psy, raiatea, Andreas Tasch,
+sabas, sim1st, zertrin, spiorf, thomasfrivold, NHellFire, Max Ruman, Pavel Kirpichyov, Pino Silvaggio, Matthew Leffler, Joubert RedRat
+Design: thomas Nicot (UX or Orbit Theme): http://resetandplay.com/
+
 
 ++ Third Party Library ++
-[Amazon S3]
-    S3 Stream Wrapper is released under the BSD license, Copyright 2011 P'unk Avenue LLC http://punkave.com/
+[JavaScript]
 
-[JavaScript] 
-	Prototype, Scriptaculous http://www.prototypejs.org/, http://script.aculo.us/ (MIT)
+    ReactJS : reactjs.org  Facebook BSD
 	Modernizr 	http://modernizr.com (BSD / MIT)
-	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
-	Chosen selector by Patrick Filler for Harvest (MIT): https://github.com/harvesthq/chosen
 	PDFJS library is provided by the Mozilla Foundation (Apache 2): http://mozilla.github.io/pdf.js/
+	See a list of all libraries and licenses used under /core/doc/npm-licenses.csv folder.
 
-[Images and Fonts]
-	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
+[Graphical Elements]
+
+    Material Design is a design specification written by Google (see https://material.io/).
+    Material UI is the JS framework we use to implement Material Design, written by Call-Em-All (MIT License)
+    Material Design Icons : https://materialdesignicons.com/ (SIL Open Font License, Version 1.1.)
 	Font Awesome by Dave Gandy : http://fortawesome.github.com/Font-Awesome/ (SIL Open Font License)
-	Open Sans by Steve Matteson : http://www.opensans.com/ (Apache Licence v2)
 	Background Photos : from http://unsplash.com/,
 	Embedded photos credits: http://www.gratisography.com/, Nick West, Martin Staněk, Sonja Langford
-	Folders & Files icons in Orbit Theme, by Ionic : http://ionicons.com/ (MIT License)
 
-[Core PHP Classes]
-    Dibi ORM: Copyright (c) 2004, 2014 David Grudl (http://davidgrudl.com) All rights reserved. (New BSD)
-	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
-	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)
-	Pclzip : http://www.phpconcept.net/pclzip/ (LGPL)
+[PHP Libraries]
 
-[Plugins]
+    aws/aws-sdk-php                    3.19.18             Apache-2.0
+    commerceguys/guzzle-oauth2-plugin  v2.1.1              MIT
+    dapphp/securimage                  3.6.4               BSD
+    davegardnerisme/nsqphp             dev-master 60f12ad  none
+    evenement/evenement                v2.0.0              MIT
+    firebase/php-jwt                   v2.2.0              BSD-3-Clause
+    gimler/guzzle-description-loader   v0.0.4              MIT
+    guzzlehttp/command                 0.7.1               MIT
+    guzzlehttp/guzzle                  5.3.1               MIT
+    guzzlehttp/guzzle-services         0.5.0               MIT
+    guzzlehttp/promises                1.2.0               MIT
+    guzzlehttp/psr7                    1.3.1               MIT
+    guzzlehttp/ringphp                 1.1.0               MIT
+    guzzlehttp/streams                 3.0.0               MIT
+    meenie/javascript-packer           1.1                 LGPL 2.1
+    mtdowling/jmespath.php             2.3.0               MIT
+    nikic/fast-route                   v1.0.1              BSD-3-Clause
+    phpseclib/phpseclib                2.0.3               MIT
+    psr/http-message                   1.0.1               MIT
+    psr/log                            1.0.2               MIT
+    react/cache                        v0.4.1              MIT
+    react/child-process                v0.4.1              MIT
+    react/dns                          v0.4.3              MIT
+    react/event-loop                   v0.4.2              MIT
+    react/http                         v0.4.1              MIT
+    react/http-client                  v0.4.13             MIT
+    react/promise                      v2.4.1              MIT
+    react/react                        v0.4.2              MIT
+    react/socket                       v0.4.3              MIT
+    react/socket-client                v0.4.5              MIT
+    react/stream                       v0.4.4              MIT
+    sabre/dav                          1.8.10              BSD-3-Clause
+    sabre/vobject                      2.1.7               BSD-3-Clause
+    symfony/config                     v3.1.5              MIT
+    symfony/console                    v3.1.5              MIT
+    symfony/debug                      v3.1.5              MIT
+    symfony/filesystem                 v3.1.5              MIT
+    symfony/polyfill-mbstring          v1.2.0              MIT
+    symfony/yaml                       v3.1.5              MIT
+    zendframework/zend-diactoros       1.3.7               BSD-2-Clause
+
+
+[Other Plugins]
 	PThumb.php http://www.phpclasses.org (LPGL)
 	OpenLayers http://www.openlayers.org (BSD)
 	Video-js http://www.videojs.com/ (LGPL)
 	Zend Lucene http://www.zend.com/ (New BSD)
-	svn_lib.inc (LGPL)
-	PhpMailer-Lite http://phpmailer.sourceforge.net (LGPL)
-	Mp3 Player : http://www.alsacreations.fr/mp3-dewplayer.html
 	SoundManager : http://www.schillmania.com/projects/soundmanager2/ (BSD)
 	CAS Driver (Apache 2): https://github.com/Jasig/phpCAS
+
 </div>
