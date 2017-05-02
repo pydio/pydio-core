@@ -31,9 +31,9 @@ class Badge extends Component {
         const repositoryId = node.getMetadata().get("repository_id")
 
         let repoString = "";
-        /*if (pydio.repositoryId && repositoryId && repositoryId != pydio.repositoryId){
+        if (typeof pydio !== "undefined" && repositoryId && repositoryId !== pydio.repositoryId){
             repoString = "&tmp_repository_id=" + repositoryId;
-        }*/
+        }
 
         const mtimeString = node.buildRandomSeed();
 
