@@ -425,6 +425,7 @@
         render: function(){
             return (
                 <UserMetaPanel
+                    pydio={this.props.pydio}
                     multiple={!this.props.selection.isUnique()}
                     ref="panel"
                     node={this.props.selection.isUnique() ? this.props.selection.getUniqueNode() : new AjxpNode()}

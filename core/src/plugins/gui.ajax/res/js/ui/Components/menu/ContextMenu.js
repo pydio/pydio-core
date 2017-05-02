@@ -52,7 +52,7 @@ class ContextMenu extends Component{
                 height: 200,
                 zIndex: 10000,
                 overflowY: 'auto'
-            });
+            }, items);
         }
     }
 

@@ -215,6 +215,9 @@ class InboxAccessDriver extends FsAccessDriver
                     $ext = "error";
                     $meta["ajxp_mime"] = "error";
                     $meta["share_meta_type"] = 2;
+                    if(strpos($repoId, "ocs_remote_share_") === 0){
+                        $meta["remote_share_id"] = str_replace("ocs_remote_share_", "", $repoId);
+                    }
                 }else if(strpos($repoId, "ocs_remote_share_") === 0){
                     // Check Status
                     $linkId = str_replace("ocs_remote_share_", "", $repoId);

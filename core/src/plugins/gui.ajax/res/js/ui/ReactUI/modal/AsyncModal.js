@@ -284,9 +284,13 @@ let AsyncModal = React.createClass({
             }
         }
 
+        let maxWidth = dialogWidth;
+        if(this.props.pydio.UI.MOBILE_EXTENSIONS){
+            maxWidth = blur ? '97%' : '87%';
+        }
         let dialogRoot = {...styles.dialogRoot}
         let dialogBody = {...styles.dialogBody, display:'flex'}
-        let dialogContent = {...styles.dialogContent, width: dialogWidth, minWidth: dialogWidth, maxWidth: dialogWidth}
+        let dialogContent = {...styles.dialogContent, width: dialogWidth, maxWidth: maxWidth}
         if(state.dialogHeight){
             dialogContent.minHeight = dialogBody.minHeight = state.dialogHeight;
         }else{

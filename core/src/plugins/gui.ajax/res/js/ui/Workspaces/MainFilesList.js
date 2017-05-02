@@ -201,6 +201,9 @@ let MainFilesList = React.createClass({
         if(mobile){
             const ContextMenuModel = require('pydio/model/context-menu');
             return <IconButton iconClassName="mdi mdi-dots-vertical" tooltip="Info" onClick={(event) => {
+                this.props.pydio.observeOnce('actions_refreshed', ()=>{
+                    ContextMenuModel.getInstance().openNodeAtPosition(node, event.clientX, event.clientY);
+                })
                 event.stopPropagation();
                 dm.setSelectedNodes([node]);
                 ContextMenuModel.getInstance().openNodeAtPosition(node, event.clientX, event.clientY);
