@@ -21,15 +21,11 @@
 import React, {Component} from 'react'
 import { ImageContainer } from './components'
 
-const baseURL = pydio.Parameters.get('ajxpServerAccess')
-const { SizeProviders, URLProvider, withResize } = PydioHOCs;
-const { ImageSizeProvider, ContainerSizeProvider } = SizeProviders;
+const baseURL = pydio.Parameters.get('ajxpServerAccess');
+const {URLProvider} = PydioHOCs;
 const ThumbnailURLProvider = URLProvider(["thumbnail"]);
 
-const ExtendedImageContainer = withResize(ImageContainer)
-
-class ImagePanel extends Component {
-
+class Badge extends Component {
     onThumbnail() {
         const {pydio, node} = this.props
         const repositoryId = node.getMetadata().get("repository_id")
@@ -46,33 +42,23 @@ class ImagePanel extends Component {
 
     render() {
         const {node, scale, ...remainingProps} = this.props
-
         return (
             <ThumbnailURLProvider urlType="thumbnail" onThumbnail={() => this.onThumbnail()}>
             {src =>
-                <ContainerSizeProvider>
-                {({containerWidth, containerHeight}) =>
-                    <ImageSizeProvider url={src}node={node}>
-                    {({imgWidth, imgHeight}) =>
-                        <ExtendedImageContainer
-                            {...remainingProps}
-                            node={node}
-                            src={src}
-                            size="cover"
-                            scale={scale}
-                            width={imgWidth}
-                            height={imgHeight}
-                            containerWidth={containerWidth}
-                            containerHeight={containerHeight}
-                        />
-                    }
-                    </ImageSizeProvider>
-                }
-                </ContainerSizeProvider>
+                <ImageContainer
+                    {...remainingProps}
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        backgroundImage:'url(' + src + ')',
+                        backgroundSize : 'cover',
+                        backgroundPosition: 'center center'
+                    }}
+                />
             }
             </ThumbnailURLProvider>
         )
     }
 }
 
-export default ImagePanel
+export default Badge

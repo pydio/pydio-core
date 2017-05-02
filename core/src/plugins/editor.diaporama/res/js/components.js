@@ -23,22 +23,28 @@ import React, {Component} from 'react'
 export class Image extends Component {
     static get propTypes() {
         return {
-            scale: React.PropTypes.number
-        }
-    }
-
-    static get styles() {
-        return {
-            margin: 0,
-            transformOrigin: "50% 0"
-            //boxShadow: DOMUtils.getBoxShadowDepth(1)
+            width: React.PropTypes.number,
+            height: React.PropTypes.number,
         }
     }
 
     render() {
-        const {width, height, scale, ...remainingProps} = this.props
+        const {src, style, width, height, ...remainingProps} = this.props
 
-        return <img {...remainingProps} style={{...Image.styles, width, height, transform: `scale(${scale})`}} />
+        return (
+            <div
+                {...remainingProps}
+                style={{
+                    width,
+                    height,
+                    backgroundImage:'url(' + src + ')',
+                    backgroundSize : "cover",
+                    backgroundPosition: 'center center',
+                    backgroundRepeat: 'no-repeat',
+                    margin: 'auto'
+                }}
+            />
+        )
     }
 }
 
@@ -46,35 +52,30 @@ export class ImageContainer extends Component {
     static get propTypes() {
         return {
             src: React.PropTypes.string.isRequired,
-            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
             imgClassName: React.PropTypes.string
         }
     }
 
-    static get IMAGE_PANEL_MARGIN() {
-        return 10
-    }
-
     static get styles() {
         return {
-            display: "flex",
             flex: 1,
-            justifyContent: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
             overflow: 'auto'
         }
     }
 
     render() {
-        const {node, src, style, width, height, imgClassName, scale} = this.props
+        const {src, style, width, height, imgClassName, scale} = this.props
 
         return (
             <div style={{...ImageContainer.styles, ...style}}>
                 <Image
                     src={src}
-                    width={width}
-                    height={height}
                     className={imgClassName}
-                    scale={scale}
+                    width={width * scale}
+                    height={height * scale}
                 />
             </div>
         )
