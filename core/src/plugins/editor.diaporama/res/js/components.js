@@ -56,6 +56,12 @@ export class ImageContainer extends Component {
         }
     }
 
+    static get defaultProps() {
+        return {
+            src: ""
+        }
+    }
+
     static get styles() {
         return {
             flex: 1,
@@ -74,8 +80,8 @@ export class ImageContainer extends Component {
                 <Image
                     src={src}
                     className={imgClassName}
-                    width={width * scale}
-                    height={height * scale}
+                    width={scale && width * scale || width}
+                    height={scale && height * scale || height}
                 />
             </div>
         )

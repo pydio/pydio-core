@@ -44,7 +44,7 @@ class Badge extends Component {
         const {node, scale, ...remainingProps} = this.props
         return (
             <ThumbnailURLProvider urlType="thumbnail" onThumbnail={() => this.onThumbnail()}>
-            {src =>
+            {src => src && 
                 <ImageContainer
                     {...remainingProps}
                     style={{
