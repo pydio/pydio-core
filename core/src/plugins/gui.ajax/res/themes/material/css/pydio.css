@@ -371,6 +371,7 @@ div.dialogBox div#element_overlay {
   height: 40px;
   width: 40px;
   line-height: 40px;
+  overflow: hidden;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -515,6 +516,7 @@ div.dialogBox div#element_overlay {
   height: 100%;
   width: 100%;
   line-height: 100%;
+  overflow: hidden;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;

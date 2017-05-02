@@ -77,7 +77,7 @@ let MainFilesList = React.createClass({
 
     statics: {
         tableEntryRenderCell: function(node){
-            return <span><FilePreview loadThumbnail={false} node={node} style={{backgroundColor:'transparent'}}/> {node.getLabel()}</span>;
+            return <span><FilePreview rounded={true} loadThumbnail={false} node={node} style={{backgroundColor:'transparent'}}/> {node.getLabel()}</span>;
         }
     },
 

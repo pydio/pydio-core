@@ -8,12 +8,10 @@ class FilePreview extends PureComponent {
             node            : PropTypes.instanceOf(AjxpNode).isRequired,
             loadThumbnail   : PropTypes.bool,
             richPreview     : PropTypes.bool,
-            // This will apply default styles and mimefontStyles
-            rounded         : PropTypes.bool,
-            roundedSize     : PropTypes.number,
             // Additional styling
             style           : PropTypes.object,
-            mimeFontStyle   : PropTypes.object
+            mimeFontStyle   : PropTypes.object,
+            mimeClassName   : PropTypes.string
         }
     }
 
@@ -30,42 +28,20 @@ class FilePreview extends PureComponent {
     }
 
     getStyles() {
+        const {style, mimeFontStyle} = this.props
+
         const color = new Color(this.props.muiTheme.palette.primary1Color).saturationl(18).lightness(44).toString();
         const light = new Color(this.props.muiTheme.palette.primary1Color).saturationl(15).lightness(94).toString();
 
-        let roundedStyle = {
-            root: {
-                backgroundColor: light,
-                borderRadius: '50%',
-                margin: 15,
-                height: 40,
-                width: 40,
-                lineHeight: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent:'center'
-            },
-            mimefont: {
-                color: color,
-                fontSize: 24,
-                textAlign: 'center',
-                flex: 1
-            }
+        const rootStyle = {
+            backgroundColor: light,
+            ...style
         };
 
-        let rootStyle = this.props.rounded ? roundedStyle.root : {backgroundColor: light};
-        let mimefontStyle = this.props.rounded ? roundedStyle.mimefont : {color: color};
-
-        if (this.props.rounded && this.props.roundedSize) {
-            rootStyle.height = rootStyle.width = rootStyle.lineHeight = this.props.roundedSize;
-            rootStyle.lineHeight = this.props.roundedSize + 'px';
-        }
-        if (this.props.style) {
-            rootStyle = {...rootStyle, ...this.props.style};
-        }
-        if (this.props.mimeFontStyle) {
-            mimefontStyle = {...mimefontStyle, ...this.props.mimeFontStyle};
-        }
+        const mimefontStyle = {
+            color: color,
+            ...mimeFontStyle
+        };
 
         return {rootStyle: rootStyle, mimeFontStyle: mimefontStyle};
     }
@@ -140,23 +116,24 @@ class FilePreview extends PureComponent {
     }
 
     render() {
-        const {node} = this.props;
-        const {EditorClass, element} = this.state;
+        const {rootStyle, mimeFontStyle} = this.getStyles();
+
+        const {node, mimeClassName} = this.props;
+        const {EditorClass} = this.state;
+
+        let element;
 
         if (EditorClass) {
-            return (
-                <EditorClass pydio={pydio} {...this.props} preview={true} />
-            )
+            element = <EditorClass pydio={pydio} {...this.props} preview={true} />
+        } else {
+            const svg = node.getSvgSource()
+            const isLeaf = node.isLeaf()
+            element = <div key="icon" className={mimeClassName || `mimefont mdi mdi-${svg || (isLeaf ? 'file' : 'folder')}`} style={mimeFontStyle}/>
         }
 
-        const {rootStyle, mimeFontStyle} = this.getStyles();
-        let svg = node.getSvgSource();
-        if(!svg){
-            svg = (node.isLeaf() ? 'file' : 'folder');
-        }
         return (
             <div ref="container" style={rootStyle} className='mimefont-container'>
-                <div key="icon" className={"mimefont mdi mdi-" + svg} style={mimeFontStyle}/>
+                {element}
             </div>
         );
     }

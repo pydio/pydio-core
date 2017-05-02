@@ -40,17 +40,60 @@ class Badge extends Component {
         return `${baseURL}${repoString}${mtimeString}&action=preview_data_proxy&get_thumb=true&file=${encodeURIComponent(node.getPath())}`
     }
 
+    /*if(editorClass.getCoveringBackgroundSource){
+            let image = new Image();
+            let bgUrl = editorClass.getCoveringBackgroundSource(node);
+            let loader = function(){
+                if(!this.isMounted()) return;
+                bgUrl = bgUrl.replace('(', '\\(').replace(')', '\\)').replace('\'', '\\\'');
+                let style = {
+                    backgroundImage:'url(' + bgUrl + ')',
+                    backgroundSize : 'cover',
+                    backgroundPosition: 'center center'
+                };
+                const {rootStyle} = this.getStyles();
+                let element = (<div className="covering-bg-preview" style={{...style, ...rootStyle}}></div>);
+                this.setState({loading: false, element: element});
+            }.bind(this);
+            this.setState({loading: true});
+            image.src = bgUrl;
+            if(image.readyState && image.readyState === 'complete'){
+                loader();
+            }else{
+                image.onload = loader();
+            }
+        } else if (editorClass.getPreviewComponent) {
+            const promise = editorClass.getPreviewComponent(node, this.props.richPreview)
+            Promise.resolve(promise).then(function (component) {
+                this.setState({
+                    preview: component
+                })
+            }.bind(this))
+        }*/
+
     render() {
         const {node, scale, ...remainingProps} = this.props
-
+        // backgroundImage:'url(' + bgUrl + ')',
+        // backgroundSize : 'cover',
+        // backgroundPosition: 'center center'
+        // <ImageContainer
+        //     {...remainingProps}
+        //     node={node}
+        //     src={src}
+        //     style={{alignItems: "center"}}
         return (
             <ThumbnailURLProvider urlType="thumbnail" onThumbnail={() => this.onThumbnail()}>
             {src =>
-                <ImageContainer
+                <div
                     {...remainingProps}
-                    node={node}
-                    src={src}
-                    style={{alignItems: "center"}}
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        backgroundImage:'url(' + src + ')',
+                        backgroundSize : 'cover',
+                        backgroundPosition: 'center center'
+                    }}
+
                 />
             }
             </ThumbnailURLProvider>

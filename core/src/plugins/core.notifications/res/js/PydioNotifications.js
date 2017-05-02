@@ -86,7 +86,22 @@
             return (
                 <div style={{position:'relative'}}>
                     <div style={{...timelineStyle, bottom: -1}}/>
-                    <PydioWorkspaces.FilePreview rounded={true} loadThumbnail={true} node={fileNode}/>
+                    <PydioWorkspaces.FilePreview style={{
+                        borderRadius: "50%",
+                        margin: 15,
+                        height: 40,
+                        width: 40,
+                        lineHeight: '40px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent:'center'
+                    }}
+                    mimeFontStyle={{
+                        fontSize: 24,
+                        textAlign: 'center',
+                        flex: 1
+                    }}
+                    loadThumbnail={true} node={fileNode}/>
                 </div>
             );
         },
