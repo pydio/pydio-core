@@ -129,7 +129,7 @@ export default class NotificationsPanel extends React.Component {
         let button;
         const buttonIcon = (
             <MaterialUI.IconButton
-                onTouchTap={this.handleTouchTap}
+                onTouchTap={this.handleTouchTap.bind(this)}
                 iconClassName={this.props.iconClassName || "icon-bell"}
                 tooltip={this.props.pydio.MessageHash['notification_center.4']}
                 className="userActionButton"
@@ -149,7 +149,7 @@ export default class NotificationsPanel extends React.Component {
                     anchorEl={this.state.anchorEl}
                     anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
                     targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                    onRequestClose={this.handleRequestClose}
+                    onRequestClose={this.handleRequestClose.bind(this)}
                     style={{width:320}}
                     zDepth={2}
 
@@ -164,10 +164,10 @@ export default class NotificationsPanel extends React.Component {
                         presetDataModel={this.state.dataModel}
                         reloadAtCursor={true}
                         actionBarGroups={[]}
-                        entryRenderIcon={this.renderIcon}
-                        entryRenderSecondLine={this.renderSecondLine}
-                        entryRenderActions={this.renderActions}
-                        nodeClicked={this.entryClicked}
+                        entryRenderIcon={this.renderIcon.bind(this)}
+                        entryRenderSecondLine={this.renderSecondLine.bind(this)}
+                        entryRenderActions={this.renderActions.bind(this)}
+                        nodeClicked={this.entryClicked.bind(this)}
                         emptyStateProps={{
                             style:{paddingTop: 20, paddingBottom: 20},
                             iconClassName:'mdi mdi-bell-off',
