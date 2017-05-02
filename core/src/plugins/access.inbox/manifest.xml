@@ -43,7 +43,7 @@
             <action name="inbox_reject_remote_share">
                 <gui text="548" title="548" iconClass="icon-remove-sign">
                     <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="change_main,inline,info_panel_share"/>
-                    <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" evalMetadata="metadata.get('remote_share_accepted')"/>
+                    <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" evalMetadata="metadata.get('remote_share_accepted') || metadata.get('ajxp_mime') === 'error'"/>
                 </gui>
                 <processing>
                     <clientCallback module="InboxWidgets.Callbacks.rejectRemoteShare"/>

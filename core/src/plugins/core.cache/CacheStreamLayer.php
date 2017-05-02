@@ -65,7 +65,11 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
      */
     public function dir_opendir($path, $options) {
 
-        $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "list");
+        $node = new AJXP_Node($path);
+        if($node->getRepositoryId() === 'inbox'){
+            return parent::dir_opendir($path, $options);
+        }
+        $options = AbstractCacheDriver::getOptionsForNode($node, "list");
 
         if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $options["id"])) {
             $this->currentListingRead = $this->currentListingOrig = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $options["id"]);

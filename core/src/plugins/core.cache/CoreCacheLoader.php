@@ -81,10 +81,14 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
 
     /**
      * Check if nodes caching is enabled
+     * @param $node AJXP_Node
      * @return bool
      */
-    public function enableNodesCaching(){
+    public function enableNodesCaching($node = null){
         if($this->getConfigs()["CORE_CACHE_DISABLE_NODES"]) {
+            return false;
+        }
+        if($node !== null && $node->getRepositoryId() === 'inbox'){
             return false;
         }
         $cDriver = ConfService::getCacheDriverImpl();
@@ -97,7 +101,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
      * @param bool $details
      */
     public function cacheNodeInfo(&$node, $contextNode, $details){
-        if(!$this->enableNodesCaching()) return;
+        if(!$this->enableNodesCaching($node)) return;
         $id = $this->computeId($node, $details);
         CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $node->getNodeInfoMeta());
     }
@@ -113,7 +117,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
             $this->clearNodeInfoCache($node);
             return;
         }
-        if(!$this->enableNodesCaching()) return;
+        if(!$this->enableNodesCaching($node)) return;
         $id = $this->computeId($node, $details);
         if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
             $metadata = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
@@ -130,7 +134,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
      * @param bool $copy
      */
     public function clearNodeInfoCache($from=null, $to=null, $copy = false){
-        if(!$this->enableNodesCaching()) return;
+        if(!$this->enableNodesCaching(!empty($from) ? $from : $to)) return;
         if($from !== null){
             $this->clearCacheForNode($from);
         }
