@@ -3,7 +3,9 @@ const {muiThemeable} = require('material-ui/styles')
 
 const Pydio = require('pydio')
 const PydioApi = require('pydio/http/api')
+const Node = require('pydio/model/node')
 const {FoldersTree} = Pydio.requireLib('components');
+const {withContextMenu} = Pydio.requireLib('hoc');
 
 const Confirm = React.createClass({
 
@@ -249,8 +251,22 @@ let WorkspaceEntry =React.createClass({
             additionalAction = <span className={fTCName} onClick={this.toggleFoldersPanelOpen}></span>;
         }
 
+        let menuNode;
+        if(this.props.workspace.getId() === this.props.pydio.user.activeRepository ){
+            menuNode = this.props.pydio.getContextHolder().getRootNode();
+        }else{
+            /*
+            menuNode = new Node('/', false, this.props.workspace.getLabel());
+            menuNode.setRoot(true);
+            const metaMap = new Map();
+            metaMap.set('repository_id', this.props.workspace.getId());
+            menuNode.setMetadata(metaMap);
+            */
+        }
+
         let wsBlock = (
-            <div
+            <ContextMenuWrapper
+                node={menuNode}
                 className={currentClass}
                 onClick={onClick}
                 title={this.props.workspace.getDescription()}
@@ -264,7 +280,7 @@ let WorkspaceEntry =React.createClass({
                     <span className="workspace-description">{this.props.workspace.getDescription()}</span>
                 </span>
                 {additionalAction}
-            </div>
+            </ContextMenuWrapper>
         );
 
         if(this.props.showFoldersTree){
@@ -287,6 +303,13 @@ let WorkspaceEntry =React.createClass({
     }
 
 });
+
+let ContextMenuWrapper = (props) => {
+    return (
+        <div {...props} />
+    )
+}
+ContextMenuWrapper = withContextMenu(ContextMenuWrapper)
 
 WorkspaceEntry = muiThemeable()(WorkspaceEntry);
 export {WorkspaceEntry as default}

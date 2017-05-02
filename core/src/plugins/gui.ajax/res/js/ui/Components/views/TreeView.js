@@ -1,5 +1,13 @@
 import {Types, collect, collectDrop, nodeDragSource, nodeDropTarget} from '../util/DND'
 const React = require('react')
+const {withContextMenu} = Pydio.requireLib('hoc');
+
+let ContextMenuWrapper = (props) => {
+    return (
+        <div {...props} />
+    )
+}
+ContextMenuWrapper = withContextMenu(ContextMenuWrapper)
 
 
 /**
@@ -187,13 +195,13 @@ var SimpleTreeNode = React.createClass({
                 icon = 'mdi mdi-delete';
             }
             selfLabel = (
-                <div className={'tree-item ' + isSelected + (boxes?' has-checkboxes':'')} style={itemStyle}>
+                <ContextMenuWrapper node={this.props.node} className={'tree-item ' + isSelected + (boxes?' has-checkboxes':'')} style={itemStyle}>
                     <div className="tree-item-label" onClick={this.onNodeSelect} title={this.props.node.getLabel()}
                          data-id={this.props.node.getPath()}>
                         {hasChildren}<span className={"tree-icon " + icon}></span>{this.props.forceLabel?this.props.forceLabel:this.props.node.getLabel()}
                     </div>
                     {boxes}
-                </div>
+                </ContextMenuWrapper>
             );
         }
 
