@@ -1,5 +1,6 @@
 import {PureComponent, PropTypes} from 'react';
 import {muiThemeable} from 'material-ui/styles';
+import Color from 'color'
 
 class FilePreview extends PureComponent {
     static get propTypes() {
@@ -29,11 +30,12 @@ class FilePreview extends PureComponent {
     }
 
     getStyles() {
-        const color = this.props.muiTheme.palette.primary1Color;
+        const color = new Color(this.props.muiTheme.palette.primary1Color).saturationl(18).lightness(44).toString();
+        const light = new Color(this.props.muiTheme.palette.primary1Color).saturationl(15).lightness(94).toString();
 
         let roundedStyle = {
             root: {
-                backgroundColor: '#ECEFF1',
+                backgroundColor: light,
                 borderRadius: '50%',
                 margin: 15,
                 height: 40,
@@ -51,8 +53,8 @@ class FilePreview extends PureComponent {
             }
         };
 
-        let rootStyle = this.props.rounded ? roundedStyle.root : {};
-        let mimefontStyle = this.props.rounded ? roundedStyle.mimefont : {};
+        let rootStyle = this.props.rounded ? roundedStyle.root : {backgroundColor: light};
+        let mimefontStyle = this.props.rounded ? roundedStyle.mimefont : {color: color};
 
         if (this.props.rounded && this.props.roundedSize) {
             rootStyle.height = rootStyle.width = rootStyle.lineHeight = this.props.roundedSize;

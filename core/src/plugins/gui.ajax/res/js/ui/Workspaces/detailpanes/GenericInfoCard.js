@@ -71,26 +71,18 @@ class GenericInfoCard extends React.Component {
                     </div>
                 </InfoPanelCard>
             );
-        } else if (this.state.isDir) {
-            return (
-                <InfoPanelCard {...this.props} primaryToolbars={["info_panel", "info_panel_share"]}>
-                    <div className="mimefont-container" style={{width:'100%', height:200}}>
-                        <div className={"mimefont mdi mdi-" + this.props.node.getMetadata().get('fonticon')}></div>
-                    </div>
-                </InfoPanelCard>
-            );
-        } else if (this.state.isLeaf) {
+        } else {
             return (
                 <InfoPanelCard {...this.props} primaryToolbars={["info_panel", "info_panel_share"]}>
                     <FilePreview
                         key={this.props.node.getPath()}
-                        style={{height: 200, padding: 0}}
+                        style={{backgroundColor:'white', height: 200, padding: 0}}
                         node={this.props.node}
-                        loadThumbnail={true}
-                        richPreview={true}
+                        loadThumbnail={this.state.isLeaf}
+                        richPreview={this.state.isLeaf}
                     />
                 </InfoPanelCard>
-            )
+            );
         }
 
         return null
