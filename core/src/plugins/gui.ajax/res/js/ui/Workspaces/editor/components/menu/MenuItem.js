@@ -58,8 +58,8 @@ class MenuItem extends React.PureComponent {
         return (
             <div style={style} onClick={this.onClick}>
                 <span style={textStyle}>{tab.title}</span>
-                <FloatingActionButton mini={true} ref="container" backgroundColor="#FFFFFF" zDepth={2}  iconStyle={{backgroundColor: "#FFFFFF"}}>
-                    <tab.icon {...this.props.tab} style={{fill: "#000000", flex: 1, alignItems: "center", justifyContent: "center", fontSize: 28, color: "#607d8b"}} icon={true} />
+                <FloatingActionButton mini={true} ref="container" backgroundColor="#FFFFFF" zDepth={2} iconStyle={{backgroundColor: "#FFFFFF"}}>
+                    <tab.icon {...this.props.tab} style={{fill: "#000000", flex: 1, alignItems: "center", justifyContent: "center", fontSize: 28, color: "#607d8b"}} loadThumbnail={true} />
                 </FloatingActionButton>
             </div>
         );

@@ -522,7 +522,6 @@ div.dialogBox div#element_overlay {
   -ms-flex-align: center;
       align-items: center;
   border-radius: 0;
-  padding-bottom: 26px;
 }
 .react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-icon div.mimefont-container div.mimefont {
   font-size: 40px;
