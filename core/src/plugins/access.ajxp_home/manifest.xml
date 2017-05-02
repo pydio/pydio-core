@@ -41,7 +41,7 @@
             </action>
         </actions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="UserDashboard" dependencies="PydioComponents,PydioTasks" props='{"rootId":"home_account_pane","style": {}}'/>
+            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="AltDashboard" dependencies="PydioComponents,PydioTasks" props='{"rootId":"home_account_pane","style": {}}'/>
         </client_configs>
 	</registry_contributions>
     <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>

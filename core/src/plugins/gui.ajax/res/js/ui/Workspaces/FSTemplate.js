@@ -141,21 +141,6 @@ let FSTemplate = React.createClass({
             mainToolbarsOthers = ["get", "change", "other"];
         }
 
-        let homeButton, breadcrumbStyle;
-        if(false && this.props.pydio.user && this.props.pydio.user.getRepositoriesList().has('ajxp_home')){
-            homeButton = (
-                <MaterialUI.IconButton
-                    style={{marginTop:7, marginLeft: 10, marginRight: -6}}
-                    iconStyle={{color: 'rgba(255,255,255,0.87)'}}
-                    onTouchTap={() => {this.props.pydio.triggerRepositoryChange('ajxp_home')}}
-                    iconClassName="userActionIcon mdi mdi-home-variant"
-                    tooltip={this.props.pydio.MessageHash['305']}
-                    tooltipPosition="bottom-right"
-                />
-            );
-            breadcrumbStyle={paddingLeft: 0};
-        }
-
         // Making sure we only pass the style to the parent element
         const {style, ...props} = this.props
 
@@ -166,8 +151,7 @@ let FSTemplate = React.createClass({
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
                         <div id="workspace_toolbar" style={{display: "flex", justifyContent: "space-between"}}>
                             <span className="drawer-button"><MaterialUI.IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
-                            {homeButton}
-                            <Breadcrumb {...props} startWithSeparator={homeButton?true:false} rootStyle={breadcrumbStyle}/>
+                            <Breadcrumb {...props} startWithSeparator={false}/>
                             <SearchForm {...props}/>
                         </div>
                         <div id="main_toolbar">

@@ -83,7 +83,7 @@ export default React.createClass({
                 );
             }
             */
-            if(this.props.pydio.Controller.getActionByName('get_my_feed')){
+            if(this.props.pydio.Controller.getActionByName('get_my_feed') && !this.props.hideNotifications){
                 notificationsButton = (
                     <AsyncComponent
                         namespace="PydioNotifications"

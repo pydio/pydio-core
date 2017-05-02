@@ -20,7 +20,7 @@ export default class NotificationsPanel extends React.Component {
         rNode.observe("loaded", function(){
             const unread = parseInt(rNode.getMetadata().get('unread_notifications_count')) || 0;
             if(unread) {
-                this.setState({unreadStatus: unread});
+                this.setState({unreadStatus: unread}, this.onStatusChange.bind(this));
             }
         }.bind(this));
         rNode.load();
@@ -44,6 +44,12 @@ export default class NotificationsPanel extends React.Component {
         };
     }
 
+    onStatusChange(){
+        if(this.props.onUnreadStatusChange){
+            this.props.onUnreadStatusChange(this.state.unreadStatus);
+        }
+    }
+
     componentWillUnmount() {
         if(this._smObs){
             this.props.pydio.stopObserving("server_message", this._smObs);
@@ -62,7 +68,7 @@ export default class NotificationsPanel extends React.Component {
             open: true,
             anchorEl: event.currentTarget,
             unreadStatus: 0
-        });
+        }, this.onStatusChange.bind(this));
     }
 
     handleRequestClose() {
@@ -121,20 +127,41 @@ export default class NotificationsPanel extends React.Component {
         PydioApi.getClient().request({
             get_action          : 'update_alerts_last_read',
             repository_scope    : this.state.repositoryScope
+        }, (transp) => {
+            this.setState({unreadStatus: 0}, this.onStatusChange.bind(this));
         });
     }
 
     render() {
 
-        let button;
-        const buttonIcon = (
-            <MaterialUI.IconButton
-                onTouchTap={this.handleTouchTap.bind(this)}
-                iconClassName={this.props.iconClassName || "icon-bell"}
-                tooltip={this.props.pydio.MessageHash['notification_center.4']}
-                className="userActionButton"
+        const LIST = (
+            <PydioComponents.NodeListCustomProvider
+                ref="list"
+                className={'files-list ' + (this.props.listClassName || '')}
+                hideToolbar={true}
+                pydio={this.props.pydio}
+                elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 2}
+                heightAutoWithMax={(this.props.listOnly? null : 500)}
+                presetDataModel={this.state.dataModel}
+                reloadAtCursor={true}
+                actionBarGroups={[]}
+                entryRenderIcon={this.renderIcon.bind(this)}
+                entryRenderSecondLine={this.renderSecondLine.bind(this)}
+                entryRenderActions={this.renderActions.bind(this)}
+                nodeClicked={this.entryClicked.bind(this)}
+                emptyStateProps={{
+                    style:{paddingTop: 20, paddingBottom: 20},
+                    iconClassName:'mdi mdi-bell-off',
+                    primaryTextId:'notification_center.14',
+                    secondaryTextId:'notification_center.15',
+                    ...this.props.emptyStateProps
+                }}
             />
         );
+
+        if(this.props.listOnly){
+            return LIST;
+        }
 
         return (
             <span>
@@ -143,7 +170,14 @@ export default class NotificationsPanel extends React.Component {
                     secondary={true}
                     style={this.state.unreadStatus  ? {padding: '0 24px 0 0'} : {padding: 0}}
                     badgeStyle={!this.state.unreadStatus ? {display:'none'} : null}
-                >{buttonIcon}</MaterialUI.Badge>
+                >
+                    <MaterialUI.IconButton
+                    onTouchTap={this.handleTouchTap.bind(this)}
+                    iconClassName={this.props.iconClassName || "icon-bell"}
+                    tooltip={this.props.pydio.MessageHash['notification_center.4']}
+                    className="userActionButton"
+                />
+                </MaterialUI.Badge>
                 <MaterialUI.Popover
                     open={this.state.open}
                     anchorEl={this.state.anchorEl}
@@ -154,27 +188,7 @@ export default class NotificationsPanel extends React.Component {
                     zDepth={2}
 
                 >
-                    <PydioComponents.NodeListCustomProvider
-                        ref="list"
-                        className={'files-list'}
-                        hideToolbar={true}
-                        pydio={this.props.pydio}
-                        elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 2}
-                        heightAutoWithMax={500}
-                        presetDataModel={this.state.dataModel}
-                        reloadAtCursor={true}
-                        actionBarGroups={[]}
-                        entryRenderIcon={this.renderIcon.bind(this)}
-                        entryRenderSecondLine={this.renderSecondLine.bind(this)}
-                        entryRenderActions={this.renderActions.bind(this)}
-                        nodeClicked={this.entryClicked.bind(this)}
-                        emptyStateProps={{
-                            style:{paddingTop: 20, paddingBottom: 20},
-                            iconClassName:'mdi mdi-bell-off',
-                            primaryTextId:'notification_center.14',
-                            secondaryTextId:'notification_center.15',
-                        }}
-                    />
+                    {LIST}
                 </MaterialUI.Popover>
             </span>
         );

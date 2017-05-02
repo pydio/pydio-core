@@ -6,14 +6,14 @@
     opacity: 1;
   }
 }
-div.left-panel.expanded .video-card .tutorial_legend {
+div.react-grid-layout.dashboard-layout .video-card .tutorial_legend {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
       flex-direction: column;
   height: 100%;
 }
-div.left-panel.expanded .video-card .tutorial_content {
+div.react-grid-layout.dashboard-layout .video-card .tutorial_content {
   -ms-flex: 1;
       flex: 1;
   padding: 16px;
@@ -22,13 +22,13 @@ div.left-panel.expanded .video-card .tutorial_content {
   font-size: 16px;
   line-height: 1.6em;
 }
-div.left-panel.expanded .video-card .tutorial_content h2 {
+div.react-grid-layout.dashboard-layout .video-card .tutorial_content h2 {
   display: none;
 }
-div.left-panel.expanded .video-card .tutorial_content ul {
+div.react-grid-layout.dashboard-layout .video-card .tutorial_content ul {
   padding-left: 20px;
 }
-div.left-panel.expanded .video-card div.tutorial_video_thumb {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb {
   height: 170px;
   min-height: 170px;
   background-color: black;
@@ -38,9 +38,9 @@ div.left-panel.expanded .video-card div.tutorial_video_thumb {
   border-radius: 2px;
   position: relative;
 }
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_prev,
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_next,
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev,
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next,
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play {
   opacity: 0;
   position: absolute;
   z-index: 100;
@@ -54,15 +54,15 @@ div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play {
   cursor: pointer;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_next,
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_next.tutorial_next,
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play.tutorial_next {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_next,
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next.tutorial_next,
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play.tutorial_next {
   left: initial;
   right: 5px;
 }
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_play,
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_next.tutorial_play,
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play.tutorial_play {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_play,
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next.tutorial_play,
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play.tutorial_play {
   left: 94px;
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.78);
@@ -70,14 +70,14 @@ div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play.tuto
   font-size: 40px;
   top: 36px;
 }
-div.left-panel.expanded .video-card div.tutorial_video_thumb:hover .tutorial_prev,
-div.left-panel.expanded .video-card div.tutorial_video_thumb:hover .tutorial_next {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb:hover .tutorial_prev,
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb:hover .tutorial_next {
   opacity: 1;
 }
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_title > span {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_title > span {
   color: rgba(0, 0, 0, 0);
 }
-div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_title > span h2 {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_title > span h2 {
   letter-spacing: 0;
   display: block;
   white-space: nowrap;
@@ -96,7 +96,7 @@ div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_title > s
   margin: 0;
   border-radius: 0 0 0 2px;
 }
-div.left-panel.expanded .video-card div.tutorial_load_button {
+div.react-grid-layout.dashboard-layout .video-card div.tutorial_load_button {
   display: block;
   padding: 5px 18px 16px;
   cursor: pointer;
@@ -106,54 +106,54 @@ div.left-panel.expanded .video-card div.tutorial_load_button {
   font-size: 15px;
   color: #009688;
 }
-div.left-panel.expanded div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar {
   border-radius: 2px 2px 0 0;
   border-bottom: 0 !important;
 }
-div.left-panel.expanded div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar .mui-toolbar-group {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar .mui-toolbar-group {
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #ffffff !important;
 }
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon {
   width: 64px;
 }
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .covering-bg-preview,
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .covering-bg-preview,
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
   height: 30px;
   width: 30px;
   margin: 14px;
 }
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
   background-color: transparent;
   border: 1px solid white;
 }
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container .mimefont {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container .mimefont {
   color: #ffffff;
   font-size: 17px;
 }
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-text {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-text {
   color: white;
   padding: 10px 0;
 }
-div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-text .material-list-line-2 {
+div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-text .material-list-line-2 {
   color: rgba(255, 255, 255, 0.53);
 }
-div.left-panel.expanded .user-widget .action_bar {
+div.react-grid-layout.dashboard-layout .user-widget .action_bar {
   position: absolute;
 }
-div.left-panel.expanded div.top_search_form.closed {
+div.react-grid-layout.dashboard-layout div.top_search_form.closed {
   width: 256px;
 }
-div.left-panel.expanded div.top_search_form.small,
-div.left-panel.expanded div.top_search_form.more,
-div.left-panel.expanded div.top_search_form.advanced {
+div.react-grid-layout.dashboard-layout div.top_search_form.small,
+div.react-grid-layout.dashboard-layout div.top_search_form.more,
+div.react-grid-layout.dashboard-layout div.top_search_form.advanced {
   position: relative;
 }
-div.left-panel.expanded .admin-helper-panel {
+div.react-grid-layout.dashboard-layout .admin-helper-panel {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -163,140 +163,30 @@ div.left-panel.expanded .admin-helper-panel {
   width: 326px;
   background-color: rgba(255, 255, 255, 0.99);
 }
-div.left-panel.expanded .admin-helper-panel .mui-paper-container {
+div.react-grid-layout.dashboard-layout .admin-helper-panel .mui-paper-container {
   height: 100%;
   overflow-y: auto;
 }
-div.left-panel.expanded .admin-helper-panel h3 {
+div.react-grid-layout.dashboard-layout .admin-helper-panel h3 {
   background-color: #FF6E40;
   color: white;
   text-align: center;
   padding-bottom: 8px;
   padding-top: 20px;
 }
-div.left-panel.expanded .admin-helper-panel .pydio-form-panel .pydio-form-group {
+div.react-grid-layout.dashboard-layout .admin-helper-panel .pydio-form-panel .pydio-form-group {
   margin-top: 0;
 }
-div.left-panel.expanded .admin-helper-panel .legend {
+div.react-grid-layout.dashboard-layout .admin-helper-panel .legend {
   padding: 0 17px;
   color: #878787;
   font-size: 12px;
   line-height: 17px;
 }
-div.left-panel.expanded .admin-helper-panel .widget-type-selector {
+div.react-grid-layout.dashboard-layout .admin-helper-panel .widget-type-selector {
   border: 1px solid #E0E0E0;
   margin-left: 16px;
   border-radius: 3px;
   margin-top: 8px;
   width: 280px;
 }
-/*
-div#tutorial_dl_apps_pane{
-
-  @color: rgba(0,0,0,0.73);
-  width: 100%;
-  position: absolute;
-  margin-top: 10px;
-  opacity: 1;
-  z-index: 2;
-  a{
-    text-decoration: none;
-    color: @color;
-  }
-
-  > div > div {
-    text-align: center;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  div.dl_blocks_sep{
-    float: left;
-    height: 90px;
-    border-right: 2px solid @color;
-    margin: 0 10px;
-  }
-
-  div#dl_pydio_cont{
-    width: 750px;
-    margin: 0 auto;
-    background-color: transparent;
-  }
-  div#dl_pydio_for{
-    display: none;
-    float: left;margin: 44px 18px;font-size: 21px;
-  }
-
-  span.dl_tooltip_container{
-    display: inline-block;
-    float:left;
-    width: 90px;
-    text-align: center;
-    div.mui-tooltip{
-      top:0;
-      width:200px;
-      left: -50px;
-    }
-  }
-
-  @dl_element_width:90px;
-  div#dl_pydio_win, div#dl_pydio_mac, div#dl_pydio_ios, div#dl_pydio_android{
-    width: @dl_element_width;
-    padding-top: 8px;
-    position: relative;
-    a.icon-laptop, a.icon-desktop, a.icon-tablet, a.icon-mobile-phone{
-      font-size: 70px;
-    }
-    a.icon-windows, a.icon-apple, a.icon-android{
-      font-size: 22px;
-      position: absolute;
-      left:0 ;
-      top: 26px;
-      color: @color;
-      width:@dl_element_width;
-    }
-    div{
-      font-size: 12px;
-      bottom: -10px;
-      width: @dl_element_width;
-      text-align: center;
-      position: absolute;
-    }
-  }
-
-  div#dl_pydio_mac{
-    a.icon-desktop{
-      font-size: 65px;
-    }
-    a.icon-apple{
-      top:18px;
-    }
-    div{
-      bottom: -14px;
-    }
-  }
-  div#dl_pydio_android{
-    a.icon-android{
-      top:30px;
-    }
-  }
-
-}
-
-.form-qrcode_dialog_form{
-  min-width: 296px;
-  .dialogTitle{
-    display: none;
-  }
-  .home-qrCode-desc{
-    padding: 0 20px;
-  }
-  .home-qrCode{
-    text-align: center;
-  }
-  .button-panel{
-    text-align: right;
-    padding: 10px;
-  }
-}
-*/

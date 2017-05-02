@@ -13,6 +13,10 @@ const PALETTE_INDEX = 3;
  */
 let RecentAccessCard = React.createClass({
 
+    getDefaultProps: function(){
+        return {colored: true};
+    },
+
     renderIcon: function(node){
         if(node.getPath() === '/' || !node.getPath()){
             return <div className="mimefont-container"><div className="mimefont" style={{fontSize: 14}}>WS</div></div>
@@ -62,14 +66,22 @@ let RecentAccessCard = React.createClass({
     },
 
     render: function(){
+        const {colored} = this.props;
         const c = new Color(Palette[PALETTE_INDEX]);
-        const title = <div style={{backgroundColor:c.darken(0.1).toString(),color:'white', padding:'16px 0 16px 12px', fontSize:20}}>{this.props.pydio.MessageHash['user_home.87']}</div>;
+        let title;
+        if(!this.props.noTitle){
+            if(colored){
+                title = <div style={{backgroundColor:c.darken(0.1).toString(),color:'white', padding:'16px 0 16px 12px', fontSize:20}}>{this.props.pydio.MessageHash['user_home.87']}</div>;
+            }else{
+                title = <div style={{padding:'16px 0 16px 12px', fontSize:20}}>{this.props.pydio.MessageHash['user_home.87']}</div>;
+            }
+        }
 
         const displayMode = this.props.displayMode || 'list';
 
         if(displayMode === 'table'){
             return (
-                <Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                <Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth : 1} {...this.props} className="vertical-layout" transitionEnabled={false}>
                     {this.getCloseButton()}
                     <NodeListCustomProvider
                         className="recently-accessed-list table-mode"
@@ -88,21 +100,21 @@ let RecentAccessCard = React.createClass({
             );
         }else{
             return (
-                <Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                <Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth :1} {...this.props} className={"vertical-layout " + (this.props.className || '')} transitionEnabled={false}>
                     {this.props.closeButton}
                     {title}
                     <NodeListCustomProvider
-                        className="recently-accessed-list files-list"
-                        style={{backgroundColor:Palette[PALETTE_INDEX]}}
+                        className={this.props.listClassName?this.props.listClassName:"recently-accessed-list files-list"}
+                        style={{backgroundColor:colored?Palette[PALETTE_INDEX]:'transparent'}}
                         nodeProviderProperties={{get_action:"load_user_recent_items"}}
                         elementHeight={63}
                         nodeClicked={(node) => {this.props.pydio.goTo(node);}}
                         hideToolbar={true}
                         delayInitialLoad={700}
-                        containerHeight={238}
                         entryRenderFirstLine={this.renderFirstLine}
                         entryRenderSecondLine={this.renderSecondLine}
                         entryRenderIcon={this.renderIcon}
+                        emptyStateProps={this.props.emptyStateProps}
                     />
                 </Paper>
             );
