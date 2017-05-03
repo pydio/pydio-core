@@ -9,6 +9,7 @@ import EmailPanel from './EmailPanel'
 const FORM_CSS = ` 
 .react-mui-context .current-user-edit.pydio-form-panel > .pydio-form-group {
   margin-top: 220px;
+  overflow-y: hidden;
 }
 .react-mui-context .current-user-edit.pydio-form-panel > .pydio-form-group div.form-entry-image {
   position: absolute;
@@ -41,10 +42,12 @@ let ProfilePane = React.createClass({
     getInitialState: function(){
         let objValues = {}, mailValues = {};
         let pydio = this.props.pydio;
-        pydio.user.preferences.forEach(function(v, k){
-            if(k === 'gui_preferences') return;
-            objValues[k] = v;
-        });
+        if(pydio.user){
+            pydio.user.preferences.forEach(function(v, k){
+                if(k === 'gui_preferences') return;
+                objValues[k] = v;
+            });
+        }
         return {
             definitions:Manager.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true' and not(contains(@name, 'NOTIFICATIONS_EMAIL'))]"),
             mailDefinitions:Manager.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true' and contains(@name, 'NOTIFICATIONS_EMAIL')]"),
@@ -56,7 +59,8 @@ let ProfilePane = React.createClass({
 
     onFormChange: function(newValues, dirty, removeValues){
         this.setState({dirty: dirty, values: newValues}, () => {
-            this._updater(this.getButtons());
+            if(this._updater) this._updater(this.getButtons());
+            if(this.props.saveOnChange) this.saveForm();
         });
     },
 
@@ -123,20 +127,24 @@ let ProfilePane = React.createClass({
     },
 
     render: function(){
-        const {pydio} = this.props;
-        const {definitions, values} = this.state;
+        const {pydio, miniDisplay} = this.props;
+        if(!pydio.user) return null;
+        let {definitions, values} = this.state;
+        if(miniDisplay){
+            definitions = definitions.filter((o) => {return ['avatar'].indexOf(o.name) !== -1});
+        }
         return (
             <div>
                 <FormPanel
                     className="current-user-edit"
-                    parameters={this.state.definitions}
-                    values={this.state.values}
+                    parameters={definitions}
+                    values={values}
                     depth={-1}
                     binary_context={"user_id="+pydio.user.id}
                     onChange={this.onFormChange}
                 />
-                <Divider/>
-                <EmailPanel pydio={this.props.pydio} definitions={this.state.mailDefinitions} values={values} onChange={this.onFormChange}/>
+                {!miniDisplay && <Divider/>}
+                {!miniDisplay && <EmailPanel pydio={this.props.pydio} definitions={this.state.mailDefinitions} values={values} onChange={this.onFormChange}/>}
                 <style type="text/css" dangerouslySetInnerHTML={{__html: FORM_CSS}}></style>
             </div>
         );

@@ -19,9 +19,7 @@ export default class NotificationsPanel extends React.Component {
         const rNode = dataModel.getRootNode();
         rNode.observe("loaded", function(){
             const unread = parseInt(rNode.getMetadata().get('unread_notifications_count')) || 0;
-            if(unread) {
-                this.setState({unreadStatus: unread}, this.onStatusChange.bind(this));
-            }
+            this.setState({unreadStatus: unread}, this.onStatusChange.bind(this));
         }.bind(this));
         rNode.load();
 
@@ -120,6 +118,7 @@ export default class NotificationsPanel extends React.Component {
             occurrences:occurences
         }, function(t){
             this.refs.list.reload();
+            this.setState({unreadStatus: 0}, this.onStatusChange.bind(this))
         }.bind(this));
     }
 
@@ -175,7 +174,7 @@ export default class NotificationsPanel extends React.Component {
                     onTouchTap={this.handleTouchTap.bind(this)}
                     iconClassName={this.props.iconClassName || "icon-bell"}
                     tooltip={this.props.pydio.MessageHash['notification_center.4']}
-                    className="userActionButton"
+                    className="userActionButton alertsButton"
                 />
                 </MaterialUI.Badge>
                 <MaterialUI.Popover

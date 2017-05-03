@@ -2,7 +2,7 @@
   "name": "access.ajxp_home",
   "version": "6.3.0",
   "description": "",
-  "source_path":"res/react",
+  "source_path": "res/react",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,5 +16,8 @@
     "grunt-contrib-watch": "~0.6.1",
     "assemble-less": "~0.7.0",
     "less-plugin-autoprefix": "~1.5.1"
+  },
+  "dependencies": {
+    "react-joyride": "^1.10.1"
   }
 }

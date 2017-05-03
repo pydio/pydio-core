@@ -62,7 +62,25 @@ let RecentAccessCard = React.createClass({
     },
 
     renderSecondLine: function(node){
-        return node.getMetadata().get('recent_access_readable');
+        const {longLegend} = this.props;
+        const meta = node.getMetadata();
+        const accessDate = meta.get('recent_access_readable');
+        if(longLegend){
+            if(!node.getPath() || node.getPath() === '/'){
+                return 'Workspace opened on ' + accessDate;
+            }else{
+                return (
+                    <span>
+                        {meta.get('repository_label')}
+                        {' - '}
+                        {node.isLeaf() ? PathUtils.getDirname(node.getPath()) : node.getPath()}
+                        {' - '}
+                        {accessDate}
+                    </span>);
+            }
+        }else{
+            return accessDate;
+        }
     },
 
     render: function(){

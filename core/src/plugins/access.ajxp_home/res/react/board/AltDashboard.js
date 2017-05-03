@@ -4,6 +4,7 @@ import ConfigLogo from './ConfigLogo'
 import {Paper, IconButton, Badge} from 'material-ui'
 import WorkspacesListCard from '../workspaces/WorkspacesListCard'
 import RecentAccessCard from '../recent/RecentAccessCard'
+import WelcomeTour from './WelcomeTour'
 import Pydio from 'pydio'
 const {LeftPanel, SearchForm} = Pydio.requireLib('workspaces');
 const {AsyncComponent} = Pydio.requireLib('boot');
@@ -91,6 +92,7 @@ let AltDashboard = React.createClass({
             right: 250,
             left: 250,
             display:'flex',
+            flexDirection:'column',
             marginRight: 10
         };
         let rglStyle = {
@@ -107,9 +109,19 @@ let AltDashboard = React.createClass({
             rglStyle = {...rglStyle, transform:'translateX(260px)'};
         }
 
+        const centerTitleStyle = {
+            padding: '20px 16px 10px',
+            fontSize: 13,
+            color: '#93a8b2',
+            fontWeight: 500
+        };
+
+        const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
+
         return (
 
             <div className={['vertical_layout', 'vertical_fit', 'react-fs-template'].join(' ')} style={{backgroundColor:'white'}}>
+                {!guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
                 <LeftPanel className="left-panel" pydio={pydio} userWidgetProps={{hideNotifications:true}}/>
                 <div className="desktop-container vertical_layout vertical_fit">
                     <Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
@@ -125,8 +137,8 @@ let AltDashboard = React.createClass({
                     </Paper>
                     <div>
                         <div style={wsListsContainerStyle}>
-                            <div style={{flex:1, width:'50%', display:'flex', flexDirection:'column'}}>
-                                <div style={{padding:16, fontSize:20}}>{"My History"}</div>
+                            <div style={{flex:3, display:'flex', flexDirection:'column'}} id="history-block">
+                                <div style={centerTitleStyle}>{"My History"}</div>
                                 <RecentAccessCard
                                     {...this.props}
                                     listClassName="recent-access-centered files-list"
@@ -134,11 +146,12 @@ let AltDashboard = React.createClass({
                                     zDepth={0}
                                     colored={false}
                                     noTitle={true}
+                                    longLegend={true}
                                     emptyStateProps={{style:{backgroundColor:'white'}}}
                                 />
                             </div>
-                            <div style={{flex:1, width:'50%', display:'flex', flexDirection:'column', borderLeft:'1px solid #e0e0e0'}}>
-                                <div style={{padding:16, fontSize:20}}>
+                            <div style={{flex:2, display:'flex', flexDirection:'column', borderTop:'2px solid #e0e0e0'}}  id="alerts-block">
+                                <div style={centerTitleStyle}>
                                     <Badge
                                         badgeContent={this.state.unreadStatus}
                                         secondary={true}

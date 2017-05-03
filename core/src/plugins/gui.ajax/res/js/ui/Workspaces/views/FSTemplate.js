@@ -3,13 +3,14 @@ const Color = require('color')
 const {withContextMenu} = require('pydio').requireLib('hoc')
 const Action = require('pydio/model/action')
 
-import MessagesProviderMixin from './MessagesProviderMixin'
+import MessagesProviderMixin from '../MessagesProviderMixin'
 import Breadcrumb from './Breadcrumb'
-import {SearchForm} from './search'
+import {SearchForm} from '../search'
 import MainFilesList from './MainFilesList'
 import EditionPanel from './EditionPanel'
-import InfoPanel from './detailpanes/InfoPanel'
-import LeftPanel from './leftnav/LeftPanel'
+import InfoPanel from '../detailpanes/InfoPanel'
+import LeftPanel from '../leftnav/LeftPanel'
+import WelcomeTour from './WelcomeTour'
 
 let FSTemplate = React.createClass({
 
@@ -141,11 +142,14 @@ let FSTemplate = React.createClass({
             mainToolbarsOthers = ["get", "change", "other"];
         }
 
+        const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
+
         // Making sure we only pass the style to the parent element
         const {style, ...props} = this.props
 
         return connectDropTarget(
             <div style={style} className={classes.join(' ')} onTouchTap={this.closeDrawer} onContextMenu={this.props.onContextMenu}>
+                {!guiPrefs['WelcomeComponent.Pydio8.TourGuide.FSTemplate'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
                 <LeftPanel className="left-panel" pydio={props.pydio}/>
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>

@@ -65,7 +65,7 @@ export default React.createClass({
                     <IconButton
                         onTouchTap={this.applyAction.bind(this, 'home')}
                         iconClassName="userActionIcon mdi mdi-home-variant"
-                        className="userActionButton"
+                        className="userActionButton backToHomeButton"
                         tooltip={messages['305']}
                         tooltipPosition="bottom-left"
                     />
@@ -115,6 +115,7 @@ export default React.createClass({
                         toolbarStyle={{display:'inline'}}
                         buttonStyle={{color: 'rgba(255,255,255,255.93)', fontSize: 18}}
                         tooltipPosition="bottom-right"
+                        className="user-widget-toolbar"
                     />
                     {notificationsButton}
                     {settingsButton}

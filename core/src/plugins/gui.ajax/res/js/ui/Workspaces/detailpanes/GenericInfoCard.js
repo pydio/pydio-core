@@ -1,6 +1,6 @@
 import React from 'react'
 import InfoPanelCard from './InfoPanelCard'
-import FilePreview from '../FilePreview'
+import FilePreview from '../views/FilePreview'
 
 class GenericInfoCard extends React.Component {
 

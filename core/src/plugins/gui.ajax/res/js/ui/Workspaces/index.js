@@ -1,16 +1,17 @@
 import OpenNodesModel from './OpenNodesModel'
-import MainFilesList from './MainFilesList'
-import Breadcrumb from './Breadcrumb'
+import MainFilesList from './views/MainFilesList'
+import Breadcrumb from './views/Breadcrumb'
+import FilePreview from './views/FilePreview'
+import FSTemplate from './views/FSTemplate'
+import EditionPanel from './views/EditionPanel'
 import {SearchForm} from './search'
-import FilePreview from './FilePreview'
-import FSTemplate from './FSTemplate'
-import EditionPanel from './EditionPanel'
 
 import WorkspacesList from './wslist/WorkspacesList'
 import WorkspacesListMaterial from './wslist/WorkspacesListMaterial'
 import LeftPanel from './leftnav/LeftPanel'
 import DynamicLeftPanel from './leftnav/DynamicLeftPanel'
 import UserWidget from './leftnav/UserWidget'
+import TourGuide from './views/TourGuide'
 
 import InfoPanel from './detailpanes/InfoPanel'
 import InfoPanelCard from './detailpanes/InfoPanelCard'
@@ -32,6 +33,7 @@ const classes = {
     LeftPanel,
     DynamicLeftPanel,
     UserWidget,
+    TourGuide,
 
     InfoPanel,
     InfoPanelCard,

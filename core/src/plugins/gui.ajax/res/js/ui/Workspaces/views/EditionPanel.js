@@ -1,7 +1,7 @@
 import Pydio from 'pydio'
-import OpenNodesModel from './OpenNodesModel'
+import OpenNodesModel from '../OpenNodesModel'
 import { connect } from 'react-redux';
-import {Editor} from './editor';
+import {Editor} from '../editor';
 
 const { EditorActions } = Pydio.requireLib('hoc')
 

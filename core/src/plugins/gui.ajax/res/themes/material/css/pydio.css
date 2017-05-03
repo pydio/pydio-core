@@ -2015,6 +2015,309 @@ div.pydio-tasks-panel div.task.task-status-8 .task_texts .status_message,
 div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
   color: #d32f2f;
 }
+.react-mui-context .joyride-beacon {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 1;
+  padding: 0;
+  height: 36px;
+  position: relative;
+  width: 36px;
+  z-index: 1500;
+}
+.react-mui-context .joyride-beacon:active,
+.react-mui-context .joyride-beacon:focus,
+.react-mui-context .joyride-beacon:hover {
+  outline: none;
+}
+.react-mui-context .joyride-beacon__inner {
+  animation: joyride-beacon-inner 1.2s infinite ease-in-out;
+  background-color: #f04;
+  border-radius: 50%;
+  display: block;
+  height: 50%;
+  left: 50%;
+  opacity: .7;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+}
+.react-mui-context .joyride-beacon__outer {
+  animation: joyride-beacon-outer 1.2s infinite ease-in-out;
+  background-color: rgba(255, 0, 68, 0.2);
+  border: 2px solid #f04;
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: block;
+  height: 100%;
+  left: 0;
+  opacity: .9;
+  position: absolute;
+  top: 0;
+  transform: translateY(-50%);
+  transform-origin: center;
+  width: 100%;
+}
+.react-mui-context .joyride-overlay {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1500;
+}
+.react-mui-context .joyride-hole {
+  border-radius: 2px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.4);
+  position: absolute;
+  transition: all 250ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+.react-mui-context .joyride-hole.safari {
+  box-shadow: 0 0 999px 9999px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 0, 0, 0.5);
+}
+.react-mui-context .joyride-tooltip {
+  background-color: #fff;
+  border-radius: 2px;
+  color: #555;
+  cursor: default;
+  filter: drop-shadow(-1px -2px 3px rgba(0, 0, 0, 0.3)) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.3));
+  opacity: 0;
+  padding: 16px;
+  pointer-events: auto;
+  transform: translateZ(0);
+  width: 290px;
+  z-index: 1510;
+}
+.react-mui-context .joyride-tooltip--animate {
+  animation: joyride-tooltip 0.4s forwards;
+  animation-timing-function: cubic-bezier(0, 1.05, 0.55, 1.18);
+}
+.react-mui-context .joyride-tooltip__triangle {
+  background-repeat: no-repeat;
+  position: absolute;
+}
+.react-mui-context .joyride-tooltip.bottom,
+.react-mui-context .joyride-tooltip.bottom-left,
+.react-mui-context .joyride-tooltip.bottom-right {
+  margin-top: 10px;
+}
+.react-mui-context .joyride-tooltip.bottom-left .joyride-tooltip__triangle,
+.react-mui-context .joyride-tooltip.bottom-right .joyride-tooltip__triangle,
+.react-mui-context .joyride-tooltip.bottom .joyride-tooltip__triangle {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M24 12L12 0 0 12z'/%3E%3C/svg%3E");
+  height: 12px;
+  left: 50%;
+  top: -10px;
+  transform: translateX(-50%);
+  width: 24px;
+}
+.react-mui-context .joyride-tooltip.top,
+.react-mui-context .joyride-tooltip.top-left,
+.react-mui-context .joyride-tooltip.top-right {
+  margin-bottom: 10px;
+}
+.react-mui-context .joyride-tooltip.top-left .joyride-tooltip__triangle,
+.react-mui-context .joyride-tooltip.top-right .joyride-tooltip__triangle,
+.react-mui-context .joyride-tooltip.top .joyride-tooltip__triangle {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='24' height='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M0 0l12 12L24 0z'/%3E%3C/svg%3E");
+  bottom: -10px;
+  height: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+}
+.react-mui-context .joyride-tooltip.bottom-left .joyride-tooltip__triangle,
+.react-mui-context .joyride-tooltip.top-left .joyride-tooltip__triangle {
+  left: 3%;
+  transform: translateX(0);
+}
+@media screen and (min-width: 480px) {
+  .react-mui-context .joyride-tooltip.bottom-left .joyride-tooltip__triangle,
+  .react-mui-context .joyride-tooltip.top-left .joyride-tooltip__triangle {
+    left: 2%;
+  }
+}
+.react-mui-context .joyride-tooltip.bottom-right .joyride-tooltip__triangle,
+.react-mui-context .joyride-tooltip.top-right .joyride-tooltip__triangle {
+  left: auto;
+  right: 3%;
+  transform: translateX(0);
+}
+@media screen and (min-width: 480px) {
+  .react-mui-context .joyride-tooltip.bottom-right .joyride-tooltip__triangle,
+  .react-mui-context .joyride-tooltip.top-right .joyride-tooltip__triangle {
+    right: 2%;
+  }
+}
+.react-mui-context .joyride-tooltip.left {
+  margin-right: 8px;
+}
+.react-mui-context .joyride-tooltip.left .joyride-tooltip__triangle {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12' height='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M0 24l12-12L0 0z'/%3E%3C/svg%3E");
+  height: 24px;
+  right: -10px;
+  width: 12px;
+}
+.react-mui-context .joyride-tooltip.right {
+  margin-left: 8px;
+}
+.react-mui-context .joyride-tooltip.right .joyride-tooltip__triangle {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12' height='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M12 0L0 12l12 12z'/%3E%3C/svg%3E");
+  height: 24px;
+  left: -10px;
+  width: 12px;
+}
+.react-mui-context .joyride-tooltip__close {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 1;
+  padding: 0;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12' height='12' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14.117.323L8.044 6.398 2.595.323a1.105 1.105 0 0 0-1.562 1.562L6.482 7.96.323 14.119a1.105 1.105 0 0 0 1.562 1.562L7.96 9.608l5.449 6.073a1.103 1.103 0 1 0 1.56-1.562L9.517 8.046l6.159-6.161a1.103 1.103 0 1 0-1.56-1.562z' fill='rgba(85,85,85,0.5)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 12px;
+  position: absolute;
+  right: 10px;
+  text-decoration: none;
+  top: 10px;
+  width: 12px;
+  z-index: 10;
+  display: block;
+}
+.react-mui-context .joyride-tooltip__close:active,
+.react-mui-context .joyride-tooltip__close:focus,
+.react-mui-context .joyride-tooltip__close:hover {
+  outline: none;
+}
+.react-mui-context .joyride-tooltip__close:focus,
+.react-mui-context .joyride-tooltip__close:hover {
+  color: rgba(60, 60, 60, 0.5);
+  outline: none;
+}
+.react-mui-context .joyride-tooltip__close--header {
+  right: 20px;
+  top: 20px;
+}
+.react-mui-context .joyride-tooltip__header {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 20px;
+  padding-bottom: 6px;
+  padding-right: 18px;
+  position: relative;
+}
+.react-mui-context .joyride-tooltip__header ~ .joyride-tooltip__main {
+  padding: 12px 0 18px;
+}
+.react-mui-context .joyride-tooltip__main {
+  font-size: 13px;
+  padding-bottom: 18px;
+  padding-right: 18px;
+}
+.react-mui-context .joyride-tooltip__footer {
+  text-align: right;
+  margin-bottom: -6px;
+  margin-right: -6px;
+}
+.react-mui-context .joyride-tooltip__button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 1;
+  padding: 0;
+}
+.react-mui-context .joyride-tooltip__button:active,
+.react-mui-context .joyride-tooltip__button:focus,
+.react-mui-context .joyride-tooltip__button:hover {
+  outline: none;
+}
+.react-mui-context .joyride-tooltip__button--primary {
+  border-radius: 2px;
+  color: #009688;
+  padding: 6px 12px;
+  transition: background-color 0.2s ease-in-out;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 15px;
+}
+.react-mui-context .joyride-tooltip__button--primary:active,
+.react-mui-context .joyride-tooltip__button--primary:focus,
+.react-mui-context .joyride-tooltip__button--primary:hover {
+  /*
+    background-color: #ff1f5a;
+    color: #fff
+    */
+}
+.react-mui-context .joyride-tooltip__button--secondary {
+  color: #757575;
+  font-weight: 500;
+  margin-right: 12px;
+}
+.react-mui-context .joyride-tooltip__button--skip {
+  color: #ccc;
+  float: left;
+  margin-right: 10px;
+}
+.react-mui-context .joyride-tooltip--standalone .joyride-tooltip__main {
+  padding-bottom: 0;
+}
+.react-mui-context .joyride-tooltip--standalone .joyride-tooltip__footer {
+  display: none;
+}
+@media screen and (min-width: 480px) {
+  .joyride-tooltip {
+    width: 360px;
+  }
+}
+@media screen and (min-width: 960px) {
+  .joyride-tooltip {
+    width: 450px;
+  }
+}
+@keyframes joyride-tooltip {
+  0% {
+    transform: scale(0.1);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1px) scale(1);
+  }
+}
+@keyframes joyride-beacon-inner {
+  20% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.7;
+  }
+}
+@keyframes joyride-beacon-outer {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    opacity: .7;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: .9;
+    transform: scale(1);
+  }
+}
 /**********************/
 /* MASTER VARIABLES
 /**********************/

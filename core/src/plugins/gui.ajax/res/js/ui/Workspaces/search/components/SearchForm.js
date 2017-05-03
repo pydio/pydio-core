@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-import FilePreview from '../../FilePreview'
+import FilePreview from '../../views/FilePreview'
 import AdvancedSearch from './AdvancedSearch'
 import Textfit from 'react-textfit'
 import Pydio from 'pydio'
