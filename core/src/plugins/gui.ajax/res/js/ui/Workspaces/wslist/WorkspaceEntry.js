@@ -209,7 +209,7 @@ let WorkspaceEntry =React.createClass({
             if(this.state.openFoldersTree){
                 style = this.getItemStyle(this.props.pydio.getContextHolder().getRootNode());
             }else{
-                style = this.getItemStyle(this.state.currentContextNode);
+                style = this.getItemStyle(this.props.pydio.getContextHolder().getContextNode());
             }
         }
 
