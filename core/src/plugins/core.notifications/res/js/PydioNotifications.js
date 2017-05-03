@@ -302,13 +302,9 @@
         },
 
         renderActions: function(node){
-            const touchTap = function(event){
-                event.stopPropagation();
-                this.dismissAlert(node);
-            }.bind(this);
             return <MaterialUI.IconButton
                 iconClassName="mdi mdi-close"
-                onClick={touchTap}
+                onClick={(e) => e.stopPropagation() && this.dismissAlert(node)}
                 style={{width: 36, height: 36, padding: 6}}
                 iconStyle={{color: 'rgba(0,0,0,.23)', hoverColor:'rgba(0,0,0,.73)'}}
             />;
