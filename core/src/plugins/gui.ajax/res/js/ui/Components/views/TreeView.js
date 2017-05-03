@@ -126,46 +126,49 @@ var SimpleTreeNode = React.createClass({
         else return (this.props.dataModel.getSelectedNodes().indexOf(n) !== -1);
     },
     render: function () {
+        const {node, childrenOnly, canDrop, isOverCurrent,
+            checkboxes, checkboxesComputeStatus, checkboxesValues, onCheckboxCheck,
+            depth, forceExpand, selectedItemStyle, getItemStyle, forceLabel} = this.props;
         var hasFolderChildrens = this.state.children.length?true:false;
         var hasChildren;
         if(hasFolderChildrens){
             hasChildren = (
                 <span onClick={this.onChildDisplayToggle}>
-                {this.state.showChildren || this.props.forceExpand?
+                {this.state.showChildren || forceExpand?
                     <span className="tree-icon icon-angle-down"></span>:
                     <span className="tree-icon icon-angle-right"></span>
                 }
                 </span>);
         }else{
             let cname = "tree-icon icon-angle-right";
-            if(this.props.node.isLoaded()){
+            if(node.isLoaded()){
                 cname += " no-folder-children";
             }
             hasChildren = <span className={cname}></span>;
         }
-        var isSelected = (this.nodeIsSelected(this.props.node) ? 'mui-menu-item mui-is-selected' : 'mui-menu-item');
+        var isSelected = (this.nodeIsSelected(node) ? 'mui-menu-item mui-is-selected' : 'mui-menu-item');
         var selfLabel;
-        if(!this.props.childrenOnly){
-            if(this.props.canDrop && this.props.isOverCurrent){
+        if(!childrenOnly){
+            if(canDrop && isOverCurrent){
                 isSelected += ' droppable-active';
             }
             var boxes;
-            if(this.props.checkboxes){
+            if(checkboxes){
                 var values = {}, inherited = false, disabled = {}, additionalClassName = '';
-                if(this.props.checkboxesComputeStatus){
-                    var status = this.props.checkboxesComputeStatus(this.props.node);
+                if(checkboxesComputeStatus){
+                    var status = checkboxesComputeStatus(node);
                     values = status.VALUES;
                     inherited = status.INHERITED;
                     disabled = status.DISABLED;
                     if(status.CLASSNAME) additionalClassName = ' ' + status.CLASSNAME;
-                }else if(this.props.checkboxesValues && this.props.checkboxesValues[this.props.node.getPath()]){
-                    values = this.props.checkboxesValues[this.props.node.getPath()];
+                }else if(checkboxesValues && checkboxesValues[node.getPath()]){
+                    values = checkboxesValues[node.getPath()];
                 }
                 var valueClasses = [];
-                boxes = this.props.checkboxes.map(function(c){
+                boxes = checkboxes.map(function(c){
                     var selected = values[c] !== undefined ? values[c] : false;
                     var click = function(event, value){
-                        this.props.onCheckboxCheck(this.props.node, c, value);
+                        onCheckboxCheck(node, c, value);
                     }.bind(this);
                     if(selected) valueClasses.push(c);
                     return (
@@ -183,22 +186,25 @@ var SimpleTreeNode = React.createClass({
                 isSelected += valueClasses.length ? (" checkbox-values-" + valueClasses.join('-')) : " checkbox-values-empty";
                 boxes = <div className={"tree-checkboxes" + additionalClassName}>{boxes}</div>;
             }
-            let itemStyle = {paddingLeft:this.props.depth*20};
-            if(this.nodeIsSelected(this.props.node) && this.props.selectedItemStyle){
-                itemStyle = {...itemStyle, ...this.props.selectedItemStyle};
+            let itemStyle = {paddingLeft:depth*20};
+            if(this.nodeIsSelected(node) && selectedItemStyle){
+                itemStyle = {...itemStyle, ...selectedItemStyle};
+            }
+            if(getItemStyle){
+                itemStyle = {...itemStyle, ...getItemStyle(node)};
             }
             let icon = 'mdi mdi-folder';
-            const ajxpMime = this.props.node.getAjxpMime();
+            const ajxpMime = node.getAjxpMime();
             if(ajxpMime === 'ajxp_browsable_archive'){
                 icon = 'mdi mdi-archive';
             }else if(ajxpMime === 'ajxp_recycle'){
                 icon = 'mdi mdi-delete';
             }
             selfLabel = (
-                <ContextMenuWrapper node={this.props.node} className={'tree-item ' + isSelected + (boxes?' has-checkboxes':'')} style={itemStyle}>
-                    <div className="tree-item-label" onClick={this.onNodeSelect} title={this.props.node.getLabel()}
-                         data-id={this.props.node.getPath()}>
-                        {hasChildren}<span className={"tree-icon " + icon}></span>{this.props.forceLabel?this.props.forceLabel:this.props.node.getLabel()}
+                <ContextMenuWrapper node={node} className={'tree-item ' + isSelected + (boxes?' has-checkboxes':'')} style={itemStyle}>
+                    <div className="tree-item-label" onClick={this.onNodeSelect} title={node.getLabel()}
+                         data-id={node.getPath()}>
+                        {hasChildren}<span className={"tree-icon " + icon}></span>{forceLabel?forceLabel:node.getLabel()}
                     </div>
                     {boxes}
                 </ContextMenuWrapper>
@@ -218,20 +224,20 @@ var SimpleTreeNode = React.createClass({
             draggable = true;
         }
 
-        if(this.state.showChildren || this.props.forceExpand){
+        if(this.state.showChildren || forceExpand){
             children = this.state.children.map(function(child) {
                 const props = {...this.props,
                     forceLabel: null,
                     childrenOnly:false,
                     key:child.getPath(),
                     node:child,
-                    depth:this.props.depth+1
+                    depth:depth+1
                 };
                 return React.createElement(draggable?DragDropTreeNode:SimpleTreeNode, props);
             }.bind(this));
         }
         return (
-            <li ref={connector} className={"treenode" + this.props.node.getPath().replace(/\//g, '_')}>
+            <li ref={connector} className={"treenode" + node.getPath().replace(/\//g, '_')}>
                 {selfLabel}
                 <ul>
                     {children}
@@ -310,6 +316,7 @@ let DNDTreeView = React.createClass({
                     checkboxesComputeStatus={this.props.checkboxesComputeStatus}
                     onCheckboxCheck={this.props.onCheckboxCheck}
                     selectedItemStyle={this.props.selectedItemStyle}
+                    getItemStyle={this.props.getItemStyle}
                 />
             </ul>
         )
@@ -369,6 +376,7 @@ let TreeView = React.createClass({
                     checkboxesComputeStatus={this.props.checkboxesComputeStatus}
                     onCheckboxCheck={this.props.onCheckboxCheck}
                     selectedItemStyle={this.props.selectedItemStyle}
+                    getItemStyle={this.props.getItemStyle}
                 />
             </ul>
         )
@@ -435,6 +443,7 @@ let FoldersTree = React.createClass({
                     node={this.props.dataModel.getRootNode()}
                     showRoot={this.props.showRoot ? true : false}
                     selectedItemStyle={this.props.selectedItemStyle}
+                    getItemStyle={this.props.getItemStyle}
                     className={"folders-tree" + (this.props.className ? ' '+this.props.className : '')}
                 />
             );
@@ -446,6 +455,7 @@ let FoldersTree = React.createClass({
                     dataModel={this.props.dataModel}
                     node={this.props.dataModel.getRootNode()}
                     selectedItemStyle={this.props.selectedItemStyle}
+                    getItemStyle={this.props.getItemStyle}
                     showRoot={this.props.showRoot ? true : false}
                     className={"folders-tree" + (this.props.className ? ' '+this.props.className : '')}
                 />

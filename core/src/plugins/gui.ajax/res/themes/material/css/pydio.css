@@ -1728,15 +1728,6 @@ div.menu.desktop a span.ajxp_icon_span {
   display: none;
 }
 .left-panel .workspaces .workspace-entry .workspace-additional-action {
-  padding: 6px 0 0 8px;
-}
-.left-panel .workspaces .workspace-entry.workspace-current {
-  opacity: 1;
-  position: relative;
-  font-weight: 500;
-}
-.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-down,
-.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-up {
   font-size: 16px;
   position: absolute;
   right: 8px;
@@ -1749,9 +1740,13 @@ div.menu.desktop a span.ajxp_icon_span {
   text-align: center;
   padding: 0;
 }
-.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-down:hover,
-.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-up:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+.left-panel .workspaces .workspace-entry .workspace-additional-action:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.left-panel .workspaces .workspace-entry.workspace-current {
+  opacity: 1;
+  position: relative;
+  font-weight: 500;
 }
 .left-panel.hidden {
   left: -255px;

@@ -58,12 +58,12 @@ class GenericInfoCard extends React.Component {
                                 <div style={{display:'flex', alignItems:'center', borderBottom:'1px solid #eeeeee'}}>
                                     <FilePreview
                                         key={node.getPath()}
-                                        style={{height:50, width:50, fontSize: 25}}
+                                        style={{height:50, width:50, fontSize: 25, flexShrink: 0}}
                                         node={node}
                                         loadThumbnail={true}
-                                        richPreview={true}
+                                        richPreview={false}
                                     />
-                                    <div style={{flex:1, fontSize:14, marginLeft:6}}>{node.getLabel()}</div>
+                                    <div style={{flex:1, fontSize:14, marginLeft:6, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{node.getLabel()}</div>
                                 </div>
                             );
                         })}

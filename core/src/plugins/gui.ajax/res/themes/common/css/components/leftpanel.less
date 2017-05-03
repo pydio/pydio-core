@@ -82,28 +82,25 @@
         display: none;
       }
       .workspace-additional-action {
-        padding: 6px 0 0 8px;
+        font-size: 16px;
+        position: absolute;
+        right: 8px;
+        margin-top: -2px;
+        border-radius: 50%;
+        transition: @bezier_transition;
+        height: 30px;
+        width: 30px;
+        line-height: 30px;
+        text-align: center;
+        padding: 0;
+        &:hover{
+          background-color: rgba(0,0,0,0.1);
+        }
       }
       &.workspace-current{
         opacity: 1;
         position: relative;
         font-weight: 500;
-        .workspace-additional-action.icon-angle-down, .workspace-additional-action.icon-angle-up{
-          font-size: 16px;
-          position: absolute;
-          right: 8px;
-          margin-top: -2px;
-          border-radius: 50%;
-          transition: @bezier_transition;
-          height: 30px;
-          width: 30px;
-          line-height: 30px;
-          text-align: center;
-          padding: 0;
-          &:hover{
-            background-color: rgba(255,255,255,0.2);
-          }
-        }
       }
     }
   }

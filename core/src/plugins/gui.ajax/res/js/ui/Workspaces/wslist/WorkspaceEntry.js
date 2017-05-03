@@ -1,5 +1,6 @@
 const React = require('react')
 const {muiThemeable} = require('material-ui/styles')
+import Color from 'color'
 
 const Pydio = require('pydio')
 const PydioApi = require('pydio/http/api')
@@ -175,6 +176,24 @@ let WorkspaceEntry =React.createClass({
         this.setState({openFoldersTree: !this.state.openFoldersTree});
     },
 
+    getItemStyle: function(node){
+        const isContext = this.props.pydio.getContextHolder().getContextNode() === node;
+        const accent2 = this.props.muiTheme.palette.accent2Color;
+        if(isContext){
+            return {
+                backgroundColor: accent2,
+                color: 'white'
+            };
+        }
+        const isSelected = this.props.pydio.getContextHolder().getSelectedNodes().indexOf(node) !== -1;
+        if(isSelected){
+            return {
+                backgroundColor: Color(accent2).lightness(95).toString()
+            }
+        }
+        return {};
+    },
+
     render:function(){
         let current = (this.props.pydio.user.getActiveRepository() == this.props.workspace.getId()),
             currentClass="workspace-entry",
@@ -183,18 +202,14 @@ let WorkspaceEntry =React.createClass({
             additionalAction,
             badge, badgeNum, newWorkspace;
 
-        const selectedItemStyle = {
-            backgroundColor: this.props.muiTheme.palette.accent2Color,
-            color: 'white'
-        };
         let style = {};
 
         if (current) {
             currentClass +=" workspace-current";
-            if(!this.state.openFoldersTree || (this.state.currentContextNode && this.state.currentContextNode.getPath() === '/')){
-                style = {...selectedItemStyle};
+            if(this.state.openFoldersTree){
+                style = this.getItemStyle(this.props.pydio.getContextHolder().getRootNode());
             }else{
-                style = {fontWeight: 500}
+                style = this.getItemStyle(this.state.currentContextNode);
             }
         }
 
@@ -247,7 +262,7 @@ let WorkspaceEntry =React.createClass({
         }
 
         if(this.props.showFoldersTree){
-            let fTCName = this.state.openFoldersTree ? "workspace-additional-action icon-angle-up" : "workspace-additional-action icon-angle-down";
+            let fTCName = this.state.openFoldersTree ? "workspace-additional-action mdi mdi-chevron-up" : "workspace-additional-action mdi mdi-chevron-down";
             additionalAction = <span className={fTCName} onClick={this.toggleFoldersPanelOpen}></span>;
         }
 
@@ -292,7 +307,7 @@ let WorkspaceEntry =React.createClass({
                         dataModel={this.props.pydio.getContextHolder()}
                         className={this.state.openFoldersTree?"open":"closed"}
                         draggable={true}
-                        selectedItemStyle={selectedItemStyle}
+                        getItemStyle={this.getItemStyle}
                     />
                 </div>
             )
