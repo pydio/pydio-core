@@ -610,6 +610,7 @@ abstract class AbstractConfDriver extends Plugin
         $action         = $requestInterface->getAttribute("action");
         $loggedUser     = $ctx->getUser();
         $mess           = LocaleService::getMessages();
+        $temporaryUploadFolder = ApplicationState::getTemporaryFolder()."/pydio_binaries_uploads";
 
         switch ($action) {
             //------------------------------------
@@ -1370,11 +1371,13 @@ abstract class AbstractConfDriver extends Plugin
             case "get_binary_param" :
 
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = ApplicationState::getTemporaryFolder() ."/". InputFilter::securePath($httpVars["tmp_file"]);
-                    if (isSet($file)) {
+                    $file = $temporaryUploadFolder ."/". InputFilter::securePath($httpVars["tmp_file"]);
+                    if (file_exists($file)) {
                         session_write_close();
                         header("Content-Type:image/png");
                         readfile($file);
+                    }else{
+                        $responseInterface = $responseInterface->withStatus(401, 'Forbidden');
                     }
                 } else if (isSet($httpVars["binary_id"])) {
                     if (isSet($httpVars["user_id"])) {
@@ -1393,10 +1396,12 @@ abstract class AbstractConfDriver extends Plugin
 
                 session_write_close();
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = ApplicationState::getTemporaryFolder() ."/". InputFilter::securePath($httpVars["tmp_file"]);
-                    if (isSet($file)) {
+                    $file = $temporaryUploadFolder ."/". InputFilter::securePath($httpVars["tmp_file"]);
+                    if (file_exists($file)) {
                         header("Content-Type:image/png");
                         readfile($file);
+                    }else{
+                        $responseInterface = $responseInterface->withStatus(401, 'Forbidden');
                     }
                 } else if (isSet($httpVars["binary_id"])) {
                     $this->loadBinary([], InputFilter::sanitize($httpVars["binary_id"], InputFilter::SANITIZE_ALPHANUM));
@@ -1417,10 +1422,13 @@ abstract class AbstractConfDriver extends Plugin
                     } else {
                         $rand = substr(md5(time()), 0, 6);
                         $tmp = $rand."-". $boxData->getClientFilename();
-                        $boxData->moveTo(ApplicationState::getTemporaryFolder() . "/" . $tmp);
+                        if(!file_exists($temporaryUploadFolder)){
+                            mkdir($temporaryUploadFolder);
+                        }
+                        $boxData->moveTo($temporaryUploadFolder . "/" . $tmp);
                     }
                 }
-                if (isSet($tmp) && file_exists(ApplicationState::getTemporaryFolder() ."/".$tmp)) {
+                if (isSet($tmp) && file_exists($temporaryUploadFolder ."/".$tmp)) {
                     print('<script type="text/javascript">');
                     print('parent.formManagerHiddenIFrameSubmission("'.$tmp.'");');
                     print('</script>');
