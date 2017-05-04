@@ -42,14 +42,23 @@ let MessageBar = React.createClass({
     },
 
     render: function(){
+        let message = this.state.message || '';
+        if(message.split('\n').length){
+            message = (
+                <span>{message.split('\n').map((m) => {
+                    return <div>{m}</div>;
+                })}</span>
+            );
+        }
         return (
             <Snackbar
                 open={this.state.open}
-                message={this.state.message || ''}
+                message={message}
                 onRequestClose={this.handleClose}
                 autoHideDuration={4000}
                 action={this.state.actionLabel}
                 onActionTouchTap={this.state.actionCallback}
+                bodyStyle={{padding:'16px 24px', height:'auto', maxHeight:200, overflowY:'auto', lineHeight:'inherit'}}
             />
         );
     }
