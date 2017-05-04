@@ -161,7 +161,7 @@ let AltDashboard = React.createClass({
                             </div>
                         </div>
                     </Paper>
-                    <div style={{backgroundColor:'white'}} className="vertical_fit">
+                    <div style={{backgroundColor:'white'}} className="vertical_fit user-dashboard-main">
 
                         <HomeSearchForm zDepth={2} {...this.props} style={styles.wsListsContainerStyle}>
                             <div style={{flex:1, display:'flex', flexDirection:'column'}} id="history-block">

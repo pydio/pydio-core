@@ -6,14 +6,59 @@
     opacity: 1;
   }
 }
-div.react-grid-layout.dashboard-layout .video-card .tutorial_legend {
+div.user-dashboard-main .admin-helper-panel {
+  position: absolute;
+  top: 55px;
+  bottom: 0;
+  padding-top: 0;
+  right: 260px;
+  z-index: 1400;
+  width: 316px;
+  background-color: rgba(255, 255, 255, 0.89);
+}
+div.user-dashboard-main .admin-helper-panel .mui-paper-container {
+  height: 100%;
+  overflow-y: auto;
+}
+div.user-dashboard-main .admin-helper-panel h3 {
+  background-color: #FF6E40;
+  color: white;
+  text-align: left;
+  padding: 12px 12px 11px;
+  font-size: 17px;
+}
+div.user-dashboard-main .admin-helper-panel .pydio-form-panel .pydio-form-group {
+  margin-top: 0;
+}
+div.user-dashboard-main .admin-helper-panel .legend {
+  padding: 0 17px;
+  color: #878787;
+  font-size: 12px;
+  line-height: 17px;
+}
+div.user-dashboard-main .admin-helper-panel .widget-type-selector {
+  border: 1px solid #E0E0E0;
+  margin-left: 16px;
+  border-radius: 3px;
+  margin-top: 8px;
+  width: 280px;
+}
+div.user-dashboard-main .home-dashboard {
+  position: static;
+  width: auto;
+  height: 100%;
+  padding: 0;
+  overflow: auto;
+  background-color: transparent;
+}
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card .tutorial_legend {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
       flex-direction: column;
   height: 100%;
 }
-div.react-grid-layout.dashboard-layout .video-card .tutorial_content {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card .tutorial_content {
   -ms-flex: 1;
       flex: 1;
   padding: 16px;
@@ -22,13 +67,13 @@ div.react-grid-layout.dashboard-layout .video-card .tutorial_content {
   font-size: 16px;
   line-height: 1.6em;
 }
-div.react-grid-layout.dashboard-layout .video-card .tutorial_content h2 {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card .tutorial_content h2 {
   display: none;
 }
-div.react-grid-layout.dashboard-layout .video-card .tutorial_content ul {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card .tutorial_content ul {
   padding-left: 20px;
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb {
   height: 170px;
   min-height: 170px;
   background-color: black;
@@ -38,9 +83,9 @@ div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb {
   border-radius: 2px;
   position: relative;
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev,
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next,
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play {
   opacity: 0;
   position: absolute;
   z-index: 100;
@@ -54,15 +99,15 @@ div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tut
   cursor: pointer;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_next,
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next.tutorial_next,
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play.tutorial_next {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_next,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next.tutorial_next,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play.tutorial_next {
   left: initial;
   right: 5px;
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_play,
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next.tutorial_play,
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play.tutorial_play {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_play,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_next.tutorial_play,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_play.tutorial_play {
   left: 94px;
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.78);
@@ -70,14 +115,14 @@ div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tut
   font-size: 40px;
   top: 36px;
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb:hover .tutorial_prev,
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb:hover .tutorial_next {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb:hover .tutorial_prev,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb:hover .tutorial_next {
   opacity: 1;
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_title > span {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_title > span {
   color: rgba(0, 0, 0, 0);
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_title > span h2 {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tutorial_title > span h2 {
   letter-spacing: 0;
   display: block;
   white-space: nowrap;
@@ -96,7 +141,7 @@ div.react-grid-layout.dashboard-layout .video-card div.tutorial_video_thumb .tut
   margin: 0;
   border-radius: 0 0 0 2px;
 }
-div.react-grid-layout.dashboard-layout .video-card div.tutorial_load_button {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card div.tutorial_load_button {
   display: block;
   padding: 5px 18px 16px;
   cursor: pointer;
@@ -106,87 +151,39 @@ div.react-grid-layout.dashboard-layout .video-card div.tutorial_load_button {
   font-size: 15px;
   color: #009688;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar {
   border-radius: 2px 2px 0 0;
   border-bottom: 0 !important;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar .mui-toolbar-group {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar .mui-toolbar-group {
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #ffffff !important;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon {
   width: 64px;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .covering-bg-preview,
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .covering-bg-preview,
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
   height: 30px;
   width: 30px;
   margin: 14px;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
   background-color: transparent;
   border: 1px solid white;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container .mimefont {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container .mimefont {
   color: #ffffff;
   font-size: 17px;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-text {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-text {
   color: white;
   padding: 10px 0;
 }
-div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-text .material-list-line-2 {
+div.user-dashboard-main div.react-grid-layout.dashboard-layout div.recently-accessed-list.files-list .material-list-entry .material-list-text .material-list-line-2 {
   color: rgba(255, 255, 255, 0.53);
-}
-div.react-grid-layout.dashboard-layout .user-widget .action_bar {
-  position: absolute;
-}
-div.react-grid-layout.dashboard-layout div.top_search_form.closed {
-  width: 256px;
-}
-div.react-grid-layout.dashboard-layout div.top_search_form.small,
-div.react-grid-layout.dashboard-layout div.top_search_form.more,
-div.react-grid-layout.dashboard-layout div.top_search_form.advanced {
-  position: relative;
-}
-div.react-grid-layout.dashboard-layout .admin-helper-panel {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  padding-top: 110px;
-  left: 0;
-  z-index: 1;
-  width: 326px;
-  background-color: rgba(255, 255, 255, 0.99);
-}
-div.react-grid-layout.dashboard-layout .admin-helper-panel .mui-paper-container {
-  height: 100%;
-  overflow-y: auto;
-}
-div.react-grid-layout.dashboard-layout .admin-helper-panel h3 {
-  background-color: #FF6E40;
-  color: white;
-  text-align: center;
-  padding-bottom: 8px;
-  padding-top: 20px;
-}
-div.react-grid-layout.dashboard-layout .admin-helper-panel .pydio-form-panel .pydio-form-group {
-  margin-top: 0;
-}
-div.react-grid-layout.dashboard-layout .admin-helper-panel .legend {
-  padding: 0 17px;
-  color: #878787;
-  font-size: 12px;
-  line-height: 17px;
-}
-div.react-grid-layout.dashboard-layout .admin-helper-panel .widget-type-selector {
-  border: 1px solid #E0E0E0;
-  margin-left: 16px;
-  border-radius: 3px;
-  margin-top: 8px;
-  width: 280px;
 }

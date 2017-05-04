@@ -7,7 +7,7 @@ const {FileDropZone} = require('pydio').requireLib('form')
 const {NativeFileDropProvider} = require('pydio').requireLib('boot');
 const BinaryDropZone = NativeFileDropProvider(FileDropZone, (items, files, props) => {});
 
-let QuickSend = React.createClass({
+let QuickSendCard = React.createClass({
 
     fileDroppedOrPicked: function(event, monitor = null){
 
@@ -90,5 +90,5 @@ let QuickSend = React.createClass({
 
 });
 
-QuickSend = asGridItem(QuickSend,'Quick Upload',{gridWidth:2,gridHeight:10},[]);
-export {QuickSend as default}
+QuickSendCard = asGridItem(QuickSendCard,'Quick Upload',{gridWidth:2,gridHeight:10},[]);
+export {QuickSendCard as default}
