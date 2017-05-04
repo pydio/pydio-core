@@ -64,7 +64,7 @@ class ListEntry extends React.Component {
         let additionalStyle = {
             transition:'background-color .25s'
         };
-        if(this.state && this.state.hover){
+        if(this.state && this.state.hover && !this.props.groupHeader){
             additionalStyle = {
                 ...additionalStyle,
                 backgroundColor: 'rgba(0,0,0,0.05)',

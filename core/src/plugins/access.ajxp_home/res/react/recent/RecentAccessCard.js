@@ -4,6 +4,7 @@ const Color = require('color')
 const {asGridItem, NodeListCustomProvider} = require('pydio').requireLib('components')
 const {FilePreview} = require('pydio').requireLib('workspaces')
 const {Paper, IconButton} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
 
 const PALETTE_INDEX = 3;
 
@@ -19,7 +20,16 @@ let RecentAccessCard = React.createClass({
 
     renderIcon: function(node){
         if(node.getPath() === '/' || !node.getPath()){
-            return <div className="mimefont-container"><div className="mimefont" style={{fontSize: 14}}>WS</div></div>
+            const label = node.getMetadata().get('repository_label').split(" ").map(function (word) {
+                return word.substr(0, 1);
+            }).slice(0, 3).join("");
+            const color = new Color(this.props.muiTheme.palette.primary1Color).saturationl(18).lightness(44).toString();
+            const light = new Color(this.props.muiTheme.palette.primary1Color).saturationl(15).lightness(94).toString();
+            return (
+                <div className="mimefont-container" style={{backgroundColor:light}}>
+                    <div className="mimefont" style={{fontSize: 14, color:color}}>{label}</div>
+                </div>
+            );
         }else{
             return <FilePreview node={node} loadThumbnail={true}/>
         }
@@ -132,7 +142,13 @@ let RecentAccessCard = React.createClass({
                         entryRenderFirstLine={this.renderFirstLine}
                         entryRenderSecondLine={this.renderSecondLine}
                         entryRenderIcon={this.renderIcon}
-                        emptyStateProps={this.props.emptyStateProps}
+                        emptyStateProps={{
+                            style: {paddingTop: 20, paddingBottom: 20},
+                            iconClassName: 'mdi mdi-timer-off',
+                            primaryTextId: 'History Empty',
+                            secondaryTextId: 'This list will display recently accessed or consulted files and folders. Enter a workspace on the left.',
+                            ...this.props.emptyStateProps
+                        }}
                     />
                 </Paper>
             );
@@ -141,5 +157,6 @@ let RecentAccessCard = React.createClass({
 
 });
 
+RecentAccessCard = muiThemeable()(RecentAccessCard);
 RecentAccessCard = asGridItem(RecentAccessCard,global.pydio.MessageHash['user_home.87'],{gridWidth:5,gridHeight:20},[]);
 export {RecentAccessCard as default}

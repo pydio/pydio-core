@@ -12,22 +12,24 @@ let LeftPanel = ({muiTheme, style={}, userWidgetProps, workspacesListProps, pydi
         const lightBg = new Color({h:colorHue,s:35,l:98});
 
         style = {
-            ...style,
-            backgroundColor: lightBg.toString()
+            backgroundColor: lightBg.toString(),
+            ...style
         };
         const widgetStyle = {
             backgroundColor: Color(palette.primary1Color).darken(0.2).toString(),
             width:'100%'
         };
         const wsListStyle = {
-            overflowY: 'auto',
-            color    : Color(palette.primary1Color).darken(0.1).alpha(0.87).toString()
+            overflowY           : 'auto',
+            backgroundColor     : lightBg.toString(),
+            color               : Color(palette.primary1Color).darken(0.1).alpha(0.87).toString()
         };
         const wsSectionTitleStyle = {
             color    : Color(palette.primary1Color).darken(0.1).alpha(0.50).toString()
         };
         const uWidgetProps = userWidgetProps || {};
         const wsListProps = workspacesListProps || {};
+
         return (
             <div className="left-panel vertical_fit vertical_layout" style={style}>
                 <UserWidget

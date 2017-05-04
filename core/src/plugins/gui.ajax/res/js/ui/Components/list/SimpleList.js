@@ -698,16 +698,21 @@ let SimpleList = React.createClass({
                 }
                 components.push(React.createElement(ListEntry, data));
             }else if(entry.groupHeader){
+                let id = entry.groupHeader, firstLine = entry.groupHeaderLabel;
+                if(this.props.entryRenderGroupHeader){
+                    firstLine = this.props.entryRenderGroupHeader(id, firstLine);
+                }
                 data = {
                     node: null,
                     key: entry.groupHeader,
-                    id: entry.groupHeader,
+                    id: id,
                     mainIcon: null,
-                    firstLine: entry.groupHeaderLabel,
+                    firstLine: firstLine,
                     className:'list-group-header',
                     onClick: null,
                     showSelector: false,
-                    selectorDisabled: true
+                    selectorDisabled: true,
+                    groupHeader: true
                 };
                 if(this.props.passScrollingStateToChildren){
                     data['parentIsScrolling'] = this.state.isScrolling;

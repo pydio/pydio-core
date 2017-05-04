@@ -8,6 +8,7 @@ import WelcomeTour from './WelcomeTour'
 import Pydio from 'pydio'
 const {LeftPanel, SearchForm} = Pydio.requireLib('workspaces');
 const {AsyncComponent} = Pydio.requireLib('boot');
+import HomeSearchForm from './HomeSearchForm'
 
 let AltDashboard = React.createClass({
 
@@ -73,7 +74,7 @@ let AltDashboard = React.createClass({
         const styles = {
             appBarStyle : {
                 zIndex: 1,
-                backgroundColor: appBarColor.toString(),
+                backgroundColor: appBarColor.alpha(.6).toString(),
                 height: 110
             },
             buttonsStyle : {
@@ -81,29 +82,29 @@ let AltDashboard = React.createClass({
             },
             iconButtonsStyle :{
                 color: appBarColor.darken(0.4).toString()
+            },
+            wsListsContainerStyle: {
+                position:'absolute',
+                zIndex: 10,
+                top: 55,
+                bottom: 0,
+                right: 260,
+                left: 260,
+                display:'flex',
+                flexDirection:'column'
+            },
+            rglStyle: {
+                position:'absolute',
+                top: 110,
+                bottom: 0,
+                right: 0,
+                width: 260,
+                overflowY:'auto',
+                backgroundColor: '#ECEFF1'
             }
         }
 
 
-        let wsListsContainerStyle = {
-            position:'absolute',
-            top: 110,
-            bottom: 0,
-            right: 250,
-            left: 250,
-            display:'flex',
-            flexDirection:'column',
-            marginRight: 10
-        };
-        let rglStyle = {
-            position:'absolute',
-            top: 110,
-            bottom: 0,
-            right: 0,
-            width: 260,
-            overflowY:'auto',
-            backgroundColor: '#ECEFF1'
-        }
         if(this.props.pydio.UI.MOBILE_EXTENSIONS){
             wsListsContainerStyle = {...wsListsContainerStyle, display:'bloc', marginRight:0, right: 0};
             rglStyle = {...rglStyle, transform:'translateX(260px)'};
@@ -118,27 +119,53 @@ let AltDashboard = React.createClass({
 
         const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
 
+        const openAlertPanel = (
+            <div style={{flex:2, display:'flex', flexDirection:'column', borderTop:'2px solid #e0e0e0'}}  id="alerts-block">
+                <div style={centerTitleStyle}>
+                    <Badge
+                        badgeContent={this.state.unreadStatus}
+                        secondary={true}
+                        style={this.state.unreadStatus  ? {padding: '0 24px 0 0'} : {padding: 0}}
+                        badgeStyle={!this.state.unreadStatus ? {display:'none'} : {marginTop: -10}}
+                    ><span style={{marginRight:10, display:'inline-block'}}>{"My Alerts"}</span></Badge>
+                </div>
+                <AsyncComponent
+                    namespace="PydioNotifications"
+                    componentName="Panel"
+                    pydio={this.props.pydio}
+                    listOnly={true}
+                    listClassName="vertical-fill"
+                    emptyStateProps={{style:{backgroundColor:'white'}}}
+                    onUnreadStatusChange={(s)=>{this.setState({unreadStatus: s})}}
+                />
+            </div>
+        );
+
         return (
 
-            <div className={['vertical_layout', 'vertical_fit', 'react-fs-template'].join(' ')} style={{backgroundColor:'white'}}>
+            <div className={['vertical_layout', 'vertical_fit', 'react-fs-template', 'user-dashboard-template'].join(' ')}>
                 {!guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
-                <LeftPanel className="left-panel" pydio={pydio} userWidgetProps={{hideNotifications:true}}/>
+                <LeftPanel
+                    className="left-panel"
+                    pydio={pydio}
+                    style={{backgroundColor:'transparent'}}
+                    userWidgetProps={{hideNotifications:false, style:{backgroundColor:appBarColor.darken(.2).alpha(.7).toString()}}}
+                />
                 <div className="desktop-container vertical_layout vertical_fit">
-                    <Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
+                    <Paper zDepth={0} style={styles.appBarStyle} rounded={false}>
                         <div id="workspace_toolbar" style={{display: "flex", justifyContent: "space-between"}}>
                             <span className="drawer-button"><IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
-                            <div style={{flex:2}}>
-                                <SearchForm {...this.props} style={{margin: '30px auto', position:'relative', width:420}} crossWorkspace={true} groupByField="repository_id"/>
-                            </div>
+                            <span style={{flex:1}}></span>
                             <div style={{textAlign:'center', width: 260}}>
                                 <ConfigLogo style={{height:110}} pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
                             </div>
                         </div>
                     </Paper>
-                    <div>
-                        <div style={wsListsContainerStyle}>
-                            <div style={{flex:3, display:'flex', flexDirection:'column'}} id="history-block">
-                                <div style={centerTitleStyle}>{"My History"}</div>
+                    <div style={{backgroundColor:'white'}} className="vertical_fit">
+
+                        <HomeSearchForm zDepth={2} {...this.props} style={styles.wsListsContainerStyle}>
+                            <div style={{flex:1, display:'flex', flexDirection:'column'}} id="history-block">
+                                <div style={centerTitleStyle}>{"Recent History"}</div>
                                 <RecentAccessCard
                                     {...this.props}
                                     listClassName="recent-access-centered files-list"
@@ -150,26 +177,7 @@ let AltDashboard = React.createClass({
                                     emptyStateProps={{style:{backgroundColor:'white'}}}
                                 />
                             </div>
-                            <div style={{flex:2, display:'flex', flexDirection:'column', borderTop:'2px solid #e0e0e0'}}  id="alerts-block">
-                                <div style={centerTitleStyle}>
-                                    <Badge
-                                        badgeContent={this.state.unreadStatus}
-                                        secondary={true}
-                                        style={this.state.unreadStatus  ? {padding: '0 24px 0 0'} : {padding: 0}}
-                                        badgeStyle={!this.state.unreadStatus ? {display:'none'} : {marginTop: -10}}
-                                    ><span style={{marginRight:10, display:'inline-block'}}>{"My Alerts"}</span></Badge>
-                                </div>
-                                <AsyncComponent
-                                    namespace="PydioNotifications"
-                                    componentName="Panel"
-                                    pydio={this.props.pydio}
-                                    listOnly={true}
-                                    listClassName="vertical-fill"
-                                    emptyStateProps={{style:{backgroundColor:'white'}}}
-                                    onUnreadStatusChange={(s)=>{this.setState({unreadStatus: s})}}
-                                />
-                            </div>
-                        </div>
+                        </HomeSearchForm>
 
                         <PydioComponents.DynamicGrid
                             storeNamespace="WelcomePanel.Dashboard"
@@ -177,7 +185,7 @@ let AltDashboard = React.createClass({
                             builderNamespaces={["WelcomeComponents"]}
                             pydio={this.props.pydio}
                             cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
-                            rglStyle={rglStyle}
+                            rglStyle={styles.rglStyle}
                         />
                     </div>
                 </div>

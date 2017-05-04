@@ -12,9 +12,23 @@ class WelcomeTour extends Component{
     componentDidMount(){
         if(!this.state.started){
             pydio.UI.openComponentInModal('UserAccount', 'WelcomeModal', {
-                onRequestStart:(skip) => {this.setState({started: true})}
+                onRequestStart:(skip) => {
+                    if(skip) {
+                        this.discard();
+                    }else{
+                        this.setState({started: true});
+                    }
+                }
             });
         }
+    }
+
+    discard(){
+        const {user} =  this.props.pydio;
+        let guiPrefs = user.getPreference('gui_preferences', true);
+        guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] = true;
+        user.setPreference('gui_preferences', guiPrefs, true);
+        user.savePreference('gui_preferences');
     }
 
     render(){
@@ -31,22 +45,22 @@ class WelcomeTour extends Component{
                 position:'right'
             },
             {
-                title:'My History',
-                text : <div><div>Here, you will find all the recent, workspaces, files and folders that you may have opened or visited.</div><div>Just click on an item to access it directly.</div></div>,
-                selector:'#history-block',
-                position:'top'
-            },
-            {
                 title:'My Alerts',
                 text : 'When you share a file or folder, you can get notified if another user accessed it. You can also watch any specific folders inside a workspace.',
-                selector:'#alerts-block',
-                position:'top'
+                selector:'.alertsButton',
+                position:'right'
             },
             {
                 title:'Search',
                 text : 'Use this search form to find files or folders in any workspace. Only the first 5 results are show, enter a workspace to get more results, and more search options.',
-                selector:'.top_search_form',
+                selector:'.home-search-form',
                 position:'bottom'
+            },
+            {
+                title:'My History',
+                text : <div><div>When no search results are displayed, you will find here all the recent workspaces, files and folders that you may have opened or visited.</div><div>Just click on an item to access it directly.</div></div>,
+                selector:'#history-block',
+                position:'top'
             },
             {
                 title:'Widgets',
@@ -69,13 +83,8 @@ class WelcomeTour extends Component{
 
         const callback = (data) => {
             if(data.type === 'step:after' && data.index === tourguideSteps.length - 1 ){
-
                 const repoList = this.props.pydio.user.getRepositoriesList();
-                let guiPrefs = this.props.pydio.user.getPreference('gui_preferences', true);
-                guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] = true;
-                this.props.pydio.user.setPreference('gui_preferences', guiPrefs, true);
-                this.props.pydio.user.savePreference('gui_preferences');
-
+                this.discard();
                 this.props.pydio.WelcomeComponentPydio8TourGuideStarted = true;
                 try{
                     const repoKey = repoList.keys().next().value;
