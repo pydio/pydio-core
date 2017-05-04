@@ -13,10 +13,21 @@ class WelcomeTour extends Component{
         }
     }
 
+    discard(){
+        const {user} = this.props.pydio;
+        let guiPrefs = user.getPreference('gui_preferences', true);
+        guiPrefs['WelcomeComponent.Pydio8.TourGuide.FSTemplate'] = true;
+        user.setPreference('gui_preferences', guiPrefs, true);
+        user.savePreference('gui_preferences');
+    }
+
     componentDidMount(){
         if(!this.state.started){
             pydio.UI.openComponentInModal('UserAccount', 'WelcomeModal', {
-                onRequestStart:(skip) => {this.setState({started: true, skip: skip})}
+                onRequestStart:(skip) => {
+                    if(skip) this.discard();
+                    this.setState({started: true, skip: skip});
+                }
             });
         }
     }
@@ -73,11 +84,7 @@ class WelcomeTour extends Component{
         ];
         const callback = (data) => {
             if(data.type === 'step:after' && data.index === tourguideSteps.length - 1 ){
-                // Update preferences
-                let guiPrefs = this.props.pydio.user.getPreference('gui_preferences', true);
-                guiPrefs['WelcomeComponent.Pydio8.TourGuide.FSTemplate'] = true;
-                this.props.pydio.user.setPreference('gui_preferences', guiPrefs, true);
-                this.props.pydio.user.savePreference('gui_preferences');
+                this.discard();
             }
         };
         return (

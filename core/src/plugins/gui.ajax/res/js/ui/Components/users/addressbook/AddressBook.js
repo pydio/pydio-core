@@ -12,8 +12,7 @@ const React = require('react');
 const Pydio = require('pydio');
 const {AsyncComponent, PydioContextConsumer} = Pydio.requireLib('boot')
 const {Popover, IconButton} = require('material-ui')
-const {muiThemeable} = require('material-ui/styles')
-const Color = require('color')
+const {muiThemeable, colors} = require('material-ui/styles')
 
 /**
  * High level component to browse users, groups and teams, either in a large format (mode='book') or a more compact
@@ -388,7 +387,7 @@ let AddressBook = React.createClass({
         const {selectedItem, root, rightPaneItem, createDialogItem} = this.state;
 
         const leftColumnStyle = {
-            backgroundColor: Color(muiTheme.palette.primary1Color).lightness(97).rgb().toString(),
+            backgroundColor: colors.grey100,
             width: 256,
             overflowY:'auto',
             overflowX: 'hidden'
@@ -459,18 +458,20 @@ let AddressBook = React.createClass({
                 />);
 
         }
-        if(rightPaneItem){
-            rightPanel = (
-                <RightPanelCard
-                    pydio={this.props.pydio}
-                    onRequestClose={() => {this.setState({rightPaneItem:null})}}
-                    style={{...leftColumnStyle, backgroundColor: 'white'}}
-                    onCreateAction={this.onCreateAction}
-                    onDeleteAction={this.onDeleteAction}
-                    onUpdateAction={this.onCardUpdateAction}
-                    item={rightPaneItem}/>
-            );
+        let rightPanelStyle = {...leftColumnStyle, transformOrigin:'right', backgroundColor: 'white'};
+        if(!rightPaneItem){
+            rightPanelStyle = {...rightPanelStyle, transform: 'translateX(256px)', width: 0};
         }
+        rightPanel = (
+            <RightPanelCard
+                pydio={this.props.pydio}
+                onRequestClose={() => {this.setState({rightPaneItem:null})}}
+                style={rightPanelStyle}
+                onCreateAction={this.onCreateAction}
+                onDeleteAction={this.onDeleteAction}
+                onUpdateAction={this.onCardUpdateAction}
+                item={rightPaneItem}/>
+        );
         if(mode === 'book'){
             leftPanel = (
                 <MaterialUI.Paper zDepth={0} style={{...leftColumnStyle, zIndex:2}}>

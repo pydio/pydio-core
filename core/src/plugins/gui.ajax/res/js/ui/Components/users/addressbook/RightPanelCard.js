@@ -11,9 +11,10 @@ class RightPanelCard extends React.Component{
     render(){
 
         let content;
-        if(this.props.item.type === 'user'){
+        const item = this.props.item || {};
+        if(item.type === 'user'){
             content = <UserCard {...this.props}/>
-        }else if(this.props.item.type === 'group' && this.props.item.id.indexOf('/AJXP_TEAM/') === 0){
+        }else if(item.type === 'group' && item.id.indexOf('/AJXP_TEAM/') === 0){
             content = <TeamCard {...this.props}/>
         }
 

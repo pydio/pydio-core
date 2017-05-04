@@ -16,14 +16,16 @@ class AlphaPaginator extends Component{
         const currentPage = (item.currentParams && item.currentParams.alpha_pages && item.currentParams.value) || -1;
 
         return (
-            <div style={style}>
-                {getMessage(249, '')}:
+            <div style={{...style, display:'flex', paddingRight: 8}}>
+                <div style={{flex:1}}>{getMessage(249, '')}</div>
+                <div>
                 {letters.map((l) => {
 
                     const letterStyle = {
                         display         :'inline-block',
                         cursor          :'pointer',
                         margin          :'0 3px',
+                        fontWeight      : 400,
                         textDecoration  :(currentPage===l?'underline':'none'),
                         fontSize        : (currentPage===l?'1.3em':'1em')
                     };
@@ -32,10 +34,13 @@ class AlphaPaginator extends Component{
                         <span
                             key={l}
                             style={letterStyle}
-                            onClick={(e) => {paginatorCallback(l)}}>{l === -1 ? getMessage(597, '') : l}
-                            </span>
+                            onClick={(e) => {paginatorCallback(l)}}
+                            title={l === -1 ? 'Limited number of results': ''}
+                        >{l === -1 ? getMessage(597, '') : l}
+                        </span>
                     )
                 })}
+                </div>
             </div>
         );
     }

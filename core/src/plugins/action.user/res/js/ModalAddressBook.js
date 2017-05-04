@@ -1,8 +1,7 @@
 const React = require('react')
 const Pydio = require('pydio')
 const {ActionDialogMixin} = Pydio.requireLib('boot')
-const {AddressBook} = Pydio.requireLib('components')
-const {AppBar} = require('material-ui')
+const {ModalAppBar, AddressBook} = Pydio.requireLib('components')
 
 const ModalAddressBook = React.createClass({
 
@@ -16,7 +15,7 @@ const ModalAddressBook = React.createClass({
             dialogSize: 'xl',
             dialogPadding: false,
             dialogIsModal: false,
-            dialogScrollBody: false
+            dialogScrollBody: true
         };
     },
 
@@ -28,12 +27,11 @@ const ModalAddressBook = React.createClass({
 
         return (
             <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
-                <AppBar
+                <ModalAppBar
                     title={this.props.pydio.MessageHash['user_dash.1']}
                     showMenuIconButton={false}
                     iconClassNameRight="mdi mdi-close"
                     onRightIconButtonTouchTap={()=>{this.dismiss()}}
-                    style={{flexShrink:0}}
                 />
                 <AddressBook
                     mode="book"

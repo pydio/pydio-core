@@ -355,12 +355,11 @@
 
             return (
                 <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
-                    <MaterialUI.AppBar
+                    <PydioComponents.ModalAppBar
                         title={this.props.pydio.MessageHash['share_center.98']}
                         showMenuIconButton={false}
                         iconClassNameRight="mdi mdi-close"
                         onRightIconButtonTouchTap={()=>{this.dismiss()}}
-                        style={{flexShrink: 0, borderRadius: '2px 2px 0 0'}}
                     />
                     <ShareView {...this.props} style={{width:'100%', flex: 1}}/>
                 </div>
