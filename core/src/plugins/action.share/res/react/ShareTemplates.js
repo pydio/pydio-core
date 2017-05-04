@@ -1,11 +1,11 @@
 const {Textfit} = require('react-textfit');
-const Workspaces = require('pydio/http/resources-manager').requireLib('workspaces');
-const Components = require('pydio/http/resources-manager').requireLib('components');
+import Pydio from 'pydio'
 const Color = require('color');
 import {muiThemeable} from 'material-ui/styles';
 
-const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = Workspaces;
-const {ButtonMenu, Toolbar, ListPaginator, ReactEditorOpener, ClipboardTextField} = Components;
+const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = Pydio.requireLib('workspaces');
+const {ContextMenu, ButtonMenu, Toolbar, ListPaginator, ReactEditorOpener, ClipboardTextField} = Pydio.requireLib('components');
+const {BackgroundImage} = Pydio.requireLib('boot')
 
 const UniqueNodeTemplateMixin = {
 
@@ -229,11 +229,11 @@ let StandardLayout = React.createClass({
 
         let style = {};
         if(this.props.imageBackgroundFromConfigs){
-            if(PydioReactUI.BackgroundImage.SESSION_IMAGE){
-                style = PydioReactUI.BackgroundImage.SESSION_IMAGE;
+            if(BackgroundImage.SESSION_IMAGE){
+                style = BackgroundImage.SESSION_IMAGE;
             }else{
-                style = PydioReactUI.BackgroundImage.getImageBackgroundFromConfig(this.props.imageBackgroundFromConfigs);
-                PydioReactUI.BackgroundImage.SESSION_IMAGE = style;
+                style = BackgroundImage.getImageBackgroundFromConfig(this.props.imageBackgroundFromConfigs);
+                BackgroundImage.SESSION_IMAGE = style;
             }
         }
 
@@ -273,7 +273,7 @@ let StandardLayout = React.createClass({
                     }
                 </MaterialUI.Paper>
                 {this.props.children}
-                <span className="context-menu"><PydioComponents.ContextMenu pydio={this.props.pydio}/></span>
+                <span className="context-menu"><ContextMenu pydio={this.props.pydio}/></span>
             </div>
         );
 
@@ -291,7 +291,9 @@ const FolderMinisite = React.createClass({
 
         return (
             <StandardLayout {...this.props} showSearchForm={this.props.pydio.getPluginConfigs('action.share').get('SHARED_FOLDER_SHOW_SEARCH')}>
-                <MainFilesList ref="list" {...this.props}/>
+                <div style={{backgroundColor:'white'}} className="layout-fill vertical-layout">
+                    <MainFilesList ref="list" {...this.props}/>
+                </div>
                 <EditionPanel {...this.props}/>
             </StandardLayout>
         );
@@ -393,8 +395,10 @@ const DropZoneMinisite = React.createClass({
 
         return (
             <StandardLayout {...this.props}>
-                <div className="minisite-dropzone vertical_fit vertical_layout">
-                    <MainFilesList ref="list" {...this.props}/>
+                <div className="vertical_fit vertical_layout" style={{backgroundColor:'white'}}>
+                    <div className="minisite-dropzone vertical_fit vertical_layout">
+                        <MainFilesList ref="list" {...this.props}/>
+                    </div>
                 </div>
                 <EditionPanel {...this.props}/>
             </StandardLayout>

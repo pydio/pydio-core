@@ -111,15 +111,20 @@ class RecentListManager
                 if(empty($repository)) continue;
                 $repoId = $node->getRepositoryId();
                 $repoLabel = $repository->getDisplay();
-                $node->mergeMetadata([
+                $nodePath = $node->getPath();
+
+                $newNode = new AJXP_Node("pydio://$repoId/$repoId$nodePath");
+                $newNode->setLeaf($node->isLeaf());
+                $newNode->mergeMetadata([
                     'recent_access_time' => $time,
                     'recent_access_readable' => StatHelper::relativeDate($time, $mess),
                     'recent_access_group' => StatHelper::relativeDateGroup($time, $mess),
                     'repository_id' => $repoId,
-                    'repository_label' => $repoLabel
+                    'repository_label' => $repoLabel,
+                    'original_path' => $nodePath
                 ]);
+                $nodesList->addBranch($newNode);
             }catch(\Exception $e){}
-            $nodesList->addBranch($node);
         }
         return $nodesList;
     }

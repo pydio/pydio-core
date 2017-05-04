@@ -24,7 +24,7 @@
 		</client_configs>
 		<actions>
 			<action name="svnlog">
-				<gui text="meta.svn.2" title="meta.svn.21" iconClass="icon-undo" src="svn_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+				<gui text="meta.svn.2" title="meta.svn.21" iconClass="icon-undo" hasAccessKey="false">
 					<context selection="true" dir="false" recycle="false" behaviour="hidden"
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="put">
@@ -54,7 +54,7 @@
 					</processing>
 			</action>
 			<action name="svnlog2">
-				<gui text="meta.svn.1" title="meta.svn.11" iconClass="icon-undo" src="svn_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+				<gui text="meta.svn.1" title="meta.svn.11" iconClass="icon-undo" hasAccessKey="false">
 					<context selection="false" dir="true" recycle="true" actionBar="false" contextMenu="true" infoPanel="false" actionBarGroup="change"/>
 				</gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>

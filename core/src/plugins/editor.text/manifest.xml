@@ -8,13 +8,6 @@
             <i18n path="plugins/editor.text/i18n" namespace="text_editor"/>
         </resources>
 	</client_settings>
-	<clientForm id="edit_box"><![CDATA[
-		<div id="edit_box" action="editer" box_width="80%" box_height="90%" box_padding="0"  class="editor_container">
-			<div class="action_bar">
-				<a href="#" onclick="return false;" class="icon-save" id="saveButton" onclick="saveForm();return false;"><img src="AJXP_IMAGES_FOLDER/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a>
-			</div>
-		</div>
-	]]></clientForm>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>

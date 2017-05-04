@@ -19,9 +19,7 @@ Charles du Jeu, Greg Hecquet, c12simple, DepaMarco, Etienne CHAMPETIER, mtskar, 
     Material UI is the JS framework we use to implement Material Design, written by Call-Em-All (MIT License)
     Material Design Icons : https://materialdesignicons.com/ (SIL Open Font License, Version 1.1.)
 	Font Awesome by Dave Gandy : http://fortawesome.github.com/Font-Awesome/ (SIL Open Font License)
-	Background Photos : from http://unsplash.com/,
-	Embedded photos credits: http://www.gratisography.com/, Nick West, Martin Staněk, Sonja Langford
-    Design: thomas Nicot (UX or Orbit Theme): http://resetandplay.com/
+	Background Photos from https://unsplash.com/ - Brad Neathery, Dustin Lee, Luis Llerena, Tim Gouw, Though Catalog
 
 <h5>Core PHP Libraries</h5>
     aws/aws-sdk-php                    3.19.18             Apache-2.0

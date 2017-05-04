@@ -5,6 +5,7 @@ const {asGridItem, NodeListCustomProvider} = require('pydio').requireLib('compon
 const {FilePreview} = require('pydio').requireLib('workspaces')
 const {Paper, IconButton} = require('material-ui')
 const {muiThemeable} = require('material-ui/styles')
+import Node from 'pydio/model/node'
 
 const PALETTE_INDEX = 3;
 
@@ -18,7 +19,24 @@ let RecentAccessCard = React.createClass({
         return {colored: true};
     },
 
+    getCorrectNode: function(node){
+        const originalPath = node.getMetadata().get('original_path');
+        const label = (!originalPath || originalPath === '/')  ? '' : node.getLabel();
+        let targetNode = new Node(originalPath, node.isLeaf(), label);
+        targetNode.setMetadata(node.getMetadata());
+        return targetNode;
+    },
+
+    /**
+     *
+     * @param node AJXP_Node
+     */
+    goTo: function(node){
+        this.props.pydio.goTo(this.getCorrectNode(node));
+    },
+
     renderIcon: function(node){
+        node = this.getCorrectNode(node);
         if(node.getPath() === '/' || !node.getPath()){
             const label = node.getMetadata().get('repository_label').split(" ").map(function (word) {
                 return word.substr(0, 1);
@@ -36,6 +54,7 @@ let RecentAccessCard = React.createClass({
     },
 
     renderLabel: function(node, data){
+        node = this.getCorrectNode(node);
         const path = node.getPath();
         const meta = node.getMetadata();
         if(!path || path === '/'){
@@ -55,15 +74,17 @@ let RecentAccessCard = React.createClass({
     },
 
     renderAction: function(node, data){
+        node = this.getCorrectNode(node);
         return <span style={{position:'relative'}}><IconButton
             iconClassName="mdi mdi-chevron-right"
             tooltip="Open ... "
-            onTouchTap={() => {this.props.pydio.goTo(node)}}
+            onTouchTap={() => {this.goTo(node)}}
             style={{position:'absolute', right:0}}
         /></span>
     },
 
     renderFirstLine: function(node){
+        node = this.getCorrectNode(node);
         if(!node.getPath() || node.getPath() === '/'){
             return node.getMetadata().get('repository_label');
         }else{
@@ -72,6 +93,7 @@ let RecentAccessCard = React.createClass({
     },
 
     renderSecondLine: function(node){
+        node = this.getCorrectNode(node);
         const {longLegend} = this.props;
         const meta = node.getMetadata();
         const accessDate = meta.get('recent_access_readable');
@@ -115,7 +137,7 @@ let RecentAccessCard = React.createClass({
                         className="recently-accessed-list table-mode"
                         nodeProviderProperties={{get_action:"load_user_recent_items"}}
                         elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
-                        nodeClicked={(node) => {this.props.pydio.goTo(node);}}
+                        nodeClicked={(node) => {this.goTo(node);}}
                         hideToolbar={true}
                         tableKeys={{
                             label:{renderCell:this.renderLabel, label:'Recently Accessed Files', width:'60%'},
@@ -136,7 +158,7 @@ let RecentAccessCard = React.createClass({
                         style={{backgroundColor:colored?Palette[PALETTE_INDEX]:'transparent'}}
                         nodeProviderProperties={{get_action:"load_user_recent_items"}}
                         elementHeight={63}
-                        nodeClicked={(node) => {this.props.pydio.goTo(node);}}
+                        nodeClicked={(node) => {this.goTo(node);}}
                         hideToolbar={true}
                         delayInitialLoad={700}
                         entryRenderFirstLine={this.renderFirstLine}

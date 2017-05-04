@@ -218,11 +218,6 @@ class Pydio extends Observable{
             this.user.setPreference("pending_folder", "-1");
             this.user.savePreference("pending_folder");
 
-        }else if(this.user.getPreference("ls_history", true)){
-
-            const data = this.user.getPreference("ls_history", true);
-            this._initLoadRep = data[repId];
-
         }
 
         this.loadRepository(repositoryObject);
@@ -262,8 +257,6 @@ class Pydio extends Observable{
         const repositoryId = repository.getId();
         const newIcon = repository.getIcon();
 
-        this.skipLsHistory = true;
-
         const providerDef = repository.getNodeProviderDef();
         let rootNode;
         if(providerDef != null){
@@ -285,10 +278,7 @@ class Pydio extends Observable{
             firstLoadObs = () => {
                 this.goTo(initLoadRep);
                 this._initLoadRep = null;
-                this.skipLsHistory = false;
             }
-        }else{
-            this.skipLsHistory = false;
         }
 
         this._contextHolder.setRootNode(rootNode);
@@ -373,7 +363,6 @@ class Pydio extends Observable{
 
         const root = this._contextHolder.getRootNode();
         if(root){
-            this.skipLsHistory = true;
             root.clear();
         }
         this.ApiClient.switchRepository(repositoryId, onComplete);

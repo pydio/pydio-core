@@ -219,7 +219,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/PydioLogo250.png"
+                      defaultImage="AJXP_IMAGES_FOLDER/PydioLogo250.png"
                       expose="true"
                 />
 

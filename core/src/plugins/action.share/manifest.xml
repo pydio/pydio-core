@@ -159,7 +159,7 @@
                 </processing>
             </action>
             <action name="sharelist-clearExpired">
-                <gui text="user_dash.25" title="user_dash.26" iconClass="icon-time" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
+                <gui text="user_dash.25" title="user_dash.26" iconClass="icon-time" accessKey="" hasAccessKey="false">
                     <context dir="true" selection="false" recycle="false" 
                              actionBar="true" contextMenu="false" infoPanel="false"
                              actionBarGroup="share_list_toolbar" inZip="false"/>
@@ -233,22 +233,22 @@
         </actions>
         <client_configs>
             <template name="minisite_std_list" element="ajxp_shared_folder" position="top" label="share_center.153"
-                      namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_shared_folder"}'/>
+                      namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_shared_folder","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
             <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154"
-                      namespace="ShareTemplates" component="FilmStripMinisite" props='{"containerId":"ajxp_film_strip"}'/>
+                      namespace="ShareTemplates" component="FilmStripMinisite" props='{"containerId":"ajxp_film_strip","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
             <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"
-                      namespace="ShareTemplates" component="FileMinisite" props='{"containerId":"ajxp_unique_strip","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'/>
+                      namespace="ShareTemplates" component="FileMinisite" props='{"containerId":"ajxp_unique_strip","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
             <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"
-                      namespace="ShareTemplates" component="DLTemplate" props='{"containerId":"ajxp_unique_dl","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'/>
+                      namespace="ShareTemplates" component="DLTemplate" props='{"containerId":"ajxp_unique_dl","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
             <template name="minisite_embed_list" element="ajxp_embed_template" position="top" label="share_center.155"
-                      namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_embed_template","minisiteMode":"embed"}'/>
+                      namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_embed_template","minisiteMode":"embed","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
             <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"
-                      namespace="ShareTemplates" component="DropZoneMinisite" props='{"containerId":"ajxp_dropbox_template","minisiteMode":"embed"}'/>
+                      namespace="ShareTemplates" component="DropZoneMinisite" props='{"containerId":"ajxp_dropbox_template","minisiteMode":"embed","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
             <component_config className="InfoPanel">
                 <infoPanel mime="meta:ajxp_shared" reactComponent="ShareInfoPanel.InfoPanel" weight="-20"/>
