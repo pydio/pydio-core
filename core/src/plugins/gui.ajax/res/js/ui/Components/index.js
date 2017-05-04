@@ -11,6 +11,7 @@ import SimpleFigureBadge from './elements/SimpleFigureBadge'
 import SearchBox from './views/SearchBox'
 import ClipboardTextField from './elements/ClipboardTextField'
 import EmptyStateView from './views/EmptyStateView'
+import ModalAppBar from './views/ModalAppBar'
 
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
@@ -48,6 +49,7 @@ const PydioComponents = {
     EmptyStateView          : EmptyStateView,
     SimpleFigureBadge       : SimpleFigureBadge,
     SearchBox               : SearchBox,
+    ModalAppBar             : ModalAppBar,
 
     ReactEditorOpener       : ReactEditorOpener,
     PaperEditorLayout       : PaperEditorLayout,
