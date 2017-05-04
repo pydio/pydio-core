@@ -114,6 +114,7 @@ class RecentListManager
                 $node->mergeMetadata([
                     'recent_access_time' => $time,
                     'recent_access_readable' => StatHelper::relativeDate($time, $mess),
+                    'recent_access_group' => StatHelper::relativeDateGroup($time, $mess),
                     'repository_id' => $repoId,
                     'repository_label' => $repoLabel
                 ]);

@@ -349,6 +349,43 @@ class StatHelper
 
     }
 
+    public static function relativeDateGroup($time, $messages){
+
+        $crtYear = date('Y');
+        $today = strtotime(date('M j, Y'));
+        $reldays = ($time - $today) / 86400;
+
+        if ($reldays >= 0 && $reldays < 1) {
+            return 'today';
+        } else if ($reldays >= 1 && $reldays < 2) {
+            return 'tomorrow';
+        } else if ($reldays >= -1 && $reldays < 0) {
+            return 'yesterday';
+        }
+
+        if (abs($reldays) < 7) {
+
+            if ($reldays > 0) {
+                $reldays = floor($reldays);
+                return str_replace("%s", $reldays, $messages['date_relative_days_ahead']);
+            } else {
+                $reldays = abs(floor($reldays));
+                return str_replace("%s", $reldays, $messages['date_relative_days_ago']);
+            }
+        }
+
+        if(abs($reldays) < 31) {
+
+            return 'more_than_week';
+
+        }else{
+
+            return 'more_than_month';
+
+        }
+
+    }
+
     /**
      * Hide file or folder for Windows OS
      * @static

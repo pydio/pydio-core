@@ -165,7 +165,7 @@ let AltDashboard = React.createClass({
 
                         <HomeSearchForm zDepth={2} {...this.props} style={styles.wsListsContainerStyle}>
                             <div style={{flex:1, display:'flex', flexDirection:'column'}} id="history-block">
-                                <div style={centerTitleStyle}>{"Recent History"}</div>
+                                <div style={centerTitleStyle}>{pydio.MessageHash['user_home.87']}</div>
                                 <RecentAccessCard
                                     {...this.props}
                                     listClassName="recent-access-centered files-list"
