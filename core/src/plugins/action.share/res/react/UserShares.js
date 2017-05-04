@@ -168,10 +168,28 @@
 
         render(){
             const selection = new PydioDataModel();
-            selection.setSelectedNodes([this.props.node.getInternalNode()]);
+            const internalNode = this.props.node.getInternalNode();
+            selection.setSelectedNodes([internalNode]);
+            const label = internalNode.getLabel();
+            const originalPath = internalNode.getMetadata().get('original_path');
+            const owner = internalNode.getMetadata().get('owner');
+            const crtUser = this.props.pydio.user && this.props.pydio.user.id;
+            let goTo;
+            if(crtUser === owner && internalNode.getMetadata().has('shared_element_parent_repository') && originalPath){
+                const parentRepoId = internalNode.getMetadata().get('shared_element_parent_repository');
+                let goToNode = new AjxpNode(originalPath);
+                goToNode.getMetadata().set('repository_id', parentRepoId);
+                goTo = <MaterialUI.IconButton iconClassName="mdi mdi-open-in-app" tooltip={this.props.pydio.MessageHash[411]} onTouchTap={() => {pydio.goTo(goToNode); this.props.onDismiss()}}/>
+
+            }
             const style = {...cardStyle, zIndex:100 - this.props.nestedLevel - 1, maxWidth: 420, minWidth: 420, marginRight: 10, overflowY:'scroll'};
+
             return (
                 <MaterialUI.Paper zDepth={1} style={style}>
+                    <div style={{padding: '22px 8px 22px 16px', height: 72, borderBottom: '1px solid #e0e0e0', backgroundColor: '#eceff1', display:'flex'}}>
+                        <div style={{paddingTop: 14, flex:1}}>{label}</div>
+                        <div>{goTo} {this.state && this.state.buttons}</div>
+                    </div>
                     <PydioReactUI.AsyncComponent
                         namespace="ShareDialog"
                         componentName="MainPanel"
@@ -181,8 +199,8 @@
                         noModal={true}
                         onLoad={this.placeButtons.bind(this)}
                         onDismiss={this.props.close}
+                        style={{flex:1}}
                     />
-                    <div style={{textAlign:'right'}}>{this.state && this.state.buttons}</div>
                 </MaterialUI.Paper>);
         }
 
@@ -313,6 +331,7 @@
                             nestedLevel={nestedLevel}
                             node={this.state.selectedChild}
                             scrollXMax={this.props.scrollXMax || this.scrollXMax.bind(this)}
+                            onDismiss={this.props.onDismiss}
                         />
                     }
                     {this.state.selectedChild && this.state.selectedChild.isLeaf() &&
@@ -322,6 +341,7 @@
                             nestedLevel={nestedLevel}
                             scrollXMax={this.props.scrollXMax || this.scrollXMax.bind(this)}
                             close={() => {this.setState({selectedChild: null})}}
+                            onDismiss={this.props.onDismiss}
                         />
                     }
                 </div>

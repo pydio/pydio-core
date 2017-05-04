@@ -91,7 +91,7 @@ let MainPanel = React.createClass({
 
     getButtons:function(updater){
 
-        this.buttonsComputer = new ButtonsComputer(this.props.pydio, this.state.model, updater, this.dismiss, this.getMessage);
+        this.buttonsComputer = new ButtonsComputer(this.props.pydio, this.state.model, updater, this.dismiss, this.getMessage, this.props.noModal);
         this.buttonsComputer.start();
         return this.buttonsComputer.getButtons();
 
@@ -277,7 +277,10 @@ class Content extends React.Component{
                 flex: 1,
                 overflow: 'hidden',
                 display:'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+            },
+            tabItemContainerStyle :{
+                flexShrink:0
             },
             contentContainerStyle : {
                 flex: 1,
@@ -290,7 +293,7 @@ class Content extends React.Component{
         }
 
         return(
-            <div className="react_share_form" style={{width: 420, display:'flex', flexDirection:'column'}}>
+            <div className="react_share_form" style={{width: 420, display:'flex', flexDirection:'column', ...this.props.style}}>
                 <HeaderPanel {...this.props} shareModel={this.props.model}/>
                 <Tabs value={this.props.initialSelectedIndex} {...tabStyles} >{this.props.panels}</Tabs>
                 {this.props.mailer}

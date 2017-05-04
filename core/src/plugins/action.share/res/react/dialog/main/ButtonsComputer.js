@@ -1,14 +1,15 @@
-const {FlatButton} = require('material-ui')
+const {FlatButton, IconButton} = require('material-ui')
 
 class ButtonsComputer{
 
-    constructor(pydio, shareModel, buttonsUpdater, dismissCallback, getMessage){
+    constructor(pydio, shareModel, buttonsUpdater, dismissCallback, getMessage, useIconButtons = false){
         this.pydio = pydio;
         this._buttonsUpdater = buttonsUpdater;
         this._dismissCallback = dismissCallback;
         this._shareModel = shareModel;
         this._saveDisabled = false;
         this._getMessage = getMessage;
+        this._iconButtons = useIconButtons;
     }
     enableSave(){
         this._saveDisabled = false;
@@ -45,15 +46,30 @@ class ButtonsComputer{
     }
     getButtons(){
         let buttons = [];
+        let ic = this._iconButtons;
         if(this._shareModel.getStatus() == 'modified'){
-            buttons.push(<a style={{cursor:'pointer',color:'rgba(0,0,0,0.53)'}} onClick={this.triggerModelRevert.bind(this)}>{this._getMessage('179')}</a>);
-            buttons.push(<FlatButton secondary={true} disabled={this._saveDisabled} label={this._getMessage('53', '')} onClick={this.triggerModelSave.bind(this)}/>);
-            buttons.push(<FlatButton secondary={false} label={this._getMessage('86', '')} onClick={this._dismissCallback.bind(this)}/>);
+            if(ic){
+                buttons.push(<IconButton iconClassName="mdi mdi-undo-variant" onTouchTap={this.triggerModelRevert.bind(this)} tooltip={this._getMessage('179')}/>);
+                buttons.push(<IconButton iconClassName="mdi mdi-check" secondary={true} disabled={this._saveDisabled} tooltip={this._getMessage('53', '')} onTouchTap={this.triggerModelSave.bind(this)}/>);
+                buttons.push(<IconButton iconClassName="mdi mdi-close" secondary={false} tooltip={this._getMessage('86', '')} onTouchTap={this._dismissCallback.bind(this)}/>);
+            }else{
+                buttons.push(<a style={{cursor:'pointer',color:'rgba(0,0,0,0.53)'}} onClick={this.triggerModelRevert.bind(this)}>{this._getMessage('179')}</a>);
+                buttons.push(<FlatButton secondary={true} disabled={this._saveDisabled} label={this._getMessage('53', '')} onTouchTap={this.triggerModelSave.bind(this)}/>);
+                buttons.push(<FlatButton secondary={false} label={this._getMessage('86', '')} onTouchTap={this._dismissCallback.bind(this)}/>);
+            }
         }else{
             if((this._shareModel.hasActiveShares() && (this._shareModel.currentIsOwner())) || this._shareModel.getStatus() === 'error' || this.pydio.user.activeRepository === "ajxp_conf"){
-                buttons.push(<FlatButton  disabled={this._saveDisabled} secondary={true} label={this._getMessage('6')} onClick={this.disableAllShare.bind(this)}/>);
+                if(ic){
+                    buttons.push(<IconButton iconClassName="mdi mdi-cancel" disabled={this._saveDisabled} secondary={true} tooltip={this._getMessage('6')} onTouchTap={this.disableAllShare.bind(this)}/>);
+                }else{
+                    buttons.push(<FlatButton  disabled={this._saveDisabled} secondary={true} label={this._getMessage('6')} onTouchTap={this.disableAllShare.bind(this)}/>);
+                }
             }
-            buttons.push(<FlatButton secondary={false} label={this._getMessage('86', '')} onClick={this._dismissCallback.bind(this)}/>);
+            if(ic){
+                buttons.push(<IconButton iconClassName="mdi mdi-close" secondary={false} tooltip={this._getMessage('86', '')} onTouchTap={this._dismissCallback.bind(this)}/>);
+            }else{
+                buttons.push(<FlatButton secondary={false} label={this._getMessage('86', '')} onTouchTap={this._dismissCallback.bind(this)}/>);
+            }
         }
         return buttons;
     }
