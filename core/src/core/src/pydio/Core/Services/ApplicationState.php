@@ -266,6 +266,11 @@ class ApplicationState
         return realpath(sys_get_temp_dir());
     }
 
+    public static function getTemporaryBinariesFolder(){
+
+        return self::getTemporaryFolder() . '/' . 'pydio_binaries_uploads';
+    }
+
     /**
      * Try to set an ini config, without errors
      * @static
