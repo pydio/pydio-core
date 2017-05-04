@@ -147,22 +147,26 @@ export default class User{
 	getPreference(prefName, fromJSON){
         if(fromJSON){
             const test = this._parsedJSONCache.get(prefName);
-            if(test !== undefined) return test;
+            if(test) return test;
         }
 	    const value = this.preferences.get(prefName);
-	    if(fromJSON && value){
-	    	try{
-                if(typeof value == "object") return value;
-		    	const parsed = JSON.parse(value);
-                this._parsedJSONCache.set(prefName, parsed);
-                return parsed;
-	    	}catch(e){
-                if(window.console){
-                    Logger.log("Error parsing JSON in preferences ("+prefName+"). You should contact system admin and clear user preferences.");
-                }else{
-                    alert("Error parsing JSON in preferences. You should contact system admin and clear user preferences.");
+	    if(fromJSON){
+	        if(value){
+                try{
+                    if(typeof value == "object") return value;
+                    const parsed = JSON.parse(value);
+                    this._parsedJSONCache.set(prefName, parsed);
+                    if(!parsed) return {};
+                    return parsed;
+                }catch(e){
+                    if(window.console){
+                        Logger.log("Error parsing JSON in preferences ("+prefName+"). You should contact system admin and clear user preferences.");
+                    }else{
+                        alert("Error parsing JSON in preferences. You should contact system admin and clear user preferences.");
+                    }
                 }
-	    	}
+            }
+            return {};
 	    }
 	    return value;
 	}

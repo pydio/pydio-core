@@ -6,13 +6,14 @@ class WelcomeTour extends Component{
 
     constructor(props, context){
         super(props, context);
-        this.state = {started: false};
+        this.state = {started: !(props.pydio.user && !props.pydio.user.getPreference('gui_preferences', true)['UserAccount.WelcomeModal.Shown'])};
     }
 
     componentDidMount(){
         if(!this.state.started){
             pydio.UI.openComponentInModal('UserAccount', 'WelcomeModal', {
                 onRequestStart:(skip) => {
+                    this.discard('UserAccount.WelcomeModal.Shown');
                     if(skip) {
                         this.discard();
                     }else{
@@ -23,10 +24,10 @@ class WelcomeTour extends Component{
         }
     }
 
-    discard(){
+    discard(pref = 'WelcomeComponent.Pydio8.TourGuide.Welcome'){
         const {user} =  this.props.pydio;
         let guiPrefs = user.getPreference('gui_preferences', true);
-        guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] = true;
+        guiPrefs[pref] = true;
         user.setPreference('gui_preferences', guiPrefs, true);
         user.savePreference('gui_preferences');
     }
@@ -74,7 +75,7 @@ class WelcomeTour extends Component{
             tourguideSteps = tourguideSteps.concat([
                 {
                     title:'Open a workspace',
-                    text : 'Now let\'s enter a workspace and learn how it is organized. Ready ?' ,
+                    text : 'At the first connection, your history is probably empty. Enter a workspace once you are ready to add files.' ,
                     selector:'.workspace-entry',
                     position:'right'
                 }
@@ -83,13 +84,7 @@ class WelcomeTour extends Component{
 
         const callback = (data) => {
             if(data.type === 'step:after' && data.index === tourguideSteps.length - 1 ){
-                const repoList = this.props.pydio.user.getRepositoriesList();
                 this.discard();
-                this.props.pydio.WelcomeComponentPydio8TourGuideStarted = true;
-                try{
-                    const repoKey = repoList.keys().next().value;
-                    this.props.pydio.triggerRepositoryChange(repoKey);
-                }catch(e){}
             }
         };
         return (

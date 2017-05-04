@@ -6,17 +6,13 @@ class WelcomeTour extends Component{
 
     constructor(props, context){
         super(props, context);
-        if(props.pydio.WelcomeComponentPydio8TourGuideStarted){
-            this.state = {started: true};
-        }else{
-            this.state = {started: false};
-        }
+        this.state = {started: !(props.pydio.user && !props.pydio.user.getPreference('gui_preferences', true)['UserAccount.WelcomeModal.Shown'])};
     }
 
-    discard(){
+    discard(pref='WelcomeComponent.Pydio8.TourGuide.FSTemplate'){
         const {user} = this.props.pydio;
         let guiPrefs = user.getPreference('gui_preferences', true);
-        guiPrefs['WelcomeComponent.Pydio8.TourGuide.FSTemplate'] = true;
+        guiPrefs[pref] = true;
         user.setPreference('gui_preferences', guiPrefs, true);
         user.savePreference('gui_preferences');
     }
@@ -25,6 +21,7 @@ class WelcomeTour extends Component{
         if(!this.state.started){
             pydio.UI.openComponentInModal('UserAccount', 'WelcomeModal', {
                 onRequestStart:(skip) => {
+                    this.discard('UserAccount.WelcomeModal.Shown');
                     if(skip) this.discard();
                     this.setState({started: true, skip: skip});
                 }

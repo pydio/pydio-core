@@ -24,6 +24,7 @@ export default React.createClass({
         };
     },
     close: function(skip){
+
         if(this.props.onRequestStart){
             this.props.onRequestStart(skip);
         }
