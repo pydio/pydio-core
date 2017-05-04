@@ -1,8 +1,14 @@
 import PluginEditor from '../core/PluginEditor'
+import {RaisedButton, Checkbox} from 'material-ui'
 
 const UpdaterDashboard = React.createClass({
 
     mixins:[AdminComponents.MessagesConsumerMixin],
+
+
+    getInitialState: function(){
+        return {checks: -1};
+    },
 
     componentDidMount:function(){
         this.checkForUpgrade();
@@ -35,26 +41,38 @@ const UpdaterDashboard = React.createClass({
     },
 
     performUpgrade: function(){
+        if(this.state.checks < 0){
+            alert('Please select at least one package!');
+            return;
+        }
         if(confirm(this.context.getMessage('15', 'updater'))){
             var client = PydioApi.getClient();
             this.setState({src:''}, function(){
-                this.setState({src: client._baseUrl + '?secure_token=' + client._secureToken  + '&get_action=perform_upgrade'});
+                this.setState({src: client._baseUrl + '?secure_token=' + client._secureToken  + '&get_action=perform_upgrade&package_index=' + this.state.checks});
             }.bind(this));
 
         }
     },
 
+    onCheckStateChange: function(index, value){
+        if(value) this.setState({checks: index});
+        else this.setState({checks: index - 1});
+    },
+
     render:function(){
 
         var list = null;
-        if(this.state && this.state.packages){
+        const {packages, checks, loading} = this.state;
+        if(packages){
             list = (
                 <div style={{paddingBottom:30,paddingRight:5}}>
                         <span style={{float:'right'}}>
-                            <ReactMUI.RaisedButton primary={true} label={this.context.getMessage('4', 'updater')} onClick={this.performUpgrade}/>
+                            <RaisedButton primary={true} label={this.context.getMessage('4', 'updater')} onTouchTap={this.performUpgrade}/>
                         </span>
                     {this.context.getMessage('16', 'updater')}
-                    <ul style={{paddingLeft:30}}>{this.state.packages.map(function(p){return <li style={{listStyle:'inherit'}} key={p}>{PathUtils.getBasename(p)}</li>;})}</ul>
+                    <div style={{paddingLeft:30}}>{packages.map((p, index) => {
+                        return <div><Checkbox style={{listStyle:'inherit'}} key={p} label={PathUtils.getBasename(p)} onCheck={(e,v)=> this.onCheckStateChange(index, v)} checked={index <= checks} /></div>
+                    })}</div>
                     <br/>{this.context.getMessage('3', 'updater')}
                 </div>
             );

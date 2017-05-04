@@ -161,8 +161,20 @@ class UpgradeManager
         } else {
             $json = FileHelper::getRemoteContent($url . "?channel=" . $channel . "&version=" . AJXP_VERSION . "&package=" . $packageName);
         }
-        if ($format == "php") return json_decode($json, true);
-        else return $json;
+        if($channel === 'test'){
+            $data = json_decode($json, true);
+            $package = $data['packages'][0];
+            $data['packages'][] = str_replace('0.0.0', '0.0.1', $package);
+            $data['packages'][] = str_replace('0.0.0', '0.0.2', $package);
+            $data['packages'][] = str_replace('0.0.0', '0.0.3', $package);
+            $json = json_encode($data);
+        }
+
+        if ($format == "php") {
+            return json_decode($json, true);
+        } else {
+            return $json;
+        }
     }
 
     /**
