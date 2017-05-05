@@ -172,7 +172,6 @@ class ConfigsParser {
                 });
             });
         });
-        console.log(panels);
         return panels;
 
     }
