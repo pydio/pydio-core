@@ -1,7 +1,10 @@
-const React = require('react')
+import React from 'react'
+import Pydio from 'pydio'
+import ReactDOM from 'react-dom'
+
 import FilePreview from './FilePreview'
-const ReactDOM = require('react-dom')
-const {IconButton} = require('material-ui')
+import {IconButton} from 'material-ui'
+const {SimpleList} = Pydio.requireLib('components')
 
 class ComponentConfigsParser {
 
@@ -186,12 +189,24 @@ let MainFilesList = React.createClass({
     },
 
     entryRenderIcon: function(node, entryProps = {}){
-        return (
-            <FilePreview
-                loadThumbnail={!entryProps['parentIsScrolling']}
-                node={node}
-            />
-        );
+        if(entryProps && entryProps.parent){
+            return (
+                <FilePreview
+                    loadThumbnail={false}
+                    node={node}
+                    mimeClassName="mimefont mdi mdi-chevron-left"
+                    onTouchTap={()=>{this.entryHandleClicks(node, SimpleList.CLICK_TYPE_DOUBLE)}}
+                    style={{cursor:'pointer'}}
+                />
+            );
+        }else{
+            return (
+                <FilePreview
+                    loadThumbnail={!entryProps['parentIsScrolling']}
+                    node={node}
+                />
+            );
+        }
     },
 
     entryRenderActions: function(node){
@@ -221,14 +236,17 @@ let MainFilesList = React.createClass({
     entryHandleClicks: function(node, clickType, event){
         let dm = this.props.pydio.getContextHolder();
         const mobile = this.props.pydio.UI.MOBILE_EXTENSIONS || this.props.horizontalRibbon;
-        if(!mobile && ( !clickType || clickType === PydioComponents.SimpleList.CLICK_TYPE_SIMPLE )){
+        if(dm.getContextNode().getParent() === node && clickType === SimpleList.CLICK_TYPE_SIMPLE){
+            return;
+        }
+        if(!mobile && ( !clickType || clickType === SimpleList.CLICK_TYPE_SIMPLE )){
             if(event && event.shiftKey && dm.getSelectedNodes().length){
                 const newSelection = this.refs.list.computeSelectionFromCurrentPlusTargetNode(dm.getSelectedNodes(), node);
                 dm.setSelectedNodes(newSelection);
             }else{
                 dm.setSelectedNodes([node]);
             }
-        }else if(mobile || clickType === PydioComponents.SimpleList.CLICK_TYPE_DOUBLE){
+        }else if(mobile || clickType === SimpleList.CLICK_TYPE_DOUBLE){
             if(node.isLeaf()){
                 dm.setSelectedNodes([node]);
                 this.props.pydio.Controller.fireAction("open_with_unique");
@@ -339,7 +357,7 @@ let MainFilesList = React.createClass({
 
         if(dMode === 'detail'){
 
-            elementHeight = PydioComponents.SimpleList.HEIGHT_ONE_LINE;
+            elementHeight = SimpleList.HEIGHT_ONE_LINE;
             tableKeys = this.state.columns;
 
         } else if(dMode === 'grid'){
@@ -366,7 +384,7 @@ let MainFilesList = React.createClass({
         } else if(dMode === 'list'){
 
             sortKeys = this.state.columns;
-            elementHeight = PydioComponents.SimpleList.HEIGHT_TWO_LINES;
+            elementHeight = SimpleList.HEIGHT_TWO_LINES;
             entryRenderSecondLine = this.entryRenderSecondLine;
 
         }
@@ -415,7 +433,7 @@ let MainFilesList = React.createClass({
         }
 
         return (
-            <PydioComponents.SimpleList
+            <SimpleList
                 ref="list"
                 tableKeys={tableKeys}
                 sortKeys={sortKeys}
@@ -430,6 +448,7 @@ let MainFilesList = React.createClass({
                 elementStyle={elementStyle}
                 passScrollingStateToChildren={true}
                 entryRenderIcon={this.entryRenderIcon}
+                entryRenderParentIcon={this.entryRenderIcon}
                 entryRenderSecondLine={entryRenderSecondLine}
                 entryRenderActions={this.entryRenderActions}
                 entryHandleClicks={this.entryHandleClicks}

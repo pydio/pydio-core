@@ -678,18 +678,24 @@ let SimpleList = React.createClass({
             let data;
             if(entry.parent) {
                 data = {
-                    node: entry.node,
-                    key: entry.node.getPath(),
-                    id: entry.node.getPath(),
-                    mainIcon: SimpleList.PARENT_FOLDER_ICON,
-                    firstLine: "..",
-                    className: "list-parent-node",
-                    secondLine:this.context.getMessage('react.1'),
-                    onClick: this.clickRow,
-                    onDoubleClick: this.doubleClickRow,
-                    showSelector: false,
-                    selectorDisabled: true
+                    node                : entry.node,
+                    key                 : entry.node.getPath(),
+                    id                  : entry.node.getPath(),
+                    mainIcon            : SimpleList.PARENT_FOLDER_ICON,
+                    firstLine           : "..",
+                    className           : "list-parent-node",
+                    secondLine          : this.context.getMessage('react.1'),
+                    onClick             : this.clickRow,
+                    onDoubleClick       : this.doubleClickRow,
+                    showSelector        : false,
+                    selectorDisabled    : true,
+                    noHover             : true
                 };
+                if(this.props.entryRenderParentIcon){
+                    data['iconCell'] = this.props.entryRenderParentIcon(entry.node, entry);
+                }else{
+                    data['mainIcon'] = SimpleList.PARENT_FOLDER_ICON;
+                }
                 if(this.props.elementStyle){
                     data['style'] = this.props.elementStyle;
                 }
@@ -703,16 +709,16 @@ let SimpleList = React.createClass({
                     firstLine = this.props.entryRenderGroupHeader(id, firstLine);
                 }
                 data = {
-                    node: null,
-                    key: entry.groupHeader,
-                    id: id,
-                    mainIcon: null,
-                    firstLine: firstLine,
-                    className:'list-group-header',
-                    onClick: null,
-                    showSelector: false,
-                    selectorDisabled: true,
-                    groupHeader: true
+                    node                : null,
+                    key                 : entry.groupHeader,
+                    id                  : id,
+                    mainIcon            : null,
+                    firstLine           : firstLine,
+                    className           : 'list-group-header',
+                    onClick             : null,
+                    showSelector        : false,
+                    selectorDisabled    : true,
+                    noHover             : true
                 };
                 if(this.props.passScrollingStateToChildren){
                     data['parentIsScrolling'] = this.state.isScrolling;
@@ -720,21 +726,21 @@ let SimpleList = React.createClass({
                 components.push(React.createElement(ListEntry, data));
             }else{
                 data = {
-                    node:entry.node,
-                    onClick: this.clickRow,
-                    onDoubleClick: this.doubleClickRow,
-                    onSelect:this.toggleSelection,
-                    key:entry.node.getPath(),
-                    id:entry.node.getPath(),
-                    renderIcon:this.props.entryRenderIcon,
-                    renderFirstLine:this.props.entryRenderFirstLine,
-                    renderSecondLine:this.props.entryRenderSecondLine,
-                    renderThirdLine:this.props.entryRenderThirdLine,
-                    renderActions:this.props.entryRenderActions,
-                    showSelector:showSelector,
-                    selected:(this.state && this.state.selection)?this.state.selection.get(entry.node):false,
-                    actions:<SimpleReactActionBar node={entry.node} actions={entry.actions} dataModel={this.dm}/>,
-                    selectorDisabled:!(this.props.entryEnableSelector?this.props.entryEnableSelector(entry.node):entry.node.isLeaf())
+                    node                : entry.node,
+                    onClick             : this.clickRow,
+                    onDoubleClick       : this.doubleClickRow,
+                    onSelect            : this.toggleSelection,
+                    key                 : entry.node.getPath(),
+                    id                  : entry.node.getPath(),
+                    renderIcon          : this.props.entryRenderIcon,
+                    renderFirstLine     : this.props.entryRenderFirstLine,
+                    renderSecondLine    : this.props.entryRenderSecondLine,
+                    renderThirdLine     : this.props.entryRenderThirdLine,
+                    renderActions       : this.props.entryRenderActions,
+                    showSelector        : showSelector,
+                    selected            : (this.state && this.state.selection)?this.state.selection.get(entry.node):false,
+                    actions             : <SimpleReactActionBar node={entry.node} actions={entry.actions} dataModel={this.dm}/>,
+                    selectorDisabled    : !(this.props.entryEnableSelector?this.props.entryEnableSelector(entry.node):entry.node.isLeaf())
                 };
                 data['isFirst'] = (index === 0);
                 data['isLast'] = (index === nodeEntriesLength - 1);

@@ -1,6 +1,8 @@
+import React from 'react'
 import ListEntryNodeListenerMixin from './ListEntryNodeListenerMixin'
 import InlineEditor from './InlineEditor'
 import {DragDropListEntry} from './ListEntry'
+import {FontIcon} from 'material-ui'
 
 /**
  * Callback based material list entry with custom icon render, firstLine, secondLine, etc.
@@ -27,7 +29,7 @@ export default React.createClass({
         } else {
             var node = this.props.node;
             var iconClass = node.getMetadata().get("icon_class")? node.getMetadata().get("icon_class") : (node.isLeaf()?"icon-file-alt":"icon-folder-close");
-            icon = <ReactMUI.FontIcon className={iconClass}/>;
+            icon = <FontIcon className={iconClass}/>;
         }
 
         if(this.props.renderFirstLine) {

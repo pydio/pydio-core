@@ -64,7 +64,7 @@ class ListEntry extends React.Component {
         let additionalStyle = {
             transition:'background-color .25s'
         };
-        if(this.state && this.state.hover && !this.props.groupHeader){
+        if(this.state && this.state.hover && !this.props.noHover){
             additionalStyle = {
                 ...additionalStyle,
                 backgroundColor: 'rgba(0,0,0,0.05)',
@@ -133,7 +133,8 @@ ListEntry.propTypes = {
     actions:React.PropTypes.element,
     activeDroppable:React.PropTypes.bool,
     className:React.PropTypes.string,
-    style: React.PropTypes.object
+    style: React.PropTypes.object,
+    noHover: React.PropTypes.bool
 }
 
 ListEntry = muiThemeable()(ListEntry);
