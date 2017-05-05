@@ -689,9 +689,9 @@ let SimpleList = React.createClass({
                     onDoubleClick       : this.doubleClickRow,
                     showSelector        : false,
                     selectorDisabled    : true,
-                    noHover             : true
+                    noHover             : false
                 };
-                if(this.props.entryRenderParentIcon){
+                if(this.props.entryRenderParentIcon && ! this.props.tableKeys){
                     data['iconCell'] = this.props.entryRenderParentIcon(entry.node, entry);
                 }else{
                     data['mainIcon'] = SimpleList.PARENT_FOLDER_ICON;

@@ -32,7 +32,13 @@ class ListEntry extends React.Component {
 
         let selector, icon, additionalClassName;
 
-        const {showSelector, selected, selectorDisabled} = this.props
+        const {node, showSelector, selected, selectorDisabled, firstLine,
+            secondLine, thirdLine, style, actions, iconCell, mainIcon, className,
+            canDrop, isOver, connectDragSource, connectDropTarget} = this.props
+
+        let mainClasses = ['material-list-entry', 'material-list-entry-' + (thirdLine?3:secondLine?2:1) + '-lines'];
+        if(className) mainClasses.push(className);
+
         if(showSelector){
             selector = (
                 <div className="material-list-selector">
@@ -41,28 +47,26 @@ class ListEntry extends React.Component {
             );
         }
 
-        const {iconCell, mainIcon} = this.props
         if(iconCell){
             icon = this.props.iconCell;
         }else if(this.props.mainIcon){
             icon = <FontIcon className={"mui-font-icon " + this.props.mainIcon} style={{fontSize: 18/*, color: "#FFFFFF"*/}} />;
         }
 
-        const {className, canDrop, isOver} = this.props
-        additionalClassName = className ? className + ' ' : '';
         if(canDrop && isOver){
-            additionalClassName += ' droppable-active ';
+            mainClasses.push('droppable-active');
         }
 
-        const {node} = this.props
         if(node){
-            additionalClassName += ' listentry' + node.getPath().replace(/\//g, '_') + ' ' + ' ajxp_node_' + (node.isLeaf()?'leaf':'collection') + ' ';
+            mainClasses.push('listentry' + node.getPath().replace(/\//g, '_'));
+            mainClasses.push('ajxp_node_' + (node.isLeaf()?'leaf':'collection'));
             if(node.getAjxpMime()){
-                additionalClassName += ' ajxp_mime_' + node.getAjxpMime() + ' ';
+                mainClasses.push('ajxp_mime_' + node.getAjxpMime())
             }
         }
+
         let additionalStyle = {
-            transition:'background-color .25s'
+            /*transition:'background-color 250ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, color 250ms cubic-bezier(0.23, 1, 0.32, 1) 0ms'*/
         };
         if(this.state && this.state.hover && !this.props.noHover){
             additionalStyle = {
@@ -73,13 +77,16 @@ class ListEntry extends React.Component {
         }
         if(selected){
             const selectionColor = this.props.muiTheme.palette.accent2Color;
+            const selectionColorDark = Color(selectionColor).dark();
             additionalStyle = {
                 ...additionalStyle,
-                backgroundColor: Color(selectionColor).lightness(95).toString()
+                backgroundColor: selectionColor,
+                color: selectionColorDark ? 'white' : 'rgba(0,0,0,.87)'
             };
+            mainClasses.push('selected');
+            mainClasses.push('selected-' + (selectionColorDark?'dark':'light'));
         }
 
-        const {connectDragSource, connectDropTarget, firstLine, secondLine, thirdLine, style, actions} = this.props
 
         return (
             <ContextMenuWrapper
@@ -91,7 +98,7 @@ class ListEntry extends React.Component {
                 }}
                 onClick={this.onClick.bind(this)}
                 onDoubleClick={showSelector? null : this.onDoubleClick.bind(this)}
-                className={additionalClassName + "material-list-entry material-list-entry-" + (thirdLine?3:secondLine?2:1) + "-lines"+ (selected? " selected":"")}
+                className={mainClasses.join(' ')}
                 onMouseOver={()=>{this.setState({hover:true})}}
                 onMouseOut={()=>{this.setState({hover:false})}}
                 style={{...style, ...additionalStyle}}>
