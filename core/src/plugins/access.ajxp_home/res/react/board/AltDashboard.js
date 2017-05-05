@@ -53,22 +53,28 @@ let AltDashboard = React.createClass({
         return {unreadStatus:0};
     },
 
+    openDrawer: function(event){
+        event.stopPropagation();
+        this.setState({drawerOpen: true});
+    },
+
+    closeDrawer: function(){
+        if(!this.state.drawerOpen){
+            return;
+        }
+        this.setState({drawerOpen: false});
+    },
+
     render:function() {
 
-        const enableSearch = this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH");
+        const {pydio} = this.props;
+
+        const enableSearch = pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH");
         const palette = this.props.muiTheme.palette;
         const Color = MaterialUI.Color;
-        const widgetStyle = {
-            backgroundColor: Color(palette.primary1Color).darken(0.2).toString(),
-            width:'100%',
-            position: 'fixed'
-        };
 
-        const lightColor = '#eceff1'; // TO DO: TO BE COMPUTED FROM MAIN COLOR
         const uWidgetProps = this.props.userWidgetProps || {};
         const wsListProps = this.props.workspacesListProps || {};
-
-        const {pydio} = this.props;
         const appBarColor = new Color(this.props.muiTheme.appBar.color);
 
         const styles = {
@@ -101,49 +107,25 @@ let AltDashboard = React.createClass({
                 width: 260,
                 overflowY:'auto',
                 backgroundColor: '#ECEFF1'
+            },
+            centerTitleStyle:{
+                padding: '20px 16px 10px',
+                fontSize: 13,
+                color: '#93a8b2',
+                fontWeight: 500
             }
         }
 
-
-        if(this.props.pydio.UI.MOBILE_EXTENSIONS){
-            styles.wsListsContainerStyle = {...styles.wsListsContainerStyle, display:'bloc', marginRight:0, right: 0};
-            styles.rglStyle = {...styles.rglStyle, transform:'translateX(260px)'};
-        }
-
-        const centerTitleStyle = {
-            padding: '20px 16px 10px',
-            fontSize: 13,
-            color: '#93a8b2',
-            fontWeight: 500
-        };
-
         const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
 
-        const openAlertPanel = (
-            <div style={{flex:2, display:'flex', flexDirection:'column', borderTop:'2px solid #e0e0e0'}}  id="alerts-block">
-                <div style={centerTitleStyle}>
-                    <Badge
-                        badgeContent={this.state.unreadStatus}
-                        secondary={true}
-                        style={this.state.unreadStatus  ? {padding: '0 24px 0 0'} : {padding: 0}}
-                        badgeStyle={!this.state.unreadStatus ? {display:'none'} : {marginTop: -10}}
-                    ><span style={{marginRight:10, display:'inline-block'}}>{"My Alerts"}</span></Badge>
-                </div>
-                <AsyncComponent
-                    namespace="PydioNotifications"
-                    componentName="Panel"
-                    pydio={this.props.pydio}
-                    listOnly={true}
-                    listClassName="vertical-fill"
-                    emptyStateProps={{style:{backgroundColor:'white'}}}
-                    onUnreadStatusChange={(s)=>{this.setState({unreadStatus: s})}}
-                />
-            </div>
-        );
+        let mainClasses = ['vertical_layout', 'vertical_fit', 'react-fs-template', 'user-dashboard-template'];
+        if(this.state.drawerOpen){
+            mainClasses.push('drawer-open');
+        }
 
         return (
 
-            <div className={['vertical_layout', 'vertical_fit', 'react-fs-template', 'user-dashboard-template'].join(' ')}>
+            <div className={mainClasses.join(' ')} onTouchTap={this.closeDrawer}>
                 {!guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
                 <LeftPanel
                     className="left-panel"
@@ -157,7 +139,7 @@ let AltDashboard = React.createClass({
                             <span className="drawer-button"><IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <span style={{flex:1}}></span>
                             <div style={{textAlign:'center', width: 260}}>
-                                <ConfigLogo style={{height:110}} pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
+                                <ConfigLogo className="home-top-logo" pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
                             </div>
                         </div>
                     </Paper>
@@ -165,7 +147,7 @@ let AltDashboard = React.createClass({
 
                         <HomeSearchForm zDepth={2} {...this.props} style={styles.wsListsContainerStyle}>
                             <div style={{flex:1, display:'flex', flexDirection:'column'}} id="history-block">
-                                <div style={centerTitleStyle}>{pydio.MessageHash['user_home.87']}</div>
+                                <div style={styles.centerTitleStyle}>{pydio.MessageHash['user_home.87']}</div>
                                 <RecentAccessCard
                                     {...this.props}
                                     listClassName="recent-access-centered files-list"

@@ -15,14 +15,14 @@ body,#ajxp_desktop,#background-imager{
   .left-panel{
     width: 250px;
     &:not(.expanded){
-      @media @screenwidth-small{
+      @media @screenwidth-medium{
         transform: translateX(-250px);
       }
     }
   }
 
   .drawer-open .left-panel{
-    @media @screenwidth-small{
+    @media @screenwidth-medium{
       transform: translateX(0px);
     }
   }
@@ -30,7 +30,7 @@ body,#ajxp_desktop,#background-imager{
   .desktop-container{
     transition: @bezier_transition;
     margin-left: 250px;
-    @media @screenwidth-small{
+    @media @screenwidth-medium{
       margin-left: 0;
     }
 
@@ -42,7 +42,8 @@ body,#ajxp_desktop,#background-imager{
       }
       .drawer-button{
         display: none;
-        @media @screenwidth-small{
+
+        @media @screenwidth-medium{
           display: block;
           margin: 6px 0;
         }

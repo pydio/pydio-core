@@ -15,7 +15,7 @@ class ConfigLogo extends React.Component{
                 url = this.props.pydio.Parameters.get('ajxpServerAccess') + "&get_action=get_global_binary_param&binary_id=" + logo;
             }
         }
-        return <img src={url} style={this.props.style}/>
+        return <img src={url} style={this.props.style} className={this.props.className}/>
     }
 }
 

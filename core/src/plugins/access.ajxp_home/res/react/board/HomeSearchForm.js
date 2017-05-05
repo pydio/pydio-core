@@ -103,7 +103,7 @@ class HomeSearchForm extends Component{
         };
 
         return (
-            <Paper style={style} zDepth={zDepth} className="vertical-layout">
+            <Paper style={style} zDepth={zDepth} className="vertical-layout home-center-paper">
                 <div style={styles.textFieldContainer} className="home-search-form">
                     <FontIcon className="mdi mdi-magnify" style={styles.magnifier}/>
                     <TextField

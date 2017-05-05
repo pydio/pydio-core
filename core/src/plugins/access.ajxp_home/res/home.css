@@ -6,6 +6,14 @@
     opacity: 1;
   }
 }
+.home-top-logo {
+  height: 110px;
+}
+@media only screen and (max-width: 758px) {
+  .home-top-logo {
+    height: 55px;
+  }
+}
 div.user-dashboard-main .admin-helper-panel {
   position: absolute;
   top: 55px;
@@ -50,6 +58,17 @@ div.user-dashboard-main .home-dashboard {
   padding: 0;
   overflow: auto;
   background-color: transparent;
+}
+@media only screen and (max-width: 758px) {
+  div.user-dashboard-main .home-center-paper {
+    left: 10px !important;
+    right: 10px !important;
+  }
+}
+@media only screen and (max-width: 758px) {
+  div.user-dashboard-main div.react-grid-layout.dashboard-layout {
+    display: none;
+  }
 }
 div.user-dashboard-main div.react-grid-layout.dashboard-layout .video-card .tutorial_legend {
   display: -ms-flexbox;
