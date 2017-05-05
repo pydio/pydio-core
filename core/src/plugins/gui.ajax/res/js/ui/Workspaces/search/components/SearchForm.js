@@ -123,7 +123,7 @@ class SearchForm extends Component {
         const {searchScope, display, loading, dataModel, empty, values} = this.state;
 
         let renderSecondLine = null, renderIcon = null, elementHeight = 49;
-        if (display !== 'small') {
+        if (display !== 'small' && display !== 'closed') {
             elementHeight = PydioComponents.SimpleList.HEIGHT_TWO_LINES + 10;
             renderSecondLine = (node) => {
                 let path = node.getPath();
@@ -137,6 +137,13 @@ class SearchForm extends Component {
             };
             renderIcon = (node, entryProps = {}) => {
                 return <FilePreview loadThumbnail={!entryProps['parentIsScrolling']} node={node}/>;
+            };
+        }else{
+            renderIcon = (node, entryProps = {}) => {
+                return <FilePreview loadThumbnail={false} richPreview={false} node={node}
+                                    style={{width:30,height:30, borderRadius:'50%',margin:'9px 6px'}}
+                                    mimeFontStyle={{fontSize: 16, display: 'block', padding: '4px 7px'}}
+                />;
             };
         }
 

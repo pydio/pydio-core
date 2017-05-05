@@ -3,6 +3,7 @@ import {FontIcon, TextField, CircularProgress, FlatButton} from 'material-ui';
 import SearchScopeSelector from './SearchScopeSelector'
 const {PydioContextConsumer} = require('pydio').requireLib('boot')
 import _ from 'lodash';
+import {muiThemeable} from 'material-ui/styles'
 
 /**
  * Subpane for search form
@@ -113,9 +114,13 @@ class MainSearch extends Component {
             input = {...input, ...closedMode.input};
             magnifier = {...magnifier, ...closedMode.magnifier};
         }
+        let topStyle = {};
+        if(mode !== 'closed'){
+            topStyle = {backgroundColor: this.props.muiTheme.palette.accent2Color};
+        }
 
         return (
-            <div className="search-input">
+            <div className="search-input" style={topStyle}>
                 <div className="panel-header" style={{display:'flex'}}>
                     {scopeSelectorProps &&
                     <span>
@@ -162,5 +167,5 @@ class MainSearch extends Component {
     }
 }
 
-MainSearch = PydioContextConsumer(MainSearch);
+MainSearch = PydioContextConsumer(muiThemeable()(MainSearch));
 export {MainSearch as default}

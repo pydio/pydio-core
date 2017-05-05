@@ -4,13 +4,14 @@ import Pydio from 'pydio';
 const { NodeListCustomProvider } = Pydio.requireLib('components');
 const { InfoPanelCard, FilePreview } = Pydio.requireLib('workspaces');
 const { Animations } = Pydio.requireLib('hoc');
+const { PydioContextConsumer } = Pydio.requireLib('boot');
 
 const Template =  Animations.makeTransition(
     {opacity: 0.3},
     {opacity: 1}
 )((props) => <div {...props} style={{padding: 0}} />)
 
-export default class ActivityPanel extends React.Component {
+class ActivityPanel extends React.Component {
 
     static get EventsIcons() {
         return {
@@ -178,7 +179,7 @@ export default class ActivityPanel extends React.Component {
         if(this.state.empty){
             return null;
         }
-        const {pydio, node} = this.props;
+        const {pydio, node, getMessage} = this.props;
 
         let renderIcon = this.renderIconFile;
         let renderFirstLine = null;
@@ -195,10 +196,10 @@ export default class ActivityPanel extends React.Component {
             nodeClicked = () => {};
         }
 
-        let label = node.isLeaf() ? "File Activity" : "Folder Activity";
+        let label = node.isLeaf() ? getMessage('notification_center.11') : getMessage('notification_center.10');
         let root = false;
         if(node === pydio.getContextHolder().getRootNode()){
-            label = "Workspace Activity";
+            label = getMessage('notification_center.9');
             root = true;
         }
 
@@ -227,3 +228,6 @@ export default class ActivityPanel extends React.Component {
         );
     }
 }
+
+ActivityPanel = PydioContextConsumer(ActivityPanel)
+export {ActivityPanel as default}

@@ -81,7 +81,7 @@ class Panel extends Component {
             items.push(<div style={{clear:'left'}}></div>)
 
             actions.push(
-                <FlatButton onClick={() => this.openInExifEditor()} label="More Exif" />
+                <FlatButton onClick={() => this.openInExifEditor()} label={this.props.pydio.MessageHash['456']} />
             );
         }
         if (this.state && this.state.gpsData) {
@@ -96,7 +96,7 @@ class Panel extends Component {
                 />
             );
             actions.push(
-                <FlatButton onClick={() => this.openInMapEditor()} label="Open Map" />
+                <FlatButton onClick={() => this.openInMapEditor()} label={this.props.pydio.MessageHash['meta.exif.2']} />
             )
         }
 
@@ -104,7 +104,7 @@ class Panel extends Component {
             return null;
         }
         return (
-            <PydioWorkspaces.InfoPanelCard style={this.props.style} title="Exif Data" actions={actions} icon="camera" iconColor="#607d8b">
+            <PydioWorkspaces.InfoPanelCard style={this.props.style} title={this.props.pydio.MessageHash['meta.exif.3']} actions={actions} icon="camera" iconColor="#607d8b">
                 {items}
             </PydioWorkspaces.InfoPanelCard>
         );

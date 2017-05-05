@@ -53,8 +53,8 @@ export default React.createClass({
 
     render() {
         const messages = this.props.pydio.MessageHash;
-        let internal = messages[531];
-        let external = messages[532];
+        let internal = messages[528];
+        let external = messages[530];
         let shared = messages[527];
 
         let content, panelData;
@@ -67,7 +67,7 @@ export default React.createClass({
         }
 
         return (
-            <InfoPanelCard title="Workspace Users" style={this.props.style} standardData={panelData} icon="account-multiple-outline" iconColor="00838f">{content}</InfoPanelCard>
+            <InfoPanelCard title={messages[249]} style={this.props.style} standardData={panelData} icon="account-multiple-outline" iconColor="00838f">{content}</InfoPanelCard>
         );
     }
 

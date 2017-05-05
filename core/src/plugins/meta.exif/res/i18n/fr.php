@@ -21,5 +21,5 @@
 $mess=array(
 "1" => "Géolocalisation",
 "2" => "Localiser",
-    "3" => "Meta Data (EXIF)",
+    "3" => "Données EXIF",
 );
