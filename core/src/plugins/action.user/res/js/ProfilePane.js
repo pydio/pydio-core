@@ -115,10 +115,16 @@ let ProfilePane = React.createClass({
             return;
         }
         let pydio = this.props.pydio;
-        let postValues = Manager.getValuesForPOST(this.state.definitions, this.state.values, 'PREFERENCES_');
+        let {definitions, values} = this.state;
+        let postValues = Manager.getValuesForPOST(definitions, values, 'PREFERENCES_');
         postValues['get_action'] = 'custom_data_edit';
         PydioApi.getClient().request(postValues, function(transport){
             PydioApi.getClient().parseXmlMessage(transport.responseXML);
+            pydio.observeOnce('user_logged', (userObject) => {
+                if(values.avatar && userObject.getPreference('avatar') !== values.avatar){
+                    this.setState({values: {...values, avatar:userObject.getPreference('avatar')}});
+                }
+            });
             pydio.refreshUserData();
             this.setState({dirty: false}, () => {
                 if(this._updater) this._updater(this.getButtons());

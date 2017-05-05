@@ -106,8 +106,8 @@ let AltDashboard = React.createClass({
 
 
         if(this.props.pydio.UI.MOBILE_EXTENSIONS){
-            wsListsContainerStyle = {...wsListsContainerStyle, display:'bloc', marginRight:0, right: 0};
-            rglStyle = {...rglStyle, transform:'translateX(260px)'};
+            styles.wsListsContainerStyle = {...styles.wsListsContainerStyle, display:'bloc', marginRight:0, right: 0};
+            styles.rglStyle = {...styles.rglStyle, transform:'translateX(260px)'};
         }
 
         const centerTitleStyle = {
