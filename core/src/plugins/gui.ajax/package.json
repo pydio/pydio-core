@@ -46,7 +46,8 @@
     "reactify": "^1.1.1",
     "redux": "*",
     "systemjs": "^0.20.11",
-    "whatwg-fetch": "^2.0.2"
+    "whatwg-fetch": "^2.0.2",
+    "wicked-good-xpath": "^1.3.0"
   },
   "devDependencies": {
     "assemble-less": "~0.7.0",

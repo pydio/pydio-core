@@ -91,10 +91,10 @@
             <serverCallback methodName="shareAssignRight" hookName="node.share.assign_right"/>
         </hooks>
         <client_configs>
-            <component_config className="InfoPanel">
+            <component_config component="InfoPanel">
                 <infoPanel mime="ajxp_root_node,generic_dir,generic_file" reactComponent="PydioNotifications.ActivityPanel"/>
             </component_config>
-            <component_config className="AjxpReactComponent::left_navigator">
+            <component_config component="AjxpReactComponent::left_navigator">
                 <additional_content
                         id="navigation_alerts"
                         position="0"

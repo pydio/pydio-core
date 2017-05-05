@@ -54,6 +54,9 @@ export default class Builder{
                 let name = tNodes[i].getAttribute('name');
                 if((position === 'bottom' && name) || target === 'body'){
                     let newDiv = document.createElement('div');
+                    if(tNodes[i].getAttribute("style")){
+                        newDiv.setAttribute('style', tNodes[i].getAttribute("style"));
+                    }
                     if(target === 'body') {
                         targetObj.appendChild(newDiv);
                     } else {
@@ -163,7 +166,7 @@ export default class Builder{
         let namespaces = [];
         props = props || {};
         props['pydio'] = this._pydio;
-        XMLUtils.XPathSelectNodes(this._pydio.getXmlRegistry(), '//client_configs/component_config[@className="'+namespace + '.' + componentName +'"]/modifier').map(function(node){
+        XMLUtils.XPathSelectNodes(this._pydio.getXmlRegistry(), '//client_configs/component_config[@component="'+namespace + '.' + componentName +'"]/modifier').map(function(node){
             const module = node.getAttribute('module');
             modifiers.push(module);
             namespaces.push(module.split('.').shift());

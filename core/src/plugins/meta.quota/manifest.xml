@@ -41,7 +41,7 @@
             </action>
         </actions>
         <client_configs>
-            <component_config className="InfoPanel">
+            <component_config component="InfoPanel">
                 <infoPanel mime="ajxp_root_node" reactComponent="QuotaActions.QuotaPanel"/>
             </component_config>
         </client_configs>

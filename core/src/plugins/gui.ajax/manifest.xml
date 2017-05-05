@@ -255,7 +255,7 @@
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>
 			]]></template>
-			<component_config className="FilesList">
+			<component_config component="FilesList">
 				<property name="thumbSize" value="128"/>
 			</component_config>
 		</client_configs>

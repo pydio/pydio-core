@@ -16,7 +16,7 @@
 			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"/>
 		</hooks>
 		<client_configs>
-			<component_config className="InfoPanel">
+			<component_config component="InfoPanel">
                 <infoPanel mime="jpg,jpeg,tiff,riff" theme="material" reactComponent="PydioExif.Panel" weight="-10"/>
 			</component_config>
 		</client_configs>

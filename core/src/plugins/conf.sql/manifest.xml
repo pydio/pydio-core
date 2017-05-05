@@ -24,7 +24,7 @@
             </action>
         </actions>
         <client_configs>
-            <component_config className="AjxpTabulator::userdashboard_main_tab">
+            <component_config component="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="team_pane"
                                 tabInfo='{"id":"teams","position":2,"iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[

@@ -44,7 +44,7 @@ class ComponentConfigsParser {
 
     loadConfigs(componentName) {
         let configs = new Map();
-        let columnsNodes = XMLUtils.XPathSelectNodes(global.pydio.getXmlRegistry(), 'client_configs/component_config[@className="FilesList"]/columns/column|client_configs/component_config[@className="FilesList"]/columns/additional_column');
+        let columnsNodes = XMLUtils.XPathSelectNodes(global.pydio.getXmlRegistry(), 'client_configs/component_config[@component="FilesList"]/columns/column|client_configs/component_config[@component="FilesList"]/columns/additional_column');
         let columns = {};
         let messages = global.pydio.MessageHash;
         columnsNodes.forEach(function(colNode){

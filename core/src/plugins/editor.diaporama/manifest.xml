@@ -70,7 +70,7 @@
 			<serverCallback hookName="node.info" methodName="extractImageMetaData" applyCondition="$apply=($args[2]!='minimal');"/>
 		</hooks>
 		<client_configs>
-			<component_config className="FilesList">
+			<component_config component="FilesList">
 				<columns>
 					<additional_column messageId="135" attributeName="readable_dimension" sortType="String" defaultVisibilty="hidden"/>
 				</columns>

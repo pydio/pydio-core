@@ -250,7 +250,7 @@
             <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"
                       namespace="ShareTemplates" component="DropZoneMinisite" props='{"containerId":"ajxp_dropbox_template","minisiteMode":"embed","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
-            <component_config className="InfoPanel">
+            <component_config component="InfoPanel">
                 <infoPanel mime="meta:ajxp_shared" reactComponent="ShareInfoPanel.InfoPanel" weight="-20"/>
             </component_config>
         </client_configs>

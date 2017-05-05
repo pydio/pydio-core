@@ -371,7 +371,7 @@
         </action>
 	</actions>
 	<client_configs>
-		<component_config className="InfoPanel">
+		<component_config component="InfoPanel">
             <infoPanel mime="generic_file" reactComponent="PydioWorkspaces.GenericInfoCard" weight="-1000"/>
 			<infoPanel mime="generic_file" reactComponent="PydioWorkspaces.FileInfoCard" weight="-999"/>
             <infoPanel mime="generic_dir" reactComponent="PydioWorkspaces.GenericInfoCard" weight="-1000"/>

@@ -51,7 +51,7 @@
         </hooks>
         -->
         <client_configs>
-            <template name="pydio-tasks-panel" element="ajxp_desktop" position="bottom" namespace="PydioTasks" component="Panel" props='{}'/>
+            <template name="pydio-tasks-panel" element="ajxp_desktop" position="bottom" namespace="PydioTasks" component="Panel" props='{}' style="position:fixed;right:0;bottom:0;"/>
         </client_configs>
     </registry_contributions>
 </ajxp_plugin>

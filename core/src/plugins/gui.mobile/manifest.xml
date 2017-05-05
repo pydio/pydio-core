@@ -99,7 +99,7 @@
                 </div>
             ]]></template>
 
-			<component_config className="FilesList">
+			<component_config component="FilesList">
 				<property name="fixedThumbSize" value="40"/>
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label" fixedWidth="60%"/>

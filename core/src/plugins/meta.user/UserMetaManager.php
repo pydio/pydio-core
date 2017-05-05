@@ -86,7 +86,7 @@ class UserMetaManager extends AbstractMetaSource
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
 
-        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@component="FilesList"]/columns');
         $contrib = $selection->item(0);
         $even = false;
         $searchables = []; $searchablesReactRenderers = [];

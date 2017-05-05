@@ -153,9 +153,10 @@ let FSTemplate = React.createClass({
                 <LeftPanel className="left-panel" pydio={props.pydio}/>
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
-                        <div id="workspace_toolbar" style={{display: "flex", justifyContent: "space-between"}}>
+                        <div id="workspace_toolbar" style={{display: 'flex'}}>
                             <span className="drawer-button"><MaterialUI.IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <Breadcrumb {...props} startWithSeparator={false}/>
+                            <span style={{flex:1}}/>
                             <SearchForm {...props}/>
                         </div>
                         <div id="main_toolbar">

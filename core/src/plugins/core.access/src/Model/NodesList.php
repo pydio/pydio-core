@@ -154,7 +154,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
                 $xmlChildren[] = XMLHelper::toXmlElement("column", $column);
             }
             $xmlConfig = XMLHelper::toXmlElement("columns", $this->columnsDescription['description'], implode("", $xmlChildren));
-            $xmlConfig = XMLHelper::toXmlElement("component_config", ["className" => "FilesList"], $xmlConfig);
+            $xmlConfig = XMLHelper::toXmlElement("component_config", ["component" => "FilesList"], $xmlConfig);
             $buffer .= XMLHelper::toXmlElement("client_configs", [], $xmlConfig);
         }
         foreach ($this->children as $child){

@@ -16,7 +16,7 @@
 			<serverCallback hookName="version.commit_file" methodName="commitFile"></serverCallback>
 		</hooks>
 		<client_configs>
-			<component_config className="FilesList">
+			<component_config component="FilesList">
 				<columns>
 					<additional_column messageId="243" attributeName="last_revision" sortType="String"/>
 				</columns>

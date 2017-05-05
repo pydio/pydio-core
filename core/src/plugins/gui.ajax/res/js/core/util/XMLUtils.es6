@@ -18,6 +18,8 @@
  * The latest code can be found at <https://pydio.com/>.
  *
  */
+//import wgxpath from 'wicked-good-xpath'
+//wgxpath.install();
 /**
  * Utilitary class for manipulating XML
  */

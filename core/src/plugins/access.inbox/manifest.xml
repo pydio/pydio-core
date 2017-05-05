@@ -91,7 +91,7 @@
             <action name="compress_ui" forbidOverride="true"/>
         </actions>
         <client_configs>
-            <component_config className="FilesList">
+            <component_config component="FilesList">
                 <columns>
                     <additional_column attributeName="share_meta_type" sortType="CellSorterValue" modifier="InboxWidgets.filesListCellModifier"
                                        defaultVisibilty="visible" messageString="Share Type"/>

@@ -25,7 +25,7 @@
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SQLSearchEngine" ajxpOptions="{}"/>
-            <component_config className="InfoPanel">
+            <component_config component="InfoPanel">
 				<infoPanel mime="no_selection" attributes="">
 					<messages>
 						<message key="folders_string" id="279"/>

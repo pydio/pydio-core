@@ -22,7 +22,7 @@
     </server_settings>
     <registry_contributions>
         <client_configs>
-            <component_config className="UserAccountTabs">
+            <component_config component="UserAccountTabs">
                 <additional_tab id="api_keys"
                                 tabInfo='{"icon":"mdi mdi-account-key","label":"keystore.1","title":"keystore.2","position":10}'
                                 paneInfo='{"namespace":"ApiKeys", "componentName":"Panel"}'/>

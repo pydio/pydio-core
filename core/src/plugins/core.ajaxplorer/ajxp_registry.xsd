@@ -421,7 +421,7 @@
             <xs:choice>
                 <xs:any maxOccurs="unbounded" processContents="skip"/>
             </xs:choice>
-            <xs:attribute name="className" use="required" type="xs:Name"/>
+            <xs:attribute name="component" use="required" type="xs:Name"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="columns">

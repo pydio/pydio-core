@@ -18,7 +18,7 @@
             <serverCallback hookName="node.change" methodName="moveMeta" defer="true"/>
 		</hooks>
 		<client_configs>
-			<component_config className="InfoPanel">
+			<component_config component="InfoPanel">
                 <infoPanel mime="meta:ajxp_has_comments_feed,ajxp_root_node" reactComponent="MetaComments.Panel" weight="10"/>
 			</component_config>
 		</client_configs>

@@ -381,7 +381,7 @@ class EmlParser extends Plugin
 
         // Add the columns template definition
         $insert = new \DOMDocument("1.0", "UTF-8");
-        $config = "<client_configs><component_config className=\"FilesList\" local=\"true\">$config</component_config></client_configs>";
+        $config = "<client_configs><component_config component=\"FilesList\" local=\"true\">$config</component_config></client_configs>";
         $insert->loadXML($config);
         $imported = $dom->importNode($insert->documentElement, true);
         $dom->documentElement->appendChild($imported);

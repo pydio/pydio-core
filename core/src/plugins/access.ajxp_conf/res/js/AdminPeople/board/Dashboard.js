@@ -158,7 +158,7 @@ let Dashboard = React.createClass({
             }
         }
         let editor = Editor;
-        const editorNode = XMLUtils.XPathSelectSingleNode(this.props.pydio.getXmlRegistry(), '//client_configs/component_config[@className="AdminPeople.Dashboard"]/editor');
+        const editorNode = XMLUtils.XPathSelectSingleNode(this.props.pydio.getXmlRegistry(), '//client_configs/component_config[@component="AdminPeople.Dashboard"]/editor');
         if(editorNode){
             editor = editorNode.getAttribute('namespace') + '.' + editorNode.getAttribute('component');
         }

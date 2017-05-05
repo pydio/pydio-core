@@ -117,7 +117,6 @@ class InfoPanel extends React.Component {
 
     render() {
 
-        let promises = []
         let templates = this.state.displayData.TEMPLATES.map((tpl, i) => {
             const component = tpl.COMPONENT;
             const [namespace, name] = component.split('.', 2);
@@ -155,9 +154,12 @@ class ConfigsParser {
     static parseConfigs(){
 
         let configs = new Map();
-        let panelsNodes = XMLUtils.XPathSelectNodes(pydio.getXmlRegistry(), 'client_configs/component_config[@className="InfoPanel"]/infoPanel[@reactComponent]');
+        let panelsNodes = XMLUtils.XPathSelectNodes(pydio.getXmlRegistry(), 'client_configs/component_config[@component="InfoPanel"]/infoPanel');
         let panels = new Map();
         panelsNodes.forEach(function(node){
+            if(!node.getAttribute('reactComponent')) {
+                return;
+            }
             let mimes = node.getAttribute('mime').split(',');
             let component = node.getAttribute('reactComponent');
             mimes.map(function(mime){
@@ -170,6 +172,7 @@ class ConfigsParser {
                 });
             });
         });
+        console.log(panels);
         return panels;
 
     }

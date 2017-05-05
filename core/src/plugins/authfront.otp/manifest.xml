@@ -45,7 +45,7 @@
             </action>
         </actions>
         <client_configs>
-            <component_config className="AuthfrontCoreActions.LoginPasswordDialog">
+            <component_config component="AuthfrontCoreActions.LoginPasswordDialog">
                 <modifier module="OTPAuthfrontActions.LoginDialogModifier"/>
             </component_config>
         </client_configs>
