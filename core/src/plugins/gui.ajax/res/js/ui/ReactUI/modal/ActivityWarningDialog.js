@@ -41,7 +41,7 @@ export default React.createClass({
                     <div className="mdi mdi-security" style={{fontSize:70,paddingRight:10}}/>
                     <p>{sentence}</p>
                 </div>
-                <p style={{textAlign:'right', textAlign: 'right', fontWeight: 500, color: '#607D8B', fontSize: 14}}>{MessageHash['376']}</p>
+                <p style={{textAlign:'right', fontWeight: 500, color: '#607D8B', fontSize: 14}}>{MessageHash['376']}</p>
             </div>
         );
     }
