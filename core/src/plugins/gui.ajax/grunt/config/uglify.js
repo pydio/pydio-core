@@ -23,8 +23,7 @@ module.exports = function(grunt, options){
         },
         nodejs: {
             files: {
-                'res/build/bundle.prod.min.js': ['res/build/bundle.prod.js'],
-                'res/build/bundle.legacy.min.js': ['res/build/bundle.legacy.prod.js']
+                'res/build/bundle.prod.min.js': ['res/build/bundle.prod.js']
             }
         },
         lib:{

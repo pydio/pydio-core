@@ -20,7 +20,6 @@ let LeftPanel = ({muiTheme, style={}, userWidgetProps, workspacesListProps, pydi
             width:'100%'
         };
         const wsListStyle = {
-            overflowY           : 'auto',
             backgroundColor     : lightBg.toString(),
             color               : Color(palette.primary1Color).darken(0.1).alpha(0.87).toString()
         };

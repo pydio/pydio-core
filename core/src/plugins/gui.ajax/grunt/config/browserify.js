@@ -35,8 +35,7 @@ module.exports = function(grunt, options){
                 alias: LibRequires.map(k => k + ':'),
             },
             files: {
-                'res/build/bundle.prod.js': 'res/js/dist/export.js',
-                'res/build/bundle.legacy.prod.js': 'res/js/dist/export.legacy.js'
+                'res/build/bundle.prod.js': 'res/js/dist/export.js'
             }
         },
         lib: {

@@ -18,17 +18,12 @@
  * The latest code can be found at <https://pydio.com/>.
  *
  */
-//import wgxpath from 'wicked-good-xpath'
-//wgxpath.install();
+import wgxpath from 'wicked-good-xpath'
+wgxpath.install();
 /**
  * Utilitary class for manipulating XML
  */
 export default class XMLUtils{
-
-    static loadXPathReplacer(){
-        if(document.createExpression) return;
-        PydioApi.loadLibrary('plugins/gui.ajax/res/js/vendor/xpath-polyfill/javascript-xpath-cmp.js', null, false);
-    }
 
     /**
      * Selects the first XmlNode that matches the XPath expression.
@@ -53,7 +48,6 @@ export default class XMLUtils{
         }
 
         if(!XMLUtils.__xpe){
-            if(!document.createExpression) XMLUtils.loadXPathReplacer();
             query = document.createExpression(query, null);
             var result = query.evaluate(element, 7, null);
             return (result.snapshotLength?result.snapshotItem(0):null);
@@ -101,7 +95,6 @@ export default class XMLUtils{
         }
         var result, nodes = [], i;
         if(!XMLUtils.__xpe){
-            if(!document.createExpression) XMLUtils.loadXPathReplacer();
             query = document.createExpression(query, null);
             result = query.evaluate(element, 7, null);
             nodes = [];
@@ -177,6 +170,9 @@ export default class XMLUtils{
      */
     static parseXml(xmlStr){
 
+        if(typeof window.DOMParser != "undefined"){
+            return ( new window.DOMParser() ).parseFromString(xmlStr, "text/xml");
+        }
         if(typeof window.ActiveXObject != "undefined" &&
             new window.ActiveXObject("MSXML2.DOMDocument.6.0")){
             var xmlDoc = new window.ActiveXObject("MSXML2.DOMDocument.6.0");
@@ -185,9 +181,9 @@ export default class XMLUtils{
             xmlDoc.loadXML(xmlStr);
             xmlDoc.setProperty('SelectionLanguage', 'XPath');
             return xmlDoc;
-        }else if(typeof window.DOMParser != "undefined"){
-            return ( new window.DOMParser() ).parseFromString(xmlStr, "text/xml");
         }
+        throw new Error('Cannot parse XML string');
+
     }
 
 }

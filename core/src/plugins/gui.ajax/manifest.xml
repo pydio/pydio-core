@@ -6,8 +6,6 @@
             <js
                 className="React"
                 file="plugins/gui.ajax/res/build/bundle.prod.min.js"
-                fallbackCondition="!window.addEventListener"
-                fallbackFile="plugins/gui.ajax/res/build/bundle.legacy.min.js"
             />
             <js
                 className="PydioCoreActions"

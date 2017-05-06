@@ -8,13 +8,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/build/pydio.<?php print($crtTheme);?>.min.css">
-    <!--[if IE 8]>
-    <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
-    <script src="plugins/gui.ajax/res/js/vendor/es6/es5-sham.min.js"></script>
-    <![endif]-->
-    <!--[if IE 7]>
-    <script src="plugins/gui.ajax/res/js/vendor/es6/json3.min.js"></script>
-    <![endif]-->
     <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/es6/browser-polyfill.js"></script>
     <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/modernizr/modernizr.min.js"></script>
     <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/build/boot.prod.js"></script>
