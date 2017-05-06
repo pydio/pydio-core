@@ -1,6 +1,96 @@
 import {Component} from 'react'
 import Pydio from 'pydio'
-const {AsyncComponent} = Pydio.requireLib('boot');
+const {AsyncComponent, PydioContextConsumer} = Pydio.requireLib('boot');
+
+class Scheme extends Component {
+
+    render(){
+        let style = {
+            position:'relative',
+            fontSize: 24,
+            width: this.props.dimension || 100,
+            height: this.props.dimension || 100,
+            backgroundColor: '#ECEFF1',
+            color: '#607d8b',
+            borderRadius: '50%',
+            margin: '0 auto'
+        };
+        return (
+            <div style={{...style, ...this.props.style}}>{this.props.children}</div>
+        );
+    }
+
+}
+
+let WorkspacesCard = PydioContextConsumer((pydio) => {
+
+    const renderRay = (angle) => {
+        return (
+            <div style={{position:'absolute', top: 52, left: 20, width: 80, display:'flex', transformOrigin:'left', transform:'rotate('+(-angle)+'deg)'}}>
+                <span style={{flex:1}}/>
+                <span className="mdi mdi-dots-horizontal" style={{opacity:.5, marginRight:5}}/>
+                <span style={{display:'inline-block', transform:'rotate('+angle+'deg)'}} className="mdi mdi-account"/>
+            </div>
+        )
+    };
+
+    return (
+        <div>
+            <p>Workspaces are top-level folders helping you organize your data. They may be accessed only by you, or shared accross many people.</p>
+            <Scheme dimension={130}>
+                <span style={{position:'absolute', top: 52, left: 20}} className="mdi mdi-network"/>
+                {renderRay(30)}
+                {renderRay(0)}
+                {renderRay(-30)}
+            </Scheme>
+            <p>Other users can share some of their folders with you: they will also appear as workspaces here.</p>
+            <Scheme>
+                <span className="mdi mdi-account" style={{position:'absolute', left: 39, top: 50 -12 -20}}/>
+                <div style={{position:'absolute', top: 46, left:14}}>
+                    <span className="mdi mdi-folder"/>
+                    <span className="mdi mdi-arrow-right"/>
+                    <span className="mdi mdi-network"/>
+                </div>
+            </Scheme>
+        </div>
+    );
+
+});
+
+
+let SearchCard = PydioContextConsumer((pydio) => {
+
+    return (
+        <div>
+            <p>Use this search form to find files or folders in any workspace. Only the first 5 results are show, enter a workspace to get more results, and more search options.</p>
+            <Scheme style={{fontSize: 10, padding: 25}} dimension={130}>
+                <div style={{boxShadow:'2px 2px 0px #CFD8DC'}}>
+                    <div style={{backgroundColor: '#03a9f4', color: 'white', borderRadius: '3px 3px 0 0'}}><span className="mdi mdi-magnify"/>Search...</div>
+                    <div style={{backgroundColor:'white'}}>
+                        <div><span className="mdi mdi-folder"/> Folder 1 </div>
+                        <div><span className="mdi mdi-folder"/>  Folder 2</div>
+                        <div><span className="mdi mdi-file"/> File 3</div>
+                    </div>
+                </div>
+            </Scheme>
+            <p>When no search is entered, the history of your recently accessed files and folder is displayed instead.</p>
+        </div>
+    );
+
+});
+
+let WidgetsCard = PydioContextConsumer((pydio) => {
+
+    return (
+        <div>
+            <p>You can add or remove widgets here. You can also reorder them by simply dragging them around.</p>
+            <Scheme>
+                <img src="plugins/access.ajxp_home/res/images/movecards.gif" style={{height:70, margin:'15px 30px'}}/>
+            </Scheme>
+        </div>
+    );
+
+});
 
 class WelcomeTour extends Component{
 
@@ -41,31 +131,19 @@ class WelcomeTour extends Component{
         let tourguideSteps = [
             {
                 title:'My Workspaces',
-                text : 'Workspaces are top-level folders helping you organize your data. They may be personal to you, or shared accross many people.',
+                text : <WorkspacesCard/>,
                 selector:'.user-workspaces-list',
                 position:'right'
             },
             {
-                title:'My Alerts',
-                text : 'When you share a file or folder, you can get notified if another user accessed it. You can also watch any specific folders inside a workspace.',
-                selector:'.alertsButton',
-                position:'right'
-            },
-            {
                 title:'Search',
-                text : 'Use this search form to find files or folders in any workspace. Only the first 5 results are show, enter a workspace to get more results, and more search options.',
+                text : <SearchCard/>,
                 selector:'.home-search-form',
                 position:'bottom'
             },
             {
-                title:'My History',
-                text : <div><div>When no search results are displayed, you will find here all the recent workspaces, files and folders that you may have opened or visited.</div><div>Just click on an item to access it directly.</div></div>,
-                selector:'#history-block',
-                position:'top'
-            },
-            {
                 title:'Widgets',
-                text : 'You can add or remove widgets here. You can also reorder them by simply dragging them around.',
+                text : <WidgetsCard/>,
                 selector:'.dashboard-layout',
                 position:'left'
             },
