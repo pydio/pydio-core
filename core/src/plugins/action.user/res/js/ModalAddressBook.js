@@ -36,7 +36,7 @@ const ModalAddressBook = React.createClass({
                 <AddressBook
                     mode="book"
                     {...this.props}
-                    style={{width:'100%', flex: 1}}
+                    style={{width:'100%', flexGrow: 1, height:'auto'}}
                 />
             </div>
         );

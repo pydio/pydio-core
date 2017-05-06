@@ -274,7 +274,7 @@ class Content extends React.Component{
 
         const tabStyles = {
             style : {
-                flex: 1,
+                flexGrow: 1,
                 overflow: 'hidden',
                 display:'flex',
                 flexDirection: 'column',
@@ -283,7 +283,7 @@ class Content extends React.Component{
                 flexShrink:0
             },
             contentContainerStyle : {
-                flex: 1,
+                flexGrow: 1,
                 overflow: 'hidden'
             },
             tabTemplateStyle: {

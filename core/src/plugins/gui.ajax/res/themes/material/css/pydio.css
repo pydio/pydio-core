@@ -723,11 +723,6 @@ div.dialogBox div#element_overlay {
 .react-mui-context input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px white inset;
 }
-.react-mui-context .ajxp_login_error {
-  margin-top: 12px;
-  color: #D32F2F;
-  font-size: 14px;
-}
 .react-mui-context div[data-reactroot].dialogRootBlur > div > div.dialogRootBlur > div {
   background-color: rgba(0, 0, 0, 0.3) !important;
   position: relative;
@@ -750,6 +745,35 @@ div.dialogBox div#element_overlay {
   color: white !important;
   height: 26px !important;
   margin-top: 37px !important;
+}
+.react-mui-context div[data-reactroot].dialogRootBlur .red-background {
+  background-color: rgba(244, 67, 54, 0.45);
+  margin-left: -24px;
+  margin-right: -24px;
+  padding: 12px 24px;
+}
+.react-mui-context div[data-reactroot].dialogRootBlur .captcha_container {
+  text-align: center;
+  background-color: rgba(244, 67, 54, 0.45);
+  margin-left: -24px;
+  margin-right: -24px;
+  padding: 12px 24px;
+}
+.react-mui-context div[data-reactroot].dialogRootBlur .ajxp_login_error {
+  font-size: 14px;
+  margin-top: 12px;
+  background-color: rgba(244, 67, 54, 0.45);
+  margin-left: -24px;
+  margin-right: -24px;
+  padding: 12px 24px;
+}
+.react-mui-context div[data-reactroot].dialogRootBlur .forgot-password-link {
+  text-align: right;
+}
+.react-mui-context div[data-reactroot].dialogRootBlur .forgot-password-link a,
+.react-mui-context div[data-reactroot].dialogRootBlur .forgot-password-link a:hover {
+  color: rgba(255, 255, 255, 0.67);
+  font-size: 13px;
 }
 #activity_monitor_warning {
   box-shadow: none;

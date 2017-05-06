@@ -19,12 +19,6 @@
     -webkit-box-shadow: 0 0 0px 1000px white inset;
   }
 
-  .ajxp_login_error{
-    margin-top: 12px;
-    color: #D32F2F;
-    font-size: 14px;
-  }
-
   div[data-reactroot].dialogRootBlur{
     & > div > div.dialogRootBlur {
       & > div{
@@ -53,6 +47,33 @@
         }
       }
     }
+
+    .red-background{
+      background-color: rgba(244, 67, 54, 0.45);
+      margin-left: -24px;
+      margin-right: -24px;
+      padding: 12px 24px;
+    }
+
+    .captcha_container{
+      text-align:center;
+      .red-background();
+    }
+
+    .ajxp_login_error{
+      font-size:14px;
+      margin-top: 12px;
+      .red-background();
+    }
+
+    .forgot-password-link{
+      text-align:right;
+      a, a:hover{
+        color: rgba(255,255,255,.67);
+        font-size: 13px;
+      }
+    }
+
   }
 
 }

@@ -716,5 +716,7 @@ $mess=array(
 "614" => "Plus petit que...",
 "615" => "Execution",
 "616" => "Masque",
+"617" => "Entrer",
+"618" => "Changer la langue...",
 /* END SENTENCE */
 );

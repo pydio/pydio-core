@@ -719,5 +719,7 @@ $mess=array(
 "614" => "Smaller than...",
 "615" => "Execute",
 "616" => "Mask",
+"617" => "Enter",
+"618" => "Switch language...",
 /* END SENTENCE */
 );

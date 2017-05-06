@@ -1,5 +1,9 @@
 (function(global){
 
+    const {muiThemeable, getMuiTheme, darkBaseTheme} = MaterialUI.Style;
+    const {TextField, MuiThemeProvider, FlatButton, Checkbox, FontIcon,
+        MenuItem, SelectField, IconButton, IconMenu, Toggle} = MaterialUI;
+
     let pydio = global.pydio;
 
     let LoginDialogMixin = {
@@ -31,7 +35,7 @@
             if(this.refs.captcha_input){
                 params['captcha_code'] = this.refs.captcha_input.getValue();
             }
-            if(this.refs.remember_me && this.refs.remember_me.isChecked()){
+            if(this.state && this.state.rememberChecked){
                 params['remember_me'] = 'true' ;
             }
             if(this.props.modifiers){
@@ -69,10 +73,14 @@
 
         getDefaultProps: function(){
             return {
-                dialogTitle: pydio.MessageHash[163],
+                dialogTitle: '', //pydio.MessageHash[163],
                 dialogIsModal: true,
                 dialogSize:'sm'
             };
+        },
+
+        getInitialState: function(){
+            return {rememberChecked: false};
         },
 
         componentWillReceiveProps: function(){
@@ -96,6 +104,26 @@
             return true;
         },
 
+        getButtons: function(){
+            const passwordOnly = this.state.globalParameters.get('PASSWORD_AUTH_ONLY');
+            const secureLoginForm = passwordOnly || this.state.authParameters.get('SECURE_LOGIN_FORM');
+
+            const enterButton = <FlatButton default={true} labelStyle={{color:'white'}} key="enter" label={pydio.MessageHash[617]} onTouchTap={() => this.submit()}/>;
+            let buttons = [];
+            if(!secureLoginForm){
+                buttons.push(
+                    <DarkThemeContainer key="remember" style={{flex:1, textAlign:'left', paddingLeft: 16}}>
+                        <Checkbox label={pydio.MessageHash[261]} labelStyle={{fontSize:13}} onCheck={(e,c)=>{this.setState({rememberChecked:c})}}/>
+                    </DarkThemeContainer>
+                );
+                buttons.push(enterButton);
+                return [<div style={{display:'flex',alignItems:'center'}}>{buttons}</div>];
+            }else{
+                return [enterButton];
+            }
+
+        },
+
         render: function(){
             const passwordOnly = this.state.globalParameters.get('PASSWORD_AUTH_ONLY');
             const secureLoginForm = passwordOnly || this.state.authParameters.get('SECURE_LOGIN_FORM');
@@ -109,23 +137,17 @@
             if(this.state.displayCaptcha){
                 captcha = (
                     <div className="captcha_container">
+                        <TextField style={{width:170, marginTop: -20}} hintText={pydio.MessageHash[390]} ref="captcha_input" onKeyDown={this.submitOnEnterKey}/>
                         <img src={this.state.globalParameters.get('ajxpServerAccess') + '&get_action=get_captcha&sid='+Math.random()}/>
-                        <MaterialUI.TextField floatingLabelText={pydio.MessageHash[390]} ref="captcha_input"/>
-                    </div>
-                );
-            }
-            let remember;
-            if(!secureLoginForm){
-                remember = (
-                    <div className="remember_container">
-                        <MaterialUI.Checkbox ref="remember_me" label={pydio.MessageHash[261]}/>
                     </div>
                 );
             }
             let forgotLink;
             if(forgotPasswordLink){
                 forgotLink = (
-                    <div className="forgot-password-link"><a style={{cursor:'pointer'}} onClick={this.fireForgotPassword}>{pydio.MessageHash[479]}</a></div>
+                    <div className="forgot-password-link">
+                        <a style={{cursor:'pointer'}} onClick={this.fireForgotPassword}>{pydio.MessageHash[479]}</a>
+                    </div>
                 );
             }
             let additionalComponentsTop, additionalComponentsBottom;
@@ -155,40 +177,76 @@
                 width: 320,
                 height: 120
             };
-            return (
 
-                <div>
+            let languages = [];
+            pydio.listLanguagesWithCallback((key, label, current) => {
+                languages.push(<MenuItem primaryText={label} value={key} rightIcon={current?<FontIcon className="mdi mdi-check"/>:null}/>);
+            });
+            const languageMenu = (
+                <IconMenu
+                    iconButtonElement={<IconButton tooltip={pydio.MessageHash[618]} iconClassName="mdi mdi-flag-outline-variant" iconStyle={{fontSize:20,color:'rgba(255,255,255,.67)'}}/>}
+                    onItemTouchTap={(e,o) => {pydio.loadI18NMessages(o.props.value)}}
+                    desktop={true}
+                >{languages}</IconMenu>
+            );
+
+            return (
+                <DarkThemeContainer>
                     <div style={logoStyle}></div>
-                    <div className="dialogLegend">{pydio.MessageHash[passwordOnly ? 552 : 180]}</div>
+                    <div className="dialogLegend" style={{fontSize: 22, paddingBottom: 12, lineHeight: '28px'}}>
+                        {pydio.MessageHash[passwordOnly ? 552 : 180]}
+                        {languageMenu}
+                    </div>
+                    {errorMessage}
                     {captcha}
                     {additionalComponentsTop}
                     <form autoComplete={secureLoginForm?"off":"on"}>
-                        {!passwordOnly && <MaterialUI.TextField
+                        {!passwordOnly && <TextField
                             className="blurDialogTextField"
                             autoComplete={secureLoginForm?"off":"on"}
                             floatingLabelText={pydio.MessageHash[181]}
                             ref="login"
                             onKeyDown={this.submitOnEnterKey}
+                            fullWidth={true}
                         />}
-                        <MaterialUI.TextField
+                        <TextField
                             className="blurDialogTextField"
                             autoComplete={secureLoginForm?"off":"on"}
                             type="password"
                             floatingLabelText={pydio.MessageHash[182]}
                             ref="password"
                             onKeyDown={this.submitOnEnterKey}
+                            fullWidth={true}
                         />
                     </form>
                     {additionalComponentsBottom}
-                    {remember}
                     {forgotLink}
-                    {errorMessage}
-                </div>
-
+                </DarkThemeContainer>
             );
         }
 
     });
+
+    class DarkThemeContainer extends React.Component{
+
+        render(){
+
+            const {muiTheme, ...props} = this.props;
+            let baseTheme = {...darkBaseTheme};
+            baseTheme.palette.primary1Color = muiTheme.palette.accent1Color;
+            const darkTheme = getMuiTheme(baseTheme);
+
+            return (
+                <MuiThemeProvider muiTheme={darkTheme}>
+                    <div {...props}/>
+                </MuiThemeProvider>
+            );
+
+        }
+
+    }
+
+    DarkThemeContainer = muiThemeable()(DarkThemeContainer);
 
     let MultiAuthSelector = React.createClass({
 
@@ -207,14 +265,14 @@
         render: function(){
             let menuItems = [];
             for (let key in this.props.authSources){
-                menuItems.push(<MaterialUI.MenuItem value={key} primaryText={this.props.authSources[key]}/>);
+                menuItems.push(<MenuItem value={key} primaryText={this.props.authSources[key]}/>);
             }
             return (
-                <MaterialUI.SelectField
+                <SelectField
                     value={this.state.value}
                     onChange={this.onChange}
                     floatingLabelText="Login as..."
-                >{menuItems}</MaterialUI.SelectField>);
+                >{menuItems}</SelectField>);
 
         }
     });
@@ -295,7 +353,7 @@
                 captcha = (
                     <div className="captcha_container">
                         <img src={this.state.globalParameters.get('ajxpServerAccess') + '&get_action=get_captcha&sid='+Math.random()}/>
-                        <MaterialUI.TextField floatingLabelText={pydio.MessageHash[390]} ref="captcha_input"/>
+                        <TextField floatingLabelText={pydio.MessageHash[390]} ref="captcha_input"/>
                     </div>
                 );
             }
@@ -311,18 +369,18 @@
                         </tr>
                         <tr>
                             <td>
-                                <MaterialUI.TextField style={tFieldStyle} ref="FTP_HOST" floatingLabelText={messages['ftp_auth.2']}/>
+                                <TextField style={tFieldStyle} ref="FTP_HOST" floatingLabelText={messages['ftp_auth.2']}/>
                             </td>
                             <td>
-                                <MaterialUI.TextField ref="FTP_PORT" style={tFieldStyle} defaultValue="21" floatingLabelText={messages['ftp_auth.8']}/>
+                                <TextField ref="FTP_PORT" style={tFieldStyle} defaultValue="21" floatingLabelText={messages['ftp_auth.8']}/>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <MaterialUI.TextField style={tFieldStyle} ref="userid" floatingLabelText={messages['181']}/>
+                                <TextField style={tFieldStyle} ref="userid" floatingLabelText={messages['181']}/>
                             </td>
                             <td>
-                                <MaterialUI.TextField style={tFieldStyle} ref="password" type="password" floatingLabelText={messages['182']}/>
+                                <TextField style={tFieldStyle} ref="password" type="password" floatingLabelText={messages['182']}/>
                             </td>
                         </tr>
                         <tr>
@@ -332,18 +390,18 @@
                         </tr>
                         <tr>
                             <td>
-                                <MaterialUI.TextField style={tFieldStyle} ref="PATH" defaultValue="/" floatingLabelText={messages['ftp_auth.4']}/>
+                                <TextField style={tFieldStyle} ref="PATH" defaultValue="/" floatingLabelText={messages['ftp_auth.4']}/>
                             </td>
                             <td>
-                                <MaterialUI.Toggle ref="FTP_SECURE" label={messages['ftp_auth.5']} labelPosition="right"/>
+                                <Toggle ref="FTP_SECURE" label={messages['ftp_auth.5']} labelPosition="right"/>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <MaterialUI.TextField style={tFieldStyle} ref="CHARSET" floatingLabelText={messages['ftp_auth.6']}/>
+                                <TextField style={tFieldStyle} ref="CHARSET" floatingLabelText={messages['ftp_auth.6']}/>
                             </td>
                             <td>
-                                <MaterialUI.Toggle ref="FTP_DIRECT" label={messages['ftp_auth.7']} labelPosition="right"/>
+                                <Toggle ref="FTP_DIRECT" label={messages['ftp_auth.7']} labelPosition="right"/>
                             </td>
                         </tr>
                     </table>
@@ -428,7 +486,7 @@
                     {!valueSubmitted &&
                         <div>
                             <div className="dialogLegend">{mess['gui.user.3']}</div>
-                            <MaterialUI.TextField
+                            <TextField
                                 className="blurDialogTextField"
                                 ref="input"
                                 fullWidth={true}
@@ -523,7 +581,7 @@
                 return (
                     <div>
                         <div className="dialogLegend">{mess['gui.user.8']}</div>
-                        <MaterialUI.TextField
+                        <TextField
                             className="blurDialogTextField"
                             value={userId}
                             floatingLabelText={mess['gui.user.4']}
