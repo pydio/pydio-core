@@ -30,10 +30,13 @@ export default React.createClass({
         }
         this.props.onDismiss();
     },
+    getMessage: function(id){
+        return this.props.pydio.MessageHash['ajax_gui.tour.welcomemodal.' + id];
+    },
     getButtons: function(){
         return [
-            <FlatButton label="Skip" onTouchTap={()=> {this.close(true)}}/>,
-            <FlatButton label="Start the Tour" primary={true} onTouchTap={() => this.close(false)}/>,
+            <FlatButton label={this.getMessage('skip')} onTouchTap={()=> {this.close(true)}}/>,
+            <FlatButton label={this.getMessage('start')} primary={true} onTouchTap={() => this.close(false)}/>,
         ];
     },
     render: function(){
@@ -42,7 +45,7 @@ export default React.createClass({
                 <div style={{position:'relative', width:'100%', height: 205, overflow: 'hidden', backgroundColor: '#eceff1'}}>
                     <ProfilePane miniDisplay={true} {...this.props} saveOnChange={true} />
                 </div>
-                <CardTitle title="Welcome to Pydio 8" subtitle="Drag'n'drop the best photo of you for your profile! Start the tour when you are ready."></CardTitle>
+                <CardTitle title={this.getMessage('title')} subtitle={this.getMessage('subtitle')}/>
             </div>
         );
     }

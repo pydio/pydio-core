@@ -1,11 +1,20 @@
 import {Component} from 'react'
+import Pydio from 'pydio'
 import Joyride from 'react-joyride'
+const {PydioContextConsumer} = Pydio.requireLib('boot')
 
 class TourGuide extends Component{
 
     render(){
-        const locale = { back: 'Back', close: 'Close', last: 'Finish', next: 'Next', skip: 'Skip' };
 
+        const message = (id) => {
+            return this.props.getMessage('ajax_gui.tour.locale.' + id);
+        }
+        const locales = ['back','close','last','next','skip'];
+        let locale = {};
+        locales.forEach((k) => {
+            locale[k] = message(k);
+        })
         return (
             <Joyride
                 {...this.props}
@@ -16,5 +25,5 @@ class TourGuide extends Component{
     }
 
 }
-
+TourGuide = PydioContextConsumer(TourGuide);
 export {TourGuide as default}

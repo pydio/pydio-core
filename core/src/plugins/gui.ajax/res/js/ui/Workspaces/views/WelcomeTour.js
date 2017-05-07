@@ -85,15 +85,13 @@ class CreateMenuCard extends Component{
     render(){
         return (
             <div>
-                <p>Start adding new files or folders to the current workspace.</p>
+                <p>{this.props.message('create-menu')}</p>
                 <IconScheme icons={['file-plus', 'folder-plus']}/>
             </div>
         );
     }
 
 }
-CreateMenuCard = PydioContextConsumer(CreateMenuCard);
-
 
 class InfoPanelCard extends Component{
 
@@ -114,29 +112,27 @@ class InfoPanelCard extends Component{
 
         return (
             <div>
-                <p>Here, you will find many information about current selection: file information, sharing status, user-defined metadata, etc.</p>
+                <p>{this.props.message('infopanel.1')}</p>
                 <Scheme style={{fontSize: 10, padding: 25}} dimension={130}>
                     <div style={{boxShadow:'2px 2px 0px #CFD8DC', display:'flex'}}>
                         <div style={{backgroundColor:'white', flex:3}}>
-                            <div><span className="mdi mdi-folder"/> Folder 1 </div>
-                            <div style={{backgroundColor: '#03a9f4', color: 'white'}}><span className="mdi mdi-folder"/>  Folder 2</div>
-                            <div><span className="mdi mdi-file"/> File 3</div>
-                            <div><span className="mdi mdi-file"/> File 4</div>
+                            <div><span className="mdi mdi-folder"/> {this.props.message('infopanel.folder')} 1 </div>
+                            <div style={{backgroundColor: '#03a9f4', color: 'white'}}><span className="mdi mdi-folder"/>  {this.props.message('infopanel.folder')} 2</div>
+                            <div><span className="mdi mdi-file"/> {this.props.message('infopanel.file')} 3</div>
+                            <div><span className="mdi mdi-file"/> {this.props.message('infopanel.file')} 4</div>
                         </div>
                         <div style={leftStyle}>
                             <div style={{backgroundColor: '#edf4f7', padding: 4, height: '100%', fontSize: 17}}><span className="mdi mdi-information-variant"/></div>
                         </div>
                     </div>
                 </Scheme>
-                <p>You can close this panel by using the <span className="mdi mdi-information" style={{fontSize: 18, color: '#5c7784'}}/> button in the display toolbar.</p>
+                <p>{this.props.message('infopanel.2')} (<span className="mdi mdi-information" style={{fontSize: 18, color: '#5c7784'}}/>).</p>
             </div>
         );
 
     }
 
 }
-
-InfoPanelCard = PydioContextConsumer(InfoPanelCard);
 
 class UserWidgetCard extends Component{
 
@@ -157,31 +153,25 @@ class UserWidgetCard extends Component{
         return (
             <div>
                 <p>
-                    <span className="mdi mdi-book-open-variant" style={iconStyle}/> Directory of all the users accessing
-                    to the platform. Create your own users, and constitute <b>teams</b> that can be used to share resources.
+                    <span className="mdi mdi-book-open-variant" style={iconStyle}/> {this.props.message('uwidget.addressbook')}
                 </p>
                 <Divider/>
                 <p>
-                    <span className="mdi mdi-bell-outline" style={iconStyle}/> Alerts panel will inform you when a user with whom you shared some
-                    resources did access it. They can be sent to you directly by email.
+                    <span className="mdi mdi-bell-outline" style={iconStyle}/> {this.props.message('uwidget.alerts')}
                 </p>
                 <Divider/>
                 <p>
-                    <span className="mdi mdi-dots-vertical" style={iconStyle}/> Access to other options : managing your profile and
-                    security features, browse all the resources you have shared, sign out of the platform.
+                    <span className="mdi mdi-dots-vertical" style={iconStyle}/> {this.props.message('uwidget.menu')}
                 </p>
                 <Divider/>
                 <p>
-                    <span className="mdi mdi-home-variant" style={iconStyle}/> Go back to the welcome panel with this button
+                    <span className="mdi mdi-home-variant" style={iconStyle}/> {this.props.message('uwidget.home')}
                 </p>
             </div>
         );
     }
 
 }
-
-
-UserWidgetCard = PydioContextConsumer(UserWidgetCard);
 
 class WelcomeTour extends Component{
 
@@ -215,30 +205,32 @@ class WelcomeTour extends Component{
         if(!this.state.started || this.state.skip){
             return null;
         }
+        const {getMessage} = this.props;
+        const message = (id) => getMessage('ajax_gui.tour.' + id);
 
         const tourguideSteps = [
             {
-                title:'Add resources',
-                text : <CreateMenuCard/>,
+                title:message('create-menu.title'),
+                text : <CreateMenuCard message={message} pydio={this.props.pydio}/>,
                 selector:'#create-button-menu',
                 position:'left',
                 style:{width:220}
             },
             {
-                title:'Display Options',
-                text : <div><p>This toolbar allows you to change the display: switch to thumbnails or detail mode depending on your usage, and sort files by name, date, etc...</p><IconScheme icons={['view-list', 'view-grid', 'view-carousel', 'sort-ascending', 'sort-descending']}/></div>,
+                title:message('display-bar.title'),
+                text : <div><p>{message('display-bar')}</p><IconScheme icons={['view-list', 'view-grid', 'view-carousel', 'sort-ascending', 'sort-descending']}/></div>,
                 selector:'#display-toolbar',
                 position:'left'
             },
             {
-                title:'Info Panel',
-                text : <InfoPanelCard/>,
+                title:message('infopanel.title'),
+                text : <InfoPanelCard message={message}/>,
                 selector:'#info_panel',
                 position:'left'
             },
             {
-                title:'User Cartouche',
-                text : <UserWidgetCard/>,
+                title:message('uwidget.title'),
+                text : <UserWidgetCard message={message}/>,
                 selector:'.user-widget',
                 position:'right',
                 style:{width: 320}
@@ -266,4 +258,5 @@ class WelcomeTour extends Component{
 
 }
 
+WelcomeTour = PydioContextConsumer(WelcomeTour)
 export {WelcomeTour as default}

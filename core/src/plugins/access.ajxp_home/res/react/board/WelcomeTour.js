@@ -22,7 +22,7 @@ class Scheme extends Component {
 
 }
 
-let WorkspacesCard = PydioContextConsumer((pydio) => {
+let WorkspacesCard = (props) => {
 
     const renderRay = (angle) => {
         return (
@@ -36,14 +36,14 @@ let WorkspacesCard = PydioContextConsumer((pydio) => {
 
     return (
         <div>
-            <p>Workspaces are top-level folders helping you organize your data. They may be accessed only by you, or shared accross many people.</p>
+            <p>{props.message('workspaces.1')}</p>
             <Scheme dimension={130}>
                 <span style={{position:'absolute', top: 52, left: 20}} className="mdi mdi-network"/>
                 {renderRay(30)}
                 {renderRay(0)}
                 {renderRay(-30)}
             </Scheme>
-            <p>Other users can share some of their folders with you: they will also appear as workspaces here.</p>
+            <p>{props.message('workspaces.2')}</p>
             <Scheme>
                 <span className="mdi mdi-account" style={{position:'absolute', left: 39, top: 50 -12 -20}}/>
                 <div style={{position:'absolute', top: 46, left:14}}>
@@ -55,42 +55,42 @@ let WorkspacesCard = PydioContextConsumer((pydio) => {
         </div>
     );
 
-});
+};
 
 
-let SearchCard = PydioContextConsumer((pydio) => {
+let SearchCard = (props) => {
 
     return (
         <div>
-            <p>Use this search form to find files or folders in any workspace. Only the first 5 results are show, enter a workspace to get more results, and more search options.</p>
+            <p>{props.message('globsearch.1')}</p>
             <Scheme style={{fontSize: 10, padding: 25}} dimension={130}>
                 <div style={{boxShadow:'2px 2px 0px #CFD8DC'}}>
-                    <div style={{backgroundColor: '#03a9f4', color: 'white', borderRadius: '3px 3px 0 0'}}><span className="mdi mdi-magnify"/>Search...</div>
+                    <div style={{backgroundColor: '#03a9f4', color: 'white', borderRadius: '3px 3px 0 0'}}><span className="mdi mdi-magnify"/>{props.message('infopanel.search')}...</div>
                     <div style={{backgroundColor:'white'}}>
-                        <div><span className="mdi mdi-folder"/> Folder 1 </div>
-                        <div><span className="mdi mdi-folder"/>  Folder 2</div>
-                        <div><span className="mdi mdi-file"/> File 3</div>
+                        <div><span className="mdi mdi-folder"/> {props.message('infopanel.folder')} 1 </div>
+                        <div><span className="mdi mdi-folder"/>  {props.message('infopanel.file')} 2</div>
+                        <div><span className="mdi mdi-file"/> {props.message('infopanel.file')} 3</div>
                     </div>
                 </div>
             </Scheme>
-            <p>When no search is entered, the history of your recently accessed files and folder is displayed instead.</p>
+            <p>{props.message('globsearch.2')}</p>
         </div>
     );
 
-});
+};
 
-let WidgetsCard = PydioContextConsumer((pydio) => {
+let WidgetsCard = (props) => {
 
     return (
         <div>
-            <p>You can add or remove widgets here. You can also reorder them by simply dragging them around.</p>
+            <p>{props.message('widget-cards')}</p>
             <Scheme>
                 <img src="plugins/access.ajxp_home/res/images/movecards.gif" style={{height:70, margin:'15px 30px'}}/>
             </Scheme>
         </div>
     );
 
-});
+};
 
 class WelcomeTour extends Component{
 
@@ -127,35 +127,37 @@ class WelcomeTour extends Component{
         if(!this.state.started){
             return null;
         }
+        const {getMessage} = this.props;
+        const message = (id) => getMessage('ajax_gui.tour.' + id);
 
         let tourguideSteps = [
             {
-                title:'My Workspaces',
-                text : <WorkspacesCard/>,
-                selector:'.user-workspaces-list',
-                position:'right'
+                title       : message('workspaces.title'),
+                text        : <WorkspacesCard message={message}/>,
+                selector    :'.user-workspaces-list',
+                position    :'right'
             },
             {
-                title:'Search',
-                text : <SearchCard/>,
-                selector:'.home-search-form',
-                position:'bottom'
+                title       : message('globsearch.title'),
+                text        : <SearchCard message={message}/>,
+                selector    : '.home-search-form',
+                position    : 'bottom'
             },
             {
-                title:'Widgets',
-                text : <WidgetsCard/>,
-                selector:'.dashboard-layout',
-                position:'left'
+                title       : message('widget-cards.title'),
+                text        : <WidgetsCard message={message}/>,
+                selector    : '.dashboard-layout',
+                position    : 'left'
             },
         ];
 
         if(this.props.pydio.user && this.props.pydio.user.getRepositoriesList().size){
             tourguideSteps = tourguideSteps.concat([
                 {
-                    title:'Open a workspace',
-                    text : 'At the first connection, your history is probably empty. Enter a workspace once you are ready to add files.' ,
-                    selector:'.workspace-entry',
-                    position:'right'
+                    title       : message('openworkspace.title'),
+                    text        : message('openworkspace'),
+                    selector    : '.workspace-entry',
+                    position    : 'right'
                 }
             ])
         }
@@ -183,5 +185,7 @@ class WelcomeTour extends Component{
     }
 
 }
+
+WelcomeTour = PydioContextConsumer(WelcomeTour);
 
 export {WelcomeTour as default}
