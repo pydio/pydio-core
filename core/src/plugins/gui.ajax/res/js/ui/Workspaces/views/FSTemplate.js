@@ -170,6 +170,7 @@ let FSTemplate = React.createClass({
                                 raised={true}
                                 secondary={true}
                                 controller={props.pydio.Controller}
+                                openOnEvent={'tutorial-open-create-menu'}
                             />
                             {!mobile &&
                                 <PydioComponents.Toolbar

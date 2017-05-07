@@ -1,5 +1,6 @@
 import Utils from './Utils'
 const React = require('react')
+const ReactDOM = require('react-dom')
 const {Menu} = require('material-ui')
 const Controller = require('pydio/model/controller')
 
@@ -13,15 +14,27 @@ const ButtonMenu = React.createClass({
         direction   : React.PropTypes.oneOf(['left', 'right'])
     },
 
+    componentDidMount: function(){
+        if(this.props.openOnEvent){
+            this.props.pydio.observe(this.props.openOnEvent, () => { this.showMenu();});
+        }
+    },
+
     getInitialState: function(){
         return {showMenu: false};
     },
 
 
     showMenu: function(event){
+        let anchor;
+        if(event){
+            anchor = event.currentTarget;
+        }else{
+            anchor = this._buttonDOM;
+        }
         this.setState({
             showMenu: true,
-            anchor: event.currentTarget
+            anchor: anchor
         })
     },
 
@@ -44,9 +57,9 @@ const ButtonMenu = React.createClass({
         const {showMenu, anchor} = this.state;
         if(menuItems.length){
             if(this.props.raised){
-                button = <MaterialUI.RaisedButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
+                button = <MaterialUI.RaisedButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle} ref={(b) => {this._buttonDOM = ReactDOM.findDOMNode(b);}}/>;
             }else{
-                button = <MaterialUI.FlatButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
+                button = <MaterialUI.FlatButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle} ref={(b) => {this._buttonDOM = ReactDOM.findDOMNode(b);}}/>;
             }
         }
         return (
