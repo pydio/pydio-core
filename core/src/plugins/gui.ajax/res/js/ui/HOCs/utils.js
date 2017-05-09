@@ -6,12 +6,14 @@ import * as contentActions from './content/actions';
 import * as resolutionActions from './resolution/actions';
 import * as selectionActions from './selection/actions';
 import * as sizeActions from './size/actions';
+import * as localisationActions from './localisation/actions';
 
 const defaultActions = {
     ...contentActions,
     ...resolutionActions,
     ...selectionActions,
-    ...sizeActions
+    ...sizeActions,
+    ...localisationActions
 }
 
 // Helper functions

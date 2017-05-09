@@ -1,3 +1,3 @@
-const { SelectionControls } = PydioHOCs;
+const { SelectionControls, LocalisationControls } = PydioHOCs;
 
-export { SelectionControls }
+export { SelectionControls, LocalisationControls }

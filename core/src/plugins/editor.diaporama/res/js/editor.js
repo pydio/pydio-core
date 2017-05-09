@@ -18,7 +18,7 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { ImageContainer } from './components'
@@ -26,17 +26,16 @@ import { ImageContainer } from './components'
 const baseURL = pydio.Parameters.get('ajxpServerAccess')
 const conf = pydio.getPluginConfigs('editor.diaporama')
 const sizes = conf && conf.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700, 1000, 1300]
+
 const { SizeProviders, URLProvider, withResolution, withSelection, withResize } = PydioHOCs;
 const { ImageSizeProvider, ContainerSizeProvider } = SizeProviders
-const ThumbnailURLProvider = URLProvider(["thumbnail"]);
 const ExtendedImageContainer = withResize(ImageContainer)
 
-class Editor extends Component {
+class Editor extends PureComponent {
 
     static get propTypes() {
         return {
-            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
-            pydio: React.PropTypes.instanceOf(Pydio).isRequired,
+            node: React.PropTypes.instanceOf(AjxpNode).isRequired
         }
     }
 
@@ -80,20 +79,19 @@ class Editor extends Component {
     }
 
     render() {
-        const {node, src, editorData, scale, ...remainingProps} = this.props;
+        const {node, src, editorData, scale} = this.props;
 
         if (!node) return null
 
         return (
             <ContainerSizeProvider>
             {({containerWidth, containerHeight}) =>
-                <ImageSizeProvider url={src}node={node}>
+                <ImageSizeProvider url={src} node={node}>
                 {({imgWidth, imgHeight}) =>
                     <ExtendedImageContainer
                         editorData={editorData}
                         node={node}
                         src={src}
-                        scale={scale}
                         width={imgWidth}
                         height={imgHeight}
                         containerWidth={containerWidth}
@@ -125,6 +123,5 @@ export default compose(
     withResolution(sizes,
         (node) => `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
         (node, dimension) => `${baseURL}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
-    ),
-    connect()
+    )
 )(Editor)

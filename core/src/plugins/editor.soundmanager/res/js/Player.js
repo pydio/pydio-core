@@ -1,3 +1,5 @@
+
+import React from 'react'
 import { soundManager } from 'soundmanager2';
 import { threeSixtyPlayer } from '../../../sm/360-player/script/360player';
 
@@ -9,6 +11,8 @@ soundManager.setup({
 class Player extends React.Component {
     constructor(props) {
         super(props)
+
+        threeSixtyPlayer.config.autoPlay = props.autoPlay
 
         threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
         threeSixtyPlayer.config.showHMSTime = true;
@@ -44,16 +48,28 @@ class Player extends React.Component {
         }
     }
 
-    componentDidMount() {
-        soundManager.reboot()
-        soundManager.onready(threeSixtyPlayer.init)
-        soundManager.onready(this.props.onReady)
-        soundManager.beginDelayedInit()
+    componentWillMount() {
+
+        //soundManager.createSound()
     }
 
-    componentWillUnmount() {
-        soundManager.reboot()
+
+    componentDidMount() {
+        //soundManager.onready(() => React.Children.map(this.props.children, (child) => soundManager.createSound({url: child.href})))
+        soundManager.onready(threeSixtyPlayer.init)
+
+        // soundManager.onready(nextProps.onReady)
+        // soundManager.beginDelayedInit()
     }
+
+    componentWillReceiveProps(nextProps) {
+        //soundManager.onready(() => React.Children.map(nextProps.children, (child) => soundManager.createSound({url: child.href})))
+        soundManager.onready(threeSixtyPlayer.init)
+    }
+
+    /*componentWillUnmount() {
+        soundManager.reboot()
+    }*/
 
     render() {
         let className="ui360"
@@ -70,11 +86,13 @@ class Player extends React.Component {
 }
 
 Player.propTypes = {
+    autoPlay: React.PropTypes.bool,
     rich: React.PropTypes.bool.isRequired,
     onReady: React.PropTypes.func
 }
 
 Player.defaultProps = {
+    autoPlay: false,
     rich: true
 }
 

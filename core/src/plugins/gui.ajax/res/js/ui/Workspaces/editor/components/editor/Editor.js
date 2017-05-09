@@ -14,6 +14,7 @@
 
 // IMPORT
 import Pydio from 'pydio'
+//import FullScreen from 'react-fullscreen';
 import Draggable from 'react-draggable';
 import { connect } from 'react-redux';
 import { Paper } from 'material-ui';

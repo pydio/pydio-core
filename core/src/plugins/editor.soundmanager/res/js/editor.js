@@ -21,10 +21,28 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
+import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui'
 import Player from './Player';
 
 class Editor extends Component {
 
+    static get styles() {
+        return {
+            container: {
+                margin: "auto",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                flex: 1
+            },
+            player: {
+                margin: "auto"
+            },
+            table: {
+                width: "100%"
+            }
+        }
+    }
     componentDidMount() {
         this.loadNode(this.props)
     }
@@ -39,7 +57,7 @@ class Editor extends Component {
         const {pydio, node} = props
 
         this.setState({
-            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid(),
+            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())),
             mimeType: "audio/" + node.getAjxpMime()
         })
     }
@@ -50,9 +68,29 @@ class Editor extends Component {
         if (!url) return null
 
         return (
-            <Player rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
-                <a type={mimeType} href={url} />
-            </Player>
+            <div style={Editor.styles.container}>
+                <Player style={Editor.styles.player} autoPlay={true} rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
+                    <a type={mimeType} href={url} />
+                </Player>
+
+                <Table
+                    style={Editor.styles.table}
+                    selectable={true}
+                    multiSelectable={true}
+                >
+                    <TableBody
+                        displayRowCheckbox={false}
+                        stripedRows={false}
+                    >
+                    {this.props.selection && this.props.selection.selection.map( (node, index) => (
+                            <TableRow key={index}>
+                                <TableRowColumn>{index}</TableRowColumn>
+                                <TableRowColumn>{node.getLabel()}</TableRowColumn>
+                            </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+            </div>
         );
     }
 }

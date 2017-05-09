@@ -25,7 +25,7 @@ import { ImageSizeProvider, ContainerSizeProvider } from './providers';
 import { EditorActions, getRatio, getDisplayName, getBoundingRect } from '../utils';
 
 const withResize = (Component) => {
-    class WithResize extends React.Component {
+    class WithResize extends React.PureComponent {
         static get displayName() {
             return `WithResize(${getDisplayName(Component)})`
         }
@@ -55,11 +55,23 @@ const withResize = (Component) => {
         }
 
         componentWillReceiveProps(nextProps) {
-            this.loadSize(nextProps)
+            const {tab, containerWidth, width, containerHeight, height} = nextProps
+            const {size = "contain"} = tab
+
+            if (
+                size !== this.props.tab.size ||
+                width !== this.props.width ||
+                height !== this.props.height ||
+                containerWidth !== this.props.containerWidth ||
+                containerHeight !== this.props.containerHeight
+            ) {
+                this.loadSize(nextProps)
+            }
         }
 
         loadSize(props) {
-            const {id, size, scale, dispatch, containerWidth, width, containerHeight, height} = props
+            const {tab, dispatch, containerWidth, width, containerHeight, height} = props
+            const {id, scale, size = "contain"} = tab
 
             const state = {
                 id,
@@ -71,13 +83,14 @@ const withResize = (Component) => {
                 })
             }
 
-            this.setState(state)
+            // this.setState(state)
             dispatch(EditorActions.tabModify({id, ...state}))
         }
 
         render() {
-            const {scale} = this.state || {}
-            const {...remainingProps} = this.props
+            //const {scale} = this.state || {}
+            const {tab, dispatch, ...remainingProps} = this.props
+            const {scale} = tab
 
             return (
                 <Component

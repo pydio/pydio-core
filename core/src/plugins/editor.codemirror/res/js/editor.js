@@ -31,27 +31,12 @@ class Editor extends React.Component {
     constructor(props) {
         super(props)
 
-        const {pydio, node, id, dispatch} = this.props
+        const {node, tab, dispatch} = this.props
+        const {id} = tab
 
         if (typeof dispatch === 'function') {
             // We have a redux dispatch so we use it
             this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
-        }
-    }
-
-    // Static functions
-    static getPreviewComponent(node, rich = false) {
-        if (rich) {
-            return {
-                element: PydioCodeMirror,
-                props: {
-                    node: node,
-                    rich: rich
-                }
-            }
-        } else {
-            // We don't have a player for the file icon
-            return null;
         }
     }
 
@@ -61,11 +46,12 @@ class Editor extends React.Component {
         pydio.ApiClient.request({
             get_action: 'get_content',
             file: node.getPath()
-        }, (transport) => this.setState({content: transport.responseText}));
+        }, ({responseText}) => this.setState({content: responseText}));
     }
 
     render() {
-        const {node, codemirror, content, lineNumbers, lineWrapping, error, dispatch} = this.props
+        const {node, tab, error, dispatch} = this.props
+        const {codemirror, content, lineNumbers, lineWrapping} = tab
 
         return (
             <CodeMirrorLoader
@@ -83,4 +69,15 @@ class Editor extends React.Component {
     }
 }
 
-export default connect()(Editor)
+export const mapStateToProps = (state, props) => {
+    const {tabs} = state
+
+    const tab = tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getPath() === props.node.getPath())[0]
+
+    return {
+        tab,
+        ...props
+    }
+}
+
+export default connect(mapStateToProps)(Editor)

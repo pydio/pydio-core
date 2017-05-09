@@ -23,10 +23,10 @@ import { connect } from 'react-redux';
 import { mapStateToProps } from './utils';
 import { handler } from '../utils';
 
-const _Prev = ({selection, ...props}) => <IconButton onClick={() => handler("onSelectionChange", props)(selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={selection && !selection.hasPrevious()} />
-const _Play = ({playing, ...props}) => <IconButton onClick={() => handler("onTogglePlaying", props)(true)} iconClassName="mdi mdi-play" disabled={playing} />
-const _Pause = ({playing, ...props}) => <IconButton onClick={() => handler("onTogglePlaying", props)(false)} iconClassName="mdi mdi-pause" disabled={!playing} />
-const _Next = ({selection, ...props}) => <IconButton onClick={() => handler("onSelectionChange", props)(selection.next())} iconClassName="mdi mdi-arrow-right" disabled={selection && !selection.hasNext()} />
+const _Prev = (props) => <IconButton onClick={() => handler("onSelectionChange", props)(props.tab.selection.previous())} iconClassName="mdi mdi-arrow-left" disabled={props.tab.selection && !props.tab.selection.hasPrevious()} />
+const _Play = (props) => <IconButton onClick={() => handler("onTogglePlaying", props)(true)} iconClassName="mdi mdi-play" disabled={props.tab.playing} />
+const _Pause = (props) => <IconButton onClick={() => handler("onTogglePlaying", props)(false)} iconClassName="mdi mdi-pause" disabled={!props.tab.playing} />
+const _Next = (props) => <IconButton onClick={() => handler("onSelectionChange", props)(props.tab.selection.next())} iconClassName="mdi mdi-arrow-right" disabled={props.tab.selection && !props.tab.selection.hasNext()} />
 
 // Final export and connection
 export const Prev = connect(mapStateToProps)(_Prev)
