@@ -127,7 +127,8 @@ class SFTPAccessWrapper extends FsAccessWrapper
             $path = substr($path, 1);
         }
         // SHOULD RETURN ssh2.sftp://Resource #23/server/path/folder/path
-        return  "ssh2.sftp://".self::getSftpResource($ctx).$basePath."/".$path;
+        // BUT SINCE PHP 5.6 there's a php issue, wrap resource in intval()
+        return  "ssh2.sftp://".intval(self::getSftpResource($ctx)).$basePath."/".$path;
     }
 
     /**
