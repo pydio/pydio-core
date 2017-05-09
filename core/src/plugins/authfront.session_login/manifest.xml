@@ -40,7 +40,7 @@
                 </processing>
             </action>
             <action name="logout" expireDefault="true">
-                <gui text="164" title="169" iconClass="icon-signout"
+                <gui text="164" title="169" iconClass="mdi mdi-logout"
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
                              contextMenu="false" actionBar="true" actionBarGroup="zlogin,minisite">
