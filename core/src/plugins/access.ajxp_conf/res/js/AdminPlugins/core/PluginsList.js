@@ -1,4 +1,5 @@
 import PluginEditor from './PluginEditor'
+import {Toggle, IconButton} from 'material-ui'
 
 const PluginsList = React.createClass({
 
@@ -30,6 +31,7 @@ const PluginsList = React.createClass({
             );
         }
         var onToggle = function(e, toggled){
+            e.stopPropagation();
             var res = this.togglePluginEnable(node, toggled);
             if(!res){
 
@@ -37,8 +39,8 @@ const PluginsList = React.createClass({
         }.bind(this);
 
         return (
-            <div style={{margin:'24px 16px'}}>
-                <ReactMUI.Toggle
+            <div style={{margin:'24px 8px'}} onClick={(e) => {e.stopPropagation()}}>
+                <Toggle
                     ref="toggle"
                     className="plugin-enable-toggle"
                     name="plugin_toggle"
@@ -75,7 +77,7 @@ const PluginsList = React.createClass({
         }.bind(this);
         return (
             <div className="plugins-list-actions">
-                <ReactMUI.IconButton className="plugin-edit" iconClassName="mdi mdi-pencil" onClick={edit}/>
+                <IconButton iconStyle={{color: 'rgba(0,0,0,0.33)', fontSize:21}} style={{padding:6}} iconClassName="mdi mdi-pencil" onClick={edit}/>
             </div>
         );
     },

@@ -18,13 +18,16 @@ const AuthenticationPluginsDashboard = React.createClass({
         });
     },
 
+    getInitialState: function(){
+        return {authfrontNode: new AjxpNode('/plugins/manager/authfront')};
+    },
+
     render:function(){
-        const fakeNode = new AjxpNode('/plugins/manager/authfront');
         const pluginsList = <PluginsList
             title={this.context.getMessage('plugtype.title.authfront', '')}
             dataModel={this.props.dataModel}
-            node={fakeNode}
-            rootNode={fakeNode}
+            node={this.state.authfrontNode}
+            rootNode={this.state.authfrontNode}
             openSelection={this.openSelection}
         />;
         return (
