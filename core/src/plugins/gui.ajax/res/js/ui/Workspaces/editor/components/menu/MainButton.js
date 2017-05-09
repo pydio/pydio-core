@@ -25,7 +25,7 @@ class Button extends React.Component {
 
         let iconClassName = 'mdi mdi-close'
         if (!rotated) {
-            iconClassName = 'mdi mdi-pencil'
+            iconClassName = 'mdi mdi-animation'
         }
 
         return (
