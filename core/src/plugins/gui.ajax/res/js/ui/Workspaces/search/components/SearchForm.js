@@ -24,16 +24,16 @@ class SearchForm extends Component {
         super(props)
 
         // Create Fake DM
-        let basicDataModel = new PydioDataModel(true);
+        this._basicDataModel = new PydioDataModel(true);
         let rNodeProvider = new EmptyNodeProvider();
-        basicDataModel.setAjxpNodeProvider(rNodeProvider);
+        this._basicDataModel.setAjxpNodeProvider(rNodeProvider);
         const rootNode = new AjxpNode("/", false, '', '', rNodeProvider);
-        basicDataModel.setRootNode(rootNode);
+        this._basicDataModel.setRootNode(rootNode);
 
         this.state = {
             values: {},
             display: 'closed',
-            dataModel: basicDataModel,
+            dataModel: this._basicDataModel,
             empty: true,
             loading: false,
             searchScope:  props.uniqueSearchScope || 'folder'
@@ -42,6 +42,17 @@ class SearchForm extends Component {
         this.setMode = _.debounce(this.setMode, 250);
         this.update = _.debounce(this.update, 500)
         this.submit = _.debounce(this.submit, 500)
+
+        this.props.pydio.observe('repository_list_refreshed', () => {
+            this.setState({
+                values: {},
+                display:'closed',
+                dataModel: this._basicDataModel,
+                empty: true,
+                loading: false
+            });
+        });
+
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -57,7 +68,16 @@ class SearchForm extends Component {
 
     setMode(mode) {
         if (mode === 'small' && this.state.display !== 'closed') return // we can only set to small when the previous state was closed
-
+        if(mode === 'more' && this.state.display === 'advanced'){
+            let {basename, ...otherValues} = this.state.values;
+            if(basename) this.setState({values: {basename}}, this.submit);
+            else this.setState({values: {}}, this.submit);
+        }else if(mode === 'small' && this.state.display === 'closed'){
+            let {basename, ...otherValues} = this.state.values;
+            if(otherValues && Object.keys(otherValues).length){
+                mode = 'advanced';
+            }
+        }
         this.setState({
             display: mode
         })
@@ -69,8 +89,8 @@ class SearchForm extends Component {
             ...newValues
         }
 
-        // Removing null values
-        Object.keys(values).forEach((key) => (values[key] == null) && delete values[key]);
+        // Removing empty values
+        Object.keys(values).forEach((key) => (!values[key]) && delete values[key]);
 
         this.setState({
             values
@@ -90,6 +110,11 @@ class SearchForm extends Component {
         }
 
         if (queryString === '') {
+            this.setState({
+                loading: false,
+                dataModel: this._basicDataModel,
+                empty: true
+            });
             return
         }
 
@@ -165,12 +190,15 @@ class SearchForm extends Component {
         if(display === 'closed'){
             zDepth = 0;
             style = {...style, backgroundColor: 'transparent'};
+        }else{
+            style = {...style, backgroundColor: '#f5f5f5'};
         }
 
         return (
             <Paper ref="root" zDepth={zDepth} className={"top_search_form " + display} style={style}>
                 <MainSearch
                     mode={display}
+                    value={values.basename}
                     title={display === 'advanced' ? 'Advanced Search' : null}
                     onOpen={() => this.setMode("small")}
                     showAdvanced={!this.props.crossWorkspace}
@@ -189,18 +217,18 @@ class SearchForm extends Component {
                 {display === 'advanced' &&
                     <AdvancedSearch
                         {...this.props}
-                        value={values.basename}
+                        values={values}
                         onChange={(values) => this.update(values)}
                         onSubmit={() => this.submit()}
                     />
                 }
 
-                <div className="search-results">
+                <div className="search-results"style={display==='small' ? {backgroundColor:'white'} : null}>
                     {empty &&
                         <EmptyStateView
                             iconClassName=""
                             primaryTextId={611}
-                            style={{minHeight: 180, backgroundColor: 'transparent'}}
+                            style={{minHeight: 180, backgroundColor: 'transparent', padding:'0 20px'}}
                         />
                     }
                     <PydioComponents.NodeListCustomProvider
@@ -211,7 +239,7 @@ class SearchForm extends Component {
                         entryRenderActions={function() {return null}}
                         entryRenderSecondLine={renderSecondLine}
                         presetDataModel={dataModel}
-                        heightAutoWithMax={display === 'small' ? 500  : 412}
+                        heightAutoWithMax={display === 'small' ? 500  : ( display === 'advanced' ? 512 : 412 )}
                         openCollection={nodeClicked}
                         nodeClicked={nodeClicked}
                         defaultGroupBy={(crossWorkspace || searchScope ==='all') ? 'repository_id' : null }
@@ -219,7 +247,7 @@ class SearchForm extends Component {
                         emptyStateProps={{
                             iconClassName:"",
                             primaryTextId:478,
-                            style:{minHeight: (display === 'small' ? 180  : 412), backgroundColor: 'transparent'}
+                            style:{minHeight: (display === 'small' ? 180  : ( display === 'advanced' ? 512 : 412 )), backgroundColor: 'transparent'}
                         }}
                     />
 

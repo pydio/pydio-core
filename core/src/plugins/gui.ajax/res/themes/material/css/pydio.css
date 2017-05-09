@@ -1380,6 +1380,10 @@ div#multiple_download_container div div a:hover {
   width: 512px;
   height: 512px;
 }
+.react-mui-context .top_search_form.more.advanced,
+.react-mui-context .top_search_form.advanced.advanced {
+  height: 612px;
+}
 .react-mui-context .top_search_form.more .search-results,
 .react-mui-context .top_search_form.advanced .search-results {
   height: 412px;
