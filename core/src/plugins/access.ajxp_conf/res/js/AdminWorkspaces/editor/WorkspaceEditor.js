@@ -1,7 +1,8 @@
+import React from 'react'
+import {FlatButton} from 'material-ui'
+
 import Workspace from '../model/Workspace'
-
 import SharesList from '../panel/SharesList'
-
 import TplFieldsChooser from './TplFieldsChooser'
 import FeaturesList from './FeaturesList'
 
@@ -293,12 +294,12 @@ class WorkspaceEditor extends React.Component{
 
         var titleActionBarButtons = [];
         if(this.state.model && this.state.model.isEditable()){
-            titleActionBarButtons.push(<ReactMUI.FlatButton key="delete" label={this.context.getMessage('ws.23')} primary={true} onClick={this.deleteWorkspace.bind(this)}/>);
+            titleActionBarButtons.push(<FlatButton key="delete" label={this.context.getMessage('ws.23')} primary={true} onTouchTap={this.deleteWorkspace.bind(this)}/>);
             titleActionBarButtons.push(<div className="separator" key="separator"></div>);
         }
-        titleActionBarButtons.push(<ReactMUI.FlatButton key="reset" label={this.context.getMessage('plugins.6')} onClick={this.reset.bind(this)} secondary={true} disabled={!this.state.dirty}/>);
-        titleActionBarButtons.push(<ReactMUI.FlatButton key="save" label={this.context.getMessage('53', '')} onClick={this.saveWorkspace.bind(this)} secondary={true} disabled={!this.state.dirty || !currentValid}/>);
-        titleActionBarButtons.push(<ReactMUI.FlatButton key="close" label={this.context.getMessage('86', '')} onClick={this.props.closeEditor} secondary={true}/>);
+        titleActionBarButtons.push(<FlatButton key="reset" label={this.context.getMessage('plugins.6')} onTouchTap={this.reset.bind(this)} secondary={true} disabled={!this.state.dirty}/>);
+        titleActionBarButtons.push(<FlatButton key="save" label={this.context.getMessage('53', '')} onTouchTap={this.saveWorkspace.bind(this)} secondary={true} disabled={!this.state.dirty || !currentValid}/>);
+        titleActionBarButtons.push(<FlatButton key="close" label={this.context.getMessage('86', '')} onTouchTap={this.props.closeEditor} secondary={true}/>);
 
         return (
             <PydioComponents.PaperEditorLayout

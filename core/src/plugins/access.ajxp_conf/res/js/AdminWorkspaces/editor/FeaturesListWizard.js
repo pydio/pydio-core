@@ -1,3 +1,5 @@
+import React from 'react'
+import {RaisedButton} from 'material-ui'
 import Workspace from '../model/Workspace'
 
 export default React.createClass({
@@ -153,16 +155,16 @@ export default React.createClass({
             step3 = <div>
                 <PydioComponents.PaperEditorNavHeader key="save-k" label={stepNumber + " - " + this.context.getMessage('ws.19')}/>
                 <div style={{textAlign:'center'}}>
-                    <ReactMUI.RaisedButton primary={false} label={this.context.getMessage('54', '')} onClick={this.props.close} />
+                    <RaisedButton primary={false} label={this.context.getMessage('54', '')} onTouchTap={this.props.close} />
                     &nbsp;&nbsp;&nbsp;
-                    <ReactMUI.RaisedButton primary={true} label={this.context.getMessage('ws.20')} onClick={this.props.save} disabled={this.props.disableCreateButton}/>
+                    <RaisedButton primary={true} label={this.context.getMessage('ws.20')} onTouchTap={this.props.save} disabled={this.props.disableCreateButton}/>
                 </div>
             </div>;
 
         }else{
 
             step3 = <div style={{textAlign:'center', marginTop: 50}}>
-                <ReactMUI.RaisedButton primary={false} label={this.context.getMessage('54', '')} onClick={this.props.close} />
+                <RaisedButton primary={false} label={this.context.getMessage('54', '')} onTouchTap={this.props.close} />
             </div>;
 
         }

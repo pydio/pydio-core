@@ -4,6 +4,7 @@ import {RoleMessagesConsumerMixin} from '../util/MessagesMixin'
 import ParameterCreate from './ParameterCreate'
 import ParametersList from './ParametersList'
 import ParametersSummary from './ParametersSummary'
+import {FlatButton} from 'material-ui'
 
 let WorkspaceCard = React.createClass({
 
@@ -85,7 +86,7 @@ let WorkspaceCard = React.createClass({
                     <div>
                         <hr/>
                         <div style={{textAlign:'right', padding:'10px 16px'}}>
-                            <ReactMUI.FlatButton onClick={this.toggleEdit} primary={true} label={this.context.getRootMessage('86')}/>
+                            <FlatButton onTouchTap={this.toggleEdit} primary={true} label={this.context.getRootMessage('86')}/>
                         </div>
                     </div>
                 );

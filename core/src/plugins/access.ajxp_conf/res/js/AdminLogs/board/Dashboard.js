@@ -1,3 +1,6 @@
+import React from 'react'
+import {RaisedButton} from 'material-ui'
+
 const Dashboard = React.createClass({
 
     mixins:[AdminComponents.MessagesConsumerMixin],
@@ -101,9 +104,9 @@ const Dashboard = React.createClass({
             }.bind(this));
             dialogContent = <div>{items}</div>;
         }
-        let exportButton = (<ReactMUI.RaisedButton label={this.context.getMessage("logs.11")} onClick={this.openExporter}/>);
+        let exportButton = (<RaisedButton label={this.context.getMessage("logs.11")} onTouchTap={this.openExporter}/>);
         if(!ResourcesManager.moduleIsAvailable('EnterpriseComponents')){
-            exportButton = (<ReactMUI.RaisedButton label={this.context.getMessage("logs.11")} disabled={true}/>);
+            exportButton = (<RaisedButton label={this.context.getMessage("logs.11")} disabled={true}/>);
         }
 
         return (
