@@ -84,7 +84,7 @@ class AdvancedSearch extends Component {
 
         const {text} = AdvancedSearch.styles
 
-        const {pydio, onChange, getMessage} = this.props
+        const {pydio, onChange, getMessage, values} = this.props
         const headerStyle = {fontSize: 18, color: 'rgba(0,0,0,0.87)', fontWeight: 400, marginBottom: -10, marginTop: 10};
 
         return (
@@ -99,13 +99,13 @@ class AdvancedSearch extends Component {
                 </AdvancedMetaFields>
 
                 <Subheader style={headerStyle}>{getMessage(490)}</Subheader>
-                <DatePanel pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
+                <DatePanel values={values} pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
 
                 <Subheader style={{...headerStyle, marginBottom: 10}}>{getMessage(498)}</Subheader>
-                <FileFormatPanel pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
+                <FileFormatPanel values={values} pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
 
                 <Subheader style={headerStyle}>{getMessage(503)}</Subheader>
-                <FileSizePanel pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
+                <FileSizePanel values={values} pydio={pydio} inputStyle={text} onChange={(values) => this.onChange(values)} />
             </div>
         )
     }

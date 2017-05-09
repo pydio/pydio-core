@@ -9,8 +9,8 @@ class SearchFileFormatPanel extends Component {
         super(props)
 
         this.state = {
-            folder: false,
-            ext: null
+            folder: this.props.values['ajxp_mime'] && this.props.values['ajxp_mime'] === 'ajxp_folder' ? true: undefined,
+            ext: (this.props.values['ajxp_mime'] && this.props.values['ajxp_mime'] !== 'ajxp_folder' ? this.props.values['ajxp_mime'] : undefined),
         }
     }
 
@@ -35,6 +35,7 @@ class SearchFileFormatPanel extends Component {
                     name="toggleFolder"
                     value="ajxp_folder"
                     label={getMessage(502)}
+                    toggled={this.state.folder}
                     onToggle={(e, toggled) => this.setState({folder: toggled})}
                 />
                 {!this.state.folder &&
@@ -44,6 +45,7 @@ class SearchFileFormatPanel extends Component {
                         hintText={getMessage(500)}
                         floatingLabelFixed={true}
                         floatingLabelText={getMessage(500)}
+                        value={this.state.ext}
                         onChange={(e) => this.setState({ext: e.target.value})}
                     />
                 }
