@@ -12,7 +12,7 @@ class EmptyStateView extends Component{
     }
 
     render(){
-        const {style, iconClassName, primaryTextId, secondaryTextId, actionLabelId, actionCallback, actionIconClassName, getMessage} = this.props;
+        const {style, iconClassName, primaryTextId, secondaryTextId, actionLabelId, actionCallback, actionStyle, actionIconClassName, getMessage} = this.props;
 
         const mainColor = Color(this.props.muiTheme.palette.primary1Color);
 
@@ -60,7 +60,7 @@ class EmptyStateView extends Component{
                         <div style={styles.secondaryText}>{getMessage(secondaryTextId)}</div>
                     }
                     {actionLabelId && actionCallback &&
-                        <div style={styles.buttonContainer}>
+                        <div style={{...styles.buttonContainer, ...actionStyle}}>
                             <FlatButton style={styles.buttonStyle} label={getMessage(actionLabelId)} onTouchTap={actionCallback} icon={buttonIcon}/>
                         </div>
                     }
@@ -81,6 +81,7 @@ EmptyStateView.propTypes = {
     secondaryTextId: PropTypes.string,
     actionLabelId: PropTypes.string,
     actionCallback: PropTypes.func,
+    actionStyle: PropTypes.object,
 
     style: PropTypes.object,
     getMessage: PropTypes.func
