@@ -6,8 +6,7 @@ import RecentAccessCard from './recent/RecentAccessCard'
 import VideoCard from './videos/VideoCard'
 import WorkspacesListCard from './workspaces/WorkspacesListCard'
 
-import UserDashboard from './board/UserDashboard'
-import AltDashboard from './board/AltDashboard'
+import HomeDashboard from './board/HomeDashboard'
 
 export {
     DlAppsCard,
@@ -17,6 +16,5 @@ export {
     RecentAccessCard,
     VideoCard,
     WorkspacesListCard,
-    UserDashboard,
-    AltDashboard
+    HomeDashboard
 }

@@ -69,7 +69,6 @@ let AltDashboard = React.createClass({
 
         const {pydio} = this.props;
 
-        const enableSearch = pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH");
         const palette = this.props.muiTheme.palette;
         const Color = MaterialUI.Color;
 
