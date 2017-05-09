@@ -19,11 +19,9 @@
  */
 
 import React, {Component} from 'react'
-import { connect } from 'react-redux'
-import { compose } from 'redux'
 import Player from './Player';
 
-class Editor extends Component {
+export default class Preview extends Component {
 
     componentDidMount() {
         this.loadNode(this.props)
@@ -50,7 +48,7 @@ class Editor extends Component {
         if (!url) return null
 
         return (
-            <Player rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
+            <Player rich={!this.props.icon && this.props.rich} style={{width: "auto", height: "auto"}} onReady={this.props.onLoad}>
                 <a type={mimeType} href={url} />
             </Player>
         );
@@ -66,32 +64,3 @@ function s4() {
         .toString(16)
         .substring(1);
 }
-
-const {withSelection, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-
-// let ExtendedPlayer = compose(
-//     withMenu,
-//     withErrors
-// )(props => <Player {...props} />)
-
-const editors = pydio.Registry.getActiveExtensionByType("editor")
-const conf = editors.filter(({id}) => id === 'editor.soundmanager')[0]
-
-const getSelectionFilter = (node) => conf.mimes.indexOf(node.getAjxpMime()) > -1
-
-const getSelection = (node) => new Promise((resolve, reject) => {
-    let selection = [];
-
-    node.getParent().getChildren().forEach((child) => selection.push(child));
-    selection = selection.filter(getSelectionFilter)
-
-    resolve({
-        selection,
-        currentIndex: selection.reduce((currentIndex, current, index) => current === node && index || currentIndex, 0)
-    })
-})
-
-export default compose(
-    withSelection(getSelection),
-    connect()
-)(Editor)

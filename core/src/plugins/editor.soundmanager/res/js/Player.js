@@ -62,10 +62,8 @@ class Player extends React.Component {
         }
 
         return (
-            <div style={{display: "flex", flex: 1, alignItems: "center", justifyContent: "center"}}>
-                <div className={className} >
-                    {this.props.children}
-                </div>
+            <div className="ui360 ui360-vis" style={this.props.style}>
+                {this.props.children}
             </div>
         )
     }
@@ -79,6 +77,5 @@ Player.propTypes = {
 Player.defaultProps = {
     rich: true
 }
-
 
 export default Player
