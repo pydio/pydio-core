@@ -22,22 +22,17 @@
 			</action>
 			<!-- OVERRIDE LOGOUT -->
 			<action name="ftp_logout" expireDefault="true">
-				<gui text="164" title="169" accessKey="" hasAccessKey="false" iconClass="icon-signout">
+				<gui text="164" title="169" accessKey="" hasAccessKey="false" iconClass="mdi mdi-logout">
 					<context selection="false" dir="" recycle="false"
 						actionBar="false" contextMenu="false" infoPanel="false"
-						actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
+						actionBarGroup="zlogin,minisite">
 					</context>
 				</gui>
 				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""/>
 				<processing>
 					<clientCallback><![CDATA[
-						clearRememberData();
-						var connexion = new Connexion();
-						connexion.addParameter('get_action', 'ftp_logout');
-						connexion.onComplete = function(transport){
-							PydioApi.getClient().parseXmlMessage(transport.responseXML);
-							};
-						connexion.sendAsync();
+						PydioApi.clearRememberData();
+						PydioApi.getClient().request({get_action:'ftp_logout'});
 						]]></clientCallback>
 					<serverCallback methodName="logoutCallback"/>
 				</processing>

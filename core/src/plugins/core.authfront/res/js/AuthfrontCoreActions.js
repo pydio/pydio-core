@@ -361,46 +361,46 @@
             return (
                 <div>
                     {captcha}
-                    <table cellpadding="2" border="0" cellspacing="0">
+                    <table cellPadding={5} border="0" style={{width:370}}>
                         <tr>
                             <td colspan="2">
                                 <div class="dialogLegend">{messages['ftp_auth.1']}</div>
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <TextField style={tFieldStyle} ref="FTP_HOST" floatingLabelText={messages['ftp_auth.2']}/>
+                            <td style={{padding:'0 5px'}}>
+                                <TextField fullWidth={true} style={tFieldStyle} ref="FTP_HOST" floatingLabelText={messages['ftp_auth.2']}/>
                             </td>
-                            <td>
-                                <TextField ref="FTP_PORT" style={tFieldStyle} defaultValue="21" floatingLabelText={messages['ftp_auth.8']}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <TextField style={tFieldStyle} ref="userid" floatingLabelText={messages['181']}/>
-                            </td>
-                            <td>
-                                <TextField style={tFieldStyle} ref="password" type="password" floatingLabelText={messages['182']}/>
+                            <td style={{padding:'0 5px'}}>
+                                <TextField fullWidth={true} ref="FTP_PORT" style={tFieldStyle} defaultValue="21" floatingLabelText={messages['ftp_auth.8']}/>
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2">
+                            <td style={{padding:'0 5px'}}>
+                                <TextField fullWidth={true} style={tFieldStyle} ref="login" floatingLabelText={messages['181']}/>
+                            </td>
+                            <td style={{padding:'0 5px'}}>
+                                <TextField fullWidth={true} style={tFieldStyle} ref="password" type="password" floatingLabelText={messages['182']}/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style={{padding:'15px 5px 0'}}>
                                 <div class="dialogLegend">{messages['ftp_auth.3']}</div>
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <TextField style={tFieldStyle} ref="PATH" defaultValue="/" floatingLabelText={messages['ftp_auth.4']}/>
+                            <td style={{padding:'0 5px'}}>
+                                <TextField fullWidth={true} style={tFieldStyle} ref="PATH" defaultValue="/" floatingLabelText={messages['ftp_auth.4']}/>
                             </td>
-                            <td>
+                            <td style={{padding:'0 5px'}}>
                                 <Toggle ref="FTP_SECURE" label={messages['ftp_auth.5']} labelPosition="right"/>
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <TextField style={tFieldStyle} ref="CHARSET" floatingLabelText={messages['ftp_auth.6']}/>
+                            <td style={{padding:'0 5px'}}>
+                                <TextField fullWidth={true} style={tFieldStyle} ref="CHARSET" floatingLabelText={messages['ftp_auth.6']}/>
                             </td>
-                            <td>
+                            <td style={{padding:'0 5px'}}>
                                 <Toggle ref="FTP_DIRECT" label={messages['ftp_auth.7']} labelPosition="right"/>
                             </td>
                         </tr>
