@@ -1,23 +1,23 @@
 /* larger canvas, spectrum + EQ visualization and other items */
 
-.ui360-vis,
+/*.ui360-vis,
 .ui360-vis .sm2-360ui,
 .sm2-inline-list .ui360-vis {
- /* size of the container for the circle, etc. */
+ /* size of the container for the circle, etc.
  width: 198px;
  height: 198px;
 }
 
 .ui360-vis {
  position:relative;
- /* a little extra spacing */
+ /* a little extra spacing
  padding-top:1px;
  padding-bottom:1px;
- margin-bottom:-18px; /* approximate "line height" we want */
+ margin-bottom:-18px; /* approximate "line height" we want
  padding-left:248px;
  margin-left:0px;
- background-position:50% 50%; /* (~109px) initial play button position */
-}
+ background-position:50% 50%; /* (~109px) initial play button position 
+}*/
 
 .sm2-inline-list .ui360-vis {
  cursor:pointer

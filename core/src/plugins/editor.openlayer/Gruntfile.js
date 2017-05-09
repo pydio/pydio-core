@@ -22,12 +22,13 @@ module.exports = function(grunt) {
             ui : {
                 options: {
                     external:Externals,
-                    browserifyOptions:{
+                    browserifyOptions: {
+                        standalone: 'PydioMaps',
                         debug:true
                     }
                 },
                 files: {
-                    'res/build/PydioMaps.js':'res/build/PydioMaps/*.js'
+                    'res/build/PydioMaps.js':'res/build/PydioMaps/index.js'
                 }
             }
         },

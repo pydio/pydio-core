@@ -90,7 +90,7 @@ class Panel extends Component {
                     namespace="PydioMaps"
                     componentName="OLMap"
                     key="map"
-                    style={{height: 170,marginBottom:0, padding:0}}
+                    style={{height: 170, marginBottom:0, padding:0}}
                     centerNode={this.props.node}
                     mapLoaded={this.mapLoaded}
                 />
