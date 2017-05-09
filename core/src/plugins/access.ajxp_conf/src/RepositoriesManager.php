@@ -759,7 +759,7 @@ class RepositoriesManager extends AbstractManager
     public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         $fullBasePath       = "/" . $rootPath . "/" . $relativePath;
-        $REPOS_PER_PAGE     = 50;
+        $REPOS_PER_PAGE     = 10000;
         $paginationHash     = $paginationHash === null ? 1 : $paginationHash;
         $offset             = ($paginationHash - 1) * $REPOS_PER_PAGE;
         $count              = null;
