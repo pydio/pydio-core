@@ -140,7 +140,6 @@ class TopLevelRouter
                 break;
             case Dispatcher::NOT_FOUND:
             default:
-                //throw new PydioException("Oups, could not find any valid route for ".$uri.", method was was ".$httpMethod);
                 header("HTTP/1.0 404 Not Found");
                 echo file_get_contents(AJXP_INSTALL_PATH . "/plugins/gui.ajax/res/html/404.html");
                 die();
