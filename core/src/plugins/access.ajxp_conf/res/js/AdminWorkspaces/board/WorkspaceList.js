@@ -29,7 +29,7 @@ export default React.createClass({
 
     filterNodes:function(node){
         if(! this.props.filter ) return true;
-        if(['ajxp_conf','ajxp_home','admin','ajxp_user'].indexOf(node.getMetadata().get('accessType')) !== -1){
+        if(['ajxp_conf','ajxp_home','admin'].indexOf(node.getMetadata().get('accessType')) !== -1){
             return false;
         }
         if( this.props.filter == 'workspaces'){

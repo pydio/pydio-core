@@ -213,15 +213,6 @@
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
-        <action name="switch_to_user_dashboard">
-            <gui src="drive_remote.png" text="user_dash.title" title="user_dash.desc" hasAccessKey="false" iconClass="icon-dashboard" >
-                <context dir="false" recycle="true" selection="false" actionBar="false" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
-            </gui>
-            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
-            <processing>
-                <clientCallback module="PydioCoreActions.Navigation.switchToUserDashboard"/>
-            </processing>
-        </action>
         <action name="switch_to_settings">
             <gui text="165" title="506" accessKey="settings_access_key" hasAccessKey="true" iconClass="mdi mdi-settings" >
                 <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="zlogin"/>

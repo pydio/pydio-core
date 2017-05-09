@@ -106,18 +106,6 @@ $REPOSITORIES[1] = array(
 );
 
 // DO NOT REMOVE THIS!
-// USER DASHBOARD
-$REPOSITORIES["ajxp_user"] = array(
-    "DISPLAY"		    =>	"My Dashboard",
-    "AJXP_SLUG"		    =>  "dashboard",
-    "DISPLAY_ID"		=>	"user_dash.title",
-    "DESCRIPTION_ID"	=>	"user_dash.desc",
-    "DRIVER"		    =>	"ajxp_user",
-    "DRIVER_OPTIONS"    => array(
-        "DEFAULT_RIGHTS" => "rw"
-    )
-);
-
 $REPOSITORIES["ajxp_home"] = array(
     "DISPLAY"		    =>	"Welcome",
     "AJXP_SLUG"		    =>  "welcome",

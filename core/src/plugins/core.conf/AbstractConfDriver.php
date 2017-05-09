@@ -128,23 +128,6 @@ abstract class AbstractConfDriver extends Plugin
             }
         }
 
-        // SWITCH TO DASHBOARD ACTION
-        $u = $ctx->getUser();
-        $access = true;
-        if($u == null) $access = false;
-        else {
-            $acl = $u->getMergedRole()->getAcl("ajxp_user");
-            if(empty($acl)) $access = false;
-        }
-        if(!$access){
-            $actionXpath=new \DOMXPath($contribNode->ownerDocument);
-            $publicUrlNodeList = $actionXpath->query('action[@name="switch_to_user_dashboard"]', $contribNode);
-            if ($publicUrlNodeList->length) {
-                $publicUrlNode = $publicUrlNodeList->item(0);
-                $contribNode->removeChild($publicUrlNode);
-            }
-        } 
-
         $exposed = UsersService::getUsersExposedParameters();
         if (!count($exposed)) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
