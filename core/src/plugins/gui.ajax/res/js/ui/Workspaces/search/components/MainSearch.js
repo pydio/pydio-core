@@ -81,17 +81,21 @@ class MainSearch extends Component {
         super(props)
 
         this.state = {
-            mode: props.mode
+            mode: props.mode,
+            value: props.value || ''
         }
 
         // Making sure we don't send too many requests
-        this.onChange = _.debounce(this.onChange, 500)
+        // this.onChange = _.debounce(this.onChange, 500)
     }
 
     componentWillReceiveProps(nextProps) {
         this.setState({
             mode: nextProps.mode
         })
+        if(nextProps.value && !this.state.value){
+            this.setState({value: nextProps.value});
+        }
     }
 
     componentDidUpdate() {
@@ -101,8 +105,10 @@ class MainSearch extends Component {
     }
 
     onChange(value) {
-        this.props.onChange({'basename': value})
-        this.props.onSubmit()
+        this.setState({value: value}, () => {
+            this.props.onChange({'basename': value})
+            this.props.onSubmit()
+        });
     }
 
     render() {
@@ -152,6 +158,7 @@ class MainSearch extends Component {
                         onFocus={onOpen}
                         onBlur={mode === 'small' ? onClose : null}
                         hintText={hintText}
+                        value={this.state.value || ''}
                         onChange={(e,v) => this.onChange(v)}
                         onKeyPress={(e) => (e.key === 'Enter' ? this.onChange(e.target.value) : null)}
                     />

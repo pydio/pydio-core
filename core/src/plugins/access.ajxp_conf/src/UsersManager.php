@@ -656,7 +656,7 @@ class UsersManager extends AbstractManager
             foreach($groups as $groupPath){
                 $groupPath = preg_replace('/^\/data\/users/', '', $groupPath);
                 if(empty($groupPath)){
-                    throw new PydioException("Oups trying to delete top-level role, there must be something wrong!");
+                    throw new PydioException("Trying to delete top-level role, there must be something wrong!");
                 }
                 $basePath = PathUtils::forwardSlashDirname($groupPath);
                 $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);

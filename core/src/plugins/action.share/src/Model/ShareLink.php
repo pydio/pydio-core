@@ -234,7 +234,7 @@ class ShareLink
         $shareMeta = isSet($this->additionalMeta) ? $this->additionalMeta : array();
         $internalUserId = (isSet($storedData["PRELOG_USER"]) ? $storedData["PRELOG_USER"] : $storedData["PRESET_LOGIN"]);
         if(empty($internalUserId)){
-            throw new \Exception("Oups, link ".$this->getHash()." has no internal user id, this is not normal.");
+            throw new \Exception("Oops, link ".$this->getHash()." has no internal user id, this is not normal.");
         }
 
         $jsonData = array(

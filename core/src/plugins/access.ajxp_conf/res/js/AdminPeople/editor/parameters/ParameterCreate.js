@@ -58,7 +58,7 @@ export default React.createClass({
         var title, content, actions;
         var params = EditorCache.CACHE['PARAMETERS'];
         if(!params){
-            return (<div>Oups: parameters cache is not loaded!</div>);
+            return (<div>Oops: parameters cache is not loaded!</div>);
         }
         var scopeId = this.props.workspaceScope;
         var pluginsFilter = this.props.pluginsFilter || function(){return true;};

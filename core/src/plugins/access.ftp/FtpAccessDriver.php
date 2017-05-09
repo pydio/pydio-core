@@ -221,7 +221,7 @@ class FtpAccessDriver extends FsAccessDriver
                         $boxData["tmp_name"] = $destName;
                         $this->copyUploadedData($uploadedFile, $destName, $mess);
                         $this->storeFileToCopy($ctx, $boxData);
-                        $this->writeUploadSuccess($request, ["PREVENT_NOTIF" => true]);
+                        $this->writeUploadSuccess($request, ["PREVENT_NOTIF" => true, "CONSUME_CHANNEL" => true]);
 
                         $task = TaskService::actionAsTask($ctx, "next_to_remote", []);
                         $task->setLabel("Copying file to remote server");

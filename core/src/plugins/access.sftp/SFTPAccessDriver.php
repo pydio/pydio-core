@@ -207,4 +207,15 @@ class SFTPAccessDriver extends FsAccessDriver
         return false;
     }
 
+
+    /**
+     * Specific isWriteable implementation
+     * @param AJXP_Node $node
+     * @return bool
+     */
+    public function isWriteable(AJXP_Node $node)
+    {
+        return true;
+    }
+
 }
