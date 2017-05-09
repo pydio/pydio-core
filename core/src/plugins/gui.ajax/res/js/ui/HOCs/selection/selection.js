@@ -30,7 +30,8 @@ const withSelection = (getSelection) => {
             constructor(props) {
                 super(props)
 
-                const {node, id, dispatch} = this.props
+                const {node, tab, dispatch} = this.props
+                const {id} = tab
 
                 if (typeof dispatch === 'function') {
                     // We have a redux dispatch so we use it
@@ -49,13 +50,16 @@ const withSelection = (getSelection) => {
             }
 
             componentDidMount() {
-                const {id, node, tabModify} = this.props
+                const {tab, node, tabModify} = this.props
+                const {id} = tab
 
                 getSelection(node).then(({selection, currentIndex}) => this.setState({id, selection: new SelectionModel(selection, currentIndex)}))
             }
 
             render() {
-                const {id, selection, playing, dispatch, ...remainingProps} = this.props
+
+                const {tab, dispatch, ...remainingProps} = this.props
+                const {id, selection, playing} = tab
 
                 if (!selection) {
                     return (
@@ -69,7 +73,9 @@ const withSelection = (getSelection) => {
                     <Component
                         {...remainingProps}
                         node={selection.current()}
+                        selection={selection}
                         selectionPlaying={playing}
+
                         onRequestSelectionPlay={() => this.setState({id, node: selection.nextOrFirst(), title: selection.current().getLabel()})}
                     />
                 )

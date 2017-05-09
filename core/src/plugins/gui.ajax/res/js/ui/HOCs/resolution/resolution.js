@@ -27,31 +27,33 @@ import { mapStateToProps } from './utils';
 const withResolution = (sizes, highResolution, lowResolution) => {
     return (Component) => {
         class WithResolution extends React.Component {
+            constructor(props) {
+                super(props)
+
+                const {node, tab, dispatch} = this.props
+                const {id} = tab
+
+                if (typeof dispatch === 'function') {
+                    // We have a redux dispatch so we use it
+                    this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
+                }
+            }
+
             static get displayName() {
                 return `WithResolution(${getDisplayName(Component)})`
             }
 
             static get propTypes() {
                 return {
-                    node: React.PropTypes.instanceOf(AjxpNode).isRequired,
-                    resolution: React.PropTypes.oneOf(["hi", "lo"]).isRequired
-                }
-            }
-
-            static get defaultProps() {
-                return {
-                    resolution: "hi"
+                    node: React.PropTypes.instanceOf(AjxpNode).isRequired
                 }
             }
 
             componentDidMount() {
-                const {id, resolution, tabModify} = this.props
+                const {tab} = this.props
+                const {id, resolution} = tab
 
-                tabModify({id, resolution})
-            }
-
-            componentWillReceiveProps() {
-
+                this.setState({id, resolution})
             }
 
             onHi() {
@@ -76,7 +78,8 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
 
             render() {
-                const {node, resolution, ...remainingProps} = this.props
+                const {tab, dispatch, ...remainingProps} = this.props
+                const {resolution = "hi"} = tab
 
                 return (
                     <ResolutionURLProvider
@@ -87,8 +90,6 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                         {src =>
                             <Component
                                 {...remainingProps}
-
-                                node={node}
                                 src={src}
                             />
                         }
@@ -97,7 +98,7 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
         }
 
-        return connect(mapStateToProps, EditorActions)(WithResolution)
+        return connect(mapStateToProps)(WithResolution)
     }
 }
 

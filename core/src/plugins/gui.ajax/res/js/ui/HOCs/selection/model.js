@@ -5,8 +5,6 @@ class SelectionModel {
         this.currentIndex = currentIndex
     }
 
-
-
     length(){
         return this.selection.length;
     }

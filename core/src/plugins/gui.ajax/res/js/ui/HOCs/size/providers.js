@@ -22,7 +22,7 @@ import React from 'react';
 import { getBoundingRect } from '../utils';
 import _ from 'lodash';
 
-export class ContainerSizeProvider extends React.Component {
+export class ContainerSizeProvider extends React.PureComponent {
     constructor(props) {
         super(props)
 
@@ -56,11 +56,12 @@ export class ContainerSizeProvider extends React.Component {
     }
 }
 
-export class ImageSizeProvider extends React.Component {
+export class ImageSizeProvider extends React.PureComponent {
     static get propTypes() {
         return {
             url: React.PropTypes.string.isRequired,
             node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+            children: React.PropTypes.func.isRequired
         }
     }
 
@@ -100,6 +101,6 @@ export class ImageSizeProvider extends React.Component {
     }
 
     render() {
-        return this.props.children(this.state)
+        return (this.props.children(this.state));
     }
 }

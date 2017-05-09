@@ -13,7 +13,7 @@
  */
 import { TransitionMotion, spring, presets } from 'react-motion';
 
-const ANIMATION={stiffness: 300, damping: 28}
+const ANIMATION={stiffness: 200, damping: 22, precision: 1}
 const TRANSLATEY_ORIGIN=800
 const TRANSLATEY_TARGET=0
 

@@ -6,6 +6,7 @@ import {ContentActions, ContentControls} from './content/index'
 import {SelectionProviders, SelectionActions, SelectionControls, withSelection} from './selection/index'
 import {SizeActions, SizeControls, SizeProviders, withResize} from './size/index'
 import {ResolutionActions, ResolutionControls, withResolution} from './resolution/index'
+import {LocalisationActions, LocalisationControls} from './localisation/index'
 import {URLProvider} from './urls'
 import PaletteModifier from './PaletteModifier'
 import * as Animations from "./animations";
@@ -25,6 +26,8 @@ const PydioHOCs = {
     SelectionProviders,
     SelectionActions,
     SelectionControls,
+    LocalisationActions,
+    LocalisationControls,
     withControls,
     withContextMenu,
     withErrors,

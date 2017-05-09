@@ -172,7 +172,7 @@ class IMagickPreviewer extends Plugin
             }
             */
         }
-        
+
     }
 
     /**

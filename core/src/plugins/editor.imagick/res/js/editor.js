@@ -1,80 +1,38 @@
-import React, {Component} from 'react'
+/*
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
+
+import React, {PureComponent} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
+import { ImageContainer } from './components'
 import PydioApi from 'pydio/http/api'
 
 const baseURL = pydio.Parameters.get('ajxpServerAccess')
 const conf = pydio.getPluginConfigs('editor.diaporama')
 const sizes = conf && conf.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700, 1000, 1300]
 
-const {SizeProviders, SelectionProviders, withResolution, withSelection, withResize, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-const {ImageSizeProvider, ContainerSizeProvider} = SizeProviders
-const {SelectionProvider} = SelectionProviders
+const { SizeProviders, URLProvider, withResolution, withSelection, withResize } = PydioHOCs;
+const { ImageSizeProvider, ContainerSizeProvider } = SizeProviders
+const ExtendedImageContainer = withResize(ImageContainer)
 
-class Image extends Component {
-    static get propTypes() {
-        scale: React.PropTypes.number
-    }
-
-    static get styles() {
-        return {
-            transformOrigin: "50% 0",
-            boxShadow: DOMUtils.getBoxShadowDepth(1)
-        }
-    }
-
-    render() {
-        const {width, height, scale, ...remainingProps} = this.props
-
-        return <img {...remainingProps} style={{...Image.styles, width, height, transform: `scale(${scale})`}} />
-    }
-}
-
-class ImagePanel extends Component {
-    static get propTypes() {
-        return {
-            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
-            src: React.PropTypes.string.isRequired,
-            imgClassName: React.PropTypes.string
-        }
-    }
-
-    static get IMAGE_PANEL_MARGIN() {
-        return 10
-    }
-
-    static get styles() {
-        return {
-            display: "flex",
-            flex: 1,
-            justifyContent: 'center',
-            padding: ImagePanel.IMAGE_PANEL_MARGIN,
-            overflow: 'auto'
-        }
-    }
-
-    render() {
-        const {src, width, height, imgClassName, scale} = this.props
-
-        return (
-            <div style={ImagePanel.styles}>
-                <Image
-                    src={src}
-                    width={width}
-                    height={height}
-                    className={imgClassName}
-                    scale={scale}
-                />
-            </div>
-        )
-    }
-}
-
-const ExtendedImagePanel = compose(
-    withResize
-)(ImagePanel)
-
-class Editor extends Component {
+class Editor extends PureComponent {
 
     static get propTypes() {
         return {
@@ -135,23 +93,19 @@ class Editor extends Component {
     }
 
     render() {
-        const {node, src, editorData, scale, ...remainingProps} = this.props;
+        const {node, src, editorData, scale} = this.props;
 
         if (!node) return null
 
         return (
             <ContainerSizeProvider>
             {({containerWidth, containerHeight}) =>
-                <ImageSizeProvider
-                    url={src}
-                    node={node}
-                >
+                <ImageSizeProvider url={src} node={node}>
                 {({imgWidth, imgHeight}) =>
-                    <ExtendedImagePanel
+                    <ExtendedImageContainer
                         editorData={editorData}
                         node={node}
                         src={src}
-                        scale={scale}
                         width={imgWidth}
                         height={imgHeight}
                         containerWidth={containerWidth}
@@ -203,6 +157,5 @@ export default compose(
     withResolution(sizes,
         (node) => getThumbnailURL(baseURL, node),
         (node) => getThumbnailURL(baseURL, node)
-    ),
-    connect()
+    )
 )(Editor)

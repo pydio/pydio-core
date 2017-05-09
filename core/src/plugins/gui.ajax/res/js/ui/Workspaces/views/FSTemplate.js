@@ -147,7 +147,7 @@ let FSTemplate = React.createClass({
         // Making sure we only pass the style to the parent element
         const {style, ...props} = this.props
 
-        return connectDropTarget(
+        return ( connectDropTarget(
             <div style={style} className={classes.join(' ')} onTouchTap={this.closeDrawer} onContextMenu={this.props.onContextMenu}>
                 {!guiPrefs['WelcomeComponent.Pydio8.TourGuide.FSTemplate'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
                 <LeftPanel className="left-panel" pydio={props.pydio}/>
@@ -200,18 +200,20 @@ let FSTemplate = React.createClass({
                     <MainFilesList ref="list" pydio={this.props.pydio}/>
                 </div>
 
-                <InfoPanel
-                    {...props}
-                    dataModel={props.pydio.getContextHolder()}
-                    onContentChange={this.infoPanelContentChange}
-                    style={styles.infoPanelStyle}
-                />
+
 
                 <EditionPanel {...props}/>
 
                 <span className="context-menu"><PydioComponents.ContextMenu pydio={this.props.pydio}/></span>
             </div>
-        );
+        ) );
+
+        // <InfoPanel
+        //     {...props}
+        //     dataModel={props.pydio.getContextHolder()}
+        //     onContentChange={this.infoPanelContentChange}
+        //     style={styles.infoPanelStyle}
+        // />
     }
 });
 

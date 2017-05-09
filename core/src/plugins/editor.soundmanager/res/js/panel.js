@@ -37,7 +37,7 @@ export default class Preview extends Component {
         const {pydio, node} = props
 
         this.setState({
-            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid(),
+            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())),
             mimeType: "audio/" + node.getAjxpMime()
         })
     }

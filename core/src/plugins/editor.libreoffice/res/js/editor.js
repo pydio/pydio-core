@@ -21,6 +21,7 @@
 import React, {Component} from 'react'
 import {compose} from 'redux'
 
+const configs = pydio.getPluginConfigs("editor.libreoffice");
 const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
 const Viewer = compose(
@@ -38,11 +39,10 @@ class Editor extends React.Component {
     }
 
     componentWillMount() {
-        let configs = this.props.pydio.getPluginConfigs("editor.libreoffice"),
-        iframeUrl = configs.get('LIBREOFFICE_IFRAME_URL'),
-        webSocketSecure = configs.get('LIBREOFFICE_WEBSOCKET_SECURE'),
-        webSocketHost = configs.get('LIBREOFFICE_WEBSOCKET_HOST'),
-        webSocketPort = configs.get('LIBREOFFICE_WEBSOCKET_PORT');
+        let iframeUrl = configs.get('LIBREOFFICE_IFRAME_URL'),
+            webSocketSecure = configs.get('LIBREOFFICE_WEBSOCKET_SECURE'),
+            webSocketHost = configs.get('LIBREOFFICE_WEBSOCKET_HOST'),
+            webSocketPort = configs.get('LIBREOFFICE_WEBSOCKET_PORT');
 
         let webSocketProtocol = webSocketSecure ? 'wss' : 'ws',
         webSocketUrl = encodeURIComponent(`${webSocketProtocol}://${webSocketHost}:${webSocketPort}`);

@@ -26,7 +26,10 @@ const EditorToolbar = ({title, className, style, onMinimise, onClose}) => {
             title={<span>{title}</span>}
             titleStyle={innerStyle}
             iconElementLeft={<IconButton iconClassName="mdi mdi-close" iconStyle={innerStyle} disabled={typeof onClose !== "function"} touch={true} onTouchTap={onClose}/>}
-            iconElementRight={<IconButton iconClassName="mdi mdi-window-minimize" iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}/>}
+            iconElementRight={
+                
+                <IconButton iconClassName="mdi mdi-window-minimize" iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}/>
+            }
         />
     )
 }
