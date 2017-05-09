@@ -79,7 +79,7 @@ class Editor extends PureComponent {
         }
 
         const fileId = node.getMetadata().get('thumb_file_id').replace("-0.jpg", "").replace(".jpg", "");
-        PydioApi.getClient().request({get_action:'delete_imagick_data', file: prefix});
+        PydioApi.getClient().request({get_action:'delete_imagick_data', file: fileId});
     }
 
     componentWillReceiveProps(nextProps) {

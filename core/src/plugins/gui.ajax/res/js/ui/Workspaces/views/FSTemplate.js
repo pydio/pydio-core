@@ -200,7 +200,12 @@ let FSTemplate = React.createClass({
                     <MainFilesList ref="list" pydio={this.props.pydio}/>
                 </div>
 
-
+                <InfoPanel
+                    {...props}
+                    dataModel={props.pydio.getContextHolder()}
+                    onContentChange={this.infoPanelContentChange}
+                    style={styles.infoPanelStyle}
+                />
 
                 <EditionPanel {...props}/>
 
@@ -208,12 +213,6 @@ let FSTemplate = React.createClass({
             </div>
         ) );
 
-        // <InfoPanel
-        //     {...props}
-        //     dataModel={props.pydio.getContextHolder()}
-        //     onContentChange={this.infoPanelContentChange}
-        //     style={styles.infoPanelStyle}
-        // />
     }
 });
 
