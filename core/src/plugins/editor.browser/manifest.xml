@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.browser" openable="true" order="1000" text="openbrowser.1"
 		title="openbrowser.2" iconClass="mdi mdi-tab-plus"
-		className="PydioBrowserEditor" mimes="*" label="CONF_MESSAGE[External Window]" description="CONF_MESSAGE[Open file in a new browser window, thus using native browser capabilities.]"
+		className="PydioBrowserEditor" mimes="*,url" label="CONF_MESSAGE[External Window]" description="CONF_MESSAGE[Open file in a new browser window, thus using native browser capabilities.]"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
         <global_param name="OPEN_DOCS_IN_TAB" type="select" label="CONF_MESSAGE[Open documents in...]"
@@ -16,15 +16,9 @@
             <js file="plugins/editor.browser/res/build/PydioBrowserEditor.js" className="PydioBrowserEditor"/>
             <js file="plugins/editor.browser/res/build/PydioBrowserActions.js" className="PydioBrowserActions"/>
             <i18n namespace="openbrowser" path="plugins/editor.browser/res/i18n" />
-            <img_library alias="openbrowser_images" path="plugins/editor.browser/res/images" />
         </resources>
     </client_settings>
     
-	<clientForm id="open_box"><![CDATA[
-		<div id="open_box" action="editer" box_width="185" class="editor_container">
-		AJXP_MESSAGE[openbrowser.3]
-		</div>
-	]]></clientForm>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
@@ -46,33 +40,12 @@
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
                     <clientCallback module="PydioBrowserActions.Callbacks.createLink"/>
-                    <!--
-                    <clientCallback><![CDATA[
-                    modal.showDialogForm('Create', 'mklink_form', null, function(){
-
-                        var oForm = modal.getForm();
-                        oForm.down("#filename").setValue(oForm.down("#filename").getValue()+ '.url');
-                        PydioApi.getClient().submitForm(oForm);
-                        hideLightBox(true);
-                        return false;
-
-                    });
-                ]]></clientCallback>
-                <clientForm id="mklink_form"><![CDATA[
-                    <div id="mklink_form" action="mkfile">
-                        <div class="dialogLegend" ajxp_message_id="openbrowser.6">AJXP_MESSAGE[openbrowser.6]</div>
-                        <input type="text" id="content" style="width:390px;" name="content" placeholder="http[s]://" class="dialogFocus">
-                        <div class="dialogLegend" ajxp_message_id="openbrowser.8">AJXP_MESSAGE[openbrowser.8]</div>
-                        <input type="text" id="filename" style="width:390px;" name="filename" value="">
-                    </div>
-                ]]></clientForm>
-                -->
                 </processing>
             </action>
     	</actions>
         <extensions>
-            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" font="link" messageId="openbrowser.7" mime="url"/>
-            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" font="web" messageId="openbrowser.7" mime="website"/>
+            <extension font="link" messageId="openbrowser.7" mime="url"/>
+            <extension font="web" messageId="openbrowser.7" mime="website"/>
         </extensions>
     </registry_contributions>
 </editor>

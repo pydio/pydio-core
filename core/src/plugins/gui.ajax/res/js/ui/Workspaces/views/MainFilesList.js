@@ -247,7 +247,7 @@ let MainFilesList = React.createClass({
                 dm.setSelectedNodes([node]);
             }
         }else if(mobile || clickType === SimpleList.CLICK_TYPE_DOUBLE){
-            if(node.isLeaf()){
+            if(!node.isBrowsable()){
                 dm.setSelectedNodes([node]);
                 this.props.pydio.Controller.fireAction("open_with_unique");
             }else{

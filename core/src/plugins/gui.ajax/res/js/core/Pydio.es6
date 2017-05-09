@@ -324,7 +324,7 @@ class Pydio extends Observable{
             gotoNode = gotoNode.findInArbo(this._contextHolder.getRootNode());
             if(gotoNode){
                 // Node is already here
-                if(gotoNode.isLeaf()){
+                if(!gotoNode.isBrowsable()){
                     this._contextHolder.setPendingSelection(PathUtils.getBasename(path));
                     this._contextHolder.requireContextChange(gotoNode.getParent());
                 }else{
@@ -333,7 +333,7 @@ class Pydio extends Observable{
             }else{
                 // Check on server if it does exist, then load
                 this._contextHolder.loadPathInfoAsync(path, function(foundNode){
-                    if(foundNode.isLeaf() && foundNode.getAjxpMime()!='ajxp_browsable_archive') {
+                    if(!foundNode.isBrowsable()) {
                         this._contextHolder.setPendingSelection(PathUtils.getBasename(path));
                         gotoNode = new AjxpNode(PathUtils.getDirname(path));
                     }else{

@@ -93,15 +93,6 @@ export default class Builder{
 
     updateHrefBase(cdataContent){
         return cdataContent;
-        /*
-         if(Prototype.Browser.IE10){
-         var base = document.getElementsByTagName('base')[0].getAttribute("href");
-         if(!base){
-         return cdataContent;
-         }
-         return cdataContent.replace('data-hrefRebase="', 'href="'+base);
-         }
-         */
     }
 
     /**
@@ -128,7 +119,8 @@ export default class Builder{
         if(!editorData){
             const selectedMime = PathUtils.getAjxpMimeType(selectedNode);
             const editors = this._pydio.Registry.findEditorsForMime(selectedMime, false);
-            if(editors.length && editors[0].openable && !(editors[0].write && selectedNode.getMetadata().get("ajxp_readonly") === "true")){
+            if(editors.length && editors[0].openable && (editors[0].mimes && (editors[0].mimes[0] !== '*' || editors[0].mimes.indexOf(selectedMime) !== -1))
+                && !(editors[0].write && selectedNode.getMetadata().get("ajxp_readonly") === "true")){
                 editorData = editors[0];
             }
         }
