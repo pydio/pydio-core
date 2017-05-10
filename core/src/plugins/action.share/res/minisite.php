@@ -7,13 +7,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
         <link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/build/themes/AJXP_THEME/images/html-folder.png">
         <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/build/pydio.AJXP_THEME.min.css?v=AJXP_CURRENT_VERSION">
-        <!--[if IE 8]>
-        <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
-        <script src="plugins/gui.ajax/res/js/vendor/es6/es5-sham.min.js"></script>
-        <![endif]-->
-        <!--[if IE 7]>
-        <script src="plugins/gui.ajax/res/js/vendor/es6/json3.min.js"></script>
-        <![endif]-->
         <link rel="stylesheet" href="plugins/action.share/res/minisite.css"/>
         <style type="text/css">
 
@@ -35,16 +28,7 @@
                 delete startParameters["PRESET_LOGIN"];
                 startParameters["PASSWORD_AUTH_ONLY"] = false;
             }
-            /*
-            document.observe("ajaxplorer:before_gui_load", function(e){
-               document.documentElement.className += " ajxp_theme_AJXP_THEME";
-           });
-           */
-            if(startParameters['HASH_LOAD_ERROR']){
-                docReady(function(){
-                    document.getElementById(startParameters['MAIN_ELEMENT']).innerHTML = '<div class="hash_load_error">'+startParameters['HASH_LOAD_ERROR']+'</div>';
-                });
-            }else{
+            if(!startParameters['HASH_LOAD_ERROR']){
                 window.useReactPydioUI = true;
                 window.pydioBootstrap = new PydioBootstrap(startParameters);
                 window.ajxpMinisite = true;
@@ -55,5 +39,10 @@
 
     <body style="overflow: hidden;" class="react-mui-context AJXP_PRELOGED_USER">
         <div id="AJXP_TEMPLATE_NAME" class="vertical_fit vertical_layout"></div>
+        <script type="text/javascript">
+            if(startParameters['HASH_LOAD_ERROR']) {
+                document.getElementById(startParameters['MAIN_ELEMENT']).innerHTML = '<div class="hash_load_error">' + startParameters['HASH_LOAD_ERROR'] + '</div>';
+            }
+        </script>
     </body>
 </html>

@@ -1,3 +1,14 @@
+body,
+html {
+  background-color: transparent !important;
+}
+body .hash_load_error,
+html .hash_load_error {
+  text-align: center;
+  color: #dddddd;
+  margin: 20% !important;
+  font-size: 3em;
+}
 #ajxp_unique_dl {
   -ms-flex-align: center;
       align-items: center;

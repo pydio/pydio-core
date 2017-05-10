@@ -108,7 +108,7 @@
             const passwordOnly = this.state.globalParameters.get('PASSWORD_AUTH_ONLY');
             const secureLoginForm = passwordOnly || this.state.authParameters.get('SECURE_LOGIN_FORM');
 
-            const enterButton = <FlatButton default={true} labelStyle={{color:'white'}} key="enter" label={pydio.MessageHash[617]} onTouchTap={() => this.submit()}/>;
+            const enterButton = <FlatButton id="dialog-login-submit" default={true} labelStyle={{color:'white'}} key="enter" label={pydio.MessageHash[617]} onTouchTap={() => this.submit()}/>;
             let buttons = [];
             if(!secureLoginForm){
                 buttons.push(
@@ -208,8 +208,10 @@
                             ref="login"
                             onKeyDown={this.submitOnEnterKey}
                             fullWidth={true}
+                            id="application-login"
                         />}
                         <TextField
+                            id="application-password"
                             className="blurDialogTextField"
                             autoComplete={secureLoginForm?"off":"on"}
                             type="password"
