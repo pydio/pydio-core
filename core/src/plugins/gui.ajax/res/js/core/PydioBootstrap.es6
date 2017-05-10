@@ -246,4 +246,21 @@ export default class PydioBootstrap{
         cssNode.media = 'screen';
         head.appendChild(cssNode);
     }
+
+
+    /**
+     * Try to load something under data/cache/
+     * @param onError Function
+     */
+    static testDataFolderAccess(onError){
+        var c = new Connexion('data/cache/index.html');
+        c.setMethod('get');
+        c.onComplete = function(response){
+            if(200 === response.status){
+                onError();
+            }
+        }
+        c.sendAsync();
+    }
+
 }
