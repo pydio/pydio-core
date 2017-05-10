@@ -5,15 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 		<link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/orbit/images/html-folder.png">
-        <!--[if IE 8]>
-        <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
-        <script src="plugins/gui.ajax/res/js/vendor/es6/es5-sham.min.js"></script>
-        <![endif]-->
-        <!--[if IE 7]>
-        <script src="plugins/gui.ajax/res/js/vendor/es6/json3.min.js"></script>
-        <![endif]-->
-        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/es6/browser-polyfill.js"></script>
-        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/nodejs/boot.prod.js"></script>
+        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/build/pydio.boot.min.js"></script>
         <style>
             * {
                 font-family: Roboto, sans-serif;
@@ -163,26 +155,20 @@
             </div>
 
             <script type="text/javascript">
-                var c = new Connexion('data/cache/index.html');
-                c.setMethod('get');
-                c.onComplete = function(response){
-                    if(200 === response.status){
-                        var div = document.createElement('div');
-                        div.className = 'testLine error';
-                        div.innerHTML = '\
+                PydioBootstrap.testDataFolderAccess(function(){
+                    var div = document.createElement('div');
+                    div.className = 'testLine error';
+                    div.innerHTML = '\
                             <div class="testName"><span>-</span>Security Breach</div>\
                             <div class="testStatus">error</div>\
                             <div class="testDescription  visible">It seems that your <b>data/</b> folder is not correctly protected, and that subfolders (like the data/cache/ folder) are web-accessible. If you are using <b>Apache</b>, make sure the AllowOverride All option is active for your current directory. If you are running <b>Windows IIS</b>, you must manually add a RequestFiltering/HiddenSegments configuration to prevent web access to these folders. If you have defined a different AJXP_DATA_PATH pointing outside the webfolder, you can ignore this warning.</div>\
                             <div class="testClear"></div>\
                         ';
-                        var container = document.getElementById('test-list');
-                        container.insertBefore(div, container.firstChild);
-                    }
-                }
-                c.sendAsync();
+                    var container = document.getElementById('test-list');
+                    container.insertBefore(div, container.firstChild);
+                });
             </script>
         </div>
 
-        <!-- <h1 style="text-align: right">Continue to Pydio &gt;&gt; </h1>-->
     </body>
 </html>

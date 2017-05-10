@@ -259,4 +259,5 @@ $mess = array(
 "242" => "Charger plus de résultats",
 "243" => "Liens Publics",
 "244" => "Dossiers Partagés",
+"245" => "%s invitation(s) personelle(s) envoyée(s)",
 );

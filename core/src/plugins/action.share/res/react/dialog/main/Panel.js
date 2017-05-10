@@ -284,7 +284,7 @@ class Content extends React.Component{
             },
             contentContainerStyle : {
                 flexGrow: 1,
-                overflow: 'hidden'
+                overflowY: 'auto'
             },
             tabTemplateStyle: {
                 height: '100%',

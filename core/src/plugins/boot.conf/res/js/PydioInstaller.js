@@ -9,7 +9,7 @@
         switchLanguage: function(event, key, payload){
             global.pydio.fire('language_changed');
             global.pydio.currentLanguage = payload;
-            global.pydio.loadI18NMessages(payload);
+            global.pydio.loadI18NMessages(payload, () => {pydio.UI.refreshTemplateParts()});
         },
 
         getDangerousHtmlLanguage: function(id){

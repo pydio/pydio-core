@@ -383,8 +383,9 @@ class Pydio extends Observable{
     /**
      * Reload all messages from server and trigger updateI18nTags
      * @param newLanguage String
+     * @param callback Function
      */
-    loadI18NMessages(newLanguage){
+    loadI18NMessages(newLanguage, callback = null){
         this.ApiClient.switchLanguage(newLanguage, function(transport){
             if(transport.responseJSON){
                 this.MessageHash = transport.responseJSON;
@@ -400,6 +401,7 @@ class Pydio extends Observable{
                 this.loadXmlRegistry();
                 this.fireContextRefresh();
                 this.currentLanguage = newLanguage;
+                if(callback) callback();
             }
 
         }.bind(this));
