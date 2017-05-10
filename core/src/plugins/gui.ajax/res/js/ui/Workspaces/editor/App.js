@@ -76,7 +76,7 @@ class App extends React.Component {
             editorStyle = {
                 position: "fixed",
                 top: "1%",
-                left: "5%",
+                left: "1%",
                 right: "15%",
                 bottom: "1%",
                 transformOrigin: this.state.transformOrigin

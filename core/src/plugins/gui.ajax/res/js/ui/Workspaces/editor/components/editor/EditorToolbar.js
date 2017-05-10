@@ -11,23 +11,24 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-const {AppBar, IconButton} = require('material-ui');
+
+const {ModalAppBar} = PydioComponents
+const {IconButton} = require('material-ui');
 
 // Display components
 const EditorToolbar = ({title, className, style, onMinimise, onClose}) => {
 
-    const innerStyle = {color: "#000000", fill: "#000000"}
-    const outerStyle = {background: "none"}
+    const innerStyle = {color: "#FFFFFF", fill: "#FFFFFF"}
 
     return (
-        <AppBar
+        <ModalAppBar
             className={className}
-            style={{...style, ...outerStyle}}
+            style={style}
             title={<span>{title}</span>}
             titleStyle={innerStyle}
             iconElementLeft={<IconButton iconClassName="mdi mdi-close" iconStyle={innerStyle} disabled={typeof onClose !== "function"} touch={true} onTouchTap={onClose}/>}
             iconElementRight={
-                
+
                 <IconButton iconClassName="mdi mdi-window-minimize" iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}/>
             }
         />
