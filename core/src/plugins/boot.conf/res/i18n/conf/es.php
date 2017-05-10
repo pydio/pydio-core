@@ -21,7 +21,7 @@
 
 $mess = array(
 "Admin access" => "Acceso administrativo",
-"Global options" => "Opciones globales",
+"Application Settings" => "Opciones globales",
 "Configurations storage" => "COnfiguraciones de almacenamiento",
 "Add some users" => "Añadir usuarios",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Por favor configura un usuario y una contraseña para el administrador. Este paso es necesario para iniciar sesión por primera vez. Puede crear más administradores más tarde desde el workspace 'Configuración'.",
@@ -66,8 +66,8 @@ $mess = array(
 "An additional message displayed at startup, on the splash screen and the login screen." => "Mensaje adicional mostrado al inicio, en la pantalla inicial y de inicio de sesión.",
 "User-friendly name of the user" => "Nombre amigable del usuario",
 "Welcome to Pydio" => "Bienvenido a Pydio",
-"Database Connexion" => "Conexión a Base de Datos",
-"Driver type (do not touch)" => "Tipo de controlador (no tocar)",
+"Database Connection" => "Conexión a Base de Datos",
+"Database type (Sqlite3 is NOT recommended for production purpose.)" => "Tipo de controlador (no tocar)",
 "Advanced Options" => "Opciones Avanzadas",
 "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration." => "Por favor revisa estos parámetros tecnicos. La codificación y URI deberían de ser detectados automáticamente, pero asegurate de que la configuración sea correcta.",
 "Detected Encoding" => "Conficación Detectada",
@@ -76,5 +76,6 @@ $mess = array(
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Asegurate de que sea correcta, se usa para reescribir el archivo htaccess",
 "Select a language activated by default( users will still be able to switch)" => "Seleccionar el lenguaje predeterminado (los usuarios podran cambiarlo)",
 "Enable cache (recommended)" => "Activar almacenamiento temporal (recomendado)",
-"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Usar clave/valor para almacenar temporalmente en memoria. Si se detecta APC/APCu, se activará por defecto, puedes cambiar esta opción después para usar un servidor dedicado como Redis o Memcache."
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Usar clave/valor para almacenar temporalmente en memoria. Si se detecta APC/APCu, se activará por defecto, puedes cambiar esta opción después para usar un servidor dedicado como Redis o Memcache.",
+"Login of the administrative user, typically an email address." => "Login of the administrative user, typically an email address.",
 );

@@ -466,7 +466,7 @@ class BootConfLoader extends AbstractConfDriver
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
         $uObj = UsersService::createUser($adminLogin, $adminPass, true);
-        if ($loginIsEmail) {
+        if ($loginIsEmail && strpos($data["ADMIN_USER_LOGIN"], '@') !== false) {
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["ADMIN_USER_LOGIN"]);
         } else if (isSet($data["MAILER_ADMIN"])) {
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);

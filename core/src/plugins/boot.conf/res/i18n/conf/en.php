@@ -21,7 +21,7 @@
 
 $mess = array(
 "Admin access" => "Admin access",
-"Global options" => "Global options",
+"Application Settings" => "Application Settings",
 "Configurations storage" => "Configurations storage",
 "Add some users" => "Add some users",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace.",
@@ -66,8 +66,8 @@ $mess = array(
 "An additional message displayed at startup, on the splash screen and the login screen." => "An additional message displayed at startup, on the splash screen and the login screen.",
 "User-friendly name of the user" => "User-friendly name of the user",
 "Welcome to Pydio" => "Welcome to Pydio",
-"Database Connexion" => "Database Connexion",
-"Driver type (do not touch)" => "Driver type (do not touch)",
+"Database Connection" => "Database Connection",
+"Database type (Sqlite3 is NOT recommended for production purpose.)" => "Database type (Sqlite3 is NOT recommended for production purpose.)",
 "Advanced Options" => "Advanced Options",
 "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration." => "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration.",
 "Detected Encoding" => "Detected Encoding",
@@ -76,5 +76,6 @@ $mess = array(
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Make sure this is correct, as it's used to rewrite the htaccess file",
 "Select a language activated by default( users will still be able to switch)" => "Select a language activated by default( users will still be able to switch)",
 "Enable cache (recommended)" => "Enable cache (recommended)",
-"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache."
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache.",
+"Login of the administrative user, typically an email address." => "Login of the administrative user, typically an email address.",
 );

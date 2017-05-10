@@ -722,5 +722,6 @@ $mess=array(
 "618" => "Switch language...",
 "619" => "Search limited to current folder and its children",
 "620" => "Search limited to current workspace",
+"621" => "This field cannot be empty",
 /* END SENTENCE */
 );

@@ -189,7 +189,7 @@
 
             const {minorStep} = this.state;
             let LAST_STEP = (minorStep === this.state.groups.size - 1);
-            let forwardLabel = 'Next';
+            let forwardLabel = this.props.pydio.MessageHash['installer.9'];
             let forwardPrimary = true;
             let forwardSecondary = false;
             let nextDisabled = !this.state.groups.get(groupKey).valid;
@@ -198,11 +198,11 @@
             if(this.state.groups.get(groupKey).switches.indexOf('dibi_provider') > -1 && !this.state.dbTestSuccessfully){
                 nextDisabled = this.checkDBPanelValidity();
                 if(this.state.dbTestFailed){
-                    forwardLabel = 'Connection Failed!';
+                    forwardLabel = this.props.pydio.MessageHash['installer.12'];
                     forwardSecondary = true;
                     forwardPrimary = false;
                 }else{
-                    forwardLabel = 'Test DB Connection';
+                    forwardLabel = this.props.pydio.MessageHash['installer.10'];
                 }
                 nextCallback = function(){
                     let testValues = this.refs['form-' + groupKey].getValuesForPOST(this.props.parentState.values);
@@ -237,7 +237,7 @@
                     }
                     {step > 0 && (
                         <MaterialUI.FlatButton
-                            label="Back"
+                            label={this.props.pydio.MessageHash['installer.11']}
                             disabled={minorStep === 0}
                             disableTouchRipple={true}
                             disableFocusRipple={true}
@@ -299,11 +299,21 @@
     const Installer = React.createClass({
 
         getInitialState: function(){
-            return {INSTALLED: false};
+            return {INSTALLED: false, clock: 4};
         },
 
         componentDidMount: function(){
             this.installPydio();
+        },
+
+        clock: function(){
+            this.setState({clock: this.state.clock - 1}, () => {
+                if(this.state.clock === 0){
+                    global.document.location.reload(true);
+                }else{
+                    setTimeout(() => {this.clock()}, 1000);
+                }
+            });
         },
 
         installPydio: function(){
@@ -312,9 +322,7 @@
             PydioApi.getClient().request(allParams, function(transp){
                 if(transp.responseText && transp.responseText === 'OK'){
                     this.setState({INSTALLED: true});
-                    global.setTimeout(function(){
-                        global.document.location.reload(true);
-                    }, 3000);
+                    this.clock();
                 }else if(transp.responseJSON){
                     this.setState({
                         INSTALLED: true,
@@ -334,15 +342,20 @@
 
             }else  if(this.state.HTACCESS_NOTIF){
 
-                return <div style={{margin:'24px 0'}}>Pydio Installation succeeded, but we could not successfully edit the .htaccess file.<br/>
-                    Please update the file <em>{this.state.HTACCESS_NOTIF.file}</em> !
-                    After applying this, just reload the page and can log in with
-                    the admin user {this.props.parentState.values['ADMIN_USER_LOGIN']} you have just defined.</div>;
+                return (
+                    <div style={{margin:'24px 0', fontSize:13}}>
+                        <div>{this.props.pydio.MessageHash['installer.14'].replace('%2', this.props.parentState.values['ADMIN_USER_LOGIN']).replace('%1', this.state.HTACCESS_NOTIF.file)}</div>
+                        <div><MaterialUI.TextField value={this.state.HTACCESS_NOTIF.content} multiLine={true} fullWidth={true}/></div>
+                    </div>
+                );
 
             }else{
 
-                return <div style={{margin:'24px 0'}}>Pydio Installation succeeded! The page will now reload automatically. You can log in with
-                    the admin user {this.props.parentState.values['ADMIN_USER_LOGIN']} you have just defined. The page with reload automatically in 3s.</div>;
+                return (
+                    <div style={{margin:'24px 0', fontSize:13}}>
+                        {this.props.pydio.MessageHash['installer.13'].replace('%1', this.props.parentState.values['ADMIN_USER_LOGIN']).replace('%2', this.state.clock)}
+                    </div>
+                );
 
             }
 
@@ -357,13 +370,13 @@
 
         getDefaultProps: function(){
             return {
-                dialogTitle: "Welcome to Pydio",
+                dialogTitle: pydio.MessageHash['installer.1'],
                 dialogIsModal: true,
                 dialogSize:'md',
                 dialogScrollBody:true,
                 majorSteps: [
-                    {componentClass: WelcomeScreen, button: "Start Configuration"},
-                    {componentClass: Configurator, button: "Install Pydio Now"},
+                    {componentClass: WelcomeScreen, button: pydio.MessageHash['installer.4']},
+                    {componentClass: Configurator, button: pydio.MessageHash['installer.6']},
                     {componentClass: Installer}
                 ]
             };

@@ -20,10 +20,10 @@
 */
 
 $mess = array(
-"Admin access" => "<span class='icon-key'></span> Erster Administratorenzugang",
-"Global options" => "<span class='icon-cogs'></span> Globale Einstellungen",
-"Configuration storage" => "<span class='icon-save'></span> Konfigurationsspeicher",
-"Add some users" => "<span class='icon-group'></span> Benutzer hinzufügen",
+"Admin access" => "Erster Administratorenzugang",
+"Application Settings" => "Globale Einstellungen",
+"Configuration storage" => "Konfigurationsspeicher",
+"Add some users" => "Benutzer hinzufügen",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Bitte geben Sie Benutzername und Passwort für den Administrator ein. Dieser Schritt ist notwendig um sich anfangs Anzumelden. Sie könenn später über die Einstellungen mehr Benutzer mit Administratorrechten erstellen.",
 "Admin Login" => "Benutzername",
 "Alphanumeric login" => "Benutzernamen bestehen aus alphanumerischen Zeichen",
@@ -66,8 +66,8 @@ $mess = array(
 "An additional message displayed at startup, on the splash screen and the login screen." => "Eine zusätzliche Mitteilung für die Anmelde-Seite.",
 "User-friendly name of the user" => "Namen den die Benutzer sehen",
 "Welcome to Pydio" => "Willkommen bei Pydio",
-"Database Connexion" => "Datenbankverbindung",
-"Driver type (do not touch)" => "Art der Datenbankverbindung",
+"Database Connection" => "Datenbankverbindung",
+"Database type (Sqlite3 is NOT recommended for production purpose.)" => "Art der Datenbankverbindung",
 "Advanced Options" => "Erweiterte Einstellungen",
 "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration." => "Bitte überprüfen Sie diese technischen Parameter. Encoding und der Pfad sollten automatich erkannt werden. Bitte stellen Sie sicher, dass die Werte zur Konfiguration des Servers passen.",
 "Detected Encoding" => "Server-Encoding",
@@ -76,5 +76,6 @@ $mess = array(
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Bitte stellen Sie sicher, dass die URL zu Ihrer Pydio-Installation korrekt ist.",
 "Select a language activated by default( users will still be able to switch)" => "Wählen Sie die Standard-Sprache der Installation aus. Alle Benutzer können ihre Sprache im Benutzerprofil ändern.",
 "Enable cache (recommended)" => "Cache aktivieren (empfohlen)",
-"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Server-Daten werden im Arbeitsspeicher zwischengespeichert. Diese Einstellung wird mit APC/APCu standardmäßig aktiviert. Es ist später möglich auf einen externen Server, wie z.B. Redis oder Memcache zu wechseln."
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Server-Daten werden im Arbeitsspeicher zwischengespeichert. Diese Einstellung wird mit APC/APCu standardmäßig aktiviert. Es ist später möglich auf einen externen Server, wie z.B. Redis oder Memcache zu wechseln.",
+"Login of the administrative user, typically an email address." => "Login of the administrative user, typically an email address.",
 );

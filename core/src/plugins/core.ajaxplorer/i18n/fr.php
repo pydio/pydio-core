@@ -720,5 +720,6 @@ $mess=array(
 "618" => "Changer la langue...",
 "619" => "Recherche limitée au répertoire courant et ses enfants.",
 "620" => "Recherche limitée au workspace courant seulement.",
+"621" => "Ce champ ne doit pas être vide",
 /* END SENTENCE */
 );

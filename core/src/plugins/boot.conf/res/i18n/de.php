@@ -28,4 +28,10 @@ $mess = array(
     "6" => "Pydio jetzt installieren",
     "7" => "Sprache",
     "8" => "Klicken Sie auf den einzelnen Abschnitt, um die Parameter zu bearbeiten.",
+    "9" => "Next",
+    "10"=> "Test DB Connection",
+    "11"=> "Back",
+    "12"=> "Connection failed!",
+    "13"=> "Pydio Installation succeeded! You can now log in with the admin user %1 you have just defined. This page with reload automatically in %2 seconds.",
+    "14"=> "Pydio Installation succeeded, except we could not update the file the .htaccess file. Please update the file %1, then reload the page and log in with the admin user %2 you have just defined.",
 );

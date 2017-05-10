@@ -20,10 +20,10 @@
 */
 
 $mess = array(
-"Admin access" => "<span class='icon-key'></span> Accès administrateur",
-"Global options" => "<span class='icon-cogs'></span> Options globales",
-"Configurations storage" => "<span class='icon-save'></span> Stockage des configurations",
-"Add some users" => "<span class='icon-group'></span> Ajouter des utilisateurs",
+"Admin access" => "Accès administrateur",
+"Application Settings" => "Paramètres de l'application",
+"Configurations storage" => "Stockage des configurations",
+"Add some users" => "Ajouter des utilisateurs",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Veuillez saisir un identifiant et un mot de passe pour l'administrateur. Ceci est requis pour vous connecter la première fois. Vous pourrez créer d'autres administrateurs ultérieurement, en vous connectant au dépôt 'Paramètres'.",		
 "Admin Login" => "Identifiant de l'administrateur",
 "Alphanumeric login" => "Identifiant alphanumérique",
@@ -66,8 +66,8 @@ $mess = array(
 "An additional message displayed at startup, on the splash screen and the login screen." => "Message supplémentaire affiché sur la page d'accueil et dans l'écran de chargement.",
 "User-friendly name of the user" => "Nom de l'utilisateur",
 "Welcome to Pydio" => "Bienvenue sur Pydio",
-"Database Connexion" => "Base de données",
-"Driver type (do not touch)" => "Type de driver (ne pas changer)",
+"Database Connection" => "Base de données",
+"Database type (Sqlite3 is NOT recommended for production purpose.)" => "Base de données (ne PAS utiliser Sqlite3 pour un environnement de production).",
 "Advanced Options" => "Options Avancées",
 "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration." => "Veuillez valider ces paramètres complémentaires. L'encodage et l'URI doivent être détectés automatiquement, mais assurez vous qu'ils correspondent à votre serveur.",
 "Detected Encoding" => "Encodage détecté",
@@ -76,6 +76,6 @@ $mess = array(
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Chemin depuis le DocumentRoot de votre serveur web, utilisé dans la réécriture des redirections.",
 "Select a language activated by default( users will still be able to switch)" => "Selectionnez un langage par défaut (les utilisateurs pourront le changer)",
 "Enable cache (recommended)" => "Activer le cache (recommandé)",
-"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Utiliser un cache de type clé/valeur pour stocker des données serveurs en mémoire. Is APC/APCu est détecté, ça sera activé par défaut, vous pouvez le changer pour utiliser un serveur à part avec Redis ou Memcache."
-
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Utiliser un cache de type clé/valeur pour stocker des données serveurs en mémoire. Is APC/APCu est détecté, ça sera activé par défaut, vous pouvez le changer pour utiliser un serveur à part avec Redis ou Memcache.",
+"Login of the administrative user, typically an email address." => "Identifiant de l'utilisateur admin, idéalement son adresse email.",
 );

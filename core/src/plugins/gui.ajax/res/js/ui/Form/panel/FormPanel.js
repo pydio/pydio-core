@@ -351,7 +351,7 @@ export default React.createClass({
                         binary_context:this.props.binary_context,
                         displayContext:'form',
                         applyButtonAction:this.applyButtonAction,
-                        errorText:mandatoryMissing?'Field cannot be empty':(attributes.errorText?attributes.errorText:null)
+                        errorText:mandatoryMissing? pydio.MessageHash['621']:( attributes.errorText?attributes.errorText:null )
                     };
 
                     field = (

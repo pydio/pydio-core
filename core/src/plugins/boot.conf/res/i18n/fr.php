@@ -28,4 +28,10 @@ $mess = array(
     "6" => "Installer Pydio",
     "7" => "Langue",
     "8" => "Cliquez sur chaque section pour éditer les paramètres",
+    "9" => "Suivant",
+    "10"=> "Tester la connexion",
+    "11"=> "Retour",
+    "12"=> "Echec de la connexion!",
+    "13"=> "L'installation est terminée! vous pouvez maintenant vous identifier avec l'utilisateur %1 que vous venez de définir. Cette page se rechargera automatiquement dans %2 secondes.",
+    "14"=> "L'installation est presque terminée, nous n'avons pas pu mettre à jour le fichier .htaccess. Veuillez copier le contenu ci-dessous dans le fichier %1, puis rechargez la page et identifiez vous avec l'utilisateur %2.",
 );
