@@ -66,7 +66,7 @@
                   PydioApi.getClient().request({get_action:'logout'}, function(transport){
                         var child = transport.responseXML.documentElement.childNodes;
                         try {
-                            if(child[0].nodeValue != "#"){ document.location.href = child[0].nodeValue; }
+                            if(child[0].nodeValue != "#"){ document.location.href = (child[0].nodeValue == null)? '':child[0].nodeValue; }
                             else{ document.location.reload(); }
                          } catch(e){}
                         });
