@@ -368,6 +368,9 @@ class RolesManager extends AbstractManager
                 if(isSet($httpVars["request_body"])){
                     // This is API V2 : only the role is passed as json body
                     $roleData = $httpVars["request_body"];
+                    if(!isSet($roleData['PARAMETERS']) || !isSet($roleData['ACTIONS']) || !isSet($roleData['ACL'])){
+                        throw new PydioException('Please post the whole role content, including PARAMETERS, ACTIONS and ACL keys at least');
+                    }
                     $data = ["METADATA" => []];
                     $outputRoleOnly = true;
                 }else{
