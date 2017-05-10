@@ -32,6 +32,10 @@ class Tab extends React.Component {
             child: {
                 display: "flex",
                 flex: 1
+            },
+            toolbar: {
+                backgroundColor: "#eeeeee",
+                flexShrink: 0
             }
         }
     }
@@ -59,7 +63,7 @@ class Tab extends React.Component {
         let boundActionCreators = bindActionCreators(actions)
 
         return (
-            <Toolbar style={{flexShrink: 0}}>
+            <Toolbar style={Tab.styles.toolbar}>
                 {SelectionControls &&
                     <ToolbarGroup>
                         <SelectionControls.Prev editorData={editorData} node={node} {...boundActionCreators} />
@@ -87,7 +91,10 @@ class Tab extends React.Component {
 
                         <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />
                         <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />
-
+                    </ToolbarGroup>
+                }
+                {ContentControls &&
+                    <ToolbarGroup>
                         <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />
                         <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />
                     </ToolbarGroup>

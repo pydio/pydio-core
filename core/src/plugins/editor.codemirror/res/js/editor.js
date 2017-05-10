@@ -34,24 +34,26 @@ class Editor extends React.Component {
         const {node, tab, dispatch} = this.props
         const {id} = tab
 
-        if (typeof dispatch === 'function') {
-            // We have a redux dispatch so we use it
-            this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
-        }
+        if (!id) dispatch(EditorActions.tabCreate({id: node.getLabel(), node}))
     }
 
     componentDidMount() {
-        const {pydio, node} = this.props
+        const {pydio, node, tab, dispatch} = this.props
+
+        const {id} = tab
 
         pydio.ApiClient.request({
             get_action: 'get_content',
             file: node.getPath()
-        }, ({responseText}) => this.setState({content: responseText}));
+        }, ({responseText}) => dispatch(EditorActions.tabModify({id: id || node.getLabel(), content: responseText})));
     }
 
     render() {
         const {node, tab, error, dispatch} = this.props
-        const {codemirror, content, lineNumbers, lineWrapping} = tab
+
+        if (!tab) return null
+
+        const {id, codemirror, content, lineNumbers, lineWrapping} = tab
 
         return (
             <CodeMirrorLoader
@@ -61,9 +63,9 @@ class Editor extends React.Component {
                 options={{lineNumbers: lineNumbers, lineWrapping: lineWrapping}}
                 error={error}
 
-                onLoad={codemirror => this.setState({codemirror})}
-                onChange={content => this.setState({content})}
-                onCursorChange={cursor => this.setState({cursor})}
+                onLoad={codemirror => dispatch(EditorActions.tabModify({id, codemirror}))}
+                onChange={content => dispatch(EditorActions.tabModify({id, content}))}
+                onCursorChange={cursor => dispatch(EditorActions.tabModify({id, cursor}))}
             />
         )
     }
@@ -72,9 +74,10 @@ class Editor extends React.Component {
 export const mapStateToProps = (state, props) => {
     const {tabs} = state
 
-    const tab = tabs.filter(({editorData, node}) => editorData.id === props.editorData.id && node.getPath() === props.node.getPath())[0]
+    const tab = tabs.filter(({editorData, node}) => (!editorData || editorData.id === props.editorData.id) && node.getPath() === props.node.getPath())[0] || {}
 
     return {
+        id: tab.id,
         tab,
         ...props
     }
