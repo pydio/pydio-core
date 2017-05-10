@@ -22,7 +22,7 @@
 $mess=array(
 "1" => "Nueva ventana",
 "2" => "Navegador en nueva ventana",
-"3" => "Abriendo el fichero en una ventana externa, espere por favor, esta ventana se cerrará automáticamente.",
+"3" => "Abriendo el archivo en una ventana externa, espere por favor, esta ventana se cerrará automáticamente.",
     "4" => "Nuevo marcador URL",
     "5" => "De manera alternativa, puede <a>crear un nuevo marcador a una URL</a>",
     "6" => "Introduzca una URL empezando por http/https",

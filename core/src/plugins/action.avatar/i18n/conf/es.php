@@ -3,9 +3,9 @@
 * Gravatar plugin for AjaXplorer
 */
 $mess=array(
-"Avatars" => "Avatars",
-"Get user avatar from Gravatar/Libravatar" => "Get user avatar from Gravatar/Libravatar",
-"Gravatar type" => "Gravatar type",
-"Provider" => "Provider",
-"Choose an avatar web service" => "Choose an avatar web service",
+"Avatars" => "Avatares",
+"Get user avatar from Gravatar/Libravatar" => "Obtener el avatar del usuario desde Gravatar/Libravatar",
+"Gravatar type" => "Tipo Gravatar",
+"Provider" => "Proveedor",
+"Choose an avatar web service" => "Elegir un servicio web de avatar",
 );

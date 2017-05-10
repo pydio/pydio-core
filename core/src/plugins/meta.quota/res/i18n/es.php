@@ -21,7 +21,7 @@
 // spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
 "1" => "Uso de la cuota (cargando...)",
-"2" => "Click para recargar el uso de la cuota",
+"2" => "Pulsa para recargar el uso de la cuota",
 "3" => "Está excediendo su cuota",
 "4" => "Uso de la cuota",
 );

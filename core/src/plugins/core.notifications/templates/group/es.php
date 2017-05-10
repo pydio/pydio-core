@@ -20,10 +20,10 @@
 */
 //      spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2016
 $mess=array(
-"file.add" => "Fichero AJXP_NODE_LABEL añadido a AJXP_PARENT_PATH",
-"file.delete" => "Fichero AJXP_NODE_LABEL eliminado de AJXP_PARENT_PATH",
-"file.change" => "Fichero AJXP_NODE_LABEL modificado por AJXP_USER",
-"file.view" => "Fichero AJXP_NODE_LABEL fue consultado por AJXP_USER",
+"file.add" => "Archivo AJXP_NODE_LABEL añadido a AJXP_PARENT_PATH",
+"file.delete" => "Archivo AJXP_NODE_LABEL eliminado de AJXP_PARENT_PATH",
+"file.change" => "Archivo AJXP_NODE_LABEL modificado por AJXP_USER",
+"file.view" => "Archivo AJXP_NODE_LABEL fue consultado por AJXP_USER",
 "file.copy_to" => "AJXP_NODE_LABEL copiado a AJXP_TARGET_FOLDER",
 "file.copy_from" => "AJXP_NODE_LABEL copiado desde AJXP_SOURCE_FOLDER",
 "file.move_to" => "AJXP_NODE_LABEL movido a AJXP_TARGET_FOLDER",
@@ -36,6 +36,6 @@ $mess=array(
 "folder.copy_from" => "Carpeta AJXP_NODE_LABEL copiada desde AJXP_SOURCE_FOLDER",
 "folder.move_to" => "Carpeta AJXP_NODE_LABEL movida a AJXP_TARGET_FOLDER",
 "folder.move_from" => "Carpeta AJXP_NODE_LABEL movida desde AJXP_SOURCE_FOLDER",
-"file.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
-"folder.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
+"file.share" => "El usuario AJXP_USER compartió AJXP_NODE_LABEL contigo",
+"folder.share" => "El usuario AJXP_USER compartió AJXP_NODE_LABEL contigo",
 );
