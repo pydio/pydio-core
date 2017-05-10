@@ -1,7 +1,7 @@
 {
-  "name": "action.ajxp_user",
+  "name": "authfront.keystore",
   "version": "8.0.0",
-  "description": "User account panels",
+  "description": "Keystore management for user profile panel",
   "source_path":"res/js",
   "main": "index.js",
   "scripts": {

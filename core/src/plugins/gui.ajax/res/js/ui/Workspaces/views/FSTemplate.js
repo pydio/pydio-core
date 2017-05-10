@@ -1,6 +1,6 @@
 const React = require('react')
 const Color = require('color')
-const {withContextMenu} = require('pydio').requireLib('hoc')
+const {withContextMenu, dropProvider} = require('pydio').requireLib('hoc')
 const Action = require('pydio/model/action')
 
 import MessagesProviderMixin from '../MessagesProviderMixin'
@@ -200,7 +200,12 @@ let FSTemplate = React.createClass({
                     <MainFilesList ref="list" pydio={this.props.pydio}/>
                 </div>
 
-
+                <InfoPanel
+                    {...props}
+                    dataModel={props.pydio.getContextHolder()}
+                    onContentChange={this.infoPanelContentChange}
+                    style={styles.infoPanelStyle}
+                />
 
                 <EditionPanel {...props}/>
 
@@ -208,18 +213,11 @@ let FSTemplate = React.createClass({
             </div>
         ) );
 
-        // <InfoPanel
-        //     {...props}
-        //     dataModel={props.pydio.getContextHolder()}
-        //     onContentChange={this.infoPanelContentChange}
-        //     style={styles.infoPanelStyle}
-        // />
+
     }
 });
 
-if(window['UploaderModel']){
-    FSTemplate = UploaderModel.DropProvider(FSTemplate);
-}
+FSTemplate = dropProvider(FSTemplate);
 FSTemplate = withContextMenu(FSTemplate);
 FSTemplate = MaterialUI.Style.muiThemeable()(FSTemplate);
 

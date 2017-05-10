@@ -1,3 +1,6 @@
+import React from 'react'
+import {FlatButton} from 'material-ui'
+
 export default React.createClass({
 
     mixins:[AdminComponents.MessagesConsumerMixin],
@@ -31,7 +34,7 @@ export default React.createClass({
                     }.bind(this);
                     removeButton = (
                         <div style={{textAlign:'right'}}>
-                            <ReactMUI.FlatButton label={this.context.getMessage('ws.31')} primary={true} onClick={remove}/>
+                            <FlatButton label={this.context.getMessage('ws.31')} primary={true} onTouchTap={remove}/>
                         </div>
                     );
                 }

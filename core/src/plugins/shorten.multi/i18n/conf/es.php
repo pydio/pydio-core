@@ -20,7 +20,7 @@ $mess=array(
 "User Name" => "Usuario",
 "Bit.ly account user name" => "Usuario de la cuenta Bit.ly",
 "Bit.ly account API Key" => "Clave API de la cuenta Bit.ly",
-"Yourls domain" => "Yourls domain",
-"Use IDN" => "Use IDN",
-"Shorten type" => "Shorten type",
+"Yourls domain" => "Dominio Yourls",
+"Use IDN" => "Usar IDN",
+"Shorten type" => "Tipo de acortado",
 );

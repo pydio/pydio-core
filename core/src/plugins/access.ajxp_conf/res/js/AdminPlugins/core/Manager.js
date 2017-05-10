@@ -1,4 +1,6 @@
 import PluginsList from './PluginsList'
+import React from 'react'
+import {RaisedButton} from 'material-ui'
 
 const PluginsManager = React.createClass({
 
@@ -17,9 +19,9 @@ const PluginsManager = React.createClass({
         return (
             <div style={{height:'100%'}} className="vertical-layout">
                     <span style={{position:'absolute', marginTop:10, marginLeft:10}}>
-                        <ReactMUI.RaisedButton
+                        <RaisedButton
                             label={this.context.getMessage('129', 'ajxp_conf')}
-                            onClick={this.clearCache}
+                            onTouchTap={this.clearCache}
                         />
                     </span>
                 <PluginsList {...this.props} ref="list"/>

@@ -1,3 +1,6 @@
+import React from 'react'
+import {FlatButton} from 'material-ui'
+
 import Workspace from '../model/Workspace'
 import WorkspaceEditor from '../editor/WorkspaceEditor'
 import WorkspaceCreator from '../editor/WorkspaceCreator'
@@ -203,15 +206,15 @@ export default React.createClass({
         if(this.state.filter == 'workspaces'){
             buttonContainer = (
                 <div className="button-container">
-                    <ReactMUI.FlatButton primary={true} label={this.context.getMessage('ws.3')} onClick={this.showWorkspaceCreator}/>
-                    <ReactMUI.FlatButton onClick={this.toggleWorkspacesFilter} secondary={true} label={this.context.getMessage('ws.1')}/>
+                    <FlatButton primary={true} label={this.context.getMessage('ws.3')} onTouchTap={this.showWorkspaceCreator}/>
+                    <FlatButton onTouchTap={this.toggleWorkspacesFilter} secondary={true} label={this.context.getMessage('ws.1')}/>
                 </div>
             );
         }else{
             buttonContainer = (
                 <div className="button-container">
-                    <ReactMUI.FlatButton primary={true} label={this.context.getMessage('ws.4')} onClick={this.showTplCreator}/>
-                    <ReactMUI.FlatButton onClick={this.toggleWorkspacesFilter} secondary={true} label={this.context.getMessage('ws.2')}/>
+                    <FlatButton primary={true} label={this.context.getMessage('ws.4')} onTouchTap={this.showTplCreator}/>
+                    <FlatButton onTouchTap={this.toggleWorkspacesFilter} secondary={true} label={this.context.getMessage('ws.2')}/>
                 </div>
             );
         }

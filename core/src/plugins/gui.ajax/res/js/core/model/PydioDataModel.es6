@@ -84,6 +84,7 @@ export default class PydioDataModel extends Observable{
 	 */
 	requireContextChange (ajxpNode, forceReload=false){
         if(ajxpNode == null) return;
+        this.setSelectedNodes([]);
 		const path = ajxpNode.getPath();
 		if((path == "" || path == "/") && ajxpNode != this._rootNode){
 			ajxpNode = this._rootNode;

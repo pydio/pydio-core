@@ -722,5 +722,7 @@ $mess=array(
 "616" => "Mask",
 "617" => "Enter",
 "618" => "Switch language...",
+"619" => "Search limited to current folder and its children",
+"620" => "Search limited to current workspace",
 /* END SENTENCE */
 );

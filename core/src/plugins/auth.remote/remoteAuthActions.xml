@@ -4,21 +4,17 @@
         <action name="logout" expireDefault="true">
 			<gui text="304" title="305" iconClass="icon-home" accessKey="" hasAccessKey="false" forbidOverride="true">
 				<context selection="false" dir="" recycle="false"
-					actionBar="false" contextMenu="false" infoPanel="false"
-                    ajxpWidgets="UserWidget::logging_string">
+					actionBar="false" contextMenu="false" infoPanel="false" actionBarGroup="zlogin,minisite">
 				</context>
 			</gui>
 			<rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly="" forbidOverride="true"/>
 			<processing forbidOverride="true">
 				<clientCallback><![CDATA[
-					clearRememberData();
-					var connexion = new Connexion();
-					connexion.addParameter('get_action', 'back');
-					connexion.onComplete = function(transport){
+					PydioApi.clearRememberData();
+					PydioApi.getClient().request({get_action:'back'}, function(transport){
 						var child = transport.responseXML.documentElement.childNodes;
                         document.location.href = child[0].nodeValue;
-						};
-					connexion.sendAsync();
+					});
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"/>
 			</processing>

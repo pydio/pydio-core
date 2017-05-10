@@ -4,15 +4,26 @@
 
     class LoginDialogModifier extends PydioReactUI.AbstractDialogModifier{
 
+        constructor(){
+            super();
+            this._modifyLoginScreen = pydio.getPluginConfigs('authfront.otp').get('MODIFY_LOGIN_SCREEN');
+        }
+
         enrichSubmitParameters(props, state, refs, params){
 
-            params['otp_code'] = refs.otp_code.getValue();
+            if(this._modifyLoginScreen){
+                params['otp_code'] = refs.otp_code.getValue();
+            }
 
         }
 
         renderAdditionalComponents(props, state, accumulator){
 
-            accumulator.bottom.push(<MaterialUI.TextField ref="otp_code" floatingLabelText="Unique Code (6 digits)"/>);
+            if(this._modifyLoginScreen){
+                accumulator.bottom.push(<MaterialUI.TextField ref="otp_code" floatingLabelText={pydio.MessageHash['authfront.otp.10']}/>);
+            }else{
+                accumulator.bottom.push(<div><span className="mdi mdi-alert"/> {pydio.MessageHash['authfront.otp.9']}</div>);
+            }
 
         }
 

@@ -1,3 +1,4 @@
+import React from 'react'
 import PluginEditor from '../core/PluginEditor'
 import {RaisedButton, Checkbox} from 'material-ui'
 
@@ -84,7 +85,7 @@ const UpdaterDashboard = React.createClass({
             list = (
                 <div>
                         <span style={{float:'right'}}>
-                            <ReactMUI.RaisedButton secondary={true} label={this.context.getMessage('20', 'updater')} onClick={this.checkForUpgrade}/>
+                            <RaisedButton secondary={true} label={this.context.getMessage('20', 'updater')} onTouchTap={this.checkForUpgrade}/>
                         </span>
                     { (this.state && this.state.no_upgrade) ? this.context.getMessage('18', 'updater') : this.context.getMessage('19', 'updater') }
                 </div>

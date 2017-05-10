@@ -60,6 +60,6 @@
 	</registry_contributions>
 	<dependencies>
 		<!-- Image proxy must be implemented -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user"/>
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>
 </editor>

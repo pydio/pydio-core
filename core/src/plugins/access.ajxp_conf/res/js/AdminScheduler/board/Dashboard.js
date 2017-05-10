@@ -1,3 +1,6 @@
+import React from 'react'
+import {FlatButton} from 'material-ui'
+
 const Dashboard = React.createClass({
 
     mixins:[AdminComponents.MessagesConsumerMixin],
@@ -72,9 +75,9 @@ const Dashboard = React.createClass({
                                 {this.context.getMessage('scheduler.1', 'ajxp_admin')}
                             </div>
                             <div className="button-container">
-                                <ReactMUI.FlatButton primary={true} label={'+ ' + this.context.getMessage('8', 'action.scheduler')} onClick={this.showTaskCreator}/>
-                                <ReactMUI.FlatButton secondary={true} label={this.context.getMessage('15', 'action.scheduler')} onClick={this.runAllTasks} />
-                                <ReactMUI.FlatButton secondary={true} label={this.context.getMessage('20', 'action.scheduler')} onClick={this.showCronExpression} />
+                                <FlatButton primary={true} label={'+ ' + this.context.getMessage('8', 'action.scheduler')} onTouchTap={this.showTaskCreator}/>
+                                <FlatButton secondary={true} label={this.context.getMessage('15', 'action.scheduler')} onTouchTap={this.runAllTasks} />
+                                <FlatButton secondary={true} label={this.context.getMessage('20', 'action.scheduler')} onTouchTap={this.showCronExpression} />
                             </div>
                             <PydioComponents.SimpleList
                                 ref="list"

@@ -1,3 +1,5 @@
+import React from 'react'
+import {RaisedButton, FlatButton} from 'material-ui'
 import {MessagesConsumerMixin} from '../util/Mixins'
 
 const GroupAdminDashboard = React.createClass({
@@ -9,10 +11,10 @@ const GroupAdminDashboard = React.createClass({
         var label = <span><span className={node.iconClass + ' button-icon'}></span> {node.label}</span>
         return(
             <span style={{display:'inline-block', margin:'0 5px'}}>
-                <ReactMUI.RaisedButton
+                <RaisedButton
                     key={node.path}
                     secondary={true}
-                    onClick={function(){pydio.goTo(node.path);}}
+                    onTouchTap={function(){pydio.goTo(node.path);}}
                     label={label}
                 />
                 </span>
@@ -39,10 +41,10 @@ const GroupAdminDashboard = React.createClass({
                     <div style={{padding:10, textAlign:'center'}}>
                         {baseNodes.map(function(n){return this.renderLink(n); }.bind(this))}
                         <br/>
-                        <ReactMUI.FlatButton
+                        <FlatButton
                             label={this.context.getMessage('home.68')}
                             secondary={true}
-                            onClick={function(){pydio.triggerRepositoryChange("ajxp_home");}}
+                            onTouchTap={function(){pydio.triggerRepositoryChange("ajxp_home");}}
                         />
                     </div>
                 </ReactMUI.Paper>

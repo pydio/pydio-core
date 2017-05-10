@@ -9,12 +9,6 @@
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
-        <global_param name="SIMPLE_CLICK_WS_OPEN" type="boolean" label="CONF_MESSAGE[Open workspace by simple click]"
-                      description="CONF_MESSAGE[Open workspace by simple click instead of double click.]" default="true" expose="true"/>
-        <global_param name="ENABLE_GETTING_STARTED" type="boolean"
-                      label="CONF_MESSAGE[Enable Getting Started]" description="CONF_MESSAGE[Enable addition tabulation to access getting started videos]" default="true" expose="true"/>
-        <global_param name="ENABLE_GLOBAL_SEARCH" type="boolean"
-                      label="CONF_MESSAGE[Enable Global Search]" description="CONF_MESSAGE[Enable cross-workspaces search form on home page]" default="true" expose="true"/>
         <global_param name="URL_APP_IOSAPPSTORE" type="string" expose="true"
                       label="CONF_MESSAGE[iOS App URL]" description="CONF_MESSAGE[URL of the iOS application]" default="https://itunes.apple.com/us/app/pydiopro/id1109419882?mt=8"/>
         <global_param name="URL_APP_ANDROID" type="string" expose="true"
@@ -23,25 +17,10 @@
                       label="CONF_MESSAGE[Windows PydioSync URL]" description="CONF_MESSAGE[URL of the windows sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
         <global_param name="URL_APP_SYNC_MAC" type="string" expose="true"
                       label="CONF_MESSAGE[Mac PydioSync URL]" description="CONF_MESSAGE[URL of the mac sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
-        <global_param name="DISPLAY_SERVER_QRCODE_ACTION" type="boolean" label="CONF_MESSAGE[Display Server QRCode]"
-                      description="CONF_MESSAGE[Let users connect easily to the latest mobile applications by displaying a QRCode]" default="false"/>
     </server_settings>
 	<registry_contributions>
-        <actions>
-            <action name="display-server-qrcode">
-                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.74">
-                    <context actionBarGroup="utils" actionBar="true" dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
-                </gui>
-                <processing>
-                    <clientCallback module="WelcomeCompeonts.QRCodeDialogLoader.open"/>
-                    <clientForm id="qrcode_dialog_form"><![CDATA[
-                        <div id="qrcode_dialog_form" box_width="296" box_padding="0" class="react-mui-context SF_material"></div>
-                    ]]></clientForm>
-                </processing>
-            </action>
-        </actions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="AltDashboard" dependencies="PydioComponents,PydioTasks" props='{"rootId":"home_account_pane","style": {}}'/>
+            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="HomeDashboard" dependencies="PydioComponents,PydioTasks" props='{"rootId":"home_account_pane","style": {}}'/>
         </client_configs>
 	</registry_contributions>
     <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>

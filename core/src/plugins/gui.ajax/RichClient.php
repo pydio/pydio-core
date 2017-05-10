@@ -103,11 +103,10 @@ class RichClient extends Plugin
                     $loggedUser->setPref("pending_folder", InputFilter::decodeSecureMagic($parameters["folder"]));
                     AuthService::updateSessionUser($loggedUser);
                 } else {
-                    $session["PENDING_REPOSITORY_ID"] = $parameters["repository_id"];
-                    $session["PENDING_FOLDER"] = InputFilter::decodeSecureMagic($parameters["folder"]);
+                    SessionService::save(SessionService::PENDING_REPOSITORY_ID, $parameters["repository_id"]);
+                    SessionService::save(SessionService::PENDING_FOLDER, InputFilter::decodeSecureMagic($parameters["folder"]));
                 }
             } else {
-                //ConfService::switchRootDir($parameters["repository_id"]);
                 $output["EXT_REP"] = urldecode($parameters["folder"]);
             }
         }

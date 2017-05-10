@@ -59,11 +59,15 @@ class ActivityPanel extends React.Component {
 
     constructor(props) {
         super(props)
-
-        this.state = {
-            empty: true,
-            dataModel: this.initDataModel(this.props.node)
+        if(props.pydio && !props.pydio.user || props.pydio.user.activeRepository === 'inbox'){
+            this.state = {empty: true};
+        }else{
+            this.state = {
+                empty: true,
+                dataModel: this.initDataModel(this.props.node)
+            }
         }
+
     }
 
     initDataModel(node) {
@@ -77,6 +81,10 @@ class ActivityPanel extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if(nextProps.node !== this.props.node){
+            if(nextProps.pydio && nextProps.pydio.user && nextProps.pydio.user.activeRepository === 'inbox'){
+                this.setState({empty: true});
+                return;
+            }
             this.setState({
                 dataModel: this.initDataModel(nextProps.node)
             }, () => {

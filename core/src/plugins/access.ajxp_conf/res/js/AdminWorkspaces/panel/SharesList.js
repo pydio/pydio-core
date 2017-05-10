@@ -1,3 +1,5 @@
+import React from 'react'
+import {RaisedButton} from 'material-ui'
 import Workspace from '../model/Workspace'
 
 export default React.createClass({
@@ -35,7 +37,7 @@ export default React.createClass({
 
         return (
             <div className="layout-fill vertical-layout">
-                <div style={{position:'absolute',right:20,top:90}}><ReactMUI.RaisedButton label={this.state.clearing?"Processing...":"Clear broken links"} disabled={this.state.clearing} onClick={this.clearBrokenLinks}/></div>
+                <div style={{position:'absolute',right:20,top:90}}><RaisedButton label={this.state.clearing?"Processing...":"Clear broken links"} disabled={this.state.clearing} onTouchTap={this.clearBrokenLinks}/></div>
                 <h1  className="workspace-general-h1">{this.context.getMessage('ws.38')}</h1>
                 <ReactMUI.Paper zDepth={1} className="workspace-activity-block layout-fill vertical-layout">
                     <PydioComponents.NodeListCustomProvider

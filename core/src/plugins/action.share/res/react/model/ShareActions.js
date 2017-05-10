@@ -56,38 +56,7 @@
 
     }
 
-    class Listeners{
-
-        static hookAfterDelete(){
-
-            if(Listeners.INSTANCE) return;
-            // Modify the Delete window
-            // Uses only pure-JS
-            pydio.observe("afterApply-delete", function(){
-                try{
-                    var u = pydio.getContextHolder().getUniqueNode();
-                    if(u.getMetadata().get("ajxp_shared")){
-                        var f = document.querySelectorAll("#generic_dialog_box #delete_message")[0];
-                        var alert = f.querySelectorAll("#share_delete_alert");
-                        if(!alert.length){
-                            var message;
-                            if(u.isLeaf()){
-                                message = global.MessageHash["share_center.158"];
-                            }else{
-                                message = global.MessageHash["share_center.157"];
-                            }
-                            f.innerHTML += "<div id='share_delete_alert' style='padding-top: 10px;color: rgb(192, 0, 0);'><span style='float: left;display: block;height: 60px;margin: 4px 7px 4px 0;font-size: 2.4em;' class='icon-warning-sign'></span>"+message+"</div>";
-                        }
-                    }
-                }catch(e){
-                    if(console) console.log(e);
-                }
-            });
-
-            Listeners.INSTANCE = true;
-        }
-
-    }
+    class Listeners{}
 
     global.ShareActions = {
         Callbacks:Callbacks,

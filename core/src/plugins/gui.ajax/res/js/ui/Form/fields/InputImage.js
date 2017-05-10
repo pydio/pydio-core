@@ -2,7 +2,7 @@ import FormMixin from '../mixins/FormMixin'
 import FileDropzone from './FileDropzone'
 const React = require('react')
 const PydioApi = require('pydio/http/api')
-const {NativeFileDropProvider} = require('pydio').requireLib('boot');
+const {NativeFileDropProvider} = require('pydio').requireLib('hoc');
 
 // Just enable the drop mechanism, but do nothing, it is managed by the FileDropzone
 const BinaryDropZone = NativeFileDropProvider(FileDropzone, (items, files, props) => {});

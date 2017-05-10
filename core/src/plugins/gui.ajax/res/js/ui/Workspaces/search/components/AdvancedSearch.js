@@ -33,9 +33,7 @@ class AdvancedSearch extends Component {
                 value: values.basename
             })
         }
-
         this.props.onChange(values)
-        this.props.onSubmit()
     }
 
     renderField(key, val) {

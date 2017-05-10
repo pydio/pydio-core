@@ -13,6 +13,8 @@ import * as Animations from "./animations";
 import reducers from './editor/reducers/index'
 import * as actions from './editor/actions';
 import withVerticalScroll from './scrollbar/withVerticalScroll';
+import dropProvider from './drop/dropProvider'
+import NativeFileDropProvider from './drop/NativeFileDropProvider'
 
 const PydioHOCs = {
     ContentActions,
@@ -37,6 +39,8 @@ const PydioHOCs = {
     withResolution,
     withSelection,
     withVerticalScroll,
+    dropProvider,
+    NativeFileDropProvider,
     Animations,
     PaletteModifier,
     URLProvider,

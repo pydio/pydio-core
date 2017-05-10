@@ -1,3 +1,5 @@
+import React from 'react'
+import {RaisedButton} from 'material-ui'
 const {Doughnut} = require('react-chartjs')
 import PluginEditor from '../core/PluginEditor'
 
@@ -125,9 +127,9 @@ const CacheServerDashboard = React.createClass({
     renderClearButton:function(cacheData){
         return (
             <div style={{paddingBottom: 10}}>
-                <ReactMUI.RaisedButton
+                <RaisedButton
                     label={"Clear " + cacheData.namespace + " cache"}
-                    onClick={this.clearCache.bind(this, cacheData.namespace)}
+                    onTouchTap={this.clearCache.bind(this, cacheData.namespace)}
                 />
             </div>
         );

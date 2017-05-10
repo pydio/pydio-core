@@ -46,7 +46,6 @@
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback module="ShareActions.Callbacks.share"/>
-                    <clientListener name="init" module="ShareActions.Listeners.hookAfterDelete"/>
                 </processing>
             </action>
             <action name="share-edit-shared">

@@ -1,3 +1,6 @@
+import React from 'react'
+import {RaisedButton, FlatButton} from 'material-ui'
+
 /**
  * Editor for a given plugin. By default, displays documentation in a left column panel,
  * and plugin parameters as form cards on the right.
@@ -207,7 +210,7 @@ const PluginEditor = React.createClass({
         }
         var closeButton;
         if(this.props.closeEditor){
-            closeButton = <ReactMUI.RaisedButton label={this.context.getMessage('86','')} onClick={this.props.closeEditor} secondary={true}></ReactMUI.RaisedButton>
+            closeButton = <RaisedButton label={this.context.getMessage('86','')} onTouchTap={this.props.closeEditor}/>
         }
 
         var doc = this.state.documentation;
@@ -236,9 +239,9 @@ const PluginEditor = React.createClass({
                 <ReactMUI.Paper className="left-nav" zDepth={0}>
                     <h1 className="admin-panel-title">{this.state.label}</h1>
                     <div className="buttons-cont" style={{padding:16}}>
-                        <ReactMUI.RaisedButton primary={true} disabled={!this.state.dirty} label={this.context.getMessage('plugins.5')} onClick={this.save}></ReactMUI.RaisedButton>
+                        <FlatButton secondary={true} disabled={!this.state.dirty} label={this.context.getMessage('plugins.6')} onTouchTap={this.revert}/>
                         &nbsp;&nbsp;
-                        <ReactMUI.RaisedButton disabled={!this.state.dirty} label={this.context.getMessage('plugins.6')} onClick={this.revert}></ReactMUI.RaisedButton>
+                        <FlatButton secondary={true} disabled={!this.state.dirty} label={this.context.getMessage('plugins.5')} onTouchTap={this.save}/>
                         &nbsp;&nbsp;&nbsp;
                         {closeButton}
                     </div>

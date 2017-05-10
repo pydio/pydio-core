@@ -1391,7 +1391,7 @@ div#multiple_download_container div div a:hover {
 .react-mui-context .top_search_form.more .search-results .material-list-entry.material-list-entry-2-lines,
 .react-mui-context .top_search_form.advanced .search-results .material-list-entry.material-list-entry-2-lines {
   background-color: white;
-  border-bottom: 0;
+  border-bottom: 0 !important;
   margin: 5px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
 }
@@ -1716,7 +1716,7 @@ div.menu.desktop a span.ajxp_icon_span {
   border-top: none;
 }
 .left-panel .workspaces {
-  font-size: 14px;
+  font-size: 15px;
 }
 .left-panel .workspaces .workspace-entry {
   padding: 6px 1px 6px 16px;
@@ -1772,6 +1772,13 @@ div.menu.desktop a span.ajxp_icon_span {
   opacity: 1;
   position: relative;
   font-weight: 500;
+}
+.left-panel .workspaces div.tree-item-label {
+  color: rgba(0, 0, 0, 0.77);
+}
+.left-panel .workspaces div.tree-item-label .tree-icon.icon-angle-down,
+.left-panel .workspaces div.tree-item-label .tree-icon.icon-angle-right {
+  color: rgba(0, 0, 0, 0.43);
 }
 .left-panel.hidden {
   left: -255px;

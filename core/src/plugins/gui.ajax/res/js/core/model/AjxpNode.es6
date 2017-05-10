@@ -278,6 +278,11 @@ export default class AjxpNode extends Observable{
     isLeaf(){
         return this._isLeaf;
     }
+
+    isBrowsable(){
+        return !this._isLeaf || this.getAjxpMime() === 'ajxp_browsable_archive';
+    }
+
     /**
      * @returns String
      */

@@ -22,7 +22,6 @@ import HiddenDownloadForm from './HiddenDownloadForm'
 
 import PydioContextProvider from './PydioContextProvider'
 import PydioContextConsumer from './PydioContextConsumer'
-import NativeFileDropProvider from './NativeFileDropProvider'
 
 export {
     Builder,
@@ -47,7 +46,6 @@ export {
     BackgroundImage,
 
     PydioContextProvider,
-    PydioContextConsumer,
-    NativeFileDropProvider
+    PydioContextConsumer
 
 }

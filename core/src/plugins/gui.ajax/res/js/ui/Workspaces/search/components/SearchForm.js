@@ -92,9 +92,7 @@ class SearchForm extends Component {
         // Removing empty values
         Object.keys(values).forEach((key) => (!values[key]) && delete values[key]);
 
-        this.setState({
-            values
-        });
+        this.setState({values}, this.submit);
     }
 
     submit() {
@@ -236,24 +234,36 @@ class SearchForm extends Component {
                         className={display !== 'small' ? 'files-list' : null}
                         elementHeight={elementHeight}
                         entryRenderIcon={renderIcon}
-                        entryRenderActions={function() {return null}}
+                        entryRenderActions={function () {
+                            return null
+                        }}
                         entryRenderSecondLine={renderSecondLine}
                         presetDataModel={dataModel}
-                        heightAutoWithMax={display === 'small' ? 500  : ( display === 'advanced' ? 512 : 412 )}
+                        heightAutoWithMax={display === 'small' ? 500 : ( display === 'advanced' ? 512 : 412 )}
                         openCollection={nodeClicked}
                         nodeClicked={nodeClicked}
-                        defaultGroupBy={(crossWorkspace || searchScope ==='all') ? 'repository_id' : null }
-                        groupByLabel={(crossWorkspace || searchScope ==='all') ? 'repository_display' : null }
+                        defaultGroupBy={(crossWorkspace || searchScope === 'all') ? 'repository_id' : null }
+                        groupByLabel={(crossWorkspace || searchScope === 'all') ? 'repository_display' : null }
                         emptyStateProps={{
-                            iconClassName:"",
-                            primaryTextId:478,
-                            style:{minHeight: (display === 'small' ? 180  : ( display === 'advanced' ? 512 : 412 )), backgroundColor: 'transparent'}
+                            iconClassName: "",
+                            primaryTextId: 478,
+                            style: {
+                                minHeight: (display === 'small' ? 180 : ( display === 'advanced' ? 512 : 412 )),
+                                backgroundColor: 'transparent',
+                                padding: '0 20px'
+                            },
+                            secondaryTextId: (searchScope === 'ws' ? 620 : (searchScope === 'folder' ? 619 : null)),
+                            actionLabelId: (searchScope === 'ws' ? 610 : (searchScope === 'folder' ? 609 : null)),
+                            actionCallback: (searchScope !== 'all' ? () => {
+                                    searchScopeChanged(searchScope === 'ws' ? 'all' : 'ws');
+                                } : null),
+                            actionStyle: {marginTop: 10}
                         }}
                     />
 
                     {display === 'small' &&
                         <div style={{display:'flex', alignItems:'center', padding:5, paddingLeft: 0, backgroundColor:'#f5f5f5'}}>
-                            {!this.props.crossWorkspace && !this.props.uniqueSearchScope &&  <SearchScopeSelector style={{flex: 1, maxWidth:170}} labelStyle={{paddingLeft: 8}} value={searchScope} onChange={searchScopeChanged} onTouchTap={() => this.setMode('small')}/>}
+                            {!this.props.crossWorkspace && !this.props.uniqueSearchScope &&  <SearchScopeSelector style={{flex: 1, maxWidth:162}} labelStyle={{paddingLeft: 8}} value={searchScope} onChange={searchScopeChanged} onTouchTap={() => this.setMode('small')}/>}
                             <FlatButton style={{marginTop:4}} primary={true} label={getMessage(456)} onFocus={() => this.setMode("small")} onTouchTap={() => this.setMode("more")} onClick={() => this.setMode("more")} />
                         </div>
                     }

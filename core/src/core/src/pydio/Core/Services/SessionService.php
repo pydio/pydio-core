@@ -155,13 +155,16 @@ class SessionService implements RepositoriesCache
     /**
      * @param UserInterface $ctxUser
      */
-    public static function checkPendingRepository($ctxUser){
+    public static function checkPendingRepository(&$ctxUser){
         if (self::has(self::PENDING_REPOSITORY_ID) && self::has(self::PENDING_FOLDER)) {
-            $ctxUser->setArrayPref("history", "last_repository", self::fetch(self::PENDING_REPOSITORY_ID));
+            $pendingId = self::fetch(self::PENDING_REPOSITORY_ID);
+            $ctxUser->setArrayPref("history", "last_repository", $pendingId);
             $ctxUser->setPref("pending_folder", self::fetch(self::PENDING_FOLDER));
             self::delete(self::PENDING_REPOSITORY_ID);
             self::delete(self::PENDING_FOLDER);
+            return $pendingId;
         }
+        return null;
     }
 
     /**
