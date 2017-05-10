@@ -154,7 +154,7 @@ let MainFilesList = React.createClass({
         const MAIN_CONTAINER_FULL_PADDING = 2;
         const THUMBNAIL_MARGIN = 1;
 
-        let containerWidth = ReactDOM.findDOMNode(this.refs['list']).clientWidth - MAIN_CONTAINER_FULL_PADDING;
+        let containerWidth = ReactDOM.findDOMNode(this.refs['list'].refs['infinite']).clientWidth - MAIN_CONTAINER_FULL_PADDING;
 
         // Find nearest dim
         let blockNumber = Math.floor(containerWidth / nearest);
