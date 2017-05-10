@@ -1,5 +1,9 @@
 export default {
     getCancelCallback(){
-        return this.props.onDismiss;
+        if(this.cancel){
+            return this.cancel;
+        }else{
+            return this.props.onDismiss;
+        }
     }
 };

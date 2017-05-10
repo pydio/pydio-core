@@ -111,7 +111,7 @@ let AsyncModal = React.createClass({
             actions:[],
             title:null,
             open: !!nextProps.open,
-            blur: !!nextProps.blur
+            blur: !!nextProps.blur || (componentData.payload && componentData.payload.blur)
         };
         if(componentData && (!componentData instanceof Object || !componentData['namespace'])){
             state['async'] = false;

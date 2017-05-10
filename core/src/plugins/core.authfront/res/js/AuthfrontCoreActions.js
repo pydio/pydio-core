@@ -429,7 +429,7 @@
 
         static loginPassword(props = {}) {
             
-            pydio.UI.openComponentInModal('AuthfrontCoreActions', 'LoginPasswordDialog', props);
+            pydio.UI.openComponentInModal('AuthfrontCoreActions', 'LoginPasswordDialog', {...props, blur: true});
 
         }
 
@@ -447,12 +447,13 @@
 
         mixins: [
             PydioReactUI.ActionDialogMixin,
-            PydioReactUI.SubmitButtonProviderMixin
+            PydioReactUI.SubmitButtonProviderMixin,
+            PydioReactUI.CancelButtonProviderMixin
         ],
 
         statics: {
             open : () => {
-                pydio.UI.openComponentInModal('AuthfrontCoreActions', 'ResetPasswordRequire');
+                pydio.UI.openComponentInModal('AuthfrontCoreActions', 'ResetPasswordRequire', {blur: true});
             }
         },
 
@@ -468,8 +469,15 @@
             return true;
         },
 
+        cancel: function(){
+            pydio.Controller.fireAction('login');
+        },
 
         submit: function(){
+            const valueSubmitted = this.state && this.state.valueSubmitted;
+            if(valueSubmitted){
+                this.cancel();
+            }
             const value = this.refs.input && this.refs.input.getValue();
             if(!value) return;
             PydioApi.getClient().request({
@@ -516,7 +524,7 @@
 
         statics: {
             open : () => {
-                pydio.UI.openComponentInModal('AuthfrontCoreActions', 'ResetPasswordDialog');
+                pydio.UI.openComponentInModal('AuthfrontCoreActions', 'ResetPasswordDialog', {blur:true});
             }
         },
 
