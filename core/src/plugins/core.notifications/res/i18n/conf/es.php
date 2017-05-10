@@ -21,12 +21,12 @@
 // spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
 "Notification Center" => "Centro de notificaciones",
-"Handle users watches and notifications" => "Manipular vistas de usuarios y notificaciones",
+"Handle users watches and notifications" => "Administrar vistas de usuarios y notificaciones",
 "Activate desktop notifications" => "Activar notificaciones de escritorio",
 "Desktop Notifications" => "Notificaciones de escritorio",
 "User events and alerts" => "Eventos y alertas de usuario",
-"Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration." => "Mostrar una nueva entrada con todos los eventos que suceden en un repositorio de usuario, y alertas. Una base de datos SQL debe ser configurada para la configuración de FEED_DRIVER.",
-"Instance Params" => "Parámetros de instancia",
+"Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration." => "Mostrar una nueva entrada con todos los eventos que suceden en un repositorio de usuario y alertas. Se debe configurar una base de datos SQL para la configuración de FEED_DRIVER.",
+"Instance Params" => "Parámetros de la instancia",
 "Feed Instance" => "Instancia de feed",
 "Choose the plugin" => "Seleccione el plugin",
 );
