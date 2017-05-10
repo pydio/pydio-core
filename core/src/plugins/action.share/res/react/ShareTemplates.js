@@ -2,11 +2,49 @@ const {Textfit} = require('react-textfit');
 import Pydio from 'pydio'
 const Color = require('color');
 import {muiThemeable} from 'material-ui/styles';
+import {connect} from 'react-redux';
+import {compose} from 'redux';
 
-const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = Pydio.requireLib('workspaces');
-const {ContextMenu, ButtonMenu, Toolbar, ListPaginator, ReactEditorOpener, ClipboardTextField} = Pydio.requireLib('components');
-const {BackgroundImage} = Pydio.requireLib('boot')
-const {dropProvider} = Pydio.requireLib('hoc')
+const { Breadcrumb, SearchForm, MainFilesList, Editor, EditionPanel } = Pydio.requireLib('workspaces');
+const { ContextMenu, ButtonMenu, Toolbar, ListPaginator, ClipboardTextField } = Pydio.requireLib('components');
+const { BackgroundImage } = Pydio.requireLib('boot');
+const { EditorActions, dropProvider } = Pydio.requireLib('hoc');
+
+const withUniqueNode = (Component) => {
+    return class WithUniqueNode extends React.PureComponent {
+
+        componentDidMount() {
+            this.detectFirstNode()
+        }
+
+        detectFirstNode() {
+            let dm = this.props.pydio.getContextHolder();
+
+            if (!dm.getSelectedNodes().length) {
+                let first = dm.getRootNode().getFirstChildIfExists();
+                if (first) {
+                    dm.setSelectedNodes([first], "dataModel");
+                    this.setState({node: first});
+                } else {
+                    setTimeout(() => this.detectFirstNode(), 1000);
+                }
+            } else {
+                if (!this.state || !this.state.node) {
+                    this.setState({node: dm.getSelectedNodes()[0]});
+                }
+            }
+        }
+
+        render() {
+
+            if (!this.state || !this.state.node) return null
+
+            return (
+                <Component {...this.props} node={this.state.node}  />
+            )
+        }
+    }
+}
 
 const UniqueNodeTemplateMixin = {
 
@@ -301,86 +339,93 @@ const FolderMinisite = React.createClass({
 
 });
 
-const InlineEditor = React.createClass({
-
-    getInitialState: function(){
-        return {node: this.props.node};
-    },
-
-    componentDidMount: function(){
-        this.props.pydio.UI.registerEditorOpener(this);
-    },
-
-    componentWillUnmount: function(){
-        this.props.pydio.UI.unregisterEditorOpener(this);
-    },
-
-    openEditorForNode: function(node, editorData){
-        this.setState({node, editorData});
-    },
-
-    _getEditorData: function(node) {
-        const {pydio} = this.props;
-        const selectedMime = PathUtils.getAjxpMimeType(node);
-        const editors = pydio.Registry.findEditorsForMime(selectedMime, false);
-        if (editors.length && editors[0].openable){
-            return editors[0];
-        }
-    },
-
-    render: function(){
-        const {pydio} = this.props;
-        const {node, editorData} = this.state;
-        return (
-            <ReactEditorOpener
-                pydio={pydio}
-                node={node}
-                registry={pydio.Registry}
-                editorData={editorData || this._getEditorData(node)}
-            />
-        );
-    }
-
-});
-
 const FileMinisite = React.createClass({
 
-    mixins: [UniqueNodeTemplateMixin],
+    componentDidMount() {
+        const {pydio, node, dispatch} = this.props
 
-    componentDidMount: function(){
-        this.detectFirstNode();
+        pydio.UI.registerEditorOpener(this);
+
+        const selectedMime = PathUtils.getAjxpMimeType(node);
+        const editors = pydio.Registry.findEditorsForMime(selectedMime, false);
+        if (editors.length && editors[0].openable) {
+
+            const editorData = editors[0]
+
+            pydio.Registry.loadEditorResources(
+                editorData.resourcesManager,
+                () => {
+                    let EditorClass = null
+
+                    if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+                        this.setState({
+                            error: "Cannot find editor component (" + editorData.editorClass + ")!"
+                        })
+                        return
+                    }
+
+                    let tabId = dispatch(EditorActions.tabCreate({
+                        id: node.getLabel(),
+                        title: node.getLabel(),
+                        url: node.getPath(),
+                        icon: PydioWorkspaces.FilePreview,
+                        Editor: EditorClass.Editor,
+                        Controls: EditorClass.Controls,
+                        pydio,
+                        node,
+                        editorData,
+                        registry: pydio.Registry
+                    })).id
+
+                    dispatch(EditorActions.editorSetActiveTab(tabId))
+                }
+            )
+        }
     },
 
-    _getEditorData: function(node) {
-        const selectedMime = PathUtils.getAjxpMimeType(node);
-        const editors = this.props.pydio.Registry.findEditorsForMime(selectedMime, false);
-        if (editors.length && editors[0].openable){
-            return editors[0];
-        }
+    openEditorForNode(node, editorData) {
+        const {dispatch} = this.props
+
+        pydio.Registry.loadEditorResources(
+            editorData.resourcesManager,
+            () => {
+                let EditorClass = null
+
+                if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+                    this.setState({
+                        error: "Cannot find editor component (" + editorData.editorClass + ")!"
+                    })
+                    return
+                }
+
+                dispatch(EditorActions.tabModify({
+                    id: node.getLabel(),
+                    title: node.getLabel(),
+                    url: node.getPath(),
+                    icon: PydioWorkspaces.FilePreview,
+                    Editor: EditorClass.Editor,
+                    Controls: EditorClass.Controls,
+                    pydio,
+                    node,
+                    editorData,
+                    registry: pydio.Registry
+                }))
+            }
+        )
+    },
+
+    componentWillUnmount() {
+        pydio.UI.unregisterEditorOpener(this);
     },
 
     render: function(){
 
         let node = this.state && this.state.node ?  this.state.node : null;
 
-        let content;
-        if(node){
-            content = (
-                <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
-                    <InlineEditor
-                        pydio={this.props.pydio}
-                        node={node}
-                    />
-                </div>
-            );
-        }else{
-            content = (
-                <PydioReactUI.Loader />
-            );
-        }
-
         return (
-            <StandardLayout {...this.props}>{content}</StandardLayout>
+            <StandardLayout {...this.props}>
+                <Editor styledisplayToolbar={false} style={{display: "flex", flex: 1}}/>
+            </StandardLayout>
         );
 
 
@@ -451,7 +496,11 @@ const FilmStripMinisite = React.createClass({
 
 window.ShareTemplates = {
     FolderMinisite      : muiThemeable()(FolderMinisite),
-    FileMinisite        : muiThemeable()(FileMinisite),
+    FileMinisite        : compose(
+        withUniqueNode,
+        muiThemeable(),
+        connect()
+    )(FileMinisite),
     DLTemplate          : muiThemeable()(DLTemplate),
     DropZoneMinisite    : muiThemeable()(DropZoneMinisite),
     FilmStripMinisite   : muiThemeable()(FilmStripMinisite)

@@ -124,7 +124,7 @@ class Editor extends React.Component {
     }
 
     render() {
-        const {activeTab, isActive} = this.props
+        const {style, activeTab, isActive, displayToolbar} = this.props
         const {minimisable} = this.state
 
         const title = activeTab ? activeTab.title : ""
@@ -149,10 +149,12 @@ class Editor extends React.Component {
         }
 
         return (
-            <div style={{display: "flex", ...this.props.style}}>
+            <div style={{display: "flex", ...style}}>
                 <Draggable cancel=".body" onStop={this.recalculate.bind(this)}>
-                    <AnimatedPaper  ref="container" onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: this.props.style.transformOrigin}}>
-                        <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onMinimise={onMinimise} />
+                    <AnimatedPaper ref="container" onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: style.transformOrigin}}>
+                        {displayToolbar &&
+                            <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onMinimise={onMinimise} />
+                        }
 
                         <div className="body" style={parentStyle}>
                             {this.renderChild()}
@@ -174,6 +176,8 @@ function mapStateToProps(state, ownProps) {
     const activeTab = tabs.filter(tab => tab.id === editor.activeTabId)[0]
 
     return  {
+        style: {},
+        displayToolbar: true,
         ...ownProps,
         activeTab,
         tabs,
