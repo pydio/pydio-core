@@ -31,7 +31,7 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                 super(props)
 
                 const {node, tab, dispatch} = this.props
-                const {id} = tab
+                const {id} = tab || {}
 
                 if (typeof dispatch === 'function') {
                     // We have a redux dispatch so we use it

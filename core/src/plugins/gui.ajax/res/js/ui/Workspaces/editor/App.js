@@ -39,7 +39,7 @@ class App extends React.Component {
     componentWillReceiveProps(nextProps) {
         const {editorModify, tabs, displayPanel, positionOrigin, positionTarget} = nextProps
 
-        editorModify({open: tabs.length > 0})
+        editorModify({open: tabs.filter(({editorData}) => editorData).length > 0})
 
         if (displayPanel) {
 

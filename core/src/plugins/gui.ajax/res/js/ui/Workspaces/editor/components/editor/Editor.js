@@ -88,7 +88,9 @@ class Editor extends React.Component {
     renderChild() {
         const {activeTab, tabs, editorSetActiveTab} = this.props
 
-        return tabs.map((tab, index) => {
+        const filteredTabs = tabs.filter(({editorData}) => editorData)
+
+        return filteredTabs.map((tab, index) => {
             let style = {
                 display: "flex",
                 width: (100 / MAX_ITEMS) + "%",
@@ -98,7 +100,7 @@ class Editor extends React.Component {
                 whiteSpace: "nowrap"
             }
 
-            if (tabs.length > MAX_ITEMS) {
+            if (filteredTabs.length > MAX_ITEMS) {
                 if (index < MAX_ITEMS) {
                     style.flex = 1
                 } else {

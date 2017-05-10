@@ -26,6 +26,15 @@ import { EditorActions, getRatio, getDisplayName, getBoundingRect } from '../uti
 
 const withResize = (Component) => {
     class WithResize extends React.PureComponent {
+        constructor(props) {
+            super(props)
+
+            const {node, tab, dispatch} = this.props
+            const {id} = tab
+
+            if (!id) dispatch(EditorActions.tabCreate({id: node.getLabel(), node}))
+        }
+
         static get displayName() {
             return `WithResize(${getDisplayName(Component)})`
         }
@@ -42,7 +51,6 @@ const withResize = (Component) => {
 
         static get defaultProps() {
             return {
-                size: "contain",
                 containerWidth: 1,
                 containerHeight: 1,
                 width: 1,
@@ -83,8 +91,7 @@ const withResize = (Component) => {
                 })
             }
 
-            // this.setState(state)
-            dispatch(EditorActions.tabModify({id, ...state}))
+            dispatch(EditorActions.tabModify(state))
         }
 
         render() {
