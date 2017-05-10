@@ -6,6 +6,7 @@ import {muiThemeable} from 'material-ui/styles';
 const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = Pydio.requireLib('workspaces');
 const {ContextMenu, ButtonMenu, Toolbar, ListPaginator, ReactEditorOpener, ClipboardTextField} = Pydio.requireLib('components');
 const {BackgroundImage} = Pydio.requireLib('boot')
+const {dropProvider} = Pydio.requireLib('hoc')
 
 const UniqueNodeTemplateMixin = {
 
@@ -281,9 +282,7 @@ let StandardLayout = React.createClass({
 
 });
 
-if(window.UploaderModel){
-    StandardLayout = window.UploaderModel.DropProvider(StandardLayout);
-}
+StandardLayout = dropProvider(StandardLayout);
 
 const FolderMinisite = React.createClass({
 

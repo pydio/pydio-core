@@ -1,6 +1,6 @@
 const React = require('react')
 const Color = require('color')
-const {withContextMenu} = require('pydio').requireLib('hoc')
+const {withContextMenu, dropProvider} = require('pydio').requireLib('hoc')
 const Action = require('pydio/model/action')
 
 import MessagesProviderMixin from '../MessagesProviderMixin'
@@ -217,9 +217,7 @@ let FSTemplate = React.createClass({
     }
 });
 
-if(window['UploaderModel']){
-    FSTemplate = UploaderModel.DropProvider(FSTemplate);
-}
+FSTemplate = dropProvider(FSTemplate);
 FSTemplate = withContextMenu(FSTemplate);
 FSTemplate = MaterialUI.Style.muiThemeable()(FSTemplate);
 

@@ -14,8 +14,6 @@ export default React.createClass({
 
     applyAction: function(actionName){
         switch (actionName){
-            case 'alerts':
-                break;
             case 'home':
                 this.props.pydio.triggerRepositoryChange('ajxp_home');
                 break;
@@ -71,19 +69,7 @@ export default React.createClass({
                     />
                 );
             }
-            /*
-            if(user.getRepositoriesList().has('ajxp_conf') && user.activeRepository === 'ajxp_home'){
-                settingsButton = (
-                    <IconButton
-                        onTouchTap={this.applyAction.bind(this, 'settings')}
-                        iconClassName="userActionIcon mdi mdi-settings"
-                        className="userActionButton settings"
-                        tooltip={messages['165']}
-                    />
-                );
-            }
-            */
-            if(this.props.pydio.Controller.getActionByName('get_my_feed') && !this.props.hideNotifications){
+            if(this.props.pydio.Controller.getActionByName('get_my_feed') && !this.props.hideNotifications && !(this.props.pydio.user && this.props.pydio.user.activeRepository === 'inbox')){
                 notificationsButton = (
                     <AsyncComponent
                         namespace="PydioNotifications"

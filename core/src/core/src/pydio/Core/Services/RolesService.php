@@ -386,15 +386,14 @@ class RolesService
             $rootRole = new AJXP_Role("MINISITE");
             $rootRole->setLabel("Minisite Users");
             $actions = array(
-                "access.fs" => array("ajxp_link", "chmod", "purge"),
-                "meta.watch" => array("toggle_watch"),
-                "conf.serial" => array("get_bookmarks"),
-                "conf.sql" => array("get_bookmarks"),
-                "index.lucene" => array("index"),
-                "action.share" => array("share", "share_react", "share-edit-shared", "share-folder-workspace", "share-file-minisite", "share-selection-minisite", "share-folder-minisite-public"),
-                "gui.ajax" => array("bookmark"),
-                "auth.serial" => array("pass_change"),
-                "auth.sql" => array("pass_change"),
+                "access.fs" => ["ajxp_link", "chmod", "purge"],
+                "meta.watch" => ["toggle_watch"],
+                "conf.serial" => ["get_bookmarks"],
+                "conf.sql" => ["get_bookmarks"],
+                "action.share" => ["share", "share_react", "share-edit-shared", "share-folder-workspace", "share-file-minisite", "share-selection-minisite", "share-folder-minisite-public", "open_user_shares"],
+                "gui.ajax" => ["bookmark"],
+                "auth.sql" => ["pass_change"],
+                "action.user" => ["open_address_book"]
             );
             foreach ($actions as $pluginId => $acts) {
                 foreach ($acts as $act) {

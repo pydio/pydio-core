@@ -109,7 +109,7 @@
 
     });
 
-    DropUploader = UploaderModel.DropProvider(DropUploader);
+    DropUploader = Pydio.requireLib('hoc').dropProvider(DropUploader);
 
     const TransferFile = React.createClass({
 

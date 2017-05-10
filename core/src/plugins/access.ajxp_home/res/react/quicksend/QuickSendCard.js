@@ -4,7 +4,7 @@ const {CardTitle, CircularProgress} = require('material-ui')
 const {asGridItem} = require('pydio').requireLib('components')
 const {FileDropZone} = require('pydio').requireLib('form')
 
-const {NativeFileDropProvider} = require('pydio').requireLib('boot');
+const {NativeFileDropProvider} = require('pydio').requireLib('hoc');
 const BinaryDropZone = NativeFileDropProvider(FileDropZone, (items, files, props) => {});
 
 let QuickSendCard = React.createClass({
