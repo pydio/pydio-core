@@ -19,17 +19,18 @@ let Panel =  React.createClass({
 
         const layoutData = ShareModel.compileLayoutData(this.props.pydio, this.props.shareModel.getNode());
         let layoutPane, visibilityPanel;
+        let {style, ...props} = this.props;
         if(!this.props.shareModel.getNode().isLeaf() && layoutData.length > 1 && this.props.shareModel.hasPublicLink()){
-            layoutPane = <PublicLinkTemplate {...this.props} linkData={this.props.shareModel.getPublicLinks()[0]} layoutData={layoutData}/>;
+            layoutPane = <PublicLinkTemplate {...props} linkData={this.props.shareModel.getPublicLinks()[0]} layoutData={layoutData}/>;
         }
         if(!this.props.shareModel.currentRepoIsUserScope()){
-            visibilityPanel = <VisibilityPanel  {...this.props}  style={{paddingBottom: 16}}/>;
+            visibilityPanel = <VisibilityPanel  {...props}  style={{paddingBottom: 16}}/>;
         }
         return (
             <div>
                 <Card style={this.props.style} title={this.props.getMessage('486', '')}>
-                    <LabelDescriptionPanel {...this.props} style={{marginTop: -10}}/>
-                    <NotificationPanel {...this.props}/>
+                    <LabelDescriptionPanel {...props} style={{marginTop: -10}}/>
+                    <NotificationPanel {...props}/>
                     {layoutPane}
                 </Card>
                 {visibilityPanel}

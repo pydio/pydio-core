@@ -46,7 +46,10 @@ let Breadcrumb = React.createClass({
         if(!pydio.user){
             return <span className="react_breadcrumb"></span>;
         }
-        let repoLabel = pydio.user.repositories.get(pydio.user.activeRepository).getLabel();
+        let repoLabel = ' ';
+        if(pydio.user && pydio.user.activeRepository && pydio.user.repositories.has(pydio.user.activeRepository)){
+            repoLabel = pydio.user.repositories.get(pydio.user.activeRepository).getLabel();
+        }
         let segments = [];
         let path = this.state.node ? LangUtils.trimLeft(this.state.node.getPath(), '/') : '';
         let rebuilt = '';

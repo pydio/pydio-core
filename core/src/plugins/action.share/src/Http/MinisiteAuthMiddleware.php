@@ -82,6 +82,7 @@ class MinisiteAuthMiddleware
             $loggedUser = AuthService::logUser($shareData["PRELOG_USER"], "", true);
             if(!empty($userTemporaryLabel)){
                 $loggedUser->getPersonalRole()->setParameterValue("core.conf", "USER_TEMPORARY_DISPLAY_NAME", $userTemporaryLabel);
+                if($sessions) SessionService::save(SessionService::USER_TEMPORARY_DISPLAY_NAME, $userTemporaryLabel);
             }
             $requestInterface = $requestInterface->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
             if($sessions){

@@ -259,4 +259,5 @@ $mess = array(
 "242" => "Cargar más Resultados",
 "243" => "Enlaces Públicos",
 "244" => "Carpetas Compartidas",
+"245" => "%s personal invitation(s) sent",
 );

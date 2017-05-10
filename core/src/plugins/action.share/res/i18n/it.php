@@ -259,4 +259,5 @@ $mess = array(
 "242" => "Load More Results",
 "243" => "Public Links",
 "244" => "Shared Folders",
+"245" => "%s personal invitation(s) sent",
 );
