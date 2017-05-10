@@ -30,12 +30,9 @@ const withResize = (Component) => {
             super(props)
 
             const {node, tab, dispatch} = this.props
-            const {id} = tab || {}
+            const {id} = tab
 
-            if (typeof dispatch === 'function') {
-                // We have a redux dispatch so we use it
-                this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
-            }
+            if (!id) dispatch(EditorActions.tabCreate({id: node.getLabel(), node}))
         }
 
         static get displayName() {
@@ -54,9 +51,6 @@ const withResize = (Component) => {
 
         static get defaultProps() {
             return {
-                tab: {
-                    size: "contain"
-                },
                 containerWidth: 1,
                 containerHeight: 1,
                 width: 1,
@@ -85,7 +79,7 @@ const withResize = (Component) => {
 
         loadSize(props) {
             const {tab, dispatch, containerWidth, width, containerHeight, height} = props
-            const {id, scale, size = "contain"} = tab || {}
+            const {id, scale, size = "contain"} = tab
 
             const state = {
                 id,
@@ -97,14 +91,13 @@ const withResize = (Component) => {
                 })
             }
 
-            // this.setState(state)
-            this.setState({id, ...state})
+            dispatch(EditorActions.tabModify(state))
         }
 
         render() {
             //const {scale} = this.state || {}
             const {tab, dispatch, ...remainingProps} = this.props
-            const {scale} = tab || this.state
+            const {scale} = tab
 
             return (
                 <Component
