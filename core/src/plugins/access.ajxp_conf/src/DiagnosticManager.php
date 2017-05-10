@@ -68,7 +68,6 @@ class DiagnosticManager extends AbstractManager
                 foreach ($diagResults as $id => $value) {
                     $nodeKey = $path."/".$id;
                     $meta = [
-                        "icon"      => "susehelpcenter.png",
                         "text"      => $id,
                         "data"      => $value,
                         "ajxp_mime" => "testResult"

@@ -25,13 +25,14 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
-use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Enterprise\Session\PydioSessionManager;
 use Pydio\Notification\Core\IFeedStore;
 use Pydio\Notification\Core\Notification;
 
@@ -120,7 +121,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
      * @param string $userId
      * @return array An array of stdClass objects with keys hookname, arguments, author, date, repository
      */
-    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId)
+    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId = null, $chainLoad = false)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         if(!dibi::isConnected()) {
@@ -131,11 +132,15 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
 
         // Add some permission mask if necessary
+        /** @var PydioSessionManager $sessionManager */
+        $sessionManager = PluginsService::findPluginWithoutCtxt("sec", "session");
 
         $repoOrs = array();
         foreach($filterByRepositories as $repoId){
             $masks = array();
-            Controller::applyHook("role.masks", array(new Context($userId, $repoId), &$masks, AJXP_Permission::READ));
+            if($sessionManager !== false){
+                $sessionManager->listCurrentMasks(new Context($userId, $repoId), $masks, AJXP_Permission::READ);
+            }
             if(count($masks)){
                 $pathesOr = array();
                 foreach($masks as $mask){
@@ -198,6 +203,18 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
             $object->event_id = $row->id;
+            if(!empty($filterByPath) && !empty($chainLoad) && substr($row->index_path, -strlen($filterByPath)) === $filterByPath
+                && $object->arguments !== null && isSet($object->arguments[0]) && $object->arguments[0] instanceOf AJXP_Node ){
+                $oldNode = $object->arguments[0];
+                $oldPath = $oldNode->getPath();
+                if(!is_array($chainLoad)) $chainLoad = [];
+                $chainLoad[] = $filterByPath;
+                if(!in_array($oldPath, $chainLoad) && count($chainLoad) <= 10){
+                    // Load previous events when path was different.
+                    $chainData = $this->loadEvents($filterByRepositories, $oldPath, $userGroup, 0, $limit, $enlargeToOwned, $userId, $chainLoad);
+                    foreach($chainData as $chainObject)  $data[] = $chainObject;
+                }
+            }
             $data[] = $object;
         }
         return $data;
@@ -300,6 +317,9 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
                 return;
             }
             $url = $startEventNotif->getNode()->getUrl();
+            if($url !== $startEventRow->index_path){
+                $url = $startEventRow->index_path;
+            }
             $date = $startEventRow->edate;
             $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND ([user_id] = %s OR [user_group] = %s) AND [edate] <= %s AND [index_path] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, $userGroup, $date, $url, $occurrences);
             $a = $newRes->fetchPairs();
@@ -337,7 +357,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
      * @param string $repositoryOwner
      * @param string $userId
      * @param string $userGroup
-     * @return void
+     * @return int last insert ID
      */
     public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
     {
@@ -347,6 +367,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
         try {
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[index_path],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "meta", "comment", $indexPath, $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+            return dibi::getInsertId();
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist meta", $e->getMessage());
         }
@@ -373,13 +394,23 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         if($recurring){
             $res = dibi::query("SELECT * FROM [ajxp_feed]
                 WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )                
                 ORDER BY %by %lmt %ofs
-            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+            ", "meta", $repositoryId, $indexPath, $userId, $userGroup, array('edate' => $orderDir), $limit, $offset);
         }else{
             $res = dibi::query("SELECT * FROM [ajxp_feed]
                 WHERE [etype] = %s AND [repository_id] = %s AND [index_path] = %s
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )                
                 ORDER BY %by %lmt %ofs
-            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+            ", "meta", $repositoryId, $indexPath, $userId, $userGroup, array('edate' => $orderDir), $limit, $offset);
         }
 
         $data = array();
@@ -397,10 +428,24 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
     }
 
     /**
+     * @inheritdoc
+     */
+    public function dismissMetaObjectById(ContextInterface $ctx, $objectId){
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
+        $userId = $ctx->getUser()->getId();
+        $userGroup = $ctx->getUser()->getGroupPath();
+        dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND ([user_id] = %s OR [user_group] = %s) AND [etype] = %s", $objectId, $userId, $userGroup, "meta");
+    }
+
+
+    /**
      * @param $repositoryId
      * @param $oldPath
      * @param null $newPath
      * @param bool $copy
+     * @return mixed|void
      */
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {

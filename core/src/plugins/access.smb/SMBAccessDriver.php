@@ -22,12 +22,20 @@
 namespace Pydio\Access\Driver\StreamProvider\SMB;
 
 use DOMNode;
+use PclZip;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\TextEncoder;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -47,6 +55,16 @@ class SMBAccessDriver extends FsAccessDriver
     protected $wrapperClassName;
     protected $urlBase;
 
+    protected function loadExternalWrapper(){
+        if(!empty($this->pluginConf['SMBCLIENT']) && !defined('SMB4PHP_SMBCLIENT')){
+            define ('SMB4PHP_SMBCLIENT', $this->pluginConf["SMBCLIENT"]);
+        }
+        if(!empty($this->pluginConf['SMB_PATH_TMP']) && !defined('SMB_PATH_TMP')){
+            define ('SMB4PHP_SMBTMP', $this->pluginConf["SMB_PATH_TMP"]);
+        }
+        require_once($this->getBaseDir()."/smb.php");
+    }
+
     /**
      * @param ContextInterface $contextInterface
      * @throws PydioException
@@ -59,13 +77,7 @@ class SMBAccessDriver extends FsAccessDriver
         } else {
             $this->driverConf = array();
         }
-        $smbclientPath = $this->driverConf["SMBCLIENT"];
-        define ('SMB4PHP_SMBCLIENT', $smbclientPath);
-
-        $smbtmpPath = $this->driverConf["SMB_PATH_TMP"];
-        define ('SMB4PHP_SMBTMP', $smbtmpPath);
-		
-        require_once($this->getBaseDir()."/smb.php");
+        $this->loadExternalWrapper();
 
         //$create = $this->repository->getOption("CREATE");
         $recycle = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
@@ -92,7 +104,7 @@ class SMBAccessDriver extends FsAccessDriver
     public function detectStreamWrapper($register = false, ContextInterface $ctx = null)
     {
         if ($register) {
-            require_once($this->getBaseDir()."/smb.php");
+            $this->loadExternalWrapper();
         }
         return parent::detectStreamWrapper($register, $ctx);
     }
@@ -115,7 +127,7 @@ class SMBAccessDriver extends FsAccessDriver
      */
     public function isWriteable(AJXP_Node $node)
     {
-        $dir = $node->getPath();
+        $dir = $node->getUrl();
         if(substr_count($dir, '/') <= 3) $rc = true;
     	else $rc = is_writable($dir);
     	return $rc;

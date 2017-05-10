@@ -44,34 +44,90 @@ $mess=array(
 "59"=> "iPhone / iPad",
 "60"=>"Mac OS",
 "61"=>"Windows",
-"62"=>"<h2>Bien débuter</h2>
-            Cette vidéo vous expliquera le fonctionnement de l'application web (anglais) :
+
+    "62"=> "<h2>[Tuto] Qu’est-ce qu’un workspace?</h2>
+            Cette vidéo explique pourquoi APPLICATION_TITLE est basé sur des Workspaces
             <ul>
-                <li>Page d'accueil</li>
-                <li>Visite de l'interface</li>
-                <li>Gestion des fichiers</li>
-                <li>Visualiser et éditer des fichiers</li>
-                <li>Accès rapide: favoris et moteur de recherche</li>
-                <li>Panier de sélection</li>
-            </ul>",
-"63"=>"<h2>Partager des fichiers avec APPLICATION_TITLE</h2>
-                            Ce tutorial vous expliquera comment partager des fichiers avec APPLICATION_TITLE (anglais) :
-                            <ul>
-                                <li>Créer des liens publics</li>
-                                <li>Les envoyer à d'autres utilisateurs</li>
-                                <li>Être alerté lorsqu'un lien est téléchargé</li>
-                                <li>Créer un lien protégé par mot de passe</li>
-                                <li>Créer plusieurs liens vers un fichier</li>
-                                <li>Arrêter un partage</li>
-            </ul>",
-"64"=>"<h2>Partager des répertoires</h2>
-                            Cette vidéo vous expliquera comment partager un répertoire entier avec APPLICATION_TITLE (anglais) :
-                            <ul>
-                                <li>Partager comme un nouveau dépôt</li>
-                                <li>Partager comme un minisite public</li>
-            </ul>",
-"65"=> "Découvrir plus de vidéos sur le canal APPLICATION_TITLE!",
-"66"=>"<h2>Utiliser APPLICATION_TITLE sur un appareil iOS</h2>
+                <li>Qu'est ce qu'un workspace dans APPLICATION_TITLE?</li>
+                <li>Qu’est-ce qu’un Workspace d’un point de vue technique?</li>
+                <li>En quoi permettent-ils d’organiser vos données?</li>
+            </ul>
+            ",
+
+    "63"=> "<h2>[Tuto] Comment uploader des fichiers dans pydio ?</h2>
+            Pour débuter, découvrez comment uploader des fichiers dans APPLICATION_TITLE:
+            <ul>
+                <li>Faire Cliquer-Glisser des fichiers vers APPLICATION_TITLE</li>
+                <li>Créer un nouveau dossier</li>
+                <li>Renommer des fichiers et des dossiers</li>
+                <li>Télécharger des fichiers sur votre Desktop</li>
+            </ul>
+            ",
+
+    "64"=> "<h2>[Tuto] Rechercher, consulter et gérer vos fichiers</h2>
+            Cette vidéo vous montre différentes astuces pour gérer efficacement vos fichiers avec APPLICATION_TITLE
+            <ul>
+                <li>Barre de recherche Cross-Workspaces</li>
+                <li>Modes d’affichage du contenu</li>
+                <li>Raccourcis-claviers</li>
+                <li>Options de tri des fichiers</li>
+                <li>Meta-données, Favoris</li>
+            </ul>
+            ",
+
+    "79"=> "<h2>[Tuto] Partager des fichiers et des dossiers avec pydio</h2>
+            Ce tutoriel vous montre comment partager des fichiers et des dossiers, aussi bien en interne qu’en externe:
+            <ul>
+                <li>Créer des liens de partage publics</li>
+                <li>Partager des fichiers et des dossiers en interne</li>
+                <li>Partager un dossier en tant que Workspace</li>
+                <li>Options de présentation d’un dossier partagé</li>
+                <li>Créer un dossier d’upload vierge</li>
+                <li>Gérer les accès utilisateurs et les droits</li>
+            </ul>
+            ",
+
+    "80"=> "<h2>[Tuto] Partage avancé : fonctionnalités de sécurité</h2>
+            Cette vidéo vous présente différentes fonctionnalités permettant de sécuriser vos partages avec APPLICATION_TITLE:
+            <ul>
+                <li>Protection par mot de passe</li>
+                <li>Date d’expiration du lien de partage</li>
+                <li>Limitation du nombre de téléchargements</li>
+            </ul>
+            ",
+
+    "81"=> "<h2>[Tuto] Personnalisation des liens de partage</h2>
+            Découvrez comment personnaliser l’URL de vos liens de partage pour les rendre plus user-friendly.
+            ",
+
+    "82"=> "<h2>[Tuto] Gestions des permissions liées aux liens de partage</h2>
+            Cette vidéo vous montre comment gérer les permissions liées à vos partages publics:
+            <ul>
+                <li>Prévisualisation</li>
+                <li>Téléchargement</li>
+                <li>Upload / Edition</li>
+            </ul>
+            ",
+
+    "83"=> "<h2>[Tuto] Langues</h2>
+            APPLICATION_TITLE est disponibles dans 28 langues. Cette vidéo vous montre comment changer la langue dans APPLICATION_TITLE.
+            ",
+
+    "84"=> "<h2>[Tuto] Alertes</h2>
+            Découvrez comment paramétrer des alertes sur certains fichiers, afin de suivre leur modification ou leur consultation.
+            ",
+
+    "85"=> "<h2>[Tuto] Edition Collaborative</h2>
+            Cette vidéo vous montre comment collaborer sur des documents bureautiques, grâce à l’intégration de la suite Office Collabora Online
+            <ul>
+                <li>Travaillez en ligne sur des documents textes, présentations, tableurs</li>
+                <li>Collaboration en temps réel multi-utilisateurs</li>
+                <li>Créer de nouveaux documents directement depuis votre navigateur</li>
+            </ul>
+            ",
+
+    "65"=> "Découvrir plus de vidéos sur le canal APPLICATION_TITLE!",
+"66"=>"<h2>[Tuto] Utiliser APPLICATION_TITLE sur un appareil iOS</h2>
                      Cette vidéo décrit l'utilisation de l'application APPLICATION_TITLE disponible sur l'App Store. Le processus est similaire sur Android.
 <ul><li>Configurer la connexion</li>
 <li>Naviguer dans les fichiers</li>
@@ -85,9 +141,15 @@ $mess=array(
 "71"=> "Application pour smartphones Android",
     "72" => "QRCode du serveur",
     "73" => "Connexion aux applications mobiles",
-    "74" => "Scannez ce QRCode avec votre application mobile pour configurer facilement la connexion.",
+    "74" => "Scannez ce code avec votre mobile pour configurer l'application.",
     "75"=> "Chercher dans tous les fichiers...",
     "76" => "Utilisez le menu en haut à droite pour acceder au %1.",
     "77" => "panneau d'administration",
     "78" => "Sélectionnez un workspace",
+    "86" => "Voir la vidéo",
+    "87" => "Historique",
+    "88" => "Glissez un fichier depuis votre bureau",
+    "89" => "Fichier sélectionné",
+    "90" => "Choisir un workspace de destination",
+    "91" => "Vos fichiers hors-ligne avec l'application de synchro",
 );

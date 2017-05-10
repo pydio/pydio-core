@@ -241,21 +241,23 @@ class ShareRightsManager
 
                 if (strpos($u, "/AJXP_TEAM/") === 0) {
 
-                    if (method_exists($confDriver, "teamIdToUsers")) {
-                        $teamUsers = $confDriver->teamIdToUsers($this->context->getUser(), str_replace("/AJXP_TEAM/", "", $u));
-                        foreach ($teamUsers as $userId) {
-                            $users[$userId] = array("ID" => $userId, "TYPE" => "user", "RIGHT" => $rightString);
-                            if ($this->watcher !== false) {
-                                $users[$userId]["WATCH"] = $uWatch;
-                            }
-                        }
+                    $roleId = str_replace("/AJXP_TEAM/", "", $u);
+                    $roleObject = RolesService::getOwnedRole($roleId, $this->context->getUser()->getId());
+                    if(empty($roleObject)){
+                        $index++;
+                        continue;
+                    }else{
+                        // Replace now with roleId
+                        $u = $roleId;
                     }
-                    $index++;
-                    continue;
+
+                    $entry = array("ID" => $u, "TYPE" => "group", "USER_TEAM" => true);
+
+                }else{
+
+                    $entry = array("ID" => $u, "TYPE" => "group");
 
                 }
-
-                $entry = array("ID" => $u, "TYPE" => "group");
 
             }
             $entry["RIGHT"] = $rightString;
@@ -330,6 +332,7 @@ class ShareRightsManager
             if(strpos($rId, "AJXP_USR_/") === 0){
                 $userId = substr($rId, strlen('AJXP_USR_/'));
                 $role = RolesService::getRole($rId);
+                if(!UsersService::userExists($userId)) continue;
                 $userObject = UsersService::getUserById($userId);
                 $LABEL = $role->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
                 $AVATAR = $role->filterParameterValue("core.conf", "avatar", AJXP_REPO_SCOPE_ALL, "");
@@ -373,8 +376,10 @@ class ShareRightsManager
                 $TYPE = "group";
             }else{
                 $role = RolesService::getRole($rId);
+                if(empty($role)) continue;
                 $LABEL = $role->getLabel();
-                $TYPE = 'group';
+                if($role->hasOwner()) $TYPE = "team";
+                else $TYPE = 'group';
             }
 
             if(empty($LABEL)) $LABEL = $rId;
@@ -387,7 +392,7 @@ class ShareRightsManager
             if($WATCH) $entry["WATCH"] = $WATCH;
             if($HIDDEN) $entry["HIDDEN"] = true;
             if($AVATAR !== false) $entry["AVATAR"] = $AVATAR;
-            if($TYPE == "group"){
+            if($TYPE === "group" || $TYPE === "team"){
                 $sharedGroups[$entry["ID"]] = $entry;
             } else {
                 $sharedEntries[$entry["ID"]] = $entry;
@@ -466,7 +471,11 @@ class ShareRightsManager
 
         foreach ($groups as $group => $groupEntry) {
             $r = $groupEntry["RIGHT"];
-            $grRole = RolesService::getOrCreateRole($group, $this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
+            if($groupEntry["USER_TEAM"]){
+                $grRole = RolesService::getOwnedRole($group, $this->context->getUser()->getId());
+            }else{
+                $grRole = RolesService::getOrCreateRole($group, $this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
+            }
             $grRole->setAcl($childRepoId, $r);
             RolesService::updateRole($grRole);
             if(!empty($originalNode)) {

@@ -214,9 +214,9 @@ addEntry:function(index, revision,author,date,message){
 		if(oXmlDoc == null || oXmlDoc.documentElement == null) return;
 		var root = oXmlDoc.documentElement;
 		if(!root.childNodes.length) return;
-		var logEntries = XPathSelectNodes(root, "log/logentry");
-		this.currentRev = XPathSelectSingleNode(root, "current_revision");
-		this.revisionRange = XPathSelectSingleNode(root, "revision_range");
+		var logEntries = XMLUtils.XPathSelectNodes(root, "log/logentry");
+		this.currentRev = XMLUtils.XPathSelectSingleNode(root, "current_revision");
+		this.revisionRange = XMLUtils.XPathSelectSingleNode(root, "revision_range");
         var i =0;
 		try{
 			for(i=0; i<logEntries.length;i++){
@@ -268,7 +268,7 @@ addEntry:function(index, revision,author,date,message){
 	setOnLoad:function(){
 		addLightboxMarkupToElement(this.container);
 		var img = new Element("img", {
-			src:ajxpResourcesFolder+'/images/loadingImage.gif',
+			src:ResourcesManager.resolveImageSource('loadingImage.gif'),
 			style:'margin-top:80px;'
 		});
 		this.container.down("#element_overlay").insert(img);		

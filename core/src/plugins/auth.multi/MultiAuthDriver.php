@@ -103,7 +103,9 @@ class MultiAuthDriver extends AbstractAuthDriver
         $contribs = parent::getRegistryContributions($ctx, $extendedVersion);
         if(count($this->drivers)){
             foreach($this->drivers as $dPlugin){
-                $contribs = array_merge($contribs, $dPlugin->getRegistryContributions($ctx));
+                if(method_exists($dPlugin, 'getChildRegistryContributions')){
+                    $contribs = array_merge($contribs, $dPlugin->getChildRegistryContributions($ctx));
+                }
             }
         }
         return $contribs; // parent::getRegistryContributions($ctx, $extendedVersion);
@@ -266,7 +268,11 @@ class MultiAuthDriver extends AbstractAuthDriver
     {
         if (empty($this->baseName)) {
             if ($this->masterSlaveMode) {
-                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                if($filterProperty === 'parent' && $filterValue === AJXP_FILTER_NOT_EMPTY){
+                    return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                }else{
+                    return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                }
             } else {
                 $keys = array_keys($this->drivers);
                 return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
@@ -311,7 +317,7 @@ class MultiAuthDriver extends AbstractAuthDriver
         }
         $allUsers = array();
         foreach ($this->drivers as $driver) {
-            $allUsers = array_merge($allUsers, $driver->listUsers($baseGroup, $recursive));
+            $allUsers = $allUsers + $driver->listUsers($baseGroup, $recursive);
         }
         return $allUsers;
     }
@@ -356,7 +362,7 @@ class MultiAuthDriver extends AbstractAuthDriver
         }
         $groups = array();
         foreach ($this->drivers as $d) {
-            $groups = array_merge($groups, $d->listChildrenGroups($baseGroup));
+            $groups = $groups + $d->listChildrenGroups($baseGroup);
         }
         return $groups;
     }

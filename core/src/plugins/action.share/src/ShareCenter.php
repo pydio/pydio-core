@@ -546,7 +546,7 @@ class ShareCenter extends Plugin
                 throw new \Exception('Link is expired');
             }
             if($share->hasDownloadLimit()){
-                $share->incrementDownloadCount();
+                $share->incrementDownloadCount($requestInterface->getAttribute('ctx'));
                 $share->save();
             }
         }
@@ -840,6 +840,7 @@ class ShareCenter extends Plugin
 
             case "load_shared_element_data":
 
+                SessionService::close();
                 $node = null;
                 if(isSet($httpVars["hash"]) && $httpVars["element_type"] == "file"){
 
@@ -981,30 +982,23 @@ class ShareCenter extends Plugin
 
             break;
 
-            case "update_shared_element_data":
+            case "share_link_update_target_users":
 
-                if(!in_array($httpVars["p_name"], array("counter", "tags"))){
-                    return null;
+                $hash = InputFilter::decodeSecureMagic($httpVars["hash"]);
+                $shareLink = $this->getShareStore()->loadShareObject($hash);
+                $repository = $shareLink->getRepository();
+                $this->getShareStore()->testUserCanEditShare($repository->getOwner(), []);
+                if(isSet($httpVars['json_users'])){
+                    $values = json_decode($httpVars['json_users'], true);
                 }
-                $hash = InputFilter::decodeSecureMagic($httpVars["element_id"]);
-                $userSelection = UserSelection::fromContext($ctx, $httpVars);
-                $ajxpNode = $userSelection->getUniqueNode();
-                if($this->getShareStore()->shareIsLegacy($hash)){
-                    // Store in metadata
-                    $metadata = $this->getShareStore()->getMetaManager()->getNodeMeta($ajxpNode);
-                    if (isSet($metadata["shares"][$httpVars["element_id"]])) {
-                        if (!is_array($metadata["shares"][$httpVars["element_id"]])) {
-                            $metadata["shares"][$httpVars["element_id"]] = array();
-                        }
-                        $metadata["shares"][$httpVars["element_id"]][$httpVars["p_name"]] = $httpVars["p_value"];
-                        // Set Private=true by default.
-                        $this->getShareStore()->getMetaManager()->setNodeMeta($ajxpNode, $metadata, true);
-                    }
+                if(!empty($values)){
+                    $values = array_map( function($e){ return InputFilter::sanitize($e, InputFilter::SANITIZE_EMAILCHARS);}, $values );
+                    $shareLink->addTargetUsers($values, (isSet($httpVars['restrict']) && $httpVars['restrict'] === 'true'));
+                    $shareLink->save();
+                    $responseInterface = new JsonResponse(['success' => true, 'users' => $values]);
                 }else{
-                    $this->getShareStore()->testUserCanEditShare(($ctx->hasUser()?$ctx->getUser()->getId():null), $hash);
-                    $this->getShareStore()->updateShareProperty($hash, $httpVars["p_name"], $httpVars["p_value"]);
+                    $responseInterface = new JsonResponse(['success' => false]);
                 }
-
 
                 break;
 
@@ -1015,6 +1009,7 @@ class ShareCenter extends Plugin
                 $crtOffset      = 0;
                 $parentRepoId   = isset($httpVars["parent_repository_id"]) ? $httpVars["parent_repository_id"] : "";
                 $userContext    = $httpVars["user_context"];
+                $shareType      = isSet($httpVars["share_type"])? InputFilter::sanitize($httpVars["share_type"], InputFilter::SANITIZE_ALPHANUM) : null;
                 $currentUser    = $ctx->getUser()->getId();
                 $clearBroken    = (isSet($httpVars["clear_broken_links"]) && $httpVars["clear_broken_links"] === "true") ? 0 : -1;
                 if($userContext == "global" && $ctx->getUser()->isAdmin()){
@@ -1026,12 +1021,30 @@ class ShareCenter extends Plugin
                     $parts = explode("%23", $httpVars["dir"]);
                     $crtPage = intval($parts[1]);
                     $crtOffset = ($crtPage - 1) * $itemsPerPage;
+                }else if(isSet($httpVars["page"])){
+                    $crtPage = intval($httpVars["page"]);
+                    $crtOffset = ($crtPage - 1) * $itemsPerPage;
                 }
                 $cursor = [$crtOffset, $itemsPerPage];
                 if($clearBroken > -1) {
                     $cursor = null;
                 }
-                $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId, $cursor, $clearBroken);
+                if($httpVars['format'] === 'json'){
+                    $data = $this->listSharesJson($ctx, $currentUser, $parentRepoId, $shareType, $cursor);
+                    if($currentUser !== '__GROUP__' && $parentRepoId !== '__GROUP__' && $shareType !== '__GROUP__'){
+                        foreach($data as $hash => $shareData){
+                            $metadata = $this->buildMetadataForShare($ctx, $hash, $shareData, $parentRepoId);
+                            if($metadata !== null){
+                                $data[$hash]["metadata"] = $metadata;
+                            }else{
+                                unset($data[$hash]);
+                            }
+                        }
+                    }
+                    $responseInterface = new JsonResponse(["data" => $data, "cursor" => $cursor]);
+                    break;
+                }
+                $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId, $cursor, $clearBroken, $shareType);
                 if($clearBroken > -1){
                     $responseInterface = new JsonResponse(["cleared_count" => $clearBroken]);
                     break;
@@ -1075,6 +1088,15 @@ class ShareCenter extends Plugin
                 $x = new SerializableResponseStream([new UserMessage($message)]);
                 $responseInterface = $responseInterface->withBody($x);
 
+
+            break;
+
+            case "sharelist-migrate":
+
+                $dryRun = true;
+                if(isSet($httpVars['run']) && $httpVars['run'] === 'true') $dryRun = false;
+                $toStore = $this->getShareStore($ctx)->migrateInternalSharesToStore('', $this->getRightsManager(), $dryRun);
+                $responseInterface = new JsonResponse($toStore);
 
             break;
 
@@ -1179,7 +1201,7 @@ class ShareCenter extends Plugin
     public function cleanUserShares($ctx, $userId){
         $shares = $this->getShareStore($ctx)->listShares($userId);
         foreach($shares as $hash => $data){
-            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash, false, true);
+            $this->getShareStore($ctx)->deleteShare($data['SHARE_TYPE'], $hash, false, true);
         }
     }
 
@@ -1247,15 +1269,21 @@ class ShareCenter extends Plugin
                 $parentRepoId = $node->getRepository()->getParentId();
                 $parentRepository = RepositoryService::getRepositoryById($parentRepoId);
                 if(!empty($parentRepository) && !$parentRepository->isTemplate()){
-                    $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
                     $newContext = $crtContext->withRepositoryId($parentRepoId);
                     $owner = $node->getRepository()->getOwner();
                     if($owner !== null){
                         $newContext = $newContext->withUserId($owner);
                     }
-                    $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
-                    $relative = substr($currentRoot, strlen($parentRoot));
-                    $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
+                    if($node->getRepository()->hasContentFilter()){
+                        $cFilter = $node->getRepository()->getContentFilter();
+                        $parentNodePath = array_keys($cFilter->filters)[0];
+                        $parentNodeURL = $newContext->getUrlBase().$parentNodePath;
+                    }else{
+                        $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
+                        $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
+                        $relative = substr($currentRoot, strlen($parentRoot));
+                        $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
+                    }
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
                     $result[$parentRepoId] = array($parentNode, "UP");
@@ -1803,6 +1831,25 @@ class ShareCenter extends Plugin
             }
 
         }
+        if(count($groups) || (count($users) && count($users) > count($hiddenUserEntries) )){
+            // Add an internal entry
+            $this->getShareStore()->storeShare(
+                $ctx->getRepositoryId(),
+                [
+                    'SHARE_TYPE'=>'repository',
+                    'OWNER_ID'=>$ctx->getUser()->getId(),
+                    'REPOSITORY'=>$newRepo->getId(),
+                    'USERS_COUNT' => count($users) - count($hiddenUserEntries),
+                    'GROUPS_COUNT' => count($groups)
+                ],
+                "repository",
+                "repo-".$newRepo->getId()
+            );
+        }else{
+            // Delete 'internal' if it exists
+            $this->getShareStore()->deleteShareEntry("repo-" . $newRepo->getId());
+        }
+
         $shareObjects[] = $newRepo;
         return $shareObjects;
 
@@ -1815,15 +1862,127 @@ class ShareCenter extends Plugin
      * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
      * @param string $parentRepositoryId
      * @param null $cursor
+     * @param null $shareType
      * @return array
      */
-    public function listShares($currentUser, $parentRepositoryId="", &$cursor = null){
+    public function listShares($currentUser, $parentRepositoryId="", &$cursor = null, $shareType = null){
         if($currentUser === false){
             $crtUser = "";
         }else {
             $crtUser = $currentUser;
         }
-        return $this->getShareStore()->listShares($crtUser, $parentRepositoryId, $cursor);
+        return $this->getShareStore()->listShares($crtUser, $parentRepositoryId, $cursor, $shareType);
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param bool $currentUser
+     * @param string $parentRepositoryId
+     * @param null $shareType
+     * @param null $cursor
+     * @return array
+     */
+    public function listSharesJson(ContextInterface $ctx, $currentUser = true, $parentRepositoryId = '', $shareType = null, &$cursor = null){
+        $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor, $shareType);
+        return $shares;
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param $hash
+     * @param $shareData
+     * @param string $parentRepositoryId
+     * @param int $clearBroken
+     * @return mixed
+     */
+    private function buildMetadataForShare(ContextInterface $ctx, $hash, $shareData, $parentRepositoryId = '', &$clearBroken = -1){
+
+        $parent = RepositoryService::getRepositoryById($parentRepositoryId);
+
+        $shareType = $shareData["SHARE_TYPE"];
+        $meta["share_type"] = $shareType;
+        $meta["ajxp_shared"] = true;
+
+        $repoId = $shareData["REPOSITORY"];
+        $repoObject = RepositoryService::getRepositoryById($repoId);
+        if($repoObject == null){
+            $meta["text"] = "Invalid link";
+            if($clearBroken > -1){
+                $this->getShareStore($ctx)->deleteShare($shareType, $hash, false, true);
+                $clearBroken ++;
+            }
+            return null;
+        }
+        $meta["text"] = $repoObject->getDisplay();
+        $permissions = $this->getRightsManager()->computeSharedRepositoryAccessRights($repoId, true, null);
+        $regularUsers = count(array_filter($permissions, function($a){
+                return (!isSet($a["HIDDEN"]) || $a["HIDDEN"] == false);
+            })) > 0;
+        $hiddenUsers = count(array_filter($permissions, function($a){
+                return (isSet($a["HIDDEN"]) && $a["HIDDEN"] == true);
+            })) > 0;
+        if($regularUsers && $hiddenUsers){
+            $meta["share_type_readable"] = "Public Link & Internal Users";
+        }elseif($regularUsers){
+            $meta["share_type_readable"] = "Internal Users";
+        }else if($hiddenUsers){
+            $meta["share_type_readable"] = "Public Link";
+        }else{
+            $meta["share_type_readable"] =  $repoObject->hasContentFilter() ? "Public Link" : ($shareType == "repository"? "Internal Users": "Public Link");
+            if(isSet($shareData["LEGACY_REPO_OR_MINI"])){
+                $meta["share_type_readable"] = "Internal Only";
+            }
+        }
+        $meta["share_data"] = ($shareType == "repository" ? 'Shared as workspace: '.$repoObject->getDisplay() : $this->getPublicAccessManager()->buildPublicLink($hash));
+        $meta["shared_element_hash"] = $hash;
+        $meta["owner"] = $repoObject->getOwner();
+        $meta["shared_element_parent_repository"] = $repoObject->getParentId();
+        if(!empty($parent)) {
+            $ctx = new Context($meta["owner"], $parent->getId());
+            $parentPath = $parent->getContextOption($ctx, "PATH");
+            $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
+        }else{
+            $crtParent = RepositoryService::getRepositoryById($repoObject->getParentId());
+            if(!empty($crtParent)){
+                $ctx = new Context($meta["owner"], $repoObject->getParentId());
+                $parentPath = $crtParent->getContextOption($ctx, "PATH");
+                $meta["shared_element_parent_repository_label"] = $crtParent->getDisplay();
+            }else {
+                $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
+            }
+        }
+        if($repoObject->hasContentFilter()){
+            $meta["ajxp_shared_minisite"] = "file";
+            $meta["icon"] = "mime_empty.png";
+            $meta["fonticon"] = "file";
+            $meta["original_path"] = array_pop(array_keys($repoObject->getContentFilter()->filters));
+        }else{
+            $meta["ajxp_shared_minisite"] = "public";
+            $meta["icon"] = "folder.png";
+            $meta["fonticon"] = "folder";
+            $ctx = $ctx->withRepositoryId($repoObject->getId());
+            $meta["original_path"] = $repoObject->getContextOption($ctx, "PATH");
+        }
+        if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
+            $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));
+        }
+        try{
+            // Test node really exists
+            $originalNode = new AJXP_Node("pydio://".$meta["owner"]."@".$meta["shared_element_parent_repository"].$meta["original_path"]);
+            $test = @file_exists($originalNode->getUrl());
+            if(!$test){
+                if($clearBroken > -1){
+                    $this->getShareStore($ctx)->deleteShare($shareType, $hash);
+                    $clearBroken ++;
+                }else{
+                    $meta["broken_link"] = true;
+                    $meta["original_path"] .= " (BROKEN)";
+                }
+            }
+        }catch(\Exception $e){}
+
+        return $meta;
+
     }
 
     /**
@@ -1833,109 +1992,35 @@ class ShareCenter extends Plugin
      * @param string $parentRepositoryId
      * @param null $cursor
      * @param int $clearBroken
+     * @param null $shareType
      * @return AJXP_Node[]
      */
-    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser, $parentRepositoryId = "", &$cursor = null, &$clearBroken = -1){
+    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser, $parentRepositoryId = "", &$cursor = null, &$clearBroken = -1, $shareType = null){
 
-        $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
+        $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor, $shareType);
         $nodes = array();
-        $parent = RepositoryService::getRepositoryById($parentRepositoryId);
 
         foreach($shares as $hash => $shareData){
 
             $icon = "folder";
-            $meta = array(
-                "icon"			=> $icon,
-                "openicon"		=> $icon,
-                "ajxp_mime" 	=> "repository_editable"
-            );
-
-            $shareType = $shareData["SHARE_TYPE"];
-            $meta["share_type"] = $shareType;
-            $meta["ajxp_shared"] = true;
 
             if(!is_object($shareData["REPOSITORY"])){
 
-                $repoId = $shareData["REPOSITORY"];
-                $repoObject = RepositoryService::getRepositoryById($repoId);
-                if($repoObject == null){
-                    $meta["text"] = "Invalid link";
-                    if($clearBroken > -1){
-                        $this->getShareStore($ctx)->deleteShare($shareType, $hash, false, true);
-                        $clearBroken ++;
-                    }
-                    continue;
-                }
-                $meta["text"] = $repoObject->getDisplay();
-                $permissions = $this->getRightsManager()->computeSharedRepositoryAccessRights($repoId, true, null);
-                $regularUsers = count(array_filter($permissions, function($a){
-                    return (!isSet($a["HIDDEN"]) || $a["HIDDEN"] == false);
-                })) > 0;
-                $hiddenUsers = count(array_filter($permissions, function($a){
-                    return (isSet($a["HIDDEN"]) && $a["HIDDEN"] == true);
-                })) > 0;
-                if($regularUsers && $hiddenUsers){
-                    $meta["share_type_readable"] = "Public Link & Internal Users";
-                }elseif($regularUsers){
-                    $meta["share_type_readable"] = "Internal Users";
-                }else if($hiddenUsers){
-                    $meta["share_type_readable"] = "Public Link";
-                }else{
-                    $meta["share_type_readable"] =  $repoObject->hasContentFilter() ? "Public Link" : ($shareType == "repository"? "Internal Users": "Public Link");
-                    if(isSet($shareData["LEGACY_REPO_OR_MINI"])){
-                        $meta["share_type_readable"] = "Internal Only";
-                    }
-                }
-                $meta["share_data"] = ($shareType == "repository" ? 'Shared as workspace: '.$repoObject->getDisplay() : $this->getPublicAccessManager()->buildPublicLink($hash));
-                $meta["shared_element_hash"] = $hash;
-                $meta["owner"] = $repoObject->getOwner();
-                $meta["shared_element_parent_repository"] = $repoObject->getParentId();
-                if(!empty($parent)) {
-                    $ctx = new Context($meta["owner"], $parent->getId());
-                    $parentPath = $parent->getContextOption($ctx, "PATH");
-                    $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
-                }else{
-                    $crtParent = RepositoryService::getRepositoryById($repoObject->getParentId());
-                    if(!empty($crtParent)){
-                        $ctx = new Context($meta["owner"], $repoObject->getParentId());
-                        $parentPath = $crtParent->getContextOption($ctx, "PATH");
-                        $meta["shared_element_parent_repository_label"] = $crtParent->getDisplay();
-                    }else {
-                        $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
-                    }
-                }
-                if($repoObject->hasContentFilter()){
-                    $meta["ajxp_shared_minisite"] = "file";
-                    $meta["icon"] = "mime_empty.png";
-                    $meta["fonticon"] = "file";
-                    $meta["original_path"] = array_pop(array_keys($repoObject->getContentFilter()->filters));
-                }else{
-                    $meta["ajxp_shared_minisite"] = "public";
-                    $meta["icon"] = "folder.png";
-                    $meta["fonticon"] = "folder";
-                    $ctx = $ctx->withRepositoryId($repoObject->getId());
-                    $meta["original_path"] = $repoObject->getContextOption($ctx, "PATH");
-                }
-                if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
-                    $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));
-                }
-                try{
-                    // Test node really exists
-                    $originalNode = new AJXP_Node("pydio://".$meta["owner"]."@".$meta["shared_element_parent_repository"].$meta["original_path"]);
-                    $test = @file_exists($originalNode->getUrl());
-                    if(!$test){
-                        if($clearBroken > -1){
-                            $this->getShareStore($ctx)->deleteShare($shareType, $hash);
-                            $clearBroken ++;
-                        }else{
-                            $meta["broken_link"] = true;
-                            $meta["original_path"] .= " (BROKEN)";
-                        }
-                    }
-                }catch(\Exception $e){}
+                $meta = $this->buildMetadataForShare($ctx, $hash, $shareData, $parentRepositoryId, $clearBroken);
+                $meta["icon"] = $meta["openicon"] = $icon;
+                $meta["ajxp_mime"] = "repository_editable";
 
             }else if($shareData["REPOSITORY"] instanceof Repository && !empty($shareData["FILE_PATH"])){
 
+                $meta = array(
+                    "icon"			=> $icon,
+                    "openicon"		=> $icon,
+                    "ajxp_mime" 	=> "repository_editable"
+                );
+
+                $shareType = $shareData["SHARE_TYPE"];
+                $meta["share_type"] = $shareType;
+                $meta["ajxp_shared"] = true;
                 $meta["owner"] = $shareData["OWNER_ID"];
                 $meta["share_type_readable"] = "Publiclet (legacy)";
                 $meta["text"] = basename($shareData["FILE_PATH"]);

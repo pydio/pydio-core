@@ -28,5 +28,5 @@ $mess = array(
     "6" => "Bestehende Schlüssel ungültig markieren",
     "7" => "Sind Sie sicher, dass diese Schlüssel widerrufen werden sollen?",
     "8" => "Schlüssel erfolgreich ungültig markiert!",
-    "9" => "Meine verbundenen Geräte:",
+    "9" => "Meine verbundenen Geräte",
 );

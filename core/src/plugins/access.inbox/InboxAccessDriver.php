@@ -107,7 +107,7 @@ class InboxAccessDriver extends FsAccessDriver
         if($nodeObject->isRoot()){
             return ['stat' => stat(ApplicationState::getTemporaryFolder())];
         }
-        $allNodes = self::getNodes($nodeObject->getContext(), false);
+        $allNodes = self::getNodes($nodeObject->getContext(), true );
         if(!isSet($allNodes[$basename])){
             throw new FileNotFoundException($basename);
         }
@@ -124,7 +124,7 @@ class InboxAccessDriver extends FsAccessDriver
                         $node->setLeaf(true);
                     }
                     Controller::applyHook("node.read", [&$node]);
-                    $stat = stat($url);
+                    $stat = @stat($url);
                 }catch (\Exception $e){
                     $stat = stat(ApplicationState::getTemporaryFolder());
                 }
@@ -215,6 +215,9 @@ class InboxAccessDriver extends FsAccessDriver
                     $ext = "error";
                     $meta["ajxp_mime"] = "error";
                     $meta["share_meta_type"] = 2;
+                    if(strpos($repoId, "ocs_remote_share_") === 0){
+                        $meta["remote_share_id"] = str_replace("ocs_remote_share_", "", $repoId);
+                    }
                 }else if(strpos($repoId, "ocs_remote_share_") === 0){
                     // Check Status
                     $linkId = str_replace("ocs_remote_share_", "", $repoId);

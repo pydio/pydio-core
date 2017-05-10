@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Crear Tabla",
-"2" => "Escriba sy consulta SQL aquí",
-"3"	=> "Consultar",
+"2" => "Escriba su búsqueda SQL aquí",
+"3"	=> "Buscar",
 "4"	=> "Limpiar"
 );

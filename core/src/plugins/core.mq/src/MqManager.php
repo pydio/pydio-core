@@ -352,15 +352,15 @@ class MqManager extends Plugin
 
         switch ($action) {
             case "client_register_channel":
-                
+
                 $this->msgExchanger->suscribeToChannel($ctx, $httpVars["channel"], $httpVars["client_id"]);
                 break;
-            
+
             case "client_unregister_channel":
-                
+
                 $this->msgExchanger->unsuscribeFromChannel($ctx, $httpVars["channel"], $httpVars["client_id"]);
                 break;
-            
+
             case "client_consume_channel":
 
                 if (UsersService::usersEnabled()) {
@@ -473,7 +473,7 @@ class MqManager extends Plugin
             $this->getAdminKeyString();
             return "SUCCESS: Nothing to do, a pair already exists";
         }catch(PydioException $e){
-            $adminPair = $this->getAdminKeyString(true);
+            $adminPair = $this->getAdminKeyString($u->getId());
             $pairFile = $this->getPluginWorkDir(true)."/apikey";
             $r = file_put_contents($pairFile, $adminPair);
             if($r === false){
@@ -510,12 +510,12 @@ class MqManager extends Plugin
      * @throws PydioException
      * @return string
      */
-    protected function getAdminKeyString($createIfNotExists = false, $restrictToIp = ""){
+    protected function getAdminKeyString($userId = "", $restrictToIp = ""){
 
-        if($createIfNotExists){
+        if($userId != ""){
             $adminKey = ApiKeysService::findPairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER);
             if($adminKey === null){
-                $adminKey = ApiKeysService::generatePairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER, "", $restrictToIp);
+                $adminKey = ApiKeysService::generatePairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER, $userId, $restrictToIp);
             }
             $adminKeyString = $adminKey["t"].":".$adminKey["p"];
         }else{
@@ -561,5 +561,5 @@ class MqManager extends Plugin
     public function getWorkerStatus($params){
         return "OFF"; //$this->getBoosterManager()->getWorkerStatus($params);
     }
-    
+
 }

@@ -23,6 +23,7 @@ namespace Pydio\Editor\EML;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Services\LocalCache;
@@ -78,7 +79,7 @@ class EmlParser extends Plugin
         $file = $node->getUrl();
         Controller::applyHook("node.read", array($node));
 
-        $wrapperClassName = MetaStreamWrapper::actualRepositoryWrapperClass($node);
+        $wrapperIsImap = $this->wrapperIsImap($node);
 
         $mess = LocaleService::getMessages();
         switch ($action) {
@@ -88,7 +89,7 @@ class EmlParser extends Plugin
                     'decode_bodies' => false,
                     'decode_headers' => 'UTF-8'
                 );
-                $decoder = $this->getStructureDecoder($file, ($wrapperClassName == "imapAccessWrapper"));
+                $decoder = $this->getStructureDecoder($file, $wrapperIsImap);
                 $xml = $decoder->getXML($decoder->decode($params));
                 $doc = new \Pydio\Core\Http\Message\XMLDocMessage($xml);
                 if (function_exists("imap_mime_header_decode")) {
@@ -122,8 +123,8 @@ class EmlParser extends Plugin
                     'decode_bodies' => true,
                     'decode_headers' => false
                 );
-                if ($wrapperClassName == "imapAccessWrapper") {
-                    $cache = LocalCache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
+                if ($wrapperIsImap) {
+                    $cache = LocalCache::getItem("eml_remote", $file, null, array($this, "computeCacheId"));
                     $content = $cache->getData();
                 } else {
                     $content = file_get_contents($file);
@@ -153,8 +154,8 @@ class EmlParser extends Plugin
                     'decode_bodies' => true,
                     'decode_headers' => false
                 );
-                if ($wrapperClassName == "imapAccessWrapper") {
-                    $cache = LocalCache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
+                if ($wrapperIsImap) {
+                    $cache = LocalCache::getItem("eml_remote", $file, null, array($this, "computeCacheId"));
                     $content = $cache->getData();
                 } else {
                     $content = file_get_contents($file);
@@ -183,8 +184,8 @@ class EmlParser extends Plugin
                     'decode_bodies' => true,
                     'decode_headers' => false
                 );
-                if ($wrapperClassName == "imapAccessWrapper") {
-                    $cache = LocalCache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
+                if ($wrapperIsImap) {
+                    $cache = LocalCache::getItem("eml_remote", $file, null, array($this, "computeCacheId"));
                     $content = $cache->getData();
                 } else {
                     $content = file_get_contents($file);
@@ -210,12 +211,12 @@ class EmlParser extends Plugin
                     if ($fp !== false) {
                         fwrite($fp, $part->body, strlen($part->body));
                         fclose($fp);
-                        $x->addChunk(new \Pydio\Core\Http\Message\UserMessage(sprintf($mess["editor.eml.7"], $part->d_parameters["filename"], $destRep)));
+                        $x->addChunk(new UserMessage(sprintf($mess["editor.eml.7"], $part->d_parameters["filename"], $destRep)));
                     } else {
-                        $x->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["editor.eml.8"], LOG_LEVEL_ERROR));
+                        $x->addChunk(new UserMessage($mess["editor.eml.8"], LOG_LEVEL_ERROR));
                     }
                 } else {
-                    $x->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["editor.eml.9"], LOG_LEVEL_ERROR));
+                    $x->addChunk(new UserMessage($mess["editor.eml.9"], LOG_LEVEL_ERROR));
                 }
             break;
 
@@ -233,13 +234,13 @@ class EmlParser extends Plugin
         if($isParent) return;
         $currentNode = $ajxpNode->getUrl();
         $metadata = $ajxpNode->metadata;
-        $wrapperClassName = MetaStreamWrapper::actualRepositoryWrapperClass($ajxpNode);
+        $wrapperIsImap = $this->wrapperIsImap($ajxpNode);
 
         $noMail = true;
-        if ($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))) {
+        if ($metadata["is_file"] && ($wrapperIsImap || preg_match("/\.eml$/i",$currentNode))) {
             $noMail = false;
         }
-        if ($wrapperClassName == "imapAccessWrapper" && !$metadata["is_file"]) {
+        if ($wrapperIsImap && !$metadata["is_file"]) {
             $metadata["mimestring"] = "Mailbox";
         }
         $parsed = UrlUtils::mbParseUrl($currentNode);
@@ -250,8 +251,8 @@ class EmlParser extends Plugin
         if (EmlParser::$currentListingOnlyEmails === NULL) {
             EmlParser::$currentListingOnlyEmails = true;
         }
-        if ($wrapperClassName == "imapAccessWrapper") {
-            $cachedFile = LocalCache::getItem("eml_remote", $currentNode, null, array("EmlParser", "computeCacheId"));
+        if ($wrapperIsImap) {
+            $cachedFile = LocalCache::getItem("eml_remote", $currentNode, null, array($this, "computeCacheId"));
             $realFile = $cachedFile->getId();
             if (!is_file($realFile)) {
                 $cachedFile->getData();// trigger loading!
@@ -264,11 +265,21 @@ class EmlParser extends Plugin
         $data["ajxp_mime"] = "eml";
         $data["mimestring"] = "Email";
         $metadata = array_merge($metadata, $data);
-        if ($wrapperClassName == "imapAccessWrapper" && $metadata["eml_attachments"]!= "0" && (strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios") !== false)) {
+        if ($wrapperIsImap && $metadata["eml_attachments"]!= "0" && (strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios") !== false)) {
             $metadata["is_file"] = false;
             $metadata["nodeName"] = basename($currentNode)."#attachments";
         }
         $ajxpNode->metadata = $metadata;
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @return bool
+     */
+    protected function wrapperIsImap($node){
+        $refClassName = "Pydio\\Access\\Driver\\StreamProvider\\Imap\\ImapAccessWrapper";
+        $wrapperClassName = MetaStreamWrapper::actualRepositoryWrapperClass($node);
+        return $wrapperClassName === $refClassName;
     }
 
     /**
@@ -328,15 +339,13 @@ class EmlParser extends Plugin
     public function lsPostProcess(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         if (!EmlParser::$currentListingOnlyEmails) {
-            header('Content-Type: text/xml; charset=UTF-8');
-            header('Cache-Control: no-cache');
             return $responseInterface;
         }
 
         $config = '<columns template_name="eml.list">
-            <column messageId="editor.eml.1" attributeName="ajxp_label" sortType="String"/>
+            <column messageId="editor.eml.2" attributeName="ajxp_label" sortType="String"/>
+            <column messageId="editor.eml.1" attributeName="eml_from" sortType="String"/>
             <column messageId="editor.eml.2" attributeName="eml_to" sortType="String"/>
-            <column messageId="editor.eml.3" attributeName="eml_subject" sortType="String"/>
             <column messageId="editor.eml.4" attributeName="ajxp_modiftime" sortType="MyDate"/>
             <column messageId="2" attributeName="filesize" sortType="NumberKo"/>
             <column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number" modifier="EmlViewer.prototype.attachmentCellRenderer" fixedWidth="30"/>
@@ -363,7 +372,7 @@ class EmlParser extends Plugin
                     }
                     $index ++;
                 } else {
-                    $text = $child->getAttribute("eml_from");
+                    $text = $child->getAttribute("eml_subject");
                 }
                 $child->setAttribute("text", $text);
                 $child->setAttribute("ajxp_modiftime", $child->getAttribute("eml_time"));
@@ -372,12 +381,12 @@ class EmlParser extends Plugin
 
         // Add the columns template definition
         $insert = new \DOMDocument("1.0", "UTF-8");
-        $config = "<client_configs><component_config className=\"FilesList\" local=\"true\">$config</component_config></client_configs>";
+        $config = "<client_configs><component_config component=\"FilesList\" local=\"true\">$config</component_config></client_configs>";
         $insert->loadXML($config);
         $imported = $dom->importNode($insert->documentElement, true);
         $dom->documentElement->appendChild($imported);
         $responseInterface = new \Zend\Diactoros\Response();
-        $responseInterface = $responseInterface->withHeader("ContentType", "text/xml");
+        $responseInterface = $responseInterface->withHeader("Content-Type", "text/xml");
         $responseInterface = $responseInterface->withHeader("Cache-Control", "no-cache");
         $responseInterface->getBody()->write($dom->saveXML());
         return $responseInterface;
@@ -394,7 +403,7 @@ class EmlParser extends Plugin
     {
         require_once ("Mail/mimeDecode.php");
         if ($cacheRemoteContent) {
-            $cache = LocalCache::getItem ( "eml_remote", $file , null, array("EmlParser", "computeCacheId"));
+            $cache = LocalCache::getItem ( "eml_remote", $file , null, array($this, "computeCacheId"));
             $content = $cache->getData ();
         } else {
             $content = file_get_contents ( $file );
@@ -522,7 +531,7 @@ class EmlParser extends Plugin
      * @param $mailPath
      * @return string
      */
-    public static function computeCacheId($mailPath)
+    public function computeCacheId($mailPath)
     {
         $header = file_get_contents($mailPath."#header");
         //$this->logDebug("Headers ", $header);

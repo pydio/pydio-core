@@ -56,7 +56,7 @@ class FileMimeSender extends Plugin
         $httpVars   = $requestInterface->getParsedBody();
 
         $repository = RepositoryService::getRepositoryById($httpVars["repository_id"]);
-        
+
         if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
             if (!$loggedUser->canSwitchTo($repository->getId())) {
@@ -93,7 +93,7 @@ class FileMimeSender extends Plugin
                 $fileMime = "application/octet-stream";
             else {
                 $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
-                $lines = file( $this->getBaseDir()."/resources/other/mime.types");
+                $lines = file( $this->getBaseDir()."/res/other/mime.types");
                 foreach ($lines as $line) {
                     if(substr($line, 0, 1) == '#')
                         continue; // skip comments
@@ -114,10 +114,14 @@ class FileMimeSender extends Plugin
             $fileMime = "application/octet-stream";
         }
 
+        if(strpos($fileMime, "application/vnd") === 0){
+            // Do not open VND (vendor specific) directly in browser.
+            $fileMime = "application/octet-stream";
+        }
+
         //Send headers
         $responseInterface = HTMLWriter::responseWithInlineHeaders($responseInterface, basename($selectedNodeUrl), $filesize, $fileMime);
-        $aSyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selectedNode){
-
+        $aSyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selectedNode) {
             $stream = fopen("php://output", "a");
             MetaStreamWrapper::copyFileInStream($selectedNode->getUrl(), $stream);
             fflush($stream);

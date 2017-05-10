@@ -140,4 +140,42 @@ class MetadataCachingStream implements StreamInterface
 
         return CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
     }
+
+    public function write($string) {
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
+
+        return $this->stream->write($string);
+    }
+
+    public function rename($newNode) {
+        $parentNode = $this->node->getParent();
+
+        if (isset($parentNode)) {
+            $parentOptions = AbstractCacheDriver::getOptionsForNode($parentNode, "meta");
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $parentOptions["id"]);
+        }
+
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
+
+        $this->node = $newNode;
+        $this->uri = $newNode->getUrl();
+        $this->cacheOptions = AbstractCacheDriver::getOptionsForNode($newNode, "meta");
+        $this->contentFilters = $newNode->getRepository()->getContentFilter()->filters;
+        $this->path = parse_url($newNode->uri, PHP_URL_PATH);
+
+        return $this->stream->rename($newNode);
+    }
+
+    public function delete() {
+        $parentNode = $this->node->getParent();
+
+        if (isset($parentNode)) {
+            $parentOptions = AbstractCacheDriver::getOptionsForNode($parentNode, "meta");
+            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $parentOptions["id"]);
+        }
+
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
+
+        return $this->stream->delete();
+    }
 }

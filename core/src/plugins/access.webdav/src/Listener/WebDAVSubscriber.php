@@ -88,7 +88,7 @@ class WebDAVSubscriber implements SubscriberInterface
         $contentType = $response->getHeader('Content-Type');
 
         // Checking we have xml as response
-        if (!isset($contentType) || strpos($contentType, "application/xml") === FALSE) {
+        if (!isset($contentType) || (strpos($contentType, "application/xml") === FALSE && strpos($contentType, "text/xml") === FALSE)) {
             return;
         }
 
@@ -138,8 +138,15 @@ class WebDAVSubscriber implements SubscriberInterface
                 }
             }
 
-            $propResult["name"] = urldecode(trim(str_replace($basePath, "", $href), "/"));
-            $propResult["resourcetype"] = $propResult["resourcetype"] == "collection" ? "folder" : "file";
+            $baseDecoded = urldecode($basePath);
+            $hrefDecoded = urldecode($href);
+
+            $propResult["name"] = trim(str_replace($baseDecoded, "", $hrefDecoded), "/");
+
+            $isFile = $propResult["getcontenttype"] != "httpd/unix-directory";
+            $isFile &= $propResult["resourcetype"] != "collection";
+
+            $propResult["resourcetype"] = $isFile ? "file" : "folder";
 
             $result[] = $propResult;
         }

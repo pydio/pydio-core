@@ -16,24 +16,17 @@
 		<actions>
 			<!-- OVERRIDE LOGOUT -->
 			<action name="smb_logout" expireDefault="true">
-				<gui text="164" title="169" src="decrypted.png"
-					accessKey="" hasAccessKey="false">
+				<gui text="164" title="169" iconClass="mdi mdi-logout" accessKey="" hasAccessKey="false">
 					<context selection="false" dir="" recycle="false"
 						actionBar="true" contextMenu="false" infoPanel="false"
-						actionBarGroup="user">
-					</context>
+						actionBarGroup="zlogin,minisite"/>
 				</gui>
-				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
+				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""/>
 				<processing>
-					<clientCallback prepareModal="false"><![CDATA[
-						clearRememberData();
-						var connexion = new Connexion();
-						connexion.addParameter('get_action', 'smb_logout');
-						connexion.onComplete = function(transport){
-							PydioApi.getClient().parseXmlMessage(transport.responseXML);
-							};
-						connexion.sendAsync();
-						]]></clientCallback>
+					<clientCallback><![CDATA[
+						PydioApi.clearRememberData();
+                        PydioApi.getClient().request({get_action:'smb_logout'});
+                    ]]></clientCallback>
 					<serverCallback methodName="logoutCallback"></serverCallback>
 				</processing>
 			</action>

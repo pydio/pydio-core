@@ -11,6 +11,8 @@
         <global_param name="SUBJECT_APPEND" group="CONF_MESSAGE[Content]" label="CONF_MESSAGE[Subject Append]" description="CONF_MESSAGE[String automatically added at the end of the mail subject]" type="string" mandatory="false" default=""/>
         <global_param name="BODY_LAYOUT" group="CONF_MESSAGE[Content]" label="CONF_MESSAGE[Body Layout]" description="CONF_MESSAGE[Main Layout for the email body, use HTML for send nice emails, and use the AJXP_MAIL_BODY keyword for the real content.]" type="textarea" mandatory="false" default="AJXP_MAIL_BODY"/>
         <global_param name="LAYOUT_FOLDER" group="CONF_MESSAGE[Content]" label="CONF_MESSAGE[Layout Folder]" description="CONF_MESSAGE[Extract the main layout from a localized file. Will prevail on the previous parameter, make sure to have an AJXP_MAIL_BODY in the layout file.]" type="string" mandatory="false" default="plugins/core.mailer/layout"/>
+        <global_param name="DIGEST_DISPLAY_LINKS" group="CONF_MESSAGE[Content]" label="CONF_MESSAGE[Display Links in Digest]" description="CONF_MESSAGE[Append links to the files for each alert when sending emails as digest]" type="boolean" mandatory="false" default="false"/>
+
         <param name="NOTIFICATIONS_EMAIL_GET" type="select" choices="true|AJXP_MESSAGE[440],false|AJXP_MESSAGE[441]" scope="user" description="CONF_MESSAGE[Receive Notifcations by email]" label="CONF_MESSAGE[Active notifications by email]" expose="true" mandatory="true" default="true" />
         <param name="NOTIFICATIONS_EMAIL_FREQUENCY" scope="user" type="select" choices="M|CONF_MESSAGE[Every X min],H|CONF_MESSAGE[Every X hour],D1|CONF_MESSAGE[Every day at ],D2|CONF_MESSAGE[Twice a day (every day at and)],W1|CONF_MESSAGE[Once a Week]" label="CONF_MESSAGE[Emails frequency]" description="CONF_MESSAGE[Emails frequency]" expose="true" mandatory="true" default="M" />
         <param name="NOTIFICATIONS_EMAIL_FREQUENCY_USER" scope="user" type="string" description="CONF_MESSAGE[Choose your mail frequency (like 9:00 or 9:00,14:00 or Wednesday)]" label="CONF_MESSAGE[Detail your frequency here]" expose="true" mandatory="true" default="5" />
@@ -20,7 +22,7 @@
     <client_settings>
         <resources>
             <i18n namespace="core.mailer" path="plugins/core.mailer/i18n"/>
-            <js className="PydioMailer" file="plugins/core.mailer/js/build/PydioMailer.js" depends="React,ReactPydio,PydioForm,UsersCompleter"/>
+            <js className="PydioMailer" file="plugins/core.mailer/js/build/PydioMailer.js" depends="React,PydioComponents,PydioForm"/>
         </resources>
     </client_settings>
     <registry_contributions>

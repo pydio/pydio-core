@@ -28,5 +28,5 @@ $mess = array(
     "6" => "Invalida le chiavi API esistenti",
     "7" => "Sicuro di voler revocare questa/e chiave/i?",
     "8" => "Chiave/i rimossa/e correttamente!",
-    "9" => "Dispositivi connessi al tuo account:",
+    "9" => "Dispositivi connessi al tuo account",
 );

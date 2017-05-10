@@ -5,94 +5,22 @@
         <resources>
             <img_library alias="meta.watch" path="plugins/meta.watch/icons"/>
             <i18n namespace="meta.watch" path="plugins/meta.watch/i18n"/>
+            <js className="WatcherActions" file="plugins/meta.watch/res/build/WatcherActions.js"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="toggle_watch">
-                <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
+                <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss" weight="10">
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="0_get" contextMenu="true"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="true" enableRoot="true"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
                 <subMenu>
-                    <dynamicBuilder><![CDATA[
-                    var n = ajaxplorer.getUserSelection().getUniqueNode();
-                    if(n){
-                        var context = window.builderContext;
-                        context.builderMenuItems = $A([]);
-                        var metaValue;
-                        if(n.getMetadata().get("meta_watched")){
-                            var metaValue = n.getMetadata().get("meta_watched");
-                        }
-                        context.builderMenuItems.push({
-                            name:MessageHash["meta.watch.11"],
-                            alt:MessageHash["meta.watch." + (n.isLeaf()?"12":"12b")],
-                            isDefault : (metaValue && metaValue == "META_WATCH_CHANGE"),
-                            image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_CHANGE")?'':'_faded')+'.png', '',  22),
-                            callback:function(e){
-                                window.metaWatchCmd = "watch_change";
-                                this.apply();
-                            }.bind(context)
-                        });
-                        context.builderMenuItems.push({
-                            name:MessageHash["meta.watch.9"],
-                            alt:MessageHash["meta.watch." + (n.isLeaf()?"10":"10b")],
-                            isDefault : (metaValue && metaValue == "META_WATCH_READ"),
-                            image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_READ")?'':'_faded')+'.png', '',  22),
-                            callback:function(e){
-                                window.metaWatchCmd = "watch_read";
-                                this.apply();
-                            }.bind(context)
-                        });
-                        context.builderMenuItems.push({
-                            name:MessageHash["meta.watch.13"],
-                            alt:MessageHash["meta.watch." + (n.isLeaf()?"14":"14b")],
-                            isDefault : (metaValue && metaValue == "META_WATCH_BOTH"),
-                            image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_BOTH")?'':'_faded')+'.png', '',  22),
-                            callback:function(e){
-                                window.metaWatchCmd = "watch_both";
-                                this.apply();
-                            }.bind(context)
-                        });
-                        if(metaValue){
-                            context.builderMenuItems.push({
-                                separator:true
-                            });
-                            context.builderMenuItems.push({
-                                name:MessageHash['meta.watch.3'],
-                                alt:MessageHash["meta.watch." + (n.isLeaf()?"8":"4")],
-                                isDefault : false,
-                                image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
-                                callback:function(e){
-                                    window.metaWatchCmd = "watch_stop";
-                                    this.apply();
-                                }.bind(context)
-                            });
-                        }
-
-                    }
-                    ]]></dynamicBuilder>
+                    <dynamicBuilder module="WatcherActions.Listeners.dynamicBuilder"/>
                 </subMenu>
                 <processing>
-                    <clientCallback><![CDATA[
-
-                        if(window.metaWatchCmd){
-                            var node = ajaxplorer.getUserSelection().getUniqueNode();
-                            var conn = new Connexion();
-                            conn.setParameters({
-                                get_action: "toggle_watch",
-                                watch_action : window.metaWatchCmd,
-                                file : node.getPath()
-                            });
-                            conn.onComplete = function(transport){
-                                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                            };
-                            window.metaWatchCmd = null;
-                            conn.sendAsync();
-                        }
-
-                            ]]></clientCallback>
+                    <clientCallback module="WatcherActions.Callbacks.toggleWatch"/>
                     <serverCallback methodName="switchActions" restParams="/file+" developerComment="Set or unset a monitor watch on the selected node">
                         <input_param name="file" type="path" description="Path to the node to wath/unwatch"/>
                         <input_param name="watch_action" type="string"

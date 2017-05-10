@@ -23,7 +23,7 @@
 * German translation:
 *  	+ update: Florian Vogt <flori@vorlif.org>
 *  	+ update: Martin Schaible <martin@martinschaible.ch>
-*******************************************************************************/  
+*******************************************************************************/
 
 $mess=array(
 "1" => "Benachrichtigungen",
@@ -37,6 +37,8 @@ $mess=array(
 "9" => "Aktivitäten",
 "10" => "Ordner-Aktivitäten",
 "11" => "Datei-Aktivitäten",
-    "12" => "Abhängig von Ihrem Browser werden Sie eine Abfrage erhalten um Benachrichtigungen zu erlauben. Diese Funktion kann über die Einstellungen des Browsers wieder deaktiviert werden.",
-    "13" => "Ihr Browser unterstützt noch keine Desktop-Benachrichtigungen."
+"12" => "Abhängig von Ihrem Browser werden Sie eine Abfrage erhalten um Benachrichtigungen zu erlauben. Diese Funktion kann über die Einstellungen des Browsers wieder deaktiviert werden.",
+"13" => "Ihr Browser unterstützt noch keine Desktop-Benachrichtigungen.",
+"14" => "No alerts",
+"15" => "Notifications about files that you monitor will appear here",
 );

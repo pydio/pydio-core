@@ -26,6 +26,7 @@ use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Http\Message\RegistryMessage;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
@@ -34,7 +35,9 @@ use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 
+use Pydio\Core\Model\AddressBookItem;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\FilteredUsersList;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Serializer\UserXML;
@@ -52,7 +55,6 @@ use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 use Pydio\Core\Utils\Vars\XMLFilter;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
@@ -125,23 +127,6 @@ abstract class AbstractConfDriver extends Plugin
                 $contribNode->removeChild($publicUrlNode);
             }
         }
-
-        // SWITCH TO DASHBOARD ACTION
-        $u = $ctx->getUser();
-        $access = true;
-        if($u == null) $access = false;
-        else {
-            $acl = $u->getMergedRole()->getAcl("ajxp_user");
-            if(empty($acl)) $access = false;
-        }
-        if(!$access){
-            $actionXpath=new \DOMXPath($contribNode->ownerDocument);
-            $publicUrlNodeList = $actionXpath->query('action[@name="switch_to_user_dashboard"]', $contribNode);
-            if ($publicUrlNodeList->length) {
-                $publicUrlNode = $publicUrlNodeList->item(0);
-                $contribNode->removeChild($publicUrlNode);
-            }
-        } 
 
         $exposed = UsersService::getUsersExposedParameters();
         if (!count($exposed)) {
@@ -320,16 +305,28 @@ abstract class AbstractConfDriver extends Plugin
     /**
      * Must return an associative array of roleId => AjxpRole objects.
      * @param array $roleIds
-     * @param boolean $excludeReserved,
+     * @param boolean $excludeReserved
+     * @param $includeOwnedRoles boolean
      * @return array AJXP_Role[]
      */
-    abstract public function listRoles($roleIds = [], $excludeReserved = false);
+    abstract public function listRoles($roleIds = [], $excludeReserved = false, $includeOwnedRoles = false);
+
 
     /**
-     * @param AJXP_Role[] $roles
-     * @return mixed
+     * Get Roles owned by a given user ( = teams )
+     * @param $ownerId
+     * @return AJXP_Role[]
      */
-    abstract public function saveRoles($roles);
+    abstract public function listRolesOwnedBy($ownerId);
+
+    /**
+     * @param $roleId string
+     * @param bool $countOnly
+     * @return string[]
+     */
+    public function getUsersForRole($roleId, $countOnly = false){
+        return [];
+    }
 
     /**
      * @abstract
@@ -590,17 +587,13 @@ abstract class AbstractConfDriver extends Plugin
      */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        $httpVars = $requestInterface->getParsedBody();
-        $action = $requestInterface->getAttribute("action");
         /** @var ContextInterface $ctx */
-        $ctx    = $requestInterface->getAttribute("ctx");
-        $loggedUser = $ctx->getUser();
-
-        foreach ($httpVars as $getName=>$getValue) {
-            $$getName = InputFilter::securePath($getValue);
-        }
-
-        $mess = LocaleService::getMessages();
+        $ctx            = $requestInterface->getAttribute("ctx");
+        $httpVars       = $requestInterface->getParsedBody();
+        $action         = $requestInterface->getAttribute("action");
+        $loggedUser     = $ctx->getUser();
+        $mess           = LocaleService::getMessages();
+        $temporaryUploadFolder = ApplicationState::getTemporaryBinariesFolder();
 
         switch ($action) {
             //------------------------------------
@@ -608,9 +601,11 @@ abstract class AbstractConfDriver extends Plugin
             //------------------------------------
             case "switch_repository":
 
-                if (!isSet($repository_id)) {
+
+                if (!isSet($httpVars['repository_id'])) {
                     break;
                 }
+                $repository_id = InputFilter::sanitize($httpVars['repository_id'], InputFilter::SANITIZE_ALPHANUM);
                 UsersService::getRepositoryWithPermission($ctx->getUser(), $repository_id);
                 SessionService::switchSessionRepositoryId($repository_id);
                 PluginsService::getInstance($ctx->withRepositoryId($repository_id));
@@ -762,7 +757,116 @@ abstract class AbstractConfDriver extends Plugin
             break;
 
             //------------------------------------
-            //	SAVE USER PREFERENCE
+            // TEAMS MANAGEMENT
+            //------------------------------------
+            case "user_team_create":
+
+                $crtUser = $ctx->getUser()->getId();
+                $teamLabel = InputFilter::sanitize($httpVars["team_label"], InputFilter::SANITIZE_HTML_STRICT);
+                if(empty($teamLabel)){
+                    throw new PydioException("Empty Team Label!");
+                }
+                $teamId = StringHelper::slugify($teamLabel) ."-".intval(rand(0,1000));
+                $roleObject = RolesService::getOrCreateOwnedRole($teamId, $crtUser);
+                $roleObject->setLabel($teamLabel);
+                RolesService::updateRole($roleObject);
+
+                $userIds = isSet($httpVars["user_ids"]) ? $httpVars["user_ids"] : [];
+                foreach ($userIds as $userId) {
+                    $id = InputFilter::sanitize($userId, InputFilter::SANITIZE_EMAILCHARS);
+                    $uObject = UsersService::getUserById($id);
+                    $uObject->addRole($roleObject);
+                    $uObject->save();
+                }
+                $responseInterface = new JsonResponse(["message" => "Created Team with id " . $teamId, "insertId" => $teamId]);
+
+                break;
+
+            case "user_team_delete":
+
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $crtUser = $ctx->getUser()->getId();
+                // Role ownership is already checked inside deleteRole() function.
+                RolesService::deleteRole($tId, $crtUser);
+                break;
+
+            case "user_team_update_label":
+
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $teamLabel = InputFilter::sanitize($httpVars["team_label"], InputFilter::SANITIZE_HTML_STRICT);
+                if(empty($teamLabel)){
+                    throw new PydioException("Empty Team Label!");
+                }
+                $roleObject->setLabel($teamLabel);
+                RolesService::updateRole($roleObject);
+                $responseInterface = new JsonResponse(["message" => "Team $tId was updated"]);
+                break;
+
+            case "user_team_add_user":
+
+                $id = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $uObject = UsersService::getUserById($id);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $uObject->addRole($roleObject);
+                $uObject->save("superuser");
+                $responseInterface = new JsonResponse(["message" => "User $id added to team " . $tId]);
+                break;
+
+            case "user_team_delete_user":
+
+                $id = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $uObject = UsersService::getUserById($id);
+                $uObject->removeRole($tId);
+                $uObject->save("superuser");
+                $responseInterface = new JsonResponse(["message" => "User $id deleted from team " . $tId]);
+                break;
+
+            case "user_team_list_users":
+
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $users = $this->getUsersForRole($tId);
+                $data = [];
+                foreach($users as $userId){
+                    try{
+                        $userObject = UsersService::getUserById($userId);
+                    }catch(UserNotFoundException $e){
+                        continue;
+                    }
+                    $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+                    $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
+                    $data[$userId] = [
+                        "label"     =>  $userLabel,
+                        "avatar"    =>  $userAvatar
+                    ];
+                }
+                $responseInterface = new JsonResponse($data);
+
+                break;
+
+            case "user_team_edit_users":
+
+                throw new PydioException("Deprecated user_team_edit_users. Please use add / remove instead");
+                break;
+
+            //------------------------------------
+            //	USERS MANAGEMENT
             //------------------------------------
             case "custom_data_edit":
             case "user_create_user":
@@ -806,7 +910,7 @@ abstract class AbstractConfDriver extends Plugin
 
                     $updating = true;
                     OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
-                    $userId = $data["existing_user_id"];
+                    $userId = InputFilter::sanitize($data["existing_user_id"], InputFilter::SANITIZE_EMAILCHARS);
                     $userObject = UsersService::getUserById($userId);
                     if($userObject->getParent() !== $loggedUser->getId()){
                         throw new \Exception("Cannot find user");
@@ -855,21 +959,29 @@ abstract class AbstractConfDriver extends Plugin
                     UsersService::updateUser($userObject);
                 }
 
-                if ($action == "user_create_user" && isSet($newUserId)) {
+                if ($action == "user_create_user") {
 
-                    Controller::applyHook($updating?"user.after_update":"user.after_create", [$ctx, $userObject]);
-                    if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
-                        $mailer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("mailer");
-                        if ($mailer !== false) {
-                            $mess = LocaleService::getMessages();
-                            $link = ApplicationState::detectServerURL();
-                            $apptitle = ConfService::getGlobalConf("APPLICATION_TITLE");
-                            $subject = str_replace("%s", $apptitle, $mess["507"]);
-                            $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $newUserId, $data["new_password"]], $mess["508"]);
-                            $mailer->sendMail($ctx, [$data["email"]], $subject, $body);
+                    if(isSet($newUserId)){
+
+                        Controller::applyHook($updating?"user.after_update":"user.after_create", [$ctx, $userObject]);
+                        if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
+                            $mailer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("mailer");
+                            if ($mailer !== false) {
+                                $mess = LocaleService::getMessages();
+                                $link = ApplicationState::detectServerURL();
+                                $apptitle = ConfService::getGlobalConf("APPLICATION_TITLE");
+                                $subject = str_replace("%s", $apptitle, $mess["507"]);
+                                $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $newUserId, $data["new_password"]], $mess["508"]);
+                                $mailer->sendMail($ctx, [$data["email"]], $subject, $body);
+                            }
                         }
+                        $responseInterface = new JsonResponse(["result" => "SUCCESS", "createdUserId" => $newUserId]);
+
+                    }else{
+
+                        $responseInterface = new JsonResponse(["result" => "SUCCESS", "createdUserId" => $userId]);
+
                     }
-                    $responseInterface = new JsonResponse(["result" => "SUCCESS", "createdUserId" => $newUserId]);
 
                 } else {
 
@@ -901,6 +1013,63 @@ abstract class AbstractConfDriver extends Plugin
 
                 $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
                 $responseInterface->getBody()->write(json_encode($result));
+
+            break;
+
+            case "user_public_data":
+
+                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
+                try{
+                    $userObject = UsersService::getUserById($userId);
+                }catch(UserNotFoundException $e){
+                    $responseInterface->getBody()->write(json_encode(["error"=>"not_found"]));
+                    break;
+                }
+                $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+                $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
+                $email = UsersService::getUserPersonalParameter("email", $userObject, "core.conf", "");
+
+                $addressBookItem = new AddressBookItem('user', $userId, $userLabel, false, $userObject->hasParent(), $userAvatar);
+                $addressBookItem->appendData('hasEmail', !empty($email));
+                if($userObject->hasParent() && $userObject->getParent() === $ctx->getUser()->getId()){
+                    // This user belongs to current user, we can display more data
+                    if(!empty($email)) $addressBookItem->appendData('email', $email);
+                    $addressBookItem->appendData('USER_DISPLAY_NAME', $userLabel);
+                    $lang = UsersService::getUserPersonalParameter("lang", $userObject, "core.conf", "");
+                    $addressBookItem->appendData('lang', $lang);
+                }
+
+                $data = [ 'user'      => $addressBookItem ];
+                if(isSet($httpVars['graph']) && $httpVars['graph'] === 'true'){
+                    $data['graph'] = ['target' => [], 'source' => []];
+                    $ctxUser = $ctx->getUser();
+                    // My repositories shared with this user
+                    $targetRepos = UsersService::getRepositoriesForUser($userObject);
+                    foreach($targetRepos as $repository){
+                        if($repository->getOwner() === $ctxUser->getId()){
+                            $data['graph']['target'][$repository->getId()] = $repository->getDisplay();
+                        }
+                    }
+                    // User repositories shared with me
+                    $sourceRepos = UsersService::getRepositoriesForUser($ctxUser);
+                    foreach($sourceRepos as $repository){
+                        if($repository->getOwner() === $userObject->getId()){
+                            $data['graph']['source'][$repository->getId()] = $repository->getDisplay();
+                        }
+                    }
+                    // My teams the user is belonging to
+                    $list = new FilteredUsersList($ctx);
+                    $teams = $list->listTeams();
+                    $roles = $userObject->getRolesKeys();
+                    $data['graph']['teams'] = [];
+                    foreach($teams as $t){
+                        if(in_array(substr($t->getId(), strlen('/AJXP_TEAM/')), $roles)){
+                            $data['graph']['teams'][] = $t;
+                        }
+                    }
+                }
+                $responseInterface->getBody()->write(json_encode($data));
 
             break;
 
@@ -1116,166 +1285,58 @@ abstract class AbstractConfDriver extends Plugin
 
             case "user_list_authorized_users" :
 
-                if(isSet($httpVars["format"]) && $httpVars["format"] == "xml"){
-                    header('Content-Type: text/xml; charset=UTF-8');
-                    header('Cache-Control: no-cache');
-                    print('<?xml version="1.0" encoding="UTF-8"?>');
+                if(isSet($httpVars["processed"])){
+                    break;
+                }
+
+                $alphaPages     = isSet($httpVars["alpha_pages"]) && $httpVars["alpha_pages"] === "true" ? true : false;
+                $crtValue       = InputFilter::sanitize($httpVars['value'], InputFilter::SANITIZE_HTML_STRICT);
+                $groupPath      = isSet($httpVars["group_path"]) ? InputFilter::sanitize($httpVars['group_path'], InputFilter::SANITIZE_DIRNAME) : '';
+                $existingOnly   = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] === "true";
+                $excludeCurrent = isSet($httpVars["exclude_current"]) && ($httpVars["exclude_current"] === "false" || $httpVars["exclude_current"] === false) ? false : true;
+                if($alphaPages){
+                    if($crtValue === '') $crtValue = 'a';
+                    $existingOnly = true;
+                }
+
+                if(isSet($httpVars["filter_value"])){
+                    $filterValue = intval(InputFilter::sanitize($httpVars["filter_value"], InputFilter::SANITIZE_ALPHANUM));
                 }else{
-                    HTMLWriter::charsetHeader();
-                }
-                if (!ConfService::getAuthDriverImpl()->usersEditable()) {
-                    break;
+                    $usersOnly      = isSet($httpVars["users_only"]) && $httpVars["users_only"] === "true";
+                    $filterValue = FilteredUsersList::FILTER_USERS_INTERNAL | FilteredUsersList::FILTER_USERS_EXTERNAL;
+                    if(!$usersOnly){
+                        $filterValue |= FilteredUsersList::FILTER_GROUPS | FilteredUsersList::FILTER_TEAMS;
+                    }
                 }
 
-                $crtValue = $httpVars["value"];
-                $usersOnly = isSet($httpVars["users_only"]) && $httpVars["users_only"] == "true";
-                $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
-                if(!empty($crtValue)) {
-                    $regexp = '^'.$crtValue;
-                    $pregexp = '/^'.preg_quote($crtValue).'/i';
-                } else {
-                    $regexp = $pregexp = null;
-                }
-                $skipDisplayWithoutRegexp = ConfService::getContextConf($ctx, "USERS_LIST_REGEXP_MANDATORY", "conf");
-                if($skipDisplayWithoutRegexp && $regexp == null){
-                    $users = "";
-                    if (method_exists($this, "listUserTeams")) {
-                        $teams = $this->listUserTeams($ctx->getUser());
-                        foreach ($teams as $tId => $tData) {
-                            $label = htmlentities($tData["LABEL"]);
-                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$label."\"><span class='user_entry_label'>[team] ".$label."</span></li>";
+                $list = new FilteredUsersList($ctx, $excludeCurrent, $alphaPages);
+                $items = $list->load($filterValue, !$existingOnly, $crtValue, $groupPath);
+                $format = $httpVars["format"];
+                if(!isSet($format)) $format = 'json';
+                switch($format){
+                    case 'xml':
+                    case 'json':
+                        $x = new SerializableResponseStream($items);
+                        $x->forceArray();
+                        $responseInterface = $responseInterface->withBody($x);
+                        break;
+                    case 'html':
+                        $responseInterface = $responseInterface->withHeader('Content-type', 'text/html; charset=UTF-8');
+                        $responseInterface->getBody()->write('<ul>');
+                        foreach($items as $chunk){
+                            $responseInterface->getBody()->write($chunk->toXml());
                         }
-                    }
-                    print("<ul>$users</ul>");
-                    break;
-                }
-                $limit = intval(ConfService::getContextConf($ctx, "USERS_LIST_COMPLETE_LIMIT", "conf"));
-                $searchAll = ConfService::getContextConf($ctx, "CROSSUSERS_ALLGROUPS", "conf");
-                $displayAll = ConfService::getContextConf($ctx, "CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
-                $baseGroup = "/";
-                if( ($regexp == null && !$displayAll) || ($regexp != null && !$searchAll) && $ctx->hasUser()){
-                    $baseGroup = $ctx->getUser()->getGroupPath();
-                }
-                $allUsers = UsersService::listUsers($baseGroup, $regexp, 0, $limit, false);
-
-                if (!$usersOnly) {
-                    $allGroups = [];
-
-                    $roleOrGroup = ConfService::getContextConf($ctx, "GROUP_OR_ROLE", "conf");
-                    $rolePrefix = $excludeString = $includeString = null;
-                    if(!is_array($roleOrGroup)){
-                        $roleOrGroup = ["group_switch_value" => $roleOrGroup];
-                    }
-
-                    $listRoleType = false;
-
-                    if(isSet($roleOrGroup["PREFIX"])){
-                        $rolePrefix    = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
-                        $excludeString = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
-                        $includeString = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["INCLUDED"]);
-                        $listUserRolesOnly = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "LIST_ROLE_BY", null, $roleOrGroup["LIST_ROLE_BY"]);
-                        if (is_array($listUserRolesOnly) && isset($listUserRolesOnly["group_switch_value"])) {
-                            switch ($listUserRolesOnly["group_switch_value"]) {
-                                case "userroles":
-                                    $listRoleType = true;
-                                    break;
-                                case "allroles":
-                                    $listRoleType = false;
-                                    break;
-                                default;
-                                    break;
-                            }
-                        }
-                    }
-
-                    switch (strtolower($roleOrGroup["group_switch_value"])) {
-                        case 'user':
-                            // donothing
-                            break;
-                        case 'group':
-                            $authGroups = UsersService::listChildrenGroups($baseGroup);
-                            foreach ($authGroups as $gId => $gName) {
-                                $allGroups["AJXP_GRP_" . rtrim($baseGroup, "/")."/".ltrim($gId, "/")] = $gName;
-                            }
-                            break;
-                        case 'role':
-                            $allGroups = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
-                            break;
-                        case 'rolegroup';
-                            $groups = [];
-                            $authGroups = UsersService::listChildrenGroups($baseGroup);
-                            foreach ($authGroups as $gId => $gName) {
-                                $groups["AJXP_GRP_" . rtrim($baseGroup, "/")."/".ltrim($gId, "/")] = $gName;
-                            }
-                            $roles = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
-
-                            empty($groups) ? $allGroups = $roles : (empty($roles) ? $allGroups = $groups : $allGroups = array_merge($groups, $roles));
-                            //$allGroups = array_merge($groups, $roles);
-                            break;
-                        default;
-                            break;
-                    }
-                }
-
-
-                $users = "";
-                $index = 0;
-                if(!empty($crtValue)){
-                    $crtValue = InputFilter::sanitize($crtValue, InputFilter::SANITIZE_HTML_STRICT);
-                }
-                if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getContextConf($ctx, "USER_CREATE_USERS", "conf") && !$existingOnly) {
-                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label=\"".StringHelper::xmlEntities($crtValue)."\"><span class='user_entry_label'>".StringHelper::xmlEntities($crtValue." (".$mess["448"]).")</span></li>";
-                } else if ($existingOnly && !empty($crtValue)) {
-                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label=\"".StringHelper::xmlEntities($crtValue)."\" data-entry_id=\"".StringHelper::xmlEntities($crtValue)."\"><span class='user_entry_label'>".StringHelper::xmlEntities($crtValue)."</span></li>";
-                }
-                $mess = LocaleService::getMessages();
-                if (!$usersOnly && (empty($regexp)  ||  preg_match($pregexp, $mess["447"]))) {
-                    $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label=\"".StringHelper::xmlEntities($mess["447"])."\"><span class='user_entry_label'>".StringHelper::xmlEntities($mess["447"])."</span></li>";
-                }
-                $indexGroup = 0;
-                if (!$usersOnly && isset($allGroups) && is_array($allGroups)) {
-                    foreach ($allGroups as $groupId => $groupLabel) {
-                        if ($regexp == null ||  preg_match($pregexp, $groupLabel)) {
-                            $groupLabel = StringHelper::xmlEntities($groupLabel);
-                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label=\"".$groupLabel."\" data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
-                            $indexGroup++;
-                        }
-                        if($indexGroup == $limit) break;
-                    }
-                }
-                if (method_exists($this, "listUserTeams") && !$usersOnly) {
-                    $teams = $this->listUserTeams($ctx->getUser());
-                    foreach ($teams as $tId => $tData) {
-                        if($regexp == null  ||  preg_match($pregexp, $tData["LABEL"])){
-                            $teamLabel = StringHelper::xmlEntities($tData["LABEL"]);
-                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$teamLabel."\"><span class='user_entry_label'>[team] ".$teamLabel."</span></li>";
-                        }
-                    }
-                }
-                foreach ($allUsers as $userId => $userObject) {
-                    if($userObject->getId() == $loggedUser->getId()) continue;
-                    if ( ( !$userObject->hasParent() &&  ConfService::getContextConf($ctx, "ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
-                        $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
-                        $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
-                        //if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
-                        $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
-                        if (ConfService::getContextConf($ctx, "USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
-                            $userDisplay = $userLabel;
-                        }
-                        $userIsExternal = $userObject->hasParent() ? "true":"false";
-                        $userLabel = StringHelper::xmlEntities($userLabel);
-                        $userDisplay = StringHelper::xmlEntities($userDisplay);
-                        $users .= "<li class='complete_user_entry' data-external=\"$userIsExternal\" data-label=\"".$userLabel."\" data-avatar='$userAvatar' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
-                        $index ++;
-                    }
-                    if($index == $limit) break;
-                }
-                print("<ul>".$users."</ul>");
+                        $responseInterface->getBody()->write('</ul>');
+                        break;
+                    default:
+                        break;
+                };
 
                 break;
 
             case "load_repository_info":
 
+                SessionService::close();
                 $data = [];
                 $repo = $ctx->getRepository();
                 if($repo != null){
@@ -1293,15 +1354,16 @@ abstract class AbstractConfDriver extends Plugin
             case "get_binary_param" :
 
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = ApplicationState::getTemporaryFolder() ."/". InputFilter::securePath($httpVars["tmp_file"]);
-                    if (isSet($file)) {
+                    $file = $temporaryUploadFolder ."/". InputFilter::securePath($httpVars["tmp_file"]);
+                    if (file_exists($file)) {
                         session_write_close();
                         header("Content-Type:image/png");
                         readfile($file);
+                    }else{
+                        $responseInterface = $responseInterface->withStatus(401, 'Forbidden');
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    if (isSet($httpVars["user_id"]) && $loggedUser != null
-                        && ( $loggedUser->getId() == $httpVars["user_id"] || $loggedUser->isAdmin() )) {
+                    if (isSet($httpVars["user_id"])) {
                         $context = ["USER" => InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS)];
                     } else if($loggedUser !== null) {
                         $context = ["USER" => $loggedUser->getId()];
@@ -1317,10 +1379,12 @@ abstract class AbstractConfDriver extends Plugin
 
                 session_write_close();
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = ApplicationState::getTemporaryFolder() ."/". InputFilter::securePath($httpVars["tmp_file"]);
-                    if (isSet($file)) {
+                    $file = $temporaryUploadFolder ."/". InputFilter::securePath($httpVars["tmp_file"]);
+                    if (file_exists($file)) {
                         header("Content-Type:image/png");
                         readfile($file);
+                    }else{
+                        $responseInterface = $responseInterface->withStatus(401, 'Forbidden');
                     }
                 } else if (isSet($httpVars["binary_id"])) {
                     $this->loadBinary([], InputFilter::sanitize($httpVars["binary_id"], InputFilter::SANITIZE_ALPHANUM));
@@ -1341,10 +1405,13 @@ abstract class AbstractConfDriver extends Plugin
                     } else {
                         $rand = substr(md5(time()), 0, 6);
                         $tmp = $rand."-". $boxData->getClientFilename();
-                        $boxData->moveTo(ApplicationState::getTemporaryFolder() . "/" . $tmp);
+                        if(!file_exists($temporaryUploadFolder)){
+                            mkdir($temporaryUploadFolder);
+                        }
+                        $boxData->moveTo($temporaryUploadFolder . "/" . $tmp);
                     }
                 }
-                if (isSet($tmp) && file_exists(ApplicationState::getTemporaryFolder() ."/".$tmp)) {
+                if (isSet($tmp) && file_exists($temporaryUploadFolder ."/".$tmp)) {
                     print('<script type="text/javascript">');
                     print('parent.formManagerHiddenIFrameSubmission("'.$tmp.'");');
                     print('</script>');
@@ -1358,66 +1425,9 @@ abstract class AbstractConfDriver extends Plugin
     }
 
     /**
-     * @param UserInterface $userObject
-     * @param string $rolePrefix get all roles with prefix
-     * @param string $includeString get roles in this string
-     * @param string $excludeString eliminate roles in this string
-     * @param bool $byUserRoles
-     * @return array
-     */
-    public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString, $byUserRoles = false)
-    {
-        if (!$userObject){
-            return [];
-        }
-        if ($byUserRoles) {
-            $allUserRoles = $userObject->getRoles();
-        } else {
-            $allUserRoles = RolesService::getRolesList([], true);
-        }
-        $allRoles = [];
-        if (isset($allUserRoles)) {
-
-            // Exclude
-            if ($excludeString) {
-                if (strpos($excludeString, "preg:") !== false) {
-                    $matchFilterExclude = "/" . str_replace("preg:", "", $excludeString) . "/i";
-                } else {
-                    $valueFiltersExclude = array_map("trim", explode(",", $excludeString));
-                    $valueFiltersExclude = array_map("strtolower", $valueFiltersExclude);
-                }
-            }
-
-            // Include
-            if ($includeString) {
-                if (strpos($includeString, "preg:") !== false) {
-                    $matchFilterInclude = "/" . str_replace("preg:", "", $includeString) . "/i";
-                } else {
-                    $valueFiltersInclude = array_map("trim", explode(",", $includeString));
-                    $valueFiltersInclude = array_map("strtolower", $valueFiltersInclude);
-                }
-            }
-
-            foreach ($allUserRoles as $roleId => $role) {
-                if (!empty($rolePrefix) && strpos($roleId, $rolePrefix) === false) continue;
-                if (isSet($matchFilterExclude) && preg_match($matchFilterExclude, substr($roleId, strlen($rolePrefix)))) continue;
-                if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersExclude)) continue;
-                if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($rolePrefix)))) continue;
-                if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
-                if($role instanceof AJXP_Role) $roleObject = $role;
-                else $roleObject = RolesService::getRole($roleId);
-                $label = $roleObject->getLabel();
-                $label = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
-                $allRoles[$roleId] = $label;
-            }
-        }
-        return $allRoles;
-    }
-
-
-    /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
+     * @return ResponseInterface
      */
     public function publishPermissionsMask(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
         $mask = [];

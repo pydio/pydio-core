@@ -22,6 +22,7 @@ namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\NodesList;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -145,7 +146,8 @@ abstract class AbstractManager
         }
 
         $nodes = PluginsService::getInstance($ctx)->searchAllManifests($query, "node", false, true, true);
-        $actions = array();
+        $parameters = array();
+        $enableMessage = LocaleService::getMessages()["ajxp_conf.170"];
         foreach ($nodes as $node) {
             if($node->parentNode->nodeName != "server_settings") continue;
             $parentPlugin = $node->parentNode->parentNode;
@@ -155,8 +157,29 @@ abstract class AbstractManager
                 if($pId == "ajxpdriver.") $pId = "access.";
                 $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
             }
-            if(!is_array($actions[$pId])) $actions[$pId] = array();
-            $actionName = $node->attributes->getNamedItem("name")->nodeValue;
+            if(!is_array($parameters[$pId])) $parameters[$pId] = array();
+            $pType = array_shift(explode('.', $pId));
+            if(in_array($pType, ['uploader', 'action', 'editor', 'meta', 'shorten', 'authfront'])){
+                if($withLabel){
+                    $parentPluginLabel = XMLFilter::resolveKeywords($parentPlugin->attributes->getNamedItem("label")->nodeValue);
+                    $paramLabel = str_replace(['%1', '%2'], [$parentPluginLabel, $pId], $enableMessage);
+                    $parameters[$pId]['AJXP_PLUGIN_ENABLED'] = [
+                        'parameter' => 'AJXP_PLUGIN_ENABLED',
+                        'label'     => $paramLabel,
+                        'attributes'=> [
+                            'name'          => 'AJXP_PLUGIN_ENABLED',
+                            'default'       => 'true',
+                            'description'   => $paramLabel,
+                            'label'         => $paramLabel,
+                            'mandatory'     => 'false',
+                            'type'          => 'boolean'
+                        ]
+                    ];
+                }else{
+                    $parameters[$pId][] = 'AJXP_PLUGIN_ENABLED';
+                }
+            }
+            $parameterName = $node->attributes->getNamedItem("name")->nodeValue;
             $attributes = array();
             for( $i = 0; $i < $node->attributes->length; $i ++){
                 $att = $node->attributes->item($i);
@@ -167,24 +190,24 @@ abstract class AbstractManager
                 $attributes[$att->nodeName] = $value;
             }
             if($withLabel){
-                $actions[$pId][$actionName] = array(
-                    "parameter" => $actionName ,
+                $parameters[$pId][$parameterName] = array(
+                    "parameter" => $parameterName ,
                     "label" => $attributes["label"],
                     "attributes" => $attributes
                 );
             }else{
-                $actions[$pId][] = $actionName;
+                $parameters[$pId][] = $parameterName;
             }
 
         }
-        foreach ($actions as $actPid => $actionGroup) {
+        foreach ($parameters as $actPid => $actionGroup) {
             ksort($actionGroup, SORT_STRING);
-            $actions[$actPid] = array();
+            $parameters[$actPid] = array();
             foreach ($actionGroup as $v) {
-                $actions[$actPid][] = $v;
+                $parameters[$actPid][] = $v;
             }
         }
-        return $actions;
+        return $parameters;
     }
 
 

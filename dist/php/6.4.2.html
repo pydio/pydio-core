@@ -1,14 +1,16 @@
 <div style='font-family: "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
      xmlns="http://www.w3.org/1999/html">
 
-    <h2>Pydio Core 6.4.2 - Bug Fixes for 6.4</h2>
+    <h2>Pydio Core 6.4.2 - Security Release</h2>
 
     Pydio Core 6.4.2 fixes vulnerabilities discovered in remote download and some specific path filtering on Windows server OS.
+    We also updated a third party library that could be vulnerable to the <a href="https://httpoxy.org" target="_blank">httpoxy</a> issue.
+    <br><span style="color: red;">Update is highly recommended as soon as possible.</span>
     Installation is done via the "Stable" update channel in-app, or via Linux packages manager depending on your installation mode.
 
     <h3>Most noticeable changes</h3>
     <ul>
-        <li>Security issues on remote download and path traversal on Windows.</li>
+        <li>Important security issues: missing filters on remote download, path traversal on Windows, fix Httpoxy by updating Guzzle library.</li>
         <li>UX fixes and improvements (icons, thumbnails view)</li>
         <li>Fix indexation issues for synchronisation</li>
         <li>Italian translations updated (DepaMarco), Czech translations updated (Svetlmodry)</li>

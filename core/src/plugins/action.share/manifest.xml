@@ -12,8 +12,10 @@
         <global_param name="FILE_MAX_EXPIRATION" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum share expiration limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file expiration limit]" type="integer" default="0" expose="true"/>
         <global_param name="FILE_MAX_DOWNLOAD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum download limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file download limit]" type="integer" default="0" expose="true"/>
         <global_param name="SHARE_FORCE_PASSWORD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Do not allow users to create public links, only private links (password-protected)]" label="CONF_MESSAGE[Set password mandatory]" type="boolean" default="false" expose="true"/>
+        <global_param name="EMAIL_PERSONAL_LINK_SEND_CLEAR" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[For personal invitations (link is customized), let users choose whether to append clear email address or hashed string to link.]" label="CONF_MESSAGE[Choose personalized invitation format]" type="boolean" default="false" expose="true"/>
         <global_param name="EMAIL_INVITE_EXTERNAL" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use external mailer for invitations]" label="CONF_MESSAGE[Force External Mailer]" type="boolean" default="false" expose="true"/>
         <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="false" expose="true"/>
+        <global_param name="SHARED_FOLDER_SHOW_SEARCH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Display a search form in the shared folder minisites. This can impact global performances as it will create indexes for all shares.]" label="CONF_MESSAGE[Allow search in minisite]" type="boolean" default="false" expose="true"/>
         <global_param name="INFOPANEL_DISPLAY_HTML_EMBED" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Display pasteable HTML snippet in right-hand information panel]" label="CONF_MESSAGE[Display HTML Embed code]" type="boolean" default="false" expose="true"/>
         <global_param name="INFOPANEL_DISPLAY_DIRECT_DOWNLOAD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Display pasteable download link in right-hand information panel]" label="CONF_MESSAGE[Display Direct Download Link]" type="boolean" default="false" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Internal Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
@@ -27,47 +29,32 @@
             <i18n namespace="share_center" path="plugins/action.share/res/i18n"/>
             <css file="plugins/action.share/res/react-share-form.css" autoload="true"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
-            <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React"/>
+            <js file="plugins/action.share/res/build/model/ShareActions.js" className="ShareActions"/>
+            <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React,PydioComponents,PydioWorkspaces"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
-            <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
+            <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,PydioComponents"/>
+            <js file="plugins/action.share/res/build/UserShares.js" className="UserShares" depends="React,PydioComponents"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="share_react">
-                <gui text="292" title="292" src="share.png" iconClass="mdi mdi-share-variant" hasAccessKey="false">
-                    <context selection="true" dir="true" recycle="hidden" actionBar="true" actionBarGroup="get,info_panel_share" contextMenu="true"/>
+                <gui text="292" title="292" iconClass="mdi mdi-share-variant" hasAccessKey="false">
+                    <context selection="true" dir="true" recycle="hidden" actionBar="true" actionBarGroup="0_get,info_panel_share" contextMenu="true"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')"/>
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(!pydio.getController().shareDialogLoader) {
-                            pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
-                                selection:pydio.getUserSelection()
-                            });
-                        }
-                        pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
-                    ]]></clientCallback>
-                    <clientForm id="react_share_form"><![CDATA[
-                        <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
-                    ]]></clientForm>
+                    <clientCallback module="ShareActions.Callbacks.share"/>
                 </processing>
             </action>
             <action name="share-edit-shared">
-                <gui src="share.png" iconClass="mdi mdi-share-variant" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" behaviour="hidden"/>
+                <gui iconClass="mdi mdi-share-variant" text="share_center.125" title="share_center.126">
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="0_get,info_panel_share" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(!pydio.getController().shareDialogLoader) {
-                            pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
-                                selection:pydio.getUserSelection()
-                            });
-                        }
-                        pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
-                    ]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.editShare"/>
                 </processing>
             </action>
             <action name="share">
@@ -133,13 +120,12 @@
                     </serverCallback>
                 </processing>
             </action>
-            <action name="update_shared_element_data">
+            <action name="share_link_update_target_users">
                 <processing>
-                    <serverCallback methodName="switchAction">
-                        <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
-                        <input_param description="Send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
-                        <input_param description="Name of the property to modify (only tags supported)" name="p_name" type="string" mandatory="true" default="tags"/>
-                        <input_param description="Value of the property to modify" name="p_value" type="string" mandatory="true"/>
+                    <serverCallback methodName="switchAction" restParams="/hash" developerComment="Store target users for a given link.">
+                        <input_param description="Hash of the link" name="hash" type="path" mandatory="true"/>
+                        <input_param description="Json encoded list of users, an associative array of unique keys and users label (e.g. email or label)." name="json_users" type="string"/>
+                        <input_param description="Restrict link access to these users" name="restrict" type="boolean"/>
                     </serverCallback>
                 </processing>
             </action>
@@ -154,19 +140,7 @@
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        var dataModel;
-                        if(window.actionArguments && window.actionArguments.length){
-                            dataModel = window.actionArguments[0];
-                        }else if(window.actionManager){
-                            dataModel = window.actionManager.getDataModel();
-                        }
-                        var dialog = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {selection:dataModel, readonly:true});
-                        dialog.openDialog('react_share_form', true);
-                    ]]></clientCallback>
-                    <clientForm id="react_share_form"><![CDATA[
-                        <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
-                    ]]></clientForm>
+                    <clientCallback module="ShareActions.Callbacks.editFromList"/>
                 </processing>
             </action>
             <action name="sharelist-load">
@@ -174,11 +148,7 @@
                     <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(window.actionManager){
-                            window.actionManager.getDataModel().requireContextChange(window.actionManager.getDataModel().getRootNode(), true);
-                        }
-                    ]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.loadList"/>
                 </processing>
                 <processing>
                     <serverCallback restParams="/" methodName="switchAction" sdkMethodName="loadShareList">
@@ -188,26 +158,20 @@
                 </processing>
             </action>
             <action name="sharelist-clearExpired">
-                <gui text="user_dash.25" title="user_dash.26" iconClass="icon-time" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
+                <gui text="user_dash.25" title="user_dash.26" iconClass="icon-time" accessKey="" hasAccessKey="false">
                     <context dir="true" selection="false" recycle="false" 
                              actionBar="true" contextMenu="false" infoPanel="false"
                              actionBarGroup="share_list_toolbar" inZip="false"/>
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-						var conn = new Connexion();
-						conn.addParameter("get_action", "sharelist-clearExpired");
-						var dm = window.actionManager.getDataModel();
-						conn.onComplete = function(transport){
-							PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                            if(window.actionManager){
-                                dm.requireContextChange(dm.getRootNode(), true);
-                            }
-						};
-						conn.sendAsync();
-					]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.clearExpired"/>
                     <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
+                </processing>
+            </action>
+            <action name="sharelist-migrate">
+                <processing>
+                    <serverCallback methodName="switchAction" developerComment="Migrate Internal repositories to store" restParams="/"/>
                 </processing>
             </action>
             <action name="share_current_page">
@@ -215,10 +179,10 @@
                     <context dir="true" recycle="false" selection="false" actionBarGroup="minisite-share-actions" actionBar="true"/>
                 </gui>
                 <processing>
-                    <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
+                    <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
-                            if(ajxpBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && pydio.getController().getActionByName("download")){
+                            if(pydioBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && pydio.getController().getActionByName("download")){
                                 var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
                                 var node = ajaxplorer.getContextHolder().getUniqueNode();
                                 var editors = pydio.Registry.findEditorsForMime(node.getAjxpMime(), true);
@@ -256,190 +220,37 @@
                     <serverCallback methodName="preProcessDownload" applyCondition="$apply=\Pydio\Core\Services\SessionService::has(\Pydio\Core\Services\SessionService::CTX_MINISITE_HASH);"/>
                 </pre_processing>
             </action>
+            <action name="open_user_shares">
+                <gui text="share_center.98" title="share_center.98" iconClass="mdi mdi-share-variant" accessKey="folder_access_key">
+                    <context selection="false" dir="" recycle="false" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
+                </gui>
+                <rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="false"/>
+                <processing>
+                    <clientCallback module="ShareActions.Callbacks.openUserShareView"/>
+                </processing>
+            </action>
         </actions>
         <client_configs>
-            <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="share_center.153"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
-                    <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{}'></div>
-                    <div id="files_list_header">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions"],"submenuOffsetTop":2}'></div>
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation","minisite", "inline"],"submenuOffsetTop":2}'></div>
-                    </div>
-                    <div id="cpane_container1" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container1", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    </div>
-                    <div id="tasks_panel" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"PydioTasks","componentName":"Panel"}'></div>
-				</div>
-                <script>
-                document.observe("ajaxplorer:afterApply-login", function(){
-                    AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                });
-                </script>
-			]]></template>
-            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "fitMarginBottom":80}'>
-                        <div id="cpane_header" class="panelHeader">
-                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline"],"submenuOffsetTop":2}'></div>
-                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":50, "resize_events":["actions_refreshed"]}'></div>
-                        </div>
-                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":60,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
-                    </div>
-				</div>
-				<script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-                    document.observe("ajaxplorer:selection_changed", function(e){
-                        try{
-                            var dm = ajaxplorer.getContextHolder();
-                            var nodes = dm.getSelectedNodes();
-                            if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
-                                window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
-                            }
-                        }catch(e){}
-                    });
-                    var p;
-				    document.observe("ajaxplorer:user_logged", function(){
-                        if(p) return;
-                        try{
-                            p = new PeriodicalExecuter(function(){
-                                var dm = ajaxplorer.getContextHolder();
-                                if(dm.getSelectedNodes().length){
-                                    p.stop();
-                                    return;
-                                }
-                                var first = dm.getRootNode().getFirstChildIfExists();
-                                if(first){
-                                    dm.setSelectedNodes([first], "dataModel");
-                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
-                                    p.stop();
-                                    return;
-                                }
-                            }, 1);
-                        }catch(e){}
-                    });
-				</script>
-			]]></template>
-            <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"submenuOffsetTop":2}'></div>
-                    <div id="widget_title" style="padding: 28px 0 22px 20px;" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
-                    </div>
-				</div>
-				<script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-				    document.observe("ajaxplorer:user_logged", function(){
-                        try{
+            <template name="minisite_std_list" element="ajxp_shared_folder" position="top" label="share_center.153"
+                      namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_shared_folder","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
 
-                            var p = new PeriodicalExecuter(function(){
-                                var dm = ajaxplorer.getContextHolder();
-                                if(dm.getSelectedNodes().length){
-                                    p.stop();
-                                    return;
-                                }
-                                var root = dm.getRootNode();
-                                var first = root.getFirstChildIfExists();
-                                if(first){
-                                    if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
-                                        return;
-                                    }
-                                    dm.setSelectedNodes([first], "dataModel");
-                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
-                                    p.stop();
-                                    return;
-                                }
-                            }, 1);
-                        }catch(e){
-                            if (console) console.log(e);
-                        }
-                    });
-				</script>
-			]]></template>
-            <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    </div>
-                    <div class="vertical-align">
-                        <div class="vertical-align-center">
-                            <div id="reactDLTemplate" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"ShareTemplates","componentName":"DLTemplate"}'></div>
-                            <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"]}'></div>
-                        </div>
-                    </div>
-                </div>
-			]]></template>
-            <template name="minisite_bare" element="ajxp_embed_template" position="top" label="share_center.155"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="cpane_header" class="panelHeader">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["navigation", "minisite", "inline", "content_pane-actions"],"submenuOffsetTop":2}'></div>
-                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
-                    </div>
-                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="tasks_panel" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"PydioTasks","componentName":"Panel"}'></div>
-				</div>
-                <script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-                </script>
-			]]></template>
-            <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="cpane_header" class="panelHeader">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","content_pane-actions"],"submenuOffsetTop":2}'></div>
-                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
-                    </div>
-                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="tasks_panel" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"PydioTasks","componentName":"Panel"}'></div>
-				</div>
-				<script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-                </script>
-			]]></template>
-            <component_config className="InfoPanel">
-                <infoPanelExtension mime="meta:ajxp_shared" attributes="" modifier="ShareInfoPanel.loader">
-                    <messages>
-                        <message key="type_string" id="share_center.50"/>
-                    </messages>
-                    <html><![CDATA[
-                        <div id="ajxp_shared_info_panel" data-infoPanelPosition="first">
-                            <div class="panelHeader infoPanelGroup" colspan="2">
-                                <span class="user_meta_change" style="display: none;" data-ajxpaction="share-edit-shared" >AJXP_MESSAGE[457]</span>
-                                <span class="mdi mdi-share-variant" data-ajxpAction="share-edit-shared" title="AJXP_MESSAGE[share_center.55]"></span>#{type_string}
-                                </div>
-                            <div class="infoPanelTable" cellspacing="0" border="0" cellpadding="0"></div>
-                        </div>
-                    ]]></html>
-                </infoPanelExtension>
-            </component_config>
-            <component_config className="AjxpTabulator::userdashboard_main_tab">
-                <additional_tab id="shared_pane2"
-                                tabInfo='{"id":"shares","iconClass":"mdi mdi-share-variant","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":4}'
-                                paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="shared_pane2" ajxpClass="AjxpPane" class="tabbed_editor">
-                        <div class="title-flex">
-                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[share_center.98]<div class="legend">AJXP_MESSAGE[share_center.99]</div></h3>
-                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"shared_files_list","toolbarsList":["share_list_toolbar-selection", "share_list_toolbar"],"submenuOffsetTop":2}'></div>
-                        </div>
-                        <div id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"displayMode":"list", "fixedDisplayMode":"list", "groupByData":"1", "fit":"height","selectionChangeCallback":false,"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"sharelist-load","user_context":"current"}}'></div>
-                    </div>
-                ]]></additional_tab>
+            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154"
+                      namespace="ShareTemplates" component="FilmStripMinisite" props='{"containerId":"ajxp_film_strip","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
+
+            <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"
+                      namespace="ShareTemplates" component="FileMinisite" props='{"containerId":"ajxp_unique_strip","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
+
+            <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"
+                      namespace="ShareTemplates" component="DLTemplate" props='{"containerId":"ajxp_unique_dl","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
+
+            <template name="minisite_embed_list" element="ajxp_embed_template" position="top" label="share_center.155"
+                      namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_embed_template","minisiteMode":"embed","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
+
+            <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"
+                      namespace="ShareTemplates" component="DropZoneMinisite" props='{"containerId":"ajxp_dropbox_template","minisiteMode":"embed","imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'/>
+
+            <component_config component="InfoPanel">
+                <infoPanel mime="meta:ajxp_shared" reactComponent="ShareInfoPanel.InfoPanel" weight="-20"/>
             </component_config>
         </client_configs>
         <hooks>

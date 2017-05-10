@@ -26,6 +26,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Auth\Core\MemorySafe;
 
 
+use Pydio\Core\Exception\WorkspaceAuthRequired;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Log\Core\Logger;
@@ -85,6 +86,8 @@ class SMBAccessWrapper extends FsAccessWrapper
                     $credentials = $domain."/".$credentials;
                 }
             }
+        }else if($repoObject->getContextOption($node->getContext(), "ANONYMOUS_FORBIDDEN") === true){
+            throw new WorkspaceAuthRequired($repoObject->getId());
         }
         $basePath = $repoObject->getContextOption($node->getContext(), "PATH");
         $fullPath = "smbclient://".$credentials.$host."/";//.$basePath."/".$path;
@@ -222,9 +225,10 @@ class SMBAccessWrapper extends FsAccessWrapper
     }
 
     /**
+     * @param $url
      * @return bool
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         return true;
     }

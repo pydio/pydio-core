@@ -681,7 +681,7 @@ class PluginsService
             $pObject->init($this->context, []);
             try {
                 $pObject->performChecks();
-                if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;
+                if(!$pObject->isEnabled($this->context) || $pObject->hasMissingExtensions()) continue;
                 $this->setPluginActive($pObject->getType(), $pObject->getName(), true);
             } catch (\Exception $e) {
                 //$this->errors[$pName] = "[$pName] ".$e->getMessage();
@@ -704,7 +704,7 @@ class PluginsService
         if ($active) {
             // Check active plugin dependencies
             $plug = $this->getPluginById($type.".".$name);
-            if(!$plug || !$plug->isEnabled()) return;
+            if(!$plug || !$plug->isEnabled($this->context)) return;
             $deps = $plug->getActiveDependencies($this);
             if (count($deps)) {
                 $found = false;
@@ -878,6 +878,9 @@ class PluginsService
         }
         /** @var AbstractAccessDriver $access */
         $access = $this->getActivePluginsForType("access", true);
+        if($access === false){
+            return null;
+        }
         $data = $access->detectStreamWrapper($register);
         if($data !== null && $data["protocol"] == $protocol){
             return $data["classname"];
@@ -994,7 +997,7 @@ class PluginsService
             $this->detectedPlugins[$plugType] = [];
         }
         $options = $confStorage->loadPluginConfig($plugType, $plugin->getName());
-        if($plugin->isEnabled() || (isSet($options["AJXP_PLUGIN_ENABLED"]) && $options["AJXP_PLUGIN_ENABLED"] === true)){
+        if($plugin->isEnabled($this->context) || (isSet($options["AJXP_PLUGIN_ENABLED"]) && $options["AJXP_PLUGIN_ENABLED"] === true)){
             $plugin = $this->instanciatePluginClass($plugin);
         }
         $plugin->loadConfigs($options);

@@ -19,109 +19,20 @@
                 </processing>
             </action>
             <action name="reset-password-ask">
-                <gui src="reset.png" iconClass="icon-terminal" text="gui.user.1" title="gui.user.2">
+                <gui iconClass="icon-terminal" text="gui.user.1" title="gui.user.2">
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="false" dialogOpenForm="reset-password-ask" dialogOkButtonOnly="false">
-                        <dialogOnOpen><![CDATA[
-                            $(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
-                            $(oForm).down('.dialogButtons').insert({bottom:$(oForm).down('.dialogButtons').down('input')});
-                        ]]></dialogOnOpen>
-                        <dialogOnCancel><![CDATA[
-                                pydio.getController().fireAction('login');
-                        ]]></dialogOnCancel>
-                        <dialogOnComplete><![CDATA[
-                            if(!oForm.BUTTON_CLICKED){
-                                var conn = new Connexion();
-                                conn.addParameter('email', oForm.down('#reset-by-email').getValue());
-                                conn.addParameter('get_action', 'reset-password-ask');
-                                conn.onComplete = function(){
-                                    oForm.BUTTON_CLICKED = true;
-                                    Effect.Fade(oForm.down('#reset-by-email'), {
-                                        duration:0.5,
-                                        afterFinish: function(){
-                                            oForm.down('#reset-password-ask').update(MessageHash['gui.user.5']);
-                                            $(oForm).down('.dialogButtons').down('input[name="ok"]').remove();
-                                        }
-                                    });
-                                };
-                                conn.sendAsync();
-                            }
-                        ]]></dialogOnComplete>
-                    </clientCallback>
-                    <clientForm id="reset-password-ask"><![CDATA[
-    				    <div id="reset-password-ask" box_width="320" style="padding:5px 12px;font-size:15px;">AJXP_MESSAGE[gui.user.3] <input type="text" style="font-size: 17px; width: 97%;margin: 10px 0;" id="reset-by-email" placeholder="AJXP_MESSAGE[gui.user.4]"></div>
-                    ]]></clientForm>
+                    <clientCallback module="AuthfrontCoreActions.ResetPasswordRequire.open"/>
                     <serverCallback methodName="processUserAccessPoint"/>
                 </processing>
             </action>
             <action name="reset-password">
-                <gui src="reset.png" iconClass="icon-terminal" text="gui.user.1" title="gui.user.2">
+                <gui iconClass="icon-terminal" text="gui.user.1" title="gui.user.2">
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="false" dialogOpenForm="reset-password" dialogOkButtonOnly="false">
-                        <dialogOnOpen><![CDATA[
-                            new Protopass($('user_change_ownpass1'), {
-                                barContainer:$('pwd_strength_container'),
-                                barPosition:'bottom'
-                            });
-                        ]]></dialogOnOpen>
-                        <dialogOnCancel><![CDATA[
-                                pydio.getController().fireAction('login');
-                        ]]></dialogOnCancel>
-                        <dialogOnComplete><![CDATA[
-						var userPass = null;
-						var passSeed = null;
-						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
-						{
-							if($('user_change_ownpass1').value.length < parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
-								alert(MessageHash[378]);
-								return false;
-							}
-							if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
-								alert(MessageHash[238]);
-								return false;
-							}
-                            userPass = $('user_change_ownpass1').value;
-							var onComplete = function(transport){
-								if(userPass != null){
-									if(transport.responseText == 'PASS_ERROR'){
-										alert(MessageHash[240]);
-									}else if(transport.responseText == 'SUCCESS'){
-										ajaxplorer.displayMessage('SUCCESS', MessageHash['gui.user.6']);
-										oForm.down('#reset-password').update(MessageHash['gui.user.6']);
-                                        $(oForm).down('.dialogButtons').down('input[name="ok"]').remove();
-									}
-								}
-							};
-							var conn = new Connexion();
-							conn.addParameter("get_action", "reset-password");
-							conn.addParameter("new_pass", userPass);
-							conn.addParameter("user_id", oForm.down('#user_id').getValue());
-							conn.addParameter("key", pydioBootstrap.parameters.get('USER_ACTION_KEY'));
-							conn.onComplete = onComplete;
-							conn.sendAsync();
-						}
-
-                        ]]></dialogOnComplete>
-                    </clientCallback>
-                    <clientForm id="reset-password"><![CDATA[
-    				    <div id="reset-password" box_width="320" style="font-size: 15px;">
-    				        <div class="dialogLegend" ajxp_message_id="gui.user.8">AJXP_MESSAGE[gui.user.8]</div>
-                            <div class="SF_element">
-                                <div class="SF_label" ajxp_message_id="gui.user.4">AJXP_MESSAGE[gui.user.4] : </div><input style="width:90%;" id="user_id" value="" type="text" class="SF_input"/>
-                            </div>
-                            <div class="SF_element">
-                                <div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input style="width:90%;" id="user_change_ownpass1" value="" type="password" class="SF_input"/>
-                            </div>
-                            <div class="SF_element">
-                                <div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input style="width:90%;" id="user_change_ownpass2" value="" type="password" class="SF_input"/>
-                            </div>
-                            <div class="SF_element" id="pwd_strength_container"></div>
-    				    </div>
-                    ]]></clientForm>
+                    <clientCallback module="AuthfrontCoreActions.ResetPasswordDialog.open"/>
                     <serverCallback methodName="processUserAccessPoint"/>
                 </processing>
             </action>

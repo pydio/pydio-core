@@ -21,7 +21,6 @@
 $mess=array(
 "timestamp" => "Horodatage",
 "Allow Timestamp file with Universign." => "Permet l'horodatage de fichier avec Universign.",
-"msgBox1" => "Merci de confirmer votre souhait d'horodater ce fichier",
 "URL" => "URL",
 "Timestamp provider API URL" => "URL de l'API du fournisseur d'horodatage",
 "User Mail" => "Courriel de l'utilisteur",

@@ -8,4 +8,6 @@ $mess = [
     "6" => "Your google key is already configured. Please contact your administrator to reset it.",
     "7" => "Cannot validate code, did you properly set up your Google Authenticator application?",
     "8" => "Something went wrong, your key should not be empty.",
+    "9" => "One-Time-Password authentication is active, please append the code to your password.",
+    "10"=> "One Time Code (6 digits)",
 ];

@@ -73,5 +73,43 @@ class PathUtils
         return str_replace("__ZIP_EXTENSION__", ".zip", $dirPath);
     }
 
+    /**
+     * Return highest common folder
+     * @param $items
+     * @return mixed
+     */
+    public static function commonPath($items)
+    {
+        $arr = array();
+        foreach($items as $i => $path)
+        {
+            $items[$i]	= explode('/', $path);
+            unset($items[$i][0]);
+
+            $arr[$i] = count($items[$i]);
+        }
+
+        $min = min($arr);
+
+        for($i = 0; $i < count($items); $i++)
+        {
+            while(count($items[$i]) > $min)
+            {
+                array_pop($items[$i]);
+            }
+
+            $items[$i] = '/' . implode('/' , $items[$i]);
+        }
+
+        $items = array_unique($items);
+        while(count($items) !== 1)
+        {
+            $items = array_map('dirname', $items);
+            $items = array_unique($items);
+        }
+        reset($items);
+
+        return current($items);
+    }
 
 }

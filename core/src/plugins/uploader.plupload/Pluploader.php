@@ -85,9 +85,11 @@ class Pluploader extends Plugin
         $minisite_session = "";
         if(strpos(session_name(), "AjaXplorer_Shared") === 0) {
             $minisite_session = "&minisite_session=" . substr(session_name(), strlen("AjaXplorer_Shared"));
+            $serverBaseUrl = ApplicationState::detectServerURL(true);
         }
         $secureToken = $requestInterface->getParsedBody()["secure_token"];
-        include($this->getBaseDir()."/pluploader_tpl.html");
+        $uploadUrlBase = array_shift(explode("?", $_SERVER["REQUEST_URI"]));
+        include($this->getBaseDir()."/pluploader.tpl");
 
     }
 
@@ -228,6 +230,9 @@ class Pluploader extends Plugin
                     Controller::applyHook("node.change", array(null, $node, false));
                 }
             }
+            $createdNode = new AJXP_Node($destStreamURL.$filename);
+            $logFile = $createdNode->getRepository()->getSlug() . $createdNode->getParent()->getPath()."/".$createdNode->getLabel();
+            $this->logInfo("Upload File", ["file"=>$logFile, "files"=> $logFile]);
         }
         // Return JSON-RPC response
         echo('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');

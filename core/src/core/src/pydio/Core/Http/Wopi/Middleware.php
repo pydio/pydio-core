@@ -94,14 +94,18 @@ class Middleware extends SapiMiddleware
                 // We modify the result to have the correct format required by the api
                 $x = new SerializableResponseStream();
                 $meta = $node->getNodeInfoMeta();
-                $userId = $node->getUser()->getId();
+                $user = $node->getUser();
+                $userId = $user->getId();
+                $repo = $node->getRepository();
+                $repoId = $repo->getId();
                 $data = [
                     "BaseFileName" => $node->getLabel(),
                     "OwnerId" => $userId,
                     "Size" => $meta["bytesize"],
                     "UserId" => $userId,
                     "Version" => "" . $meta["ajxp_modiftime"],
-                    "UserFriendlyName" => $userId
+                    "UserFriendlyName" => $userId,
+                    "UserCanWrite" => $user->canWrite($repoId) && is_writeable($node->getUrl())
                 ];
 
                 $x->addChunk(new Message($data));

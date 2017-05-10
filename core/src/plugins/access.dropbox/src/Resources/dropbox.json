@@ -1,192 +1,227 @@
 {
-  "name" : "DropBox Client",
-  "description" : "DropBox REST API client",
-  "operations" : {
-    "Ls" : {
-      "httpMethod" : "POST",
-      "uri" : "files/list_folder",
-      "summary" : "Open the object as a stream for the StreamWrapper to access",
-      "responseClass" : "Directory",
-      "parameters" : {
-        "path" : {
-          "required" : true,
-          "type" : "object",
-          "location" : "json",
-          "sentAs": "path",
-          "filters": [{
-            "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
-            "args": [ "@value" ]
-          }]
-        }
-      }
-    },
-    "Get" : {
-      "httpMethod" : "POST",
-      "uri" : "files/download",
-      "summary" : "Open the object as a stream for the StreamWrapper to access",
-      "responseClass" : "File",
-      "parameters" : {
-        "path" : {
-          "required" : true,
-          "type" : "object",
-          "location" : "header",
-          "sentAs": "Dropbox-API-Arg",
-          "filters": [{
-            "method": "\\Pydio\\Access\\DropBox\\Driver::convertToJSON",
-            "args": [ "@api", "@value" ]
-          }]
-        }
-      }
-    },
-    "Stat" : {
-      "httpMethod" : "POST",
-      "uri" : "files/get_metadata",
-      "summary" : "Returns the stat of a specific object",
-      "responseClass" : "Stat",
-      "exceptions" : false,
-      "parameters" : {
-        "path" : {
-          "required" : true,
-          "type" : "object",
-          "location" : "json",
-          "sentAs": "path",
-          "filters": [{
-            "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
-            "args": [ "@value" ]
-          }]
-        }
-      }
-    },
-    "Mkdir" : {
-      "httpMethod" : "POST",
-      "uri" : "files/create_folder",
-      "parameters" : {
-        "path" : {
-          "required" : true,
-          "type" : "object",
-          "location" : "json",
-          "sentAs": "path",
-          "filters": [{
-            "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
-            "args": [ "@value" ]
-          }]
-        }
-      }
-    },
-    "Rmdir" : {
-      "httpMethod" : "POST",
-      "uri" : "files/delete",
-      "parameters" : {
-        "path" : {
-          "required" : true,
-          "type" : "object",
-          "location" : "json",
-          "sentAs": "path",
-          "filters": [{
-            "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
-            "args": [ "@value" ]
-          }]
-        }
-      }
-    },
-    "Rename" : {
-      "httpMethod" : "POST",
-      "uri" : "files/move",
-      "parameters" : {
-        "frompath/fullpath" : {
-          "required" : true,
-          "type" : "string",
-          "location" : "json",
-          "sentAs": "from_path"
+    "name" : "DropBox Client",
+    "description" : "DropBox REST API client",
+    "operations" : {
+        "Ls" : {
+            "httpMethod" : "POST",
+            "uri" : "files/list_folder",
+            "summary" : "Open the object as a stream for the StreamWrapper to access",
+            "responseClass" : "Directory",
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "json",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+                        "args": [ "@value" ]
+                    }]
+                }
+            }
         },
-        "topath/fullpath" : {
-          "required" : true,
-          "type" : "string",
-          "location" : "json",
-          "sentAs": "to_path"
-        }
-      }
-    },
-    "Put" : {
-      "httpMethod" : "POST",
-      "uri": "files/upload",
-      "parameters" : {
-        "path/fullpath": {
-          "required": true,
-          "type": "string",
-          "location": "query",
-          "sentAs": "path"
+        "Get" : {
+            "httpMethod" : "POST",
+            "uri" : "files/download",
+            "summary" : "Open the object as a stream for the StreamWrapper to access",
+            "responseClass" : "File",
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "header",
+                    "sentAs": "Dropbox-API-Arg",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertToJSON",
+                        "args": [ "@api", "@value" ]
+                    }]
+                }
+            }
         },
-        "body" : {
-          "location" : "body"
+        "Stat" : {
+            "httpMethod" : "POST",
+            "uri" : "files/get_metadata",
+            "summary" : "Returns the stat of a specific object",
+            "responseClass" : "Stat",
+            "exceptions" : false,
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "json",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+                        "args": [ "@value" ]
+                    }]
+                }
+            }
+        },
+        "Mkdir" : {
+            "httpMethod" : "POST",
+            "uri" : "files/create_folder",
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "json",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+                        "args": [ "@value" ]
+                    }]
+                }
+            }
+        },
+        "Rmdir" : {
+            "httpMethod" : "POST",
+            "uri" : "files/delete",
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "json",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+                        "args": [ "@value" ]
+                    }]
+                }
+            }
+        },
+        "Rename" : {
+            "httpMethod" : "POST",
+            "uri" : "files/move",
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "json",
+                    "sentAs": "from_path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+                        "args": [ "@value" ]
+                    }]
+                },
+                "newPath" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "json",
+                    "sentAs": "to_path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+                        "args": [ "@value" ]
+                    }]
+                }
+            }
+        },
+        "Put" : {
+            "httpMethod" : "POST",
+            "uri": "files/upload",
+            "parameters" : {
+                "type" : {
+                    "type": "string",
+                    "location": "header",
+                    "sentAs": "Content-Type",
+                    "default": "application/octet-stream"
+                },
+                "path": {
+                    "required": true,
+                    "type": "object",
+                    "location" : "header",
+                    "sentAs": "Dropbox-API-Arg",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertToJSONOverwrite",
+                        "args": [ "@api", "@value" ]
+                    }]
+                },
+                "body" : {
+                    "location" : "body"
+                }
+            }
+        },
+        "Delete" : {
+            "httpMethod" : "POST",
+            "uri" : "files/delete",
+            "parameters" : {
+                "path" : {
+                    "required" : true,
+                    "type" : "object",
+                    "location" : "json",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+                        "args": [ "@value" ]
+                    }]
+                }
+            }
         }
-      }
     },
-    "Delete" : {
-      "httpMethod" : "POST",
-      "uri" : "files/delete",
-      "parameters" : {
-        "path/fullpath" : {
-          "required" : true,
-          "type" : "string",
-          "location" : "json",
-          "sentAs": "path"
+    "models" : {
+        "Directory" : {
+            "type" : "array",
+            "location" : "json",
+            "items": {
+                "type" : "object",
+                "location" : "json",
+                "properties" : {
+                    "type": {
+                        "type": "string",
+                        "sentAs": ".tag"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "mtime": {
+                        "type": "string",
+                        "sentAs": "client_modified",
+                        "filters": [{
+                            "method": "\\Pydio\\Access\\WebDAV\\Driver::convertTime",
+                            "args": [
+                                "@value"
+                            ]
+                        }]
+                    },
+                    "size": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "File" : {
+            "type": "object",
+            "location": "body",
+            "properties" : {
+                "body": {
+                    "location": "body"
+                }
+            }
+        },
+        "Stat" : {
+            "type" : "object",
+            "location" : "json",
+            "properties" : {
+                "type": {
+                    "type": "string",
+                    "sentAs": ".tag"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "mtime": {
+                    "type": "string",
+                    "sentAs": "client_modified",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertTime",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
+                },
+                "size": {
+                    "type": "string"
+                }
+            }
         }
-      }
     }
-  },
-  "models" : {
-    "Directory" : {
-      "type" : "array",
-      "location" : "json",
-      "items": {
-        "type" : "object",
-        "location" : "json",
-        "properties" : {
-          "type": {
-            "type": "string",
-            "sentAs": ".tag"
-          },
-          "name": {
-            "type": "string"
-          },
-          "lastModified": {
-            "type": "string",
-            "sentAs": "client_modified"
-          },
-          "size": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "File" : {
-      "type": "object",
-      "properties" : {
-        "body" : {
-          "location" : "body"
-        }
-      }
-    },
-    "Stat" : {
-      "type" : "object",
-      "location" : "json",
-      "properties" : {
-        "type": {
-          "type": "string",
-          "sentAs": ".tag"
-        },
-        "name": {
-          "type": "string"
-        },
-        "lastModified": {
-          "type": "string",
-          "sentAs": "client_modified"
-        },
-        "size": {
-          "type": "string"
-        }
-      }
-    }
-  }
 }

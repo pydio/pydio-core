@@ -221,7 +221,7 @@ class InputFilter
         } else {
             $s = str_replace(array("<", ">"), array("&lt;", "&gt;"), $s);
         }
-        if($throwException && $original !== $s){
+        if($throwException && trim($original) !== trim($s)){
             throw new ForbiddenCharacterException($original);
         }
         return ltrim($s);

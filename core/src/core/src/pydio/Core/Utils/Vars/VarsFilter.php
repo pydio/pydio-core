@@ -52,7 +52,7 @@ class VarsFilter
     public static function filter($value, ContextInterface $ctx)
     {
         // If AJXP_PARENT_OPTION, resolve and return directly, do not filter the real value.
-        if(is_string($value) && preg_match("/AJXP_PARENT_OPTION:([\w_-]*):/", $value, $matches)){
+        if(is_string($value) && preg_match("/AJXP_PARENT_OPTION:([\w_-]*):?/", $value, $matches)){
             $repoObject = $ctx->getRepository();
             $parentRepository = $repoObject->getParentRepository();
             if(empty($parentRepository)){

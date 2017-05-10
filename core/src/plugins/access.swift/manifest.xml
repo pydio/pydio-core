@@ -3,6 +3,7 @@
     <client_settings icon="plugins/access.fs/icon.png" description_template="{ENDPOINT}{REGION}/{CONTAINER}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="swift_access" path="plugins/access.swift/i18n"/>
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
     </client_settings>
 

@@ -75,10 +75,11 @@ class OptionsHelper
                         }
                         $value = "";
                     } else {
-                        $file = ApplicationState::getTemporaryFolder() . "/" . $value;
+                        $file = ApplicationState::getTemporaryBinariesFolder() . "/" . $value;
                         if (file_exists($file)) {
                             $id = !empty($level["original_binary"]) ? $level["original_binary"] : null;
                             $id = ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                            unlink($file);
                             $value = $id;
                         }
                     }
@@ -137,10 +138,11 @@ class OptionsHelper
                                 }
                                 $value = "";
                             } else {
-                                $file = ApplicationState::getTemporaryFolder() . "/" . $value;
+                                $file = ApplicationState::getTemporaryBinariesFolder() . "/" . $value;
                                 if (file_exists($file)) {
                                     $id = !empty($repDef[$key . "_original_binary"]) ? $repDef[$key . "_original_binary"] : null;
                                     $id = ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                                    unlink($file);
                                     $value = $id;
                                 }
                             }

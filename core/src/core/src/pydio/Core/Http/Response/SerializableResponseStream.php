@@ -57,6 +57,11 @@ class SerializableResponseStream implements StreamInterface
      */
     protected $serializedContent;
 
+    /**
+     * @var bool
+     */
+    protected $forceArray = false;
+
     private $streamStatus = 'open';
 
     /**
@@ -82,6 +87,13 @@ class SerializableResponseStream implements StreamInterface
         if($context !== null){
             $this->serializerContext = $context;
         }
+    }
+
+    /**
+     * Set forceArray flag
+     */
+    public function forceArray(){
+        $this->forceArray = true;
     }
 
     /**
@@ -156,7 +168,7 @@ class SerializableResponseStream implements StreamInterface
             if(isSet($this->serializerContext) && isSet($this->serializerContext["pretty"]) && $this->serializerContext["pretty"] === true){
                 $pretty = JSON_PRETTY_PRINT;
             }
-            if(count($buffer) == 1) {
+            if(count($buffer) === 1 && !$this->forceArray) {
                 $json = json_encode(array_shift($buffer), $pretty);
             }else {
                 $json = json_encode($buffer, $pretty);
@@ -272,7 +284,7 @@ class SerializableResponseStream implements StreamInterface
      */
     public function getSize()
     {
-        if(!empty($this->data)){
+        if(!empty($this->data) || $this->forceArray){
             $this->serializedContent = $this->getContents();
             return strlen($this->serializedContent);
         }else{

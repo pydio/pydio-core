@@ -20,6 +20,7 @@
  */
 
 namespace Pydio\OCS;
+use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Cache\Core\CacheStreamLayer;
@@ -32,6 +33,7 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Client\OCSClient;
 use Pydio\OCS\Model\SQLStore;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -42,6 +44,16 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class ActionsController
 {
+    private $configs;
+
+    /**
+     * ActionsController constructor.
+     * @param $configs
+     */
+    public function __construct($configs){
+        $this->configs = $configs;
+    }
+
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
@@ -57,6 +69,14 @@ class ActionsController
         $httpVars = $request->getParsedBody();
         
         switch($action){
+
+            case "user_list_authorized_users":
+
+                if(isSet($httpVars['trusted_server_id'])){
+                    $this->forwardUsersListToRemote($request, $response);
+                }
+
+                break;
 
             case "accept_invitation":
 
@@ -119,4 +139,46 @@ class ActionsController
 
         return null;
     }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $responseInterface
+     * @throws PydioException
+     */
+    protected function forwardUsersListToRemote(ServerRequestInterface &$request, ResponseInterface &$responseInterface){
+
+        $httpVars           = $request->getParsedBody();
+        $searchQuery       = InputFilter::sanitize($httpVars['value'], InputFilter::SANITIZE_HTML_STRICT);
+        $trustedServerId   = InputFilter::sanitize($httpVars['trusted_server_id'], InputFilter::SANITIZE_ALPHANUM);
+        if(!isSet($this->configs["TRUSTED_SERVERS"]) || !isSet($this->configs["TRUSTED_SERVERS"][$trustedServerId])){
+            throw new PydioException("Cannot find trusted server with id " . $trustedServerId);
+        }
+        $serverData = $this->configs["TRUSTED_SERVERS"][$trustedServerId];
+        $url = $serverData['url'] . '/api/pydio/user_list_authorized_users/' . $searchQuery;
+        $params = [
+            'format'            => 'json',
+            'users_only'        => 'true',
+            'existing_only'     => 'true',
+            'exclude_current'   => 'false'
+        ];
+        $client = new Client();
+        $postResponse = $client->post($url, [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($serverData['user'] . ':' . $serverData['pass'])
+            ],
+            'body' => $params
+        ]);
+        $body = $postResponse->getBody()->getContents();
+        $jsonContent = json_decode($body);
+        foreach($jsonContent as $userEntry){
+            $userEntry->trusted_server_id       = $trustedServerId;
+            $userEntry->trusted_server_label    = $serverData['label'];
+        }
+
+        $httpVars['processed'] = true;
+        $request = $request->withParsedBody($httpVars);
+        $responseInterface = new JsonResponse($jsonContent);
+
+    }
+
 }

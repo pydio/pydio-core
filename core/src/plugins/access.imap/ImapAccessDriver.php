@@ -71,11 +71,21 @@ class ImapAccessDriver extends FsAccessDriver
         }
     }
 
+    /**
+     * @param $st1
+     * @param $st2
+     * @return int
+     */
     public static function inverseSort($st1, $st2)
     {
         return strnatcasecmp($st2, $st1);
     }
 
+    /**
+     * @param $st1
+     * @param $st2
+     * @return int
+     */
     public static function sortInboxFirst($st1, $st2)
     {
         if($st1 == "INBOX") return -1;
@@ -83,6 +93,13 @@ class ImapAccessDriver extends FsAccessDriver
         return strcmp($st1, $st2);
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     * @throws \Exception
+     * @throws \Pydio\Access\Core\Exception\FileNotWriteableException
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         if ($request->getAttribute("action") ==  "ls") {
@@ -201,11 +218,16 @@ class ImapAccessDriver extends FsAccessDriver
     {
         if($foldersOnly) return 0;
         $count = 0;
-        if($tmpHandle = opendir($dirNode->getUrl())){
+        if($dirHANDLE !== null){
+            $tmpHandle = $dirHANDLE;
+        }else{
+            $tmpHandle = opendir($dirNode->getUrl());
+        }
+        if($tmpHandle !== false){
             // WILL USE IMAP FUNCTIONS TO COUNT;
             $this->logDebug("COUNT : ".ImapAccessWrapper::getCurrentDirCount());
             $count = ImapAccessWrapper::getCurrentDirCount();
-            closedir($tmpHandle);
+            //closedir($tmpHandle);
         }
         return $count;
     }

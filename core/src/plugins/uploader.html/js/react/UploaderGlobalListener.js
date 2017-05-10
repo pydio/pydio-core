@@ -63,7 +63,7 @@
     var initialized = false;
 
     var initUploaderExtension = function(){
-
+return;
         if(initialized) return;
         else initialized = true;
         let mainElement = global.pydio.Parameters.get('MAIN_ELEMENT');
@@ -87,8 +87,9 @@
                 if(Event.findElement(event, '.class-FetchedResultPane')){
                     return (listZone ? listZone : dropzone);
                 }
-                if(el.ajxpNode.isLeaf() && listZoneSelector){
-                    el = Event.findElement(event, listZoneSelector);
+                if(el.hasClassName('ajxpNodeLeaf') || el.ajxpNode.isLeaf() || el.ajxpNode.getAjxpMime() === 'ajxp_recycle'){
+                    if(listZoneSelector) el = Event.findElement(event, listZoneSelector);
+                    else el = Event.findElement(event, '[ajxpClass="FilesList"]');
                 }
             }
             if(!el) {

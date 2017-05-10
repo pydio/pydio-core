@@ -143,12 +143,14 @@
                 let bytesLoaded = computableEvent.loaded;
                 this.setProgress(percentage, bytesLoaded);
             }.bind(this);
+
             this.setStatus('loading');
 
             let maxUpload = parseFloat(UploaderConfigs.getInstance().getOption('UPLOAD_MAX_SIZE'));
 
             let queryString;
             try{
+                UploaderConfigs.getInstance().extensionAllowed(this);
                 queryString = this.buildQueryString();
             }catch(e){
                 this.onError(e.message);
@@ -170,7 +172,7 @@
                 }.bind(this));
 
             }else{
-                
+
                 if(this.getSize() > maxUpload){
                     this.onError(global.pydio.MessageHash[211]);
                     completeCallback();
@@ -193,7 +195,7 @@
             let configs = this.getMqConfigs();
             var secure = configs.get("BOOSTER_MAIN_SECURE");
             if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE']){
-                secure = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
+                secure = configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
             }
             var host = configs.get("BOOSTER_MAIN_HOST");
             if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_HOST']){
@@ -207,7 +209,7 @@
             if(this._relativePath) {
                 fullPath += PathUtils.getDirname(this._relativePath);
             }
-            fullPath += '/' + PathUtils.getBasename(this._file.name);
+            fullPath += '/' + encodeURI(PathUtils.getBasename(this._file.name));
 
             let url = "http"+(secure?"s":"")+"://"+host+":"+port+"/"+configs.get("UPLOAD_PATH")+"/"+this._repositoryId + fullPath;
             let queryString = '';
@@ -357,6 +359,7 @@
                 this.processNext();
             } // Autostart with queue was empty before
             this.notify('update');
+            this.notify('item_added', folderItem);
         }
         pushFile(uploadItem){
             this._uploads.push(uploadItem);
@@ -369,6 +372,7 @@
                 this.processNext();
             } // Autostart with queue was empty before
             this.notify('update');
+            this.notify('item_added', uploadItem);
         }
         log(){
         }
@@ -472,7 +476,7 @@
             }
         }
 
-        handleDropEventResults(items, files, targetNode, accumulator = null){
+        handleDropEventResults(items, files, targetNode, accumulator = null, filterFunction = null ){
 
             let oThis = this;
 
@@ -491,11 +495,13 @@
                         entry.file(function(File) {
                             if(File.size == 0) return;
                             let uploadItem = new UploadItem(File, targetNode);
+                            if(filterFunction && !filterFunction(uploadItem)) return;
                             if(!accumulator) oThis.pushFile(uploadItem);
                             else accumulator.push(uploadItem);
                         }, error );
                     } else if (entry.isDirectory) {
                         let folderItem = new FolderItem(entry.fullPath, targetNode);
+                        if(filterFunction && !filterFunction(folderItem)) continue;
                         if(!accumulator) oThis.pushFolder(folderItem);
                         else accumulator.push(folderItem);
 
@@ -504,12 +510,14 @@
                             fileEntry.file(function(File) {
                                 if(File.size == 0) return;
                                 let uploadItem = new UploadItem(File, targetNode, relativePath);
+                                if(filterFunction && !filterFunction(uploadItem)) return;
                                 if(!accumulator) oThis.pushFile(uploadItem);
                                 else accumulator.push(uploadItem);
 
                             }, error );
                         }, function(folderEntry){
                             let folderItem = new FolderItem(folderEntry.fullPath, targetNode);
+                            if(filterFunction && !filterFunction(uploadItem)) return;
                             if(!accumulator) oThis.pushFolder(folderItem);
                             else accumulator.push(folderItem);
                         }, error );
@@ -517,12 +525,12 @@
                 }
             }else{
                 for(var j=0;j<files.length;j++){
-                    console.log(files[j]);
                     if(files[j].size === 0){
                         alert(global.pydio.MessageHash['html_uploader.8']);
                         return;
                     }
                     let uploadItem = new UploadItem(files[j], targetNode);
+                    if(filterFunction && !filterFunction(uploadItem)) continue;
                     if(!accumulator) oThis.pushFile(uploadItem);
                     else accumulator.push(uploadItem);
                 }
@@ -545,7 +553,7 @@
                 dirReader.readEntries (function(results) {
                     if (!results.length) {
 
-                        $A(entries).each(function(e){
+                        entries.map(function(e){
                             if(e.isDirectory){
                                 folderHandler(e);
                                 recurseDir(e, fileHandler, folderHandler, errorHandler);
@@ -586,6 +594,17 @@
             if(!this._global){
                 this._global = global.pydio.getPluginConfigs("uploader");
                 this._mq = global.pydio.getPluginConfigs("mq");
+            }
+        }
+
+        extensionAllowed(uploadItem){
+            let extString = this.getOption("ALLOWED_EXTENSIONS", '', '');
+            if(!extString) return true;
+            let extDescription = this.getOption("ALLOWED_EXTENSIONS_READABLE", '', '');
+            if(extDescription) extDescription = ' (' + extDescription + ')';
+            let itemExt = PathUtils.getFileExtension(uploadItem.getLabel());
+            if(extString.split(',').indexOf(itemExt) === -1){
+                throw new Error(global.pydio.MessageHash[367] + extString + extDescription);
             }
         }
 

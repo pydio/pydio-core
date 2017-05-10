@@ -22,6 +22,7 @@
 ###################################################################
 namespace Pydio\Access\Driver\StreamProvider\SMB;
 
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 
 define ('SMB4PHP_VERSION', '0.8');
@@ -271,7 +272,7 @@ class smb
                                 : array();
                             break;
                         case 'error':
-                            if (strstr($regs[1], "NO_SUCH_FILE") == 0) {
+                            if (strstr($regs[1], "NO_SUCH_FILE") !== false) {
                                 return "NOT_FOUND";
                             }
                             trigger_error($regs[1], E_USER_ERROR);
@@ -553,7 +554,7 @@ class smb_stream_wrapper extends smb
 {
     # variables
 
-    public $stream, $url, $parsed_url = array (), $mode, $tmpfile;
+    public $stream, $url, $parsed_url = array (), $mode, $tmpfile, $defer_stream_read;
     public $need_flush = FALSE;
     public $dir = array (), $dir_index = -1;
 
@@ -648,7 +649,6 @@ class smb_stream_wrapper extends smb
         $url = smb::cleanUrl($url);
         $this->url = $url;
         $this->mode = $mode;
-        $this->defer_stream_read;
         $this->parsed_url = $pu = smb::parse_url($url);
         if ($pu['type'] <> 'path') trigger_error('stream_open(): error in URL', E_USER_ERROR);
         switch ($mode) {
@@ -745,38 +745,36 @@ function ConvSmbParameterToWinOs($params)
 {
 
     $paramstemp = explode(" ", $params);
-    
-	// first command '-d' or '-L' ?
-    if ($paramstemp[0] == "-d") {
-        $count_params = count($paramstemp);
 
+    // first command '-d' or '-L' ?
+    if ($paramstemp[0] === '-d') {
+
+        $count_params = count($paramstemp);
         // index command = 4;
         // index start path = 6;
         $paramstemp[6] = '""'.$paramstemp[6];
         $type_cmd = substr($paramstemp[4], 1);
         switch ($type_cmd) {
 
-        case get:
-        case put:
-        case rename:
-            $index_end_path = $count_params - 2;
-            $paramstemp[$index_end_path] = $paramstemp[$index_end_path].'""';
-            $new_params = implode(" ", $paramstemp);
-            $new_params = str_replace('   ', '""   ""', $new_params);
-            break;
+            case 'get':
+            case 'put':
+            case 'rename':
+                $index_end_path = $count_params - 2;
+                $paramstemp[$index_end_path] = $paramstemp[$index_end_path].'""';
+                $new_params = implode(" ", $paramstemp);
+                $new_params = str_replace('   ', '""   ""', $new_params);
+                break;
 
-        //Cmd: dir, del, rmdir, mkdir					
-        default:
-            $index_end_path = $count_params - 2;
-            $paramstemp[$index_end_path] = $paramstemp[$index_end_path].'""';
-            $new_params = implode(" ", $paramstemp);
+            //Cmd: dir, del, rmdir, mkdir
+            default:
+                $index_end_path = $count_params - 2;
+                $paramstemp[$index_end_path] = $paramstemp[$index_end_path].'""';
+                $new_params = implode(" ", $paramstemp);
         }
+        $params = $new_params;
+    }
 
-        return $new_params;
-    }
-    else {		
-        return $params;
-    }
+    return TextEncoder::toStorageEncoding($params);
 }
 
 ###################################################################

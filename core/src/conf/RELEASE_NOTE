@@ -1,5 +1,68 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+First pre-beta build for Pydio 8
+
+----
+7.0.4 is a bugfix and security release for 7 branch.
+
+Make sure checking db version test does not break everything (if there is a missing table for example).
+Fix throw error when accessing to prohibited path on smb wsp
+Fix EncFS and caching issues
+Optim: make sure clear cache is called deferred.
+Do not use applyHook but load session manager directly instead for performances.
+Mq.serial: make $channels static variable as in mq.sql
+Add an option to disable nodes caching
+Add ldap support AD memberof values in nested group
+Fix EncFS
+Make sure that unserialized object is a Notification instance
+Switch lite version to full version
+Fix webDAV upload events. Should fix #1317 and fix #1318
+Replace check for bypass_pwd by check on empty $pwd variable. Should fix #1316, please confirm
+Test USE_SESSION_CREDENTIALS value, not just isset(). Should be the real cause of #1316
+Close session on possibly long requests that may block the UI
+Adding local cache per instance to MemorySafe and removing time limit on nodes cache
+Adding interval for the Zoho Editor when in the minisite
+Fix #1319, enable Copy action on readonly files.
+Making sure we don't break previous usage
+Update tutorial videos. Open panel by default for the first connexion.
+Fix events forwarding for one-doc minisite (use ContentFilter instead of relative path re-compute). Zoho send a create event instead of a content event.
+Fix for s3 shares
+Typo error
+Fix #1322 by triming userId whitespaces.
+Missing logs when upload via pluploader. Fix #1321
+Remove double urldecode, creating "+" issues in Rest API.
+Typo in roles manager could lead to group admin seeing unauthorized workspaces
+Add an optional parameter to enable links in digest email.
+Fix notifications when registering on a "publicly visible" share.
+Fix non-deleting alerts
+Try to make a better error reporting when exception fails because response already sent or logger fails.
+Fix closing of videos tutorials
+
+7.0.3 is a bugfixes for 7.0.2. Particularly, some issues were introduced with the Session Credentials mechanism.
+
+. Build a version tar.gz with noemptydirs
+. Simple modif to release note for testing builds with noemptydirs
+. Fix test workspace in public links (repository has encoded credentials option)
+. Typo in hasNumericKeys detection was still breaking the numeric logins case for meta watch.
+. Fix multi auth with numeric logins
+. getWrapperClassName: make sure to exit if current registry does not have any active access plugin.
+. Put -moz-user-select key after the others to make sure it's taken. Was breaking Ctrl+C on recent Firefox versions.
+. Fix share alerts overriding one another
+. Fix restore
+. Change how RO or WO permission overwrites existing RW permission.
+. Call fflush in createEmptyFile to make sure FTP wrapper is working.
+. Should fix #1300
+. Fixing admin key for the pydio booster so that a user id is always associated to it
+. Use TextResponse objects - Fix #1308 (plus other similar occurrences)
+. Fix specific urlencoding issues on webdav.
+. Fix specific cases in PThumb
+. Fix get instance ID base on plugin option and roles
+. Fix #1306 - moving file cross workspace
+. Fixing non initialized message
+
+
+--
+
 Welcome to Pydio 7.0!
 
 Pydio 7 is a full overhaul of the PHP code, raising the standards, improving performances and making the platform more modular than ever. We also introduce a new separate tool called Pydio Booster, written in Go, removing php limits and easing the deployment of WebSockets.
@@ -12,6 +75,71 @@ Pydio 7.0.1 Fix main upgrade issues of 7.0
 . php 5.5.9 issue, count(false) returns true, making RolesList empty.
 . Check php version: 5.6 is finally required for enterprise dist, because of ioncube loaders.
 . Fix case sensitive rename (details)
+
+Pydio 7.0.2 Bugfix release for Pydio 7
+--
+. Fix command line automatic comma-split, let it enabled only for -i and -r options, otherwise it can break some commands. (details)
+. Update current stable version (details)
+. Use a dedicated mbParseUrl() function instead of parse_url that may fail with utf-8 on some specific installs (inc. macos) (details)
+. Fix issue #1259: Zip on-the-fly option creates 0-sized empty files (apache compatibility) (details)
+. Users and groups deletion: use UsersService and RolesService instead of deleting directly in db to fix caching issues. (details)
+. Fix roles assignment when updating user groupPath (details)
+. JS UI: handle Prompt exception and dialog. (details)
+. New Middleware WorkspaceAuthRequired catches specific exception, sends JS prompt message and re-initialize request when form is submitted. (details)
+. changed invalid link to developer guide to v7 developer guide (details)
+. Reorganize MemorySafe. Add a context identifier to handle multiple credential sources. For storing when passed via ENV CLi. (details)
+. Tplus / Tminus were moved to subfolder. Fix #1255 (details)
+. Change docs editors orders. Fix #1264 (details)
+. Fix ChainCache declaring PatternClearable although subacaches may not have this feature. Fix #1265 (details)
+. Make sure to save repoId in session when loading minisite, can make some issues if shared user have other workspaces accesses. (details)
+. Sets a default provider for TaskService otherwise top-level errors of command line are not visible to task status. (details)
+. Fix slug issues - Fix #1273 (details)
+. Prevent enabling cache at install if apc/apcu is not enabled. Should fix #1261 (details)
+. Make sure to recompute readonly flag if current context has a permission mask, by using node.info.nocache hook. (details)
+. Change icon for dwg files, use cube. Fix #1230 (details)
+. Do not post "change" notifications or alerts when just copying a file to another workspace. Fix #1274 (details)
+. Silently ignore register channel on non-readable repository. Avoid sending events on write-only repositories, see #1256 (details)
+. Dav impl childExists function is highly inefficient, replace by a simple call to is_file on childnode. (details)
+. And WorkspaceAuthRequired instead of simple exception (details)
+. Fix meta.git download/preview. Fix #1275 (details). .
+. Fix Shared Files download, the associated method is no more switchAction but downloadAction. Fix #1276 (details)
+. Use file_exists instead of is_file (details)
+. CLI and task_id passed : make sure to update status by default, for actions that do not implement specific tasks management. Otherwise scheduler will show "Starting action.... " and nothing more. (details)
+. Missing context in cleanUserShares() could create an error on user deletion. Close #1279 (details)
+. Fix mbParseUrl if preg_replace returns null. (details)
+. Catch deleteById() exceptions in ElasticSearch (details)
+. Remote download was broken. Fix #1281 (details)
+. Auth.multi : when looking for shared users only, skip master driver. Auth.ldap : fix users count caching per baseGroup. (details)
+. Fix CSS on share dialog title. (details)
+. Add user if not in indexed URL. (details)
+. Meta.git: make sure to apply node.change after revert operation. (details)
+. Fix counting user on ldap (details)
+. Missing curly brace (details)
+. Fix Imap & EML plugins - Warning php7 requires Mail_mimeDecode 1.5.6 - Fix #1282 (details)
+. Fix #1288 (details)
+. Rewire ALLOWED_EXTENSIONS configs - Fix #1283 (details)
+. Fix SMB access driver and custom smbclient path. Close #1290 (details)
+. Fix zip operation when child drivers are remote (inc. smb) - Fix #1287 Fix base detection for archive (details)
+. Auth.ldap: add starttsl support. See #1248, should fix it. (details)
+. Manual merge of #1292 (put encoding call directly inside win-dedicated function. (details)
+. Update trigger as mysql automatically pads varchars when comparing, creating a content instead of path in some case (trailing spaces). See #1253 (details)
+. i18n new prompt exception mechanism (details)
+. RolesManager loading role data : Make sure to remove invalid repos on error from shared repositories list. (details)
+. Initiate release note and dist resources for 7.0.2 (details)
+. 7.0.2 : rename extensions.conf file. (details)
+. Fixing webdav dir php7, caching and guzzle version compat issue (details)
+. Enabling empty file creation via Guzzle (details)
+. Optionally convert to ASCII//TRANSLIT the search term. Close #1243 (details)
+. Removing double encoding to fix 1252 (details)
+. Fix IMAP access driver that was failing if cache was enabled. (details)
+. resolveAddress: check userExists before validateEmail(), otherwise a user with email-like ID will not have his real address taken into account. Close #1286 (details)
+. Handle Minisite + Lock case - Fix #1278 (details)
+. Access.smb: throw WorkspaceAuthRequired if no credentials found and anonymous connection is not allowed. (details)
+. Previous commit seems not necessary (details)
+. Finally keep the WorkspaceAuthRequired throw from Smb. Test for empty credentials when testing workspace. Modal: fix overlay not present (prevents prompt opening). (details)
+. Document the //TRANSLIT support in Zip Encoding field. See #1252 (details)
+. Fix drag'n'drop on leaf nodes (cause of possible "Empty Response" error at upload). (details)
+. Make sure to never call getId() on null user. (details)
 
 **************
 New Features

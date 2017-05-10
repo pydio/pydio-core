@@ -24,8 +24,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 $mess = array(
     "1" => "Compress",
     "2" => "Compress Selection",
-    "3" => "Select the format of the archive:",
-    "4" => "Archive's name :",
+    "3" => "Format",
+    "4" => "Archive's name",
     "5" => "Starting compression...",
     "6" => "Adding files in the archive... %s ",
     "7" => "During compression in %s ...",

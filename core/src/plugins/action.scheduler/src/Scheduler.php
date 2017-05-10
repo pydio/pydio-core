@@ -145,7 +145,6 @@ class Scheduler extends Plugin
     public function runTask(ContextInterface $ctx, $taskId, $status = null, &$currentlyRunning = -1, $forceStart = false)
     {
         // TODO : Set MasterInterval as config, or detect last execution?
-        $mess = LocaleService::getMessages();
         $masterInterval = 1;
         $maximumProcesses = 2;
 
@@ -162,7 +161,7 @@ class Scheduler extends Plugin
             $job->setId(StringHelper::createGUID());
             $job->setParentId($task->getId());
             $job->setStatus(Task::STATUS_PENDING);
-            $job->setStatusMessage($mess["action.scheduler.31"]);
+            $job->setStatusMessage("Starting...");
             TaskService::getInstance()->createTask($job, new Schedule(Schedule::TYPE_ONCE_NOW));
             if($job->getUserId() !== $ctx->getUser()->getId()){
                 $uId = $job->getUserId();
@@ -195,7 +194,6 @@ class Scheduler extends Plugin
      */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        $mess = LocaleService::getMessages();
         $action = $requestInterface->getAttribute("action");
         /** @var ContextInterface $ctx */
         $ctx    = $requestInterface->getAttribute("ctx");
@@ -213,10 +211,10 @@ class Scheduler extends Plugin
                 foreach($tasks as $task){
                     $res = $this->runTask($ctx, $task->getId());
                     if($res){
-                        $message .= $mess["action.scheduler.32"] . $task->getLabel() . " \n ";
+                        $message .= "Launching " . $task->getLabel() . " \n ";
                     }
                 }
-                if (empty($message)) $message = $mess["action.scheduler.33"];
+                if (empty($message)) $message = "Nothing to do";
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($message), new ReloadMessage()]));
 
                 break;
@@ -226,7 +224,7 @@ class Scheduler extends Plugin
                 $err = -1;
                 $tId = InputFilter::sanitize($requestInterface->getParsedBody()["task_id"], InputFilter::SANITIZE_ALPHANUM);
                 $this->runTask($ctx, $tId, null, $err, true);
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($mess["action.scheduler.34"]), new ReloadMessage()]));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage("Launching task now"), new ReloadMessage()]));
 
                 break;
 
@@ -260,7 +258,6 @@ class Scheduler extends Plugin
      */
     public function handleTasks(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        $mess       = LocaleService::getMessages();
         $action     = $requestInterface->getAttribute("action");
         $ctx        = $requestInterface->getAttribute("ctx");
         $httpVars   = $requestInterface->getParsedBody();
@@ -308,7 +305,7 @@ class Scheduler extends Plugin
                     $task->setType(Task::TYPE_ADMIN);
                 }
                 $task->setStatus(Task::STATUS_TEMPLATE);
-                $task->setStatusMessage($mess["action.scheduler.27"]);
+                $task->setStatusMessage("Scheduled");
                 $task->setAction($actionName);
                 $task->setParameters($parameters);
                 $task->setLabel($taskLabel);
@@ -321,7 +318,7 @@ class Scheduler extends Plugin
                     TaskService::getInstance()->createTask($task, $task->getSchedule());
                 }
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($mess["action.scheduler.28"]), new ReloadMessage()]));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage("Successfully added/edited task"), new ReloadMessage()]));
                 break;
 
             case "scheduler_removeTask" :
@@ -329,12 +326,15 @@ class Scheduler extends Plugin
                 $task = TaskService::getInstance()->getTaskById(InputFilter::sanitize($httpVars["task_id"], InputFilter::SANITIZE_ALPHANUM));
                 if($task !== null){
                     $children = $task->getChildrenTasks();
-                    if(!empty($children)){
-                        throw new PydioException($mess["action.scheduler.29"]);
+                    foreach ($children as $child){
+                        if($child->getStatus() === Task::STATUS_RUNNING){
+                            throw new PydioException("This task has currently jobs running, please wait that they are finished");
+                        }
+                        TaskService::getInstance()->deleteTask($child->getId());
                     }
                     TaskService::getInstance()->deleteTask($task->getId());
                 }
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($mess["action.scheduler.30"]), new ReloadMessage()]));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage("Successfully removed task"), new ReloadMessage()]));
                 break;
 
             case "scheduler_loadTask":
@@ -416,8 +416,8 @@ class Scheduler extends Plugin
                 "DESCRIPTION" => "action.scheduler.22",
                 "ICON" => "preferences_desktop.png",
                 "METADATA" => array(
-                    "icon_class" => "icon-time",
-                    "component" => "Scheduler.Board"
+                    "icon_class" => "mdi mdi-timetable",
+                    "component" => "AdminScheduler.Dashboard"
                 ),
                 "LIST" => array($this, "listTasks")
             );
@@ -500,9 +500,9 @@ class Scheduler extends Plugin
      * @return AJXP_Node
      */
     protected function taskToNode(Task $task, $basePath, $dateFormat, $isChild = false){
-	$mess = LocaleService::getMessages();
+
         if($isChild){
-            $label = ($task->getStatus() === Task::STATUS_FAILED ? $mess["action.scheduler.36"] : $mess["action.scheduler.35"]);
+            $label = ($task->getStatus() === Task::STATUS_FAILED ? "JOB ERROR" : "JOB RUNNING");
             $mime = ($task->getStatus() === Task::STATUS_FAILED ? "scheduler_error_task" : "scheduler_running_task");
             $meta = [
                 "task_id"       => $task->getId(),
@@ -516,7 +516,7 @@ class Scheduler extends Plugin
                 "user_id"       => "",
                 "STATUS"        => "",
                 "NEXT_EXECUTION"     => "",
-                "LAST_EXECUTION"     => $mess["action.scheduler.37"] . $task->getCreationDate()->format($dateFormat),
+                "LAST_EXECUTION"     => "Started on ". $task->getCreationDate()->format($dateFormat),
             ];
         }else{
             $s = $task->getSchedule()->getValue();
@@ -547,7 +547,6 @@ class Scheduler extends Plugin
      * Migrate old JSON file format to TaskService
      */
     protected function migrateLegacyTasks(){
-        $mess = LocaleService::getMessages();
         $dbFile = $this->getDbFile();
         if(!file_exists($dbFile)) return;
         $tasks = FileHelper::loadSerialFile($dbFile, false, "json");
@@ -562,7 +561,7 @@ class Scheduler extends Plugin
             $t->setWsId($tData["repository_id"]);
             $t->setType(Task::TYPE_ADMIN);
             $t->setStatus(Task::STATUS_TEMPLATE);
-            $t->setStatusMessage($mess["action.scheduler.27"]);
+            $t->setStatusMessage("Scheduled");
             TaskService::getInstance()->createTask($t, $t->getSchedule());
         }
         @unlink($dbFile);

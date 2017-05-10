@@ -40,7 +40,7 @@ class NodeXML
      * @param bool $isLeaf
      * @param array $metaData
      * @param bool $close
-     * @return string|void
+     * @return string
      * @internal param bool $print
      */
     public static function toNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close = true)
@@ -73,7 +73,7 @@ class NodeXML
      * @static
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param bool $close
-     * @return string|void
+     * @return string
      */
     public static function toXML($node, $close = true)
     {

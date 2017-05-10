@@ -25,6 +25,8 @@ use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Exception\PydioPromptException;
+use Pydio\Access\Core\Stream\Exception\OAuthException;
 
 use Pydio\Core\Utils\FileHelper;
 use React\Promise\Deferred;
@@ -137,7 +139,7 @@ class StreamWrapper implements IAjxpWrapper
 
         return true;
     }
-    
+
     /**
      * @return bool
      */
@@ -182,7 +184,7 @@ class StreamWrapper implements IAjxpWrapper
      */
     public function mkdir($path, $mode, $options) {
         $stream = self::createStream($path);
-        
+
         return $stream->mkdir();
     }
 
@@ -234,9 +236,10 @@ class StreamWrapper implements IAjxpWrapper
     }
 
     /**
+     * @param $url
      * @return bool
      */
-    public static function isRemote() {
+    public static function isRemote($url) {
         return true;
     }
 
@@ -309,10 +312,17 @@ class StreamWrapper implements IAjxpWrapper
 
         $nodeStream = Stream::factory($node, $mode);
         if ($useAuthStream) $nodeStream = new AuthStream($nodeStream, $node);
-        if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
 
+        try {
+            if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
+        } catch (OAuthException $e) {
+            throw PydioPromptException::promptForAuthRedirection("test", $e->getURL());
+        }
+
+        if (strpos($mode, 'w') !== false) {
+            $nodeStream = new WriteBufferStream($nodeStream, $node);
+        }
         $nodeStream = new MetadataCachingStream($nodeStream, $node);
-        $nodeStream = new WriteBufferStream($nodeStream, $node);
 
         PydioStreamWrapper::getResource($nodeStream);
 
@@ -348,6 +358,7 @@ class StreamWrapper implements IAjxpWrapper
      */
     public function unlink($path)
     {
-        // TODO: Implement unlink() method.
+        $stream = self::createStream($path);
+        return $stream->delete();
     }
 }

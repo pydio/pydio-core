@@ -168,6 +168,9 @@ class TreeManager extends AbstractManager
             if (strstr(urldecode($dir), "#") !== false) {
                 list($dir, $hash) = explode("#", urldecode($dir));
             }
+            if(isSet($httpVars['page'])){
+                $hash = intval($httpVars['page']);
+            }
             $splits = explode("/", $dir);
             $root = array_shift($splits);
             if (count($splits)) {

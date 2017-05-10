@@ -46,6 +46,9 @@ class SessionMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
+        if(ApplicationState::isAdminMode()){
+            SessionService::setSessionName(PYDIO_SESSION_NAME_SETTINGS);
+        }
         $getParams = $requestInterface->getQueryParams();
         $sessionName = SessionService::getSessionName();
 

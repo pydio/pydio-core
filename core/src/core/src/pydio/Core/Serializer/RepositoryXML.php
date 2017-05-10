@@ -120,13 +120,16 @@ class RepositoryXML
         $currentUserIsOwner = false;
         $ownerLabel = null;
         if ($repoObject->hasOwner()) {
-            $uId = $repoObject->getOwner();
-            if($loggedUser != null && $loggedUser->getId() == $uId){
-                $currentUserIsOwner = true;
+            if(strpos($repoId, 'ocs_remote_share_') === 0){
+                $ownerLabel = $uId = $repoObject->getOwner();
+            }else{
+                $uId = $repoObject->getOwner();
+                if($loggedUser != null && $loggedUser->getId() == $uId){
+                    $currentUserIsOwner = true;
+                }
+                $ownerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
             }
-            $label = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
-            $ownerLabel = $label;
-            $isSharedString =  'owner="'. StringHelper::xmlEntities($label) .'"';
+            $isSharedString =  'owner="'. StringHelper::xmlEntities($ownerLabel) .'"';
         }
         if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
             $streamString .= " userScope=\"true\"";

@@ -32,8 +32,12 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\SessionService;
+use Pydio\Core\Services\UsersService;
 use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -55,12 +59,36 @@ class AuthMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
+        if(!UsersService::usersEnabled()){
+            /** @var ContextInterface $ctx */
+            $ctx = $requestInterface->getAttribute("ctx");
+            if(!UsersService::userExists("shared")){
+                $sharedUser = UsersService::createUser("shared", "xxxxxxxx", true);
+            }else{
+                $sharedUser = UsersService::getUserById("shared");
+            }
+            if(!$sharedUser->isAdmin()) {
+                $sharedUser->setAdmin(true);
+                RolesService::updateAdminRights($sharedUser);
+            }
+            $requestInterface = $requestInterface->withAttribute("ctx", $ctx->withUserId("shared"));
+            return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
+        }
+
         $driverImpl = ConfService::getAuthDriverImpl();
         PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
         $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
-        if($response != null){
+        if($response !== null){
             return $response;
+        }
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute('ctx');
+        if($ctx->hasUser() && ApplicationState::sapiUsesSession() && SessionService::has(SessionService::USER_TEMPORARY_DISPLAY_NAME)){
+            $user = $ctx->getUser();
+            $user->getPersonalRole()->setParameterValue("core.conf", "USER_TEMPORARY_DISPLAY_NAME", SessionService::fetch(SessionService::USER_TEMPORARY_DISPLAY_NAME));
+            $ctx->setUserObject($user);
+            $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
         }
 
         try{

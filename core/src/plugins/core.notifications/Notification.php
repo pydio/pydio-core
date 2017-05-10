@@ -65,6 +65,10 @@ class Notification implements ContextProviderInterface
      */
     public $author;
     /**
+     * @var String
+     */
+    public $authorTemporaryLabel;
+    /**
      * @var int
      */
     public $date;
@@ -328,8 +332,11 @@ class Notification implements ContextProviderInterface
      */
     protected function getPublicAuthorLabel(){
         $m = LocaleService::getMessages();
-        $label = str_replace("%s", Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
-        return $label;
+        if(!empty($this->authorTemporaryLabel)){
+            return $this->authorTemporaryLabel . ' (' . Logger::getClientAdress().')';
+        }else{
+            return str_replace("%s", Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
+        }
     }
 
     /**
@@ -409,7 +416,7 @@ class Notification implements ContextProviderInterface
     }
 
     /**
-     * @return Notification
+     * @return Notification[]
      */
     public function getRelatedNotifications()
     {
@@ -423,5 +430,21 @@ class Notification implements ContextProviderInterface
     public function getContext()
     {
         return $this->getNode()->getContext();
+    }
+
+    /**
+     * @return String
+     */
+    public function getAuthorTemporaryLabel()
+    {
+        return $this->authorTemporaryLabel;
+    }
+
+    /**
+     * @param String $authorTemporaryLabel
+     */
+    public function setAuthorTemporaryLabel($authorTemporaryLabel)
+    {
+        $this->authorTemporaryLabel = $authorTemporaryLabel;
     }
 }

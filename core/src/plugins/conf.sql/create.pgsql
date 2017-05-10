@@ -54,10 +54,15 @@ CREATE TABLE ajxp_roles (
   role_id varchar(255) PRIMARY KEY,
   serial_role bytea NOT NULL,
   searchable_repositories text,
+  owner_user_id varchar(255) default NULL,
   last_updated INT NOT NULL DEFAULT 0
 );
 
 CREATE INDEX roles_updated_idx ON ajxp_roles(last_updated);
+CREATE INDEX roles_owner_idx ON ajxp_roles(owner_user_id);
+CREATE UNIQUE INDEX owner_role ON ajxp_roles(`role_id`, `owner_user_id`);
+CREATE UNIQUE INDEX prefs_login_name ON ajxp_user_prefs(`login`, `name`);
+
 
 CREATE TABLE ajxp_groups (
   "groupPath" varchar(255) PRIMARY KEY,

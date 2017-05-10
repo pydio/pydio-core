@@ -90,7 +90,7 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
             self::$metaCache[$nameSpace] = array();
         }
         $hasNumericKeys = array_reduce(array_keys($metaData), function($carry, $item){
-            return $carry && is_numeric($item);
+            return $carry || is_numeric($item);
         }, false);
         if($hasNumericKeys) self::$metaCache[$nameSpace] = self::$metaCache[$nameSpace] + $metaData;
         else self::$metaCache[$nameSpace] = array_merge(self::$metaCache[$nameSpace], $metaData);

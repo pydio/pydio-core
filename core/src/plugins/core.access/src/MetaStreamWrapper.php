@@ -347,10 +347,11 @@ class MetaStreamWrapper implements IAjxpWrapper
     /**
      * Describe whether the current wrapper operates on a remote server or not.
      * @static
-     * @return boolean
+     * @param $url
+     * @return bool
      * @throws \Exception
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         throw new \Exception("Do not call this method directly, but MetaStreamWrapper::wrapperIsRemote() instead");
     }
@@ -372,7 +373,7 @@ class MetaStreamWrapper implements IAjxpWrapper
      * @return boolean
      */
     public static function wrapperIsRemote($url){
-        return call_user_func(array(self::actualRepositoryWrapperClass(new AJXP_Node($url)), "isRemote"));
+        return call_user_func(array(self::actualRepositoryWrapperClass(new AJXP_Node($url)), "isRemote"), $url);
     }
 
     /**

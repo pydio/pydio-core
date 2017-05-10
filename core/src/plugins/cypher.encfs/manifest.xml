@@ -2,13 +2,14 @@
 <ajxp_plugin enabled="false" label="CONF_MESSAGE[Encfs Mount]" description="CONF_MESSAGE[Dynamically create/mount/umount an encfs filesystem]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
-        <core_relation packaged="true" tested_version="7.0"/>
+        <core_relation packaged="true" tested_version="8.0"/>
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
     <client_settings>
         <resources>
             <i18n namespace="encfs" path="plugins/cypher.encfs/resources/i18n"/>
             <img_library alias="cypher.encfs" path="plugins/cypher.encfs/resources/img"/>
+            <js className="EncFSActions" file="plugins/cypher.encfs/res/build/EncFSActions.js"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -27,64 +28,20 @@
         <actions>
             <action name="encfs.cypher_folder_create">
                 <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.5" title="encfs.6" hasAccessKey="false">
-                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
+                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="other" contextMenu="true"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="!metadata.get('ENCFS_clear_folder')"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="encfs_cypher">
-                        <dialogOnComplete><![CDATA[
-                             var passValue = $(oForm).down('input[name="password"]').getValue();
-                             var passValue2 = $(oForm).down('input[name="password_confirm"]').getValue();
-                             if(passValue != passValue2){
-                                 ajaxplorer.displayMessage('ERROR', 'Warning, both passwords differ');
-                                 return;
-                             }
-                             var conn = new Connexion();
-                             conn.setParameters($H({
-                                get_action:'encfs.cypher_folder',
-                                file:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
-                                pass: passValue
-                             }));
-                             conn.onComplete = function(transport){
-                                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                             };
-                             conn.sendAsync();
-                             hideLightBox();
-                        ]]></dialogOnComplete>
-                    </clientCallback>
-                    <clientForm id="encfs_cypher"><![CDATA[
-                         <div id="encfs_cypher" name="encfs_cypher" box_width="320">
-                         <div class="legend">Choose an encryption key to make your data inaccessible by anyone but you. Be aware that if you loose the key, your data will be lost forever!</div>
-                         <div class="SF_element">
-                            <div class="SF_label">Encryption Key</div>
-                            <input type="password" name="password" class="SF_input dialogFocus"/>
-                         </div>
-                         <div class="SF_element">
-                            <div class="SF_label">Confirm Key</div>
-                            <input type="password" name="password_confirm" class="SF_input"/>
-                         </div>
-                         </div>
-                     ]]></clientForm>
+                    <clientCallback  module="EncFSActions.Callbacks.createCypheredFolder"/>
                 </processing>
             </action>
             <action name="encfs.cypher_folder">
                 <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.1" title="encfs.2" hasAccessKey="false">
-                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true" actionBarGroup="other"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder_mounted')"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                         var conn = new Connexion();
-                         conn.setParameters($H({
-                            get_action:'encfs.cypher_folder',
-                            file:ajaxplorer.getUserSelection().getUniqueNode().getPath()
-                         }));
-                         conn.onComplete = function(transport){
-                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                         };
-                         conn.sendAsync();
-                         hideLightBox();
-                        ]]></clientCallback>
+                    <clientCallback module="EncFSActions.Callbacks.cypherFolder"/>
                     <serverCallback methodName="switchAction" restParams="/dir+" developerComment="Cypher a folder using EncFS plugin">
                         <input_param name="dir" type="path" description="Path to the directory to encrypt"/>
                         <input_param name="pass" type="string" description="Password for first encryption. Next calls, pass is not necessary, folder will just be unmounted."/>
@@ -93,35 +50,11 @@
             </action>
             <action name="encfs.uncypher_folder">
                 <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.3" title="encfs.4" hasAccessKey="false">
-                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true" actionBarGroup="other"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder') &amp;&amp; !metadata.get('ENCFS_clear_folder_mounted')"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="encfs_mount">
-                        <dialogOnComplete><![CDATA[
-                             var passValue = $(oForm).down('input[name="password"]').getValue();
-                             var conn = new Connexion();
-                             conn.setParameters($H({
-                                get_action:'encfs.uncypher_folder',
-                                file:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
-                                pass: passValue
-                                }));
-                             conn.onComplete = function(transport){
-                                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                             };
-                             conn.sendAsync();
-                             hideLightBox();
-                        ]]></dialogOnComplete>
-                    </clientCallback>
-                    <clientForm id="encfs_mount"><![CDATA[
-                         <div id="encfs_mount" name="encfs_mount" box_width="320">
-                         <div class="legend">Enter the encryption key you have chosen when first encrypting this folder.</div>
-                         <div class="SF_element">
-                            <div class="SF_label">Key</div>
-                            <input type="password" name="password" class="SF_input dialogFocus"/>
-                         </div>
-                         </div>
-                     ]]></clientForm>
+                    <clientCallback module="EncFSActions.Callbacks.uncypherFolder"/>
                     <serverCallback methodName="switchAction" restParams="/dir+" developerComment="Decrypt a folder using EncFS plugin.">
                         <input_param name="dir" type="path" description="Path to the directory to encrypt" mandatory="true"/>
                         <input_param name="pass" type="string" description="Password used at encrytion time" mandatory="true"/>
@@ -155,7 +88,7 @@
             </action>
         </actions>
         <hooks>
-            <serverCallback methodName="filterENCFS" hookName="node.info"/>
+            <serverCallback methodName="filterENCFS" hookName="node.info.nocache"/>
         </hooks>
     </registry_contributions>
     <dependencies>

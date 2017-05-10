@@ -38,7 +38,7 @@ Class.create("CartManager", FetchedResultPane, {
         AjxpDroppables.add(element, this._rootNode);
 
         ajaxplorer.observe("server_message", function(event){
-            var newValue = XPathSelectSingleNode(event, "nodes_diff/update|nodes_diff/remove");
+            var newValue = XMLUtils.XPathSelectSingleNode(event, "nodes_diff/update|nodes_diff/remove");
             if(newValue && this._dataLoaded){
                 // Remove or update selection if node has been removed!
             }
@@ -77,7 +77,7 @@ Class.create("CartManager", FetchedResultPane, {
 
         // Replace "search" by "search-cart-download"
         delete props['get_action'];
-        if(paneLabel) props["archive_name"] = slugString(paneLabel)+".zip";
+        if(paneLabel) props["archive_name"] = LangUtils.computeStringSlug(paneLabel)+".zip";
 
         var form = $('download_form');
         form.action = window.ajxpServerAccessPath;

@@ -93,9 +93,10 @@ class FtpAccessWrapper implements IAjxpWrapper
     }
 
     /**
+     * @param $url
      * @return bool
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         return true;
     }

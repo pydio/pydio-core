@@ -24,6 +24,7 @@ namespace Pydio\Gui;
 use DOMXPath;
 use Exception;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Http\UserAgent;
 
@@ -61,6 +62,32 @@ class MobileGuiPlugin extends Plugin
             if (!$tplNodeList->length) return;
             $contribNode->removeChild($tplNodeList->item(0));
         }
+
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param $htmlContent
+     */
+    public function filterHTML(ContextInterface $ctx, &$htmlContent){
+
+        if (ApplicationState::hasMinisiteHash()) {
+            // Do not activate smart banner for minisites
+            return;
+        }
+
+        $confs = $this->getConfigs();
+        $iosAppId = $confs['IOS_APP_ID'];
+        $iosAppIcon = $confs['IOS_APP_ICON'];
+        $androidAppId = $confs['ANDROID_APP_ID'];
+        $androidAppIcon = $confs['ANDROID_APP_ICON'];
+        $meta = "    
+            <meta name=\"apple-itunes-app\" content=\"app-id=$iosAppId\"/>
+            <meta name=\"google-play-app\" content=\"app-id=$androidAppId\"/>
+            <link rel=\"apple-touch-icon\" href=\"$iosAppIcon\">
+            <link rel=\"android-touch-icon\" href=\"$androidAppIcon\" />
+        ";
+        $htmlContent = str_replace("</head>", "$meta\n</head>", $htmlContent);
 
     }
 

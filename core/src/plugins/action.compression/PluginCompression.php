@@ -82,7 +82,7 @@ class PluginCompression extends Plugin
             case "compression":
 
                 $archiveName = InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
-                $archiveFormat = $httpVars["type_archive"];
+                $archiveFormat = '.' . InputFilter::sanitize($httpVars["type_archive"], InputFilter::SANITIZE_ALPHANUM);
                 $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
                 $acceptedExtension = false;
                 foreach ($tabTypeArchive as $extensionArchive) {

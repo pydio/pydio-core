@@ -2,7 +2,7 @@
   "name": "core.tasks",
   "version": "6.5.1",
   "description": "",
-  "source_path":"js",
+  "source_path":"js/react",
   "main": "index.js",
   "author": "Abstrium SAS",
   "license": "AGPL",

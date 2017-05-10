@@ -48,51 +48,111 @@ $mess=array(
     "59"=> "iPhone/iPad",
     "60"=>"Mac OS (Beta)",
     "61"=>"Windows (Beta)",
-    "62"=>"<h2>Empezando</h2>
-            Este video es una introducción a la aplicación web APPLICATION_TITLE :
+    "62"=> "<h2>¿Qué es un Workspace?</h2>
+            Este vídeo explica que son los Workspaces en APPLICATION_TITLE
             <ul>
-                <li>Cuadro de mandos del usuario</li>
-                <li>Descripción del interfaz gráfico</li>
-                <li>Administrando ficheros y carpetas</li>
-                <li>Previsualizando y editando ficheros</li>
-                <li>Acceso rápido mediante marcadores y motor de búsqueda</li>
-                <li>Cesta de selección</li>
-            </ul>",
-    "63"=>"<h2>Compartiendo ficheros usando APPLICATION_TITLE</h2>
-            En este tutorial vamos a cubrir los puntos básicos para el intercambio de ficheros con APPLICATION_TITLE:
-			<ul>
-				<li>Crear enlaces web</li>
-				<li>Enviarlos a usuarios internos o externos</li>
-				<li>Obtener notificaciones cuando un enlace ha sido descargado</li>
-				<li>Crear un enlace con protección por contraseña</li>
-				<li>Crear más de un enlace para un solo archivo</li>
-				<li>Detener completamente la compartición de un fichero</li>
-			</ul>",
-    "64"=>"<h2>Compartiendo carpetas usando APPLICATION_TITLE</h2>
-            Este video muestra las diversas maneras de compartir carpetas en APPLICATION_TITLE
+                <li>¿Por qué APPLICATION_TITLE se centra en los Workspaces?</li>
+                <li>¿Qué son los Workspaces desde una perspectiva técnica?</li>
+                <li>¿Cómo te permiten organizar tus datos?</li>
+            </ul>
+            ",
+
+    "63"=> "<h2>Subir archivos a APPLICATION_TITLE</h2>
+            Cómo subir archivos a APPLICATION_TITLE
             <ul>
-            <li>Compartir como un nuevo repositorio</li>
-			<li>Compartir como un minisitio público</li>
-            </ul>",
+                <li>Arrastra y suelta archivos en APPLICATION_TITLE</li>
+                <li>Crear un nuevo directorio</li>
+                <li>Renombrar archivos y directorios</li>
+                <li>Descargar archivos en tu ordenador</li>
+            </ul>
+            ",
+
+    "64"=> "<h2>Busca, explora y gestiona tus archivos</h2>
+            Este vídeo muestra varios consejos para gestionar tus archivos en APPLICATION_TITLE
+            <ul>
+                <li>Barra de búsqueda para todos los Workspaces</li>
+                <li>Modos de visualización de contenidos, Atajos de teclado</li>
+                <li>Ordenar archivos</li>
+                <li>Metadatos, Favoritos</li>
+            </ul>
+            ",
+
+    "79"=> "<h2>Compartiendo archivos y carpetas</h2>
+            Este tutorial muestra como compartir archivos y carpetas interna o externamente
+            <ul>
+                <li>Creando enlaces para compartir externamente</li>
+                <li>Compartiendo archivos y directorios con colaboradores internos</li>
+                <li>Compartiendo un directorio como Workspace</li>
+                <li>Opciones de disposición para directorios compartidos</li>
+                <li>Creando un directorio «blind drop»</li>
+                <li>Gestionando usuarios y permisos de archivos compartidos</li>
+            </ul>
+            ",
+
+    "80"=> "<h2>Compartiendo: seguridad</h2>
+            Este video muestra opciones para compartir que ayudaran a hacer más seguros tus intercambios
+            <ul>
+                <li>Protección con contraseña</li>
+                <li>Tiempo de expiración</li>
+                <li>Limitar el número de descargas</li>
+            </ul>
+            ",
+
+    "81"=> "<h2>Personaliza tus enlaces</h2>
+            Aprende como personalizar la URL de tus enlaces de intercambio para hacerlos más amigables
+            ",
+
+    "82"=> "<h2>Shared links custom rights</h2>
+            Este vídeo muestra como gestionar los permisos de tus archivos compartidos
+            <ul>
+                <li>Previsualizar</li>
+                <li>Descargar</li>
+                <li>Subir / Editar</li>
+            </ul>
+            ",
+
+    "83"=> "<h2>Idioma</h2>
+            APPLICATION_TITLE está disponible en 28 idiomas. Este vídeo muestra como cambiar el idioma de APPLICATION_TITLE
+            ",
+
+    "84"=> "<h2>Alertas</h2>
+            Aprende como configurar alertas en un archivo para ver cuando se modifica o se consulta.
+            Learn how to set alerts on a file, in order to see when it has been modified or consulted.
+            ",
+
+    "85"=> "<h2>Edición Colaborativa</h2>
+            Este vídeo muestra como colaborar en documentos Office gracias a Collabora Online Office Suite
+            <ul>
+                <li>Trabaja con documentos de texto, presentaciónes y tablas</li>
+                <li>Edita documentos de forma colaborativa en tiempo real</li>
+                <li>Crear documentos nuevos desde tu navegador</li>
+            </ul>
+            ",
     "65"=> "¡Descubre más en el canal de APPLICATION_TITLE!",
     "66"=>"<h2>Usar APPLICATION_TITLE en dispositivos iOS</h2>
             Este video muestra como usar la aplicación APPLICATION_TITLE (disponible en el App Store). El proceso es bastante similar en Android.
 			<ul>
 				<li>Configurar la conexión del servidor</li>
-				<li>Navegar a través de los ficheros</li>
+				<li>Navegar a través de los archivos</li>
 				<li>Mantener los archivos fuera de línea y la interacción con aplicaciones externas</li>
 				<li>Protegiendo la aplicación mediante un código PIN</li>
 				<li>Usando marcadores y el motor de búsqueda</li></ul>",
     "67"=> "¿No eres %s? %logout",
-    "68"=> "Download Sync Client for Windows",
-    "69"=> "Download Sync Client for Mac OSX",
-    "70"=> "Native application for iOS devices",
-    "71"=> "Native application for Android Devices",
-    "72" => "Server QRCode",
-    "73" => "Easily connect your mobile applications",
-    "74" => "Scan this QRCode with your mobile application to easily configure the connection",
-    "75"=> "Search all files...",
-    "76" => "Access the %1 through the top-right menu",
-    "77" => "admin dashboard",
-    "78" => "Pick a target workspace",
+    "68"=> "Descargar el Cliente de Sincronización para Windows",
+    "69"=> "Descargar el Cliente de Sincronización para Mac",
+    "70"=> "Descargar la aplicación nativa para dispositivos iOS",
+    "71"=> "Descargar la aplicación nativa para dispositivos Android",
+    "72" => "QRCode del Servidor",
+    "73" => "Conecta fácilmente a tu aplicación móvil",
+    "74" => "Escanéa este QRCode con tu aplicación móvil para configurar fácilmente la conexión",
+    "75"=> "Buscar todos los archivos...",
+    "76" => "Acceder al %1 a través de el menú superior derecho",
+    "77" => "panel de administrador",
+    "78" => "Seleccionar un workspace",
+    "86" => "Reproducir vídeo",
+    "87" => "Historia Reciente",
+    "88" => "Suelta un archivo aquí desde tu escritorio",
+    "89" => "Seleccionado archivo para subir",
+    "90" => "Seleccionar workspace de destino",
+    "91" => "Archivos offline con Desktop Sync Client",
 );

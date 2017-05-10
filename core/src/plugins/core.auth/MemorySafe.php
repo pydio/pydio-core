@@ -25,8 +25,6 @@ use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
-
-
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -40,6 +38,7 @@ class MemorySafe
     const SAFE_CREDENTIALS_KEY = "PYDIO_SAFE_CREDENTIALS";
 
     private static $instances;
+    private static $cache;
 
     private $instanceId = "";
     private $user;
@@ -73,12 +72,28 @@ class MemorySafe
      * @return bool|string FALSE if no need, or String (warning, it can be an empty string) if instance needed.
      */
     public static function contextUsesInstance($ctx){
-        if ($ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
-            $instanceId = $ctx->getRepository()->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT", null);
+        if ($ctx->hasRepository() && $ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
+            $instanceId = self::getInstanceId($ctx);
             if (empty($instanceId)) $instanceId = "";
             return $instanceId;
         }
         return false;
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @return string return instanceId (e.g "authfront.cas")
+     */
+    public static function getInstanceId(ContextInterface $ctx){
+        $instanceId = $ctx->getRepository()->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT", null);
+        if(!empty($instanceId)) return $instanceId;
+        $loggedUser = $ctx->getUser();
+        if ($loggedUser != null) {
+            $repository = $ctx->getRepository();
+            $instanceId = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), "SESSION_CREDENTIALS_AUTHFRONT", $repository->getId(), "");
+        }
+        if (empty($instanceId)) $instanceId = "";
+        return $instanceId;
     }
 
     /**
@@ -223,6 +238,19 @@ class MemorySafe
         $user = $password = "";
         $optionsPrefix = "";
         $repository = $ctx->getRepository();
+        
+        $instanceId = self::getInstanceId($ctx);
+        $instanceId = empty($instanceId) ? "" : $instanceId;
+        $instanceKey = $instanceId;
+        if(empty($instanceKey)) {
+            $instanceKey = '__DEFAULT__';
+        }
+
+    	$cache = self::$cache;
+        if (isset($cache[$instanceKey])) {
+            return $cache[$instanceKey];
+        }
+
         if ($repository->getAccessType() == "ftp") {
             $optionsPrefix = "FTP_";
         }
@@ -259,16 +287,21 @@ class MemorySafe
             }
         }
         if ($user=="" && ( $repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
-            $instanceId = $repository->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT");
-            $instanceId = empty($instanceId) ? "" : $instanceId;
             $safeCred = MemorySafe::loadCredentials($instanceId);
             if ($safeCred !== false) {
                 $user = $safeCred["user"];
                 $password = $safeCred["password"];
             }
         }
-        return array("user" => $user, "password" => $password);
 
+        $res = ["user" => $user, "password" => $password];
+
+        // Storing to local cache when we have a result
+        if ($user != "") {
+            self::$cache[$instanceKey] = $res;
+        }
+
+        return $res;
     }
 
     /*******************/

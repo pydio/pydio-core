@@ -28,4 +28,10 @@ $mess=array(
 "7" => "Work",
 "8" => "Important",
 "9" => "No Value",
+"10" => "Existing or new tag",
+"11" => "No metadata set, click to add any",
+"12" => "Multiple Selection:",
+"13" => "check the fields that you want to update, value will be applied to all selected files",
+"14" => "Edit meta",
+"15" => "Save meta",
 );

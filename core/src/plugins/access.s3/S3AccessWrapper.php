@@ -292,7 +292,7 @@ class S3AccessWrapper extends FsAccessWrapper
     /**
      * @inheritdoc
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         return true;
     }

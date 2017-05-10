@@ -3,6 +3,7 @@
     <client_settings icon="plugins/access.sftp/icon.png" description_template="{SERV}{PATH}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="sftp_access" path="plugins/access.sftp/i18n"/>
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
     </client_settings>
 
@@ -18,8 +19,8 @@
 	<registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<client_configs>
-			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"topPane", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}' theme="orbit"/>
-            <component_config className="FilesList">
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"topPane", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}'/>
+            <component_config component="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
 					<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
@@ -27,7 +28,7 @@
 					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate"/>
 				</columns>
 			</component_config>
-			<component_config className="FoldersTree">
+			<component_config component="FoldersTree">
 				<property name="display" value="d"/>
 			</component_config>
 		</client_configs>

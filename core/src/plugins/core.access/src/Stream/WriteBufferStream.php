@@ -56,12 +56,10 @@ class WriteBufferStream implements StreamInterface {
     }
 
     public function close() {
-        if ($this->size > 0) {
-            $this->stream->write($this->bufferStream);
-        }
+        $this->stream->write($this->bufferStream);
 
         $this->size = 0;
-        $this->stream->close();
+        return $this->stream->close();
     }
 
     /**

@@ -6,49 +6,33 @@
     </plugin_info>
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
 		<resources>
-			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/i18n" />
-			<i18n namespace="ajxp_shared" path="plugins/access.ajxp_shared/i18n" />
-			<js file="plugins/access.ajxp_conf/class.ConfigEditor.js" className="ConfigEditor" autoload="true"/>
-            <css file="plugins/access.ajxp_conf/ajxp_conf.css" autoload="true"/>
+			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/res/i18n" />
+			<i18n namespace="role_editor" path="plugins/access.ajxp_conf/res/i18n/role" />
+			<i18n namespace="pydio_role" path="plugins/access.ajxp_conf/res/i18n/editor" />
+            <i18n namespace="ajxp_admin" path="plugins/access.ajxp_conf/res/i18n/admin" />
+            <i18n namespace="admin_dashboard" path="plugins/access.ajxp_conf/res/i18n/dashboard" />
+
+            <css file="plugins/access.ajxp_conf/res/css/ajxp_admin.css" autoload="true"/>
+            <css file="plugins/access.ajxp_conf/res/css/rolesEditor.css" autoload="true"/>
+
+            <js className="AdminComponents" file="plugins/access.ajxp_conf/res/build/AdminComponents.js" depends="React,PydioComponents,PydioWorkspaces"/>
+            <js className="AdminActions" file="plugins/access.ajxp_conf/res/build/AdminActions.js" depends="AdminComponents"/>
+            <js className="AdminPeople" file="plugins/access.ajxp_conf/res/build/AdminPeople.js" depends="React,PydioComponents,PydioForm"/>
+            <js className="AdminRoleEditor" file="plugins/access.ajxp_conf/res/build/AdminRoleEditor.js" depends="React,AdminComponents,PydioComponents,PydioForm"/>
+            <js className="AdminWorkspaces" file="plugins/access.ajxp_conf/res/build/AdminWorkspaces.js" depends="PydioForm,PydioTasks"/>
+            <js className="AdminPlugins" file="plugins/access.ajxp_conf/res/build/AdminPlugins.js" depends="React,PydioComponents,PydioForm"/>
+            <js className="AdminLogs" file="plugins/access.ajxp_conf/res/build/AdminLogs.js" depends="React,PydioComponents"/>
+            <js className="AdminScheduler" file="plugins/access.ajxp_conf/res/build/AdminScheduler.js" depends="React,PydioForm,PydioTasks"/>
+
 		</resources>
 	</client_settings>
 	<registry_contributions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fitMinOffsetTop":"$(\"global_toolbar\").getHeight();", "fakeOption":"true"}' theme="orbit"><![CDATA[
-                <div id="vertical_splitter" style="opacity:0;" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": 280, "minA":28, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
-                    <div ajxpClass="AjxpTabulator" id="leftTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"ajxp_conf.122","iconClass":"icon-cogs","element":"leftPane"},{"id":"flagged","label":"147","iconClass":"icon-bookmark","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["vertical_splitter-actions"],"submenuOffsetTop":2}}'>
-                        <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
-                        <div id="leftPane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}' class="vertical_layout">
-                            <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10, "groupByData":false, "leavesOpenOnSelect": true}'></div>
-                            <div id="settings_pane" class="flat_tree_pane vertical_fit" ajxpClass="FoldersTree" ajxpOptions='{"fit":"height", "fitParent":"leftPane", "display":"dz","replaceScroller":true}' ></div>
-                        </div>
-                    </div>
-                    <div id="rightPane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "messageBoxReference":true}'>
-                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{"ajaxplorer:context_changed":"this.switchToFirstIfPathDiffers(arguments[0]);"}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
-                            <div id="files_list_pane" ajxpClass="AjxpPane" style="overflow-x:hidden;">
-                                <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div><div ajxpClass="BookmarksBar" ajxpOptions='{}' id="bm_bar"></div></div>
-                                <div id="actions" class="buttons_bar_container">
-                                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get", "remote"],"submenuOffsetTop":2}'></div>
-                                </div>
-                                <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":0, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <script>
-                    if($("leftTabulator")) $("leftTabulator").ajxpPaneObject.resize();
-                    window.setTimeout(function(){
-                        try{
-                            $A($("settings_pane").ajxpPaneObject.tree.childNodes).each(function(c){
-                                c._webfxtree_expand();
-                                $(c._loadingItem).remove();
-                            })
-                        }catch(e){}
-                        if($("leftTabulator")) $("leftTabulator").ajxpPaneObject.resize();
-                    }, 2000);
-                </script>
-			]]></template_part>
-		</client_configs>
+            <template_part ajxpId="orbit_content" theme="material" namespace="AdminComponents" component="AdminDashboard" dependencies="PydioComponents,PydioForm"/>
+            <component_config component="AdminPeople.Dashboard">
+                <editor namespace="AdminPeople" component="RoleEditor"/>
+            </component_config>
+        </client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="client_configs/*"/>
 	</registry_contributions>

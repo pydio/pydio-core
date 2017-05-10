@@ -3,6 +3,7 @@
     <client_settings icon="plugins/access.fs/icon.png" description_template="{HOST}{PATH}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="smb_access" path="plugins/access.smb/i18n"/>
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
     </client_settings>
 	<server_settings>
@@ -11,6 +12,7 @@
 		<param name="DOMAIN" type="string" label="CONF_MESSAGE[Domain]" description="CONF_MESSAGE[Default domain to use with session credentials. The domain name ends with '/' or '\' depend on your system. Example: MyDomain\ or YourDomain/. Default is /]" mandatory="false"/>
 		<param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
 		<param name="SESSION_CREDENTIALS_AUTHFRONT" type="string" label="CONF_MESSAGE[Session Credentials Authfront]" description="CONF_MESSAGE[Set this workspace to use only credentials from a specific authfront. Leave empty by default, can be useful to restrict credentials to e.g. CAS authfront (use authfront.cas value in that case).]" default=""/>
+        <param name="ANONYMOUS_FORBIDDEN" type="boolean" label="CONF_MESSAGE[Forbid anonymous connection]" description="CONF_MESSAGE[If no user/password are provided, throw an authentication exception, never try to login anonymously to remote share.]"/>
         <global_param name="SMBCLIENT" type="string" label="CONF_MESSAGE[Smbclient]" description="CONF_MESSAGE[Path to smbclient executable, considered to be in the path by default.]" mandatory="true" default="smbclient"/>
         <global_param name="SMB_PATH_TMP" type="string" label="CONF_MESSAGE[Path Tmp]" description="CONF_MESSAGE[OS Path Temporary if not the default one]" mandatory="true" default="/tmp"/>
         <global_param name="SMB_ENABLE_ZIP" type="boolean" label="CONF_MESSAGE[Enable Zip]" description="CONF_MESSAGE[Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!]" mandatory="false" default="false"/>
@@ -23,7 +25,7 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
         <client_configs>
-            <component_config className="FoldersTree">
+            <component_config component="FoldersTree">
                 <property name="display" value="d"/>
             </component_config>
         </client_configs>

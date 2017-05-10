@@ -180,7 +180,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         }
         if($GROUP_PATH == null) $GROUP_PATH = false;
         if(strpos($channelName, "nodes:") === 0 && $channelName !== "nodes:*"){
-            $repositoryId = substr($channelName, strlen("nodes:*"));
+            $repositoryId = substr($channelName, strlen("nodes:"));
             // Make sure current user has Read access on this workspace
             if(!empty($user) && !$user->canRead($repositoryId)){
                 $this->suscribeToChannel($ctx, "nodes:*", $clientId);

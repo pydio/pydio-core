@@ -73,6 +73,11 @@ class AJXP_Role implements IGroupPathProvider
      */
     protected $lastUpdated = 0;
 
+    /**
+     * @var string
+     */
+    protected $ownerId;
+
     static $cypheredPassPrefix = '$pydio_password$';
 
     /**
@@ -128,6 +133,26 @@ class AJXP_Role implements IGroupPathProvider
         return strpos($this->roleId, "AJXP_USER_") === 0;
     }
 
+    /**
+     * @param $ownerId string
+     */
+    public function setOwnerId($ownerId){
+        $this->ownerId = $ownerId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasOwner(){
+        return !empty($this->ownerId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwner(){
+        return $this->ownerId;
+    }
 
     /**
      * Whether this role can read the given repo

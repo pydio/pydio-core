@@ -21,7 +21,6 @@
 $mess=array(
 "Timestamp" => "Timestamp",
 "Allow Timestamp file with Universign." => "Abilita il file Timestamp con Universing.",
-"msgBox1" => "Conferma di voler aggiungere un timestamp a questo file",
 "URL" => "URL",
 "Timestamp provider API URL" => "URL delle API del fornitore di Timestamp",
 "User Mail" => "Email Utente",

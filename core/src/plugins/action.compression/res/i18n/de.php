@@ -24,8 +24,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 $mess = array(
     "1" => "Komprimieren",
     "2" => "Auswahl komprimieren",
-    "3" => "Format des Archivs:",
-    "4" => "Name des Archivs:",
+    "3" => "Format des Archivs",
+    "4" => "Name des Archivs",
     "5" => "Starte Komprimierung...",
     "6" => "Dateien werden zu Archiv hinzugefügt... %s ",
     "7" => "%s Archiv wird erstellt...",

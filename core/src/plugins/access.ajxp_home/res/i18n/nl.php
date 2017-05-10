@@ -45,32 +45,85 @@ $mess=array(
 "59"=> "iPhone/iPad",
     "60"=>"Mac OS",
     "61"=>"Windows",
-    "62"=>"<h2>Aan de slag</h2>
-            Deze video is een introductie voor de APPLICATION_TITLE web applicatie:
+    "62"=> "<h2>What is a workspace?</h2>
+            This video explains what Workspaces are in APPLICATION_TITLE
             <ul>
-                <li>Gebruikers Dashboard</li>
-                <li>GUI Overzicht</li>
-                <li>Beheer bestanden en mappen</li>
-                <li>Preview en wijzig bestanden</li>
-                <li>Snel toegang tot favorieten en de zoekmachine</li>
-                <li>Selectie wagen</li>
-            </ul>",
-    "63"=>"<h2>Deel bestanden met APPLICATION_TITLE</h2>
-                            In deze tutorial, leggen we de basis van bestandsdeling met APPLICATION_TITLE uit:
-                            <ul>
-                                <li>Maak web links</li>
-                                <li>Stuur ze naar interne of externe gebruikers</li>
-                                <li>Ontvang een notificatie als een link gedownload is</li>
-                                <li>Maak een wachtwoord beschermde link aan</li>
-                                <li>Maak veel links van 1 bestand</li>
-                                <li>Stop al het delen</li>
-            </ul>",
-    "64"=>"<h2>Sharing folders with APPLICATION_TITLE</h2>
-                            Deze video laat de diverse opties voor bestandsdeling in APPLICATION_TITLE zien
-                            <ul>
-                                <li>Deel als een nieuwe werkplek</li>
-                                <li>Deel als een publieke mini-site</li>
-            </ul>",
+                <li>Why are Workspaces central in APPLICATION_TITLE?</li>
+                <li>What are Workspaces from a technical perspective?</li>
+                <li>How do they allow you to organise your data?</li>
+            </ul>
+            ",
+
+    "63"=> "<h2>Upload files to APPLICATION_TITLE</h2>
+            Get started with APPLICATION_TITLE and see how to upload files
+            <ul>
+                <li>Drag and drop files into APPLICATION_TITLE</li>
+                <li>Create a new folder</li>
+                <li>Rename files and folders</li>
+                <li>Download files to your Computer</li>
+            </ul>
+            ",
+
+    "64"=> "<h2>Search, browse and manage your files</h2>
+            This video shows you various tips to efficiently manage your files in APPLICATION_TITLE
+            <ul>
+                <li>Cross-workspaces search bar</li>
+                <li>Content display modes, Keyboard shortcuts</li>
+                <li>Sort Files</li>
+                <li>Meta Data, Bookmarks</li>
+            </ul>
+            ",
+
+    "79"=> "<h2>Sharing files and folders</h2>
+            This tutorial shows you how to share files and folders, internally or externally
+            <ul>
+                <li>Creating share links for external people</li>
+                <li>Sharing files and folders with internal collaborators</li>
+                <li>Sharing a folder as a workspace</li>
+                <li>Layout options of shared folders</li>
+                <li>Creating a blind drop folder</li>
+                <li>Managing users and share rights</li>
+            </ul>
+            ",
+
+    "80"=> "<h2>Sharing : security features</h2>
+            This video goes through the various share settings that help you secure your shares
+            <ul>
+                <li>Password protection</li>
+                <li>Expiration date</li>
+                <li>Limit the number of downloads</li>
+            </ul>
+            ",
+
+    "81"=> "<h2>Customize your share links</h2>
+            See how you can customise the URL of your share links to make them look more user-friendly.
+            ",
+
+    "82"=> "<h2>Shared links custom rights</h2>
+            This video shows you how to manage the permissions attached to your shares
+            <ul>
+                <li>Preview</li>
+                <li>Download</li>
+                <li>Upload / Edit</li>
+            </ul>
+            ",
+
+    "83"=> "<h2>Language</h2>
+            APPLICATION_TITLE is available in 28 languages. This video shows you how to change the language in APPLICATION_TITLE.
+            ",
+
+    "84"=> "<h2>Alerts</h2>
+            Learn how to set alerts on a file, in order to see when it has been modified or consulted.
+            ",
+
+    "85"=> "<h2>Collaborative edition</h2>
+            This video shows you how to collaborate on office docs, thanks to Collabora online office suite
+            <ul>
+                <li>Work on text docs, presentations, spreadsheets</li>
+                <li>Edit docs collaboratively in real time</li>
+                <li>Create new documents directly from your browser</li>
+            </ul>
+            ",
     "65"=> "Ontdek meer op het APPLICATION_TITLE kanaal!",
     "66"=>"<h2>Gebruik van APPLICATION_TITLE op een iOS apparaat</h2>
                             Deze video laat zien hoe de APPLICATION_TITLE applicatie werkt (beschikbaar in de App Store). Het proces is bijna gelijk aan de Android versie.
@@ -91,5 +144,11 @@ $mess=array(
     "76" => "Access the %1 through the top-right menu",
     "77" => "admin dashboard",
     "78" => "Pick a target workspace",
+    "86" => "Play video",
+    "87" => "Recent History",
+    "88" => "Drop a file here from your desktop",
+    "89" => "Selected file for upload",
+    "90" => "Select target workspace",
+    "91" => "Keep your files offline with our Desktop Sync Client",
 );
 

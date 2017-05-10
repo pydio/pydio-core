@@ -14,10 +14,7 @@ node_modules
 composer.lock
 /core/vendor/
 /plugins/*/vendor/
+/plugins/*/res/build
+/plugins/*/js/build
 /plugins/access.ajxp_user/build
-/plugins/access.ajxp_home/res/build
-/plugins/access.inbox/res/build
-/plugins/core.mailer/js/build
-/plugins/uploader.html/js/build
-/plugins/core.tasks/js/build
 /plugins/action.demo_counter/build

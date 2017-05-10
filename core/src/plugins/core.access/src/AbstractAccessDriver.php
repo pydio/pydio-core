@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -24,6 +25,7 @@ use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
@@ -39,6 +41,9 @@ use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
+
+use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Core\Http\Message\UserMessage;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -106,7 +111,7 @@ abstract class AbstractAccessDriver extends Plugin
             }
         }
     }
-    
+
 
     /**
      * Populate publiclet options
@@ -117,7 +122,9 @@ abstract class AbstractAccessDriver extends Plugin
      * @param Repository $repository
      * @return array
      */
-    public function makePublicletOptions($filePath, $password, $expires, $downloadlimit, $repository) {}
+    public function makePublicletOptions($filePath, $password, $expires, $downloadlimit, $repository) {
+        return [];
+    }
 
     /**
      * Populate shared repository options
@@ -125,7 +132,9 @@ abstract class AbstractAccessDriver extends Plugin
      * @param array $httpVars
      * @return array
      */
-    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars){}
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars){
+        return $httpVars;
+    }
 
     /**
      * @param $node AJXP_Node
@@ -156,7 +165,6 @@ abstract class AbstractAccessDriver extends Plugin
             return;
         }
 
-
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $files = $selection->getFiles();
 
@@ -169,9 +177,10 @@ abstract class AbstractAccessDriver extends Plugin
         $destRepoId = $httpVars["dest_repository_id"];
         $destStreamURL = "pydio://$crtUser@$destRepoId";
         $destNode = new AJXP_Node($destStreamURL);
+        $destCtx = $ctx->withRepositoryId($destRepoId);
         MetaStreamWrapper::detectWrapperForNode($destNode, true);
 
-        // Check rights
+        // Check permissions
         if (UsersService::usersEnabled()) {
             /** @var ContextInterface $ctx */
             $ctx = $requestInterface->getAttribute("ctx");
@@ -182,6 +191,7 @@ abstract class AbstractAccessDriver extends Plugin
                 throw new \Exception($mess[364]);
             }
         }
+
         $srcRepoData= array(
             'base_url'      => $origStreamURL,
             'recycle'       => $this->repository->getContextOption($ctx, "RECYCLE_BIN")
@@ -191,18 +201,26 @@ abstract class AbstractAccessDriver extends Plugin
             'chmod'         => $this->repository->getContextOption($ctx, 'CHMOD')
         );
 
+        $origNodesDiffs = new NodesDiff();
+        $destNodesDiffs = new NodesDiff();
         $messages = array();
         $errorMessages = array();
-        foreach ($files as $file) {
 
+        // Looping through selections
+        foreach ($files as $file) {
             $destFile = rtrim(InputFilter::decodeSecureMagic($httpVars["dest"]), "/") ."/". PathUtils::forwardSlashBasename($file);
             $this->copyOrMoveFile(
                 $destFile,
                 $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
                 $srcRepoData, $destRepoData, $taskId);
 
+            if(isSet($httpVars["moving_files"])){
+                $origNodesDiffs->remove($file);
+            }
+            $destNodesDiffs->add($destNode->createChildNode($destFile));
         }
 
+        // Handling task details
         if(!empty($taskId)){
             if (count($errorMessages)) {
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, implode("\n", $errorMessages));
@@ -210,6 +228,22 @@ abstract class AbstractAccessDriver extends Plugin
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
             }
         }
+
+        // Catching potential errors
+        if (!empty($errorMessages)) {
+            throw new PydioException(join("\n", $errorMessages));
+        }
+
+        // Sending messages to listeners (WS)
+        Controller::applyHook("msg.instant", [$ctx, $origNodesDiffs->toXML()]);
+        Controller::applyHook("msg.instant", [$destCtx, $destNodesDiffs->toXML()]);
+
+        // Sending success response along with nodes diff for the context
+        $body = new SerializableResponseStream();
+        $body->addChunk(new UserMessage(join("\n", $messages)));
+        $body->addChunk($origNodesDiffs);
+        $responseInterface = $responseInterface->withBody($body);
+
     }
 
     /**
@@ -291,7 +325,7 @@ abstract class AbstractAccessDriver extends Plugin
             if ($move) {
                 Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) {
-                    $this->deldir($destFile, $destRepoData);
+                    $this->deldir($destFile, $destRepoData, $taskId);
                 }
                 $res = rename($realSrcFile, $destFile);
                 if($res!==true){
@@ -309,14 +343,28 @@ abstract class AbstractAccessDriver extends Plugin
             }
         } else {
             if ($move) {
-                Controller::applyHook("node.before_path_change", array($srcNode));
+                Controller::applyHook("node.before_path_change", [$srcNode]);
                 if(file_exists($destFile)) unlink($destFile);
                 if(MetaStreamWrapper::nodesUseSameWrappers($realSrcFile, $destFile)){
                     rename($realSrcFile, $destFile);
                 }else{
-                    copy($realSrcFile, $destFile);
+                    if (copy($realSrcFile, $destFile)) {
+                        // Now delete original (with recycling if needed)
+                        $this->deldir($realSrcFile, $srcRepoData, $taskId); // both file and dir
+                    }
                 }
-                Controller::applyHook("node.change", array($srcNode, $destNode, false));
+
+                // If the move from intra-repository, we register it as a simple rename as should be
+                // If the move was cross-repository, we always registe it as a delete then create, even though the move could have been a simple rename
+                if ($destUrlBase == $srcUrlBase) {
+                    Controller::applyHook("node.change", [$srcNode, $destNode, false]);
+                } else {
+                    // A move is technically a copy then a delete, though to avoid
+                    // having duplicate showing up, we pretend for the UI it's a delete
+                    // then a create
+                    Controller::applyHook("node.change", [$srcNode, null, false]);
+                    Controller::applyHook("node.change", [null, $destNode, false]);
+                }
             } else {
                 try {
                     $this->filecopy($realSrcFile, $destFile);
@@ -330,10 +378,11 @@ abstract class AbstractAccessDriver extends Plugin
             }
         }
 
+        // Handling the recycle bin
         if ($move) {
-            // Now delete original
-            // $this->deldir($realSrcFile); // both file and dir
             $messagePart = $mess[74]." ".$destDir;
+
+            // Register as recycled if we've done a move to the relative recycle bin
             if (RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle()) {
                 RecycleBinManager::fileToRecycle($srcFile);
                 $messagePart = $mess[123]." ".$mess[122];
@@ -601,7 +650,7 @@ abstract class AbstractAccessDriver extends Plugin
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"FIXED PERM DATA ($fixPermPolicy)",sprintf("%o", ($p & 000777)));
         }
     }
-    
+
     /**
      * Test if userSelection is containing a hidden file, which should not be the case!
      * @param ContextInterface $ctx

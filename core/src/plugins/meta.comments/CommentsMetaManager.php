@@ -24,6 +24,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 
@@ -31,7 +32,9 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Pydio\Core\Utils\XMLHelper;
 use Pydio\Notification\Core\IFeedStore;
+use Pydio\Core\Controller\Controller;
 
 define("AJXP_META_SPACE_COMMENTS", "AJXP_META_SPACE_COMMENTS");
 
@@ -142,9 +145,9 @@ class CommentsMetaManager extends AbstractMetaSource
                 $uId = $ctx->getUser()->getId();
                 $limit = $this->getContextualOption($ctx, "COMMENT_SIZE_LIMIT");
                 if (!empty($limit)) {
-                    $content = substr(InputFilter::decodeSecureMagic($httpVars["content"]), 0, $limit);
+                    $content = substr(InputFilter::decodeSecureMagic($httpVars["content"], InputFilter::SANITIZE_HTML), 0, $limit);
                 } else {
-                    $content = InputFilter::decodeSecureMagic($httpVars["content"]);
+                    $content = InputFilter::decodeSecureMagic($httpVars["content"], InputFilter::SANITIZE_HTML);
                 }
                 $com = array(
                     "date"      => time(),
@@ -152,8 +155,8 @@ class CommentsMetaManager extends AbstractMetaSource
                     "content"   => $content
                 );
                 $existingFeed[] = $com;
-                if ($feedStore!== false) {
-                    $feedStore->persistMetaObject(
+                if ($feedStore !== false) {
+                    $com['uuid'] = $feedStore->persistMetaObject(
                         $uniqNode->getPath(),
                         base64_encode($content),
                         $uniqNode->getRepositoryId(),
@@ -161,6 +164,7 @@ class CommentsMetaManager extends AbstractMetaSource
                         $uniqNode->getRepository()->getOwner(),
                         $ctx->getUser()->getId(),
                         $ctx->getUser()->getGroupPath());
+
                 } else {
                     $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
                     $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);
@@ -169,11 +173,15 @@ class CommentsMetaManager extends AbstractMetaSource
                 $com["hdate"] = StatHelper::relativeDate($com["date"], $mess);
                 $com["path"] = $uniqNode->getPath();
                 echo json_encode($com);
+                $imMessage = '<![CDATA[' . json_encode($com) . ']]>';
+                $imMessage = XMLHelper::toXmlElement("metacomments", ["event" => "newcomment", "path" => $uniqNode->getPath()], $imMessage);
+                Controller::applyHook("msg.instant", array($uniqNode->getContext(), $imMessage));
 
                 break;
 
             case "load_comments_feed":
 
+                SessionService::close();
                 HTMLWriter::charsetHeader("application/json");
                 if ($feedStore !== false) {
                     $sortBy = isSet($httpVars["sort_by"])? InputFilter::decodeSecureMagic($httpVars["sort_by"]) :"date";
@@ -242,8 +250,10 @@ class CommentsMetaManager extends AbstractMetaSource
                     HTMLWriter::charsetHeader("application/json");
                     echo json_encode($reFeed);
                 } else {
-                    $feedStore->dismissAlertById($ctx, $data["uuid"], 1);
+                    $feedStore->dismissMetaObjectById($ctx, $data["uuid"]);
                 }
+                $imMessage = XMLHelper::toXmlElement("metacomments", ["event" => "deletecomment", "path" => $uniqNode->getPath()]);
+                Controller::applyHook("msg.instant", array($uniqNode->getContext(), $imMessage));
 
                 break;
 

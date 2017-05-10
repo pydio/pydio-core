@@ -58,10 +58,10 @@
             <xs:attribute name="accessKey"/>
             <xs:attribute name="hasAccessKey" type="xs:boolean"/>
             <xs:attribute name="specialAccessKey" type="xs:NCName"/>
-            <xs:attribute name="src" use="required"/>
             <xs:attribute name="iconClass" use="optional"/>
             <xs:attribute name="text" use="required" type="xs:NMTOKEN"/>
             <xs:attribute name="title" use="required" type="xs:NMTOKEN"/>
+            <xs:attribute name="weight" use="optional" type="xs:integer"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="context">
@@ -112,7 +112,11 @@
             </xs:choice>
         </xs:complexType>
     </xs:element>
-    <xs:element name="dynamicBuilder" type="xs:string"/>
+    <xs:element name="dynamicBuilder">
+        <xs:complexType>
+            <xs:attribute name="module" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="post_processing">
         <xs:complexType>
             <xs:sequence>
@@ -292,7 +296,6 @@
                     </xs:sequence>
                     <xs:attribute name="className" use="required" type="xs:NCName"/>
                     <xs:attribute name="formId" type="xs:NCName"/>
-                    <xs:attribute name="icon" use="required"/>
                     <xs:attribute name="iconClass" use="optional"/>
                     <xs:attribute name="mimes" use="required"/>
                     <xs:attribute name="openable" use="required" type="xs:boolean"/>
@@ -418,7 +421,7 @@
             <xs:choice>
                 <xs:any maxOccurs="unbounded" processContents="skip"/>
             </xs:choice>
-            <xs:attribute name="className" use="required" type="xs:Name"/>
+            <xs:attribute name="component" use="required" type="xs:Name"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="columns">
@@ -453,27 +456,13 @@
             <xs:attribute name="sortType" use="optional" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
-    <xs:element name="infoPanelExtension">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" ref="messages"/>
-                <xs:element ref="html"/>
-            </xs:sequence>
-            <xs:attribute name="attributes" use="required"/>
-            <xs:attribute name="mime" use="required"/>
-            <xs:attribute name="modifier"/>
-        </xs:complexType>
-    </xs:element>
     <xs:element name="infoPanel">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="messages"/>
-                <xs:element ref="html"/>
-            </xs:sequence>
-            <xs:attribute name="attributes" use="required"/>
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
+            <xs:attribute name="reactComponent" type="xs:NCName"/>
             <xs:attribute name="primary" type="xs:boolean"/>
+            <xs:attribute name="weight" type="xs:integer"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="template">
@@ -481,6 +470,9 @@
             <xs:attribute name="element" use="required" type="xs:NCName"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="position" use="required" type="xs:NCName"/>
+            <xs:attribute name="namespace" type="xs:NCName"/>
+            <xs:attribute name="component" type="xs:NCName"/>
+            <xs:attribute name="props" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
             <xs:attribute name="label" type="xs:all"/>
         </xs:complexType>
@@ -488,9 +480,15 @@
     <xs:element name="template_part">
         <xs:complexType mixed="true">
             <xs:attribute name="theme" use="optional" type="xs:NCName"/>
-            <xs:attribute name="ajxpClass" use="required" type="xs:NCName"/>
             <xs:attribute name="ajxpId" use="required" type="xs:NCName"/>
-            <xs:attribute name="ajxpOptions" use="required"/>
+            <!-- legacy components -->
+            <xs:attribute name="ajxpClass" type="xs:NCName"/>
+            <xs:attribute name="ajxpOptions" />
+            <!-- react components -->
+            <xs:attribute name="component" type="xs:NCName"/>
+            <xs:attribute name="namespace" type="xs:NCName"/>
+            <xs:attribute name="dependencies" type="xs:NCName"/>
+            <xs:attribute name="props" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="hooks">
@@ -520,8 +518,6 @@
             <xs:sequence>
                 <xs:element minOccurs="0" ref="clientCallback"/>
                 <xs:element minOccurs="0" maxOccurs="100" ref="clientForm"/>
-                <xs:element minOccurs="0" ref="dialogOnOpen"/>
-                <xs:element minOccurs="0" ref="dialogOnComplete"/>
                 <xs:element minOccurs="0" ref="extensionOnInit"/>
                 <xs:element minOccurs="0" ref="clientListener"/>
                 <xs:element minOccurs="0" ref="standardFormDefinition"/>
@@ -532,30 +528,14 @@
     </xs:element>
     <xs:element name="clientCallback">
         <xs:complexType mixed="true">
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="dialogOnOpen"/>
-                <xs:element ref="dialogOnCancel"/>
-                <xs:element ref="dialogOnComplete"/>
-            </xs:choice>
-            <xs:attribute name="dialogOkButtonOnly" type="xs:boolean"/>
-            <xs:attribute name="dialogOpenForm" type="xs:NCName"/>
-            <xs:attribute name="dialogSkipButtons" type="xs:boolean"/>
-            <xs:attribute name="prepareModal" type="xs:boolean"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="dialogOnCancel">
-        <xs:complexType mixed="true">
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="dialogOnComplete">
-        <xs:complexType mixed="true">
-            <xs:attribute name="hideDialog" type="xs:boolean"/>
+            <xs:attribute name="module" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="extensionOnInit" type="xs:string"/>
     <xs:element name="clientListener">
         <xs:complexType mixed="true">
             <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="module" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="activeCondition" type="xs:string"/>
@@ -642,6 +622,7 @@
             <xs:attribute name="className" use="required" type="xs:NCName"/>
             <xs:attribute name="file" use="required"/>
             <xs:attribute name="depends"/>
+            <xs:attribute name="expose"/>
             <xs:attribute name="fallbackCondition"/>
             <xs:attribute name="fallbackFile"/>
         </xs:complexType>
@@ -672,6 +653,9 @@
             <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
             <xs:attribute name="replicationGroup"/>
+            <xs:attribute name="replicationTitle" type="xs:Name" use="optional"/>
+            <xs:attribute name="replicationDescription" type="xs:Name" use="optional"/>
+            <xs:attribute name="replicationMandatory" type="xs:boolean" use="optional"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
@@ -695,6 +679,9 @@
             <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
             <xs:attribute name="replicationGroup"/>
+            <xs:attribute name="replicationTitle" type="xs:Name" use="optional"/>
+            <xs:attribute name="replicationDescription" type="xs:Name" use="optional"/>
+            <xs:attribute name="replicationMandatory" type="xs:boolean" use="optional"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>

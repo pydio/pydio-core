@@ -25,6 +25,9 @@ use Exception;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Vars\InputFilter;
 
@@ -71,6 +74,7 @@ class EncfsMounter extends Plugin
      * @param $httpVars
      * @param $fileVars
      * @param ContextInterface $ctx
+     * @throws PydioException
      */
     public function preProcessMove($actionName, &$httpVars, &$fileVars, ContextInterface $ctx)
     {
@@ -78,29 +82,56 @@ class EncfsMounter extends Plugin
         $dest = substr($destO, 1, strpos(ltrim($destO, "/"), "/"));
         if (empty($dest)) $dest = ltrim($destO, "/");
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
-        if (!$userSelection->isEmpty()) {
-            $testFileO = $userSelection->getUniqueFile();
-            $testFile = substr($testFileO, 1, strpos(ltrim($testFileO, "/"), "/"));
-            if (empty($testFile)) $testFile = ltrim($testFileO, "/");
-            if ($actionName == "move") {
-                if ((strstr($dest, "ENCFS_CLEAR_") != false && strstr($testFile, "ENCFS_CLEAR_") === false)
-                    || (strstr($dest, "ENCFS_CLEAR_") === false && strstr($testFile, "ENCFS_CLEAR_") !== false)
-                    || (strstr($dest, "ENCFS_CLEAR_") != false && strstr($testFile, "ENCFS_CLEAR_") !== false
-                        && $testFile != $dest)
-                ) {
-                    $httpVars["force_copy_delete"] = "true";
-                    $this->logDebug("One mount to another, copy/delete instead of move ($dest, $testFile)");
+
+        if ($userSelection->isEmpty()) {
+            return;
+        }
+
+        $srcNodes = $userSelection->buildNodes();
+        $rootCypher = false;
+        foreach($srcNodes as $srcNode){
+            if(strpos(basename($srcNode->getPath()), "ENCFS_CLEAR_") === 0){
+                // Trying to apply an action directly on an cyphered node
+                if(file_exists($srcNode->getUrl()."/.ajxp_mount")){
+                    throw new PydioException("Please unmount the cyphered folder before trying to delete it.");
+                }else{
+                    $rawNode = $srcNode->getParent()->createChildNode(str_replace("ENCFS_CLEAR_", "ENCFS_RAW_", basename($srcNode->getPath())));
+                    if(file_exists($rawNode->getUrl())){
+                        $httpVars["nodes"][] = $rawNode->getPath();
+                    }
                 }
-            } else if ($actionName == "delete" && RecycleBinManager::recycleEnabled()) {
-                if (strstr($testFile, "ENCFS_CLEAR_") !== false) {
-                    $httpVars["force_copy_delete"] = "true";
-                    $this->logDebug("One mount to another, copy/delete instead of move");
-                }
-            } else if ($actionName == "restore") {
-                if (strstr(RecycleBinManager::getFileOrigin($testFile), "ENCFS_CLEAR_")) {
-                    $httpVars["force_copy_delete"] = "true";
-                    $this->logDebug("One mount to another, copy/delete instead of move");
-                }
+                $rootCypher = true;
+            }
+        }
+        if($rootCypher){
+            return;
+        }
+
+
+        $testFileO = $userSelection->getUniqueFile();
+        $testFile = substr($testFileO, 1, strpos(ltrim($testFileO, "/"), "/"));
+        if (empty($testFile)) {
+            $testFile = ltrim($testFileO, "/");
+        }
+
+        if ($actionName == "move") {
+            if ((strstr($dest, "ENCFS_CLEAR_") !== false && strstr($testFile, "ENCFS_CLEAR_") === false)
+                || (strstr($dest, "ENCFS_CLEAR_") === false && strstr($testFile, "ENCFS_CLEAR_") !== false)
+                || (strstr($dest, "ENCFS_CLEAR_") !== false && strstr($testFile, "ENCFS_CLEAR_") !== false
+                    && $testFile != $dest)
+            ) {
+                $httpVars["force_copy_delete"] = "true";
+                $this->logDebug("One mount to another, copy/delete instead of move ($dest, $testFile)");
+            }
+        } else if ($actionName == "delete" && RecycleBinManager::recycleEnabled()) {
+            if (strstr($testFile, "ENCFS_CLEAR_") !== false) {
+                $httpVars["force_copy_delete"] = "true";
+                $this->logDebug("One mount to another, copy/delete instead of move");
+            }
+        } else if ($actionName == "restore") {
+            if (strstr(RecycleBinManager::getFileOrigin($testFile), "ENCFS_CLEAR_")) {
+                $httpVars["force_copy_delete"] = "true";
+                $this->logDebug("One mount to another, copy/delete instead of move");
             }
         }
     }
@@ -159,10 +190,16 @@ class EncfsMounter extends Plugin
                         }
                         rmdir($dir);
                         self::umountFolder($clear);
+                        $newNode = $node->getParent()->createChildNode(basename($clear));
+                        Controller::applyHook("node.change", [null, &$newNode], true);
+                        $newNode->loadNodeInfo(true);
                     }
                 } else if (substr(basename($dir), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_") {
                     // SIMPLY UNMOUNT
                     self::umountFolder($dir);
+                    // Reload node
+                    Controller::applyHook("node.change", [&$node, &$node], true);
+                    $node->loadNodeInfo(true);
                 }
                 break;
 
@@ -175,13 +212,12 @@ class EncfsMounter extends Plugin
                 if (is_dir($raw)) {
                     self::mountFolder($raw, $dir, $pass, $uid);
                 }
+                $node->loadNodeInfo(true);
                 break;
         }
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
-        $diff = new \Pydio\Access\Core\Model\NodesDiff();
-        $diff->update($node);
-        $x->addChunk($diff);
+        $x->addChunk(new ReloadMessage("", $node->getPath()));
         $responseInterface = $responseInterface->withBody($x);
 
     }
@@ -196,17 +232,18 @@ class EncfsMounter extends Plugin
     {
         if (substr($ajxpNode->getLabel(), 0, strlen("ENCFS_RAW_")) == "ENCFS_RAW_") {
             $ajxpNode->hidden = true;
-        } else if (substr($ajxpNode->getLabel(), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_") {
+        } else if (strpos(basename($ajxpNode->getPath()), "ENCFS_CLEAR_") === 0) {
             $ajxpNode->ENCFS_clear_folder = true;
             $ajxpNode->overlay_icon = "cypher.encfs/overlay_ICON_SIZE.png";
             $ajxpNode->overlay_class = "icon-lock";
-            $ajxpNode->ajxp_readonly = "true";
+            //$ajxpNode->ajxp_readonly = "true";
             if (is_file($ajxpNode->getUrl() . "/.ajxp_mount")) {
-                $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")));
+                $ajxpNode->setLabel(substr(basename($ajxpNode->getPath()), strlen("ENCFS_CLEAR_")));
                 $ajxpNode->ENCFS_clear_folder_mounted = true;
-                $ajxpNode->ajxp_readonly = "false";
             } else {
-                $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")) . " (encrypted)");
+                //$ajxpNode->ajxp_readonly = "false";
+                $ajxpNode->ENCFS_clear_folder_mounted = false;
+                $ajxpNode->setLabel(substr(basename($ajxpNode->getPath()), strlen("ENCFS_CLEAR_")) . " (encrypted)");
             }
         }
     }
@@ -288,7 +325,7 @@ class EncfsMounter extends Plugin
         if (!empty($error)) {
             throw new Exception("Error mounting volume : " . $error);
         }
-        if (stristr($text, "error")) {
+        if (!empty($text)) {
             throw new Exception("Error mounting volume : " . $text);
         }
         // Mount should have succeeded now

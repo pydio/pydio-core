@@ -28,5 +28,5 @@ $mess = array(
 "6" => "Invalidar chaves de API existentes",
 "7" => "Tem certeza que deseja revogar esta(s) chave(s)?",
 "8" => "Chaves(s) removidas com sucesso!",
-"9" => "Dispositivos conectados em sua conta:",
+"9" => "Dispositivos conectados em sua conta",
 );

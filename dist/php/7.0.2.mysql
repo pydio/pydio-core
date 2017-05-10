@@ -1,0 +1,6 @@
+/* SEPARATOR */
+DROP TRIGGER IF EXISTS `LOG_UPDATE`;
+/* SEPARATOR */
+CREATE TRIGGER `LOG_UPDATE` AFTER UPDATE ON `ajxp_index`
+FOR EACH ROW INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
+VALUES (new.repository_identifier, new.node_id, old.node_path, new.node_path, CASE LENGTH(new.node_path) = LENGTH(old.node_path) AND old.node_path COLLATE utf8_bin = new.node_path COLLATE utf8_bin WHEN true THEN 'content' ELSE 'path' END);

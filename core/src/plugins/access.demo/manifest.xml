@@ -7,6 +7,7 @@
     <client_settings icon="plugins/access.fs/icon.png">
         <resources>
             <i18n namespace="access.demo" path="plugins/access.demo/i18n"/>
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
 	</client_settings>
 	<server_settings>

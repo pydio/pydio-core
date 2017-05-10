@@ -20,7 +20,7 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\Imap;
 
-use EmlParser;
+use Pydio\Editor\EML\EmlParser;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 
@@ -133,7 +133,6 @@ class ImapAccessWrapper implements IAjxpWrapper
             $attachmentId = array_pop($ar);
             $this->currentAttachmentData = array("realPath" => $mailPath, "attachmentId" => $attachmentId);
             // EXTRACT ATTACHMENT AND RETURN
-            require_once AJXP_INSTALL_PATH."/plugins/editor.eml/class.EmlParser.php";
             $emlParser = new EmlParser("", "");
             $attachMeta = array();
             $this->data = $emlParser->getAttachmentBody(
@@ -212,7 +211,6 @@ class ImapAccessWrapper implements IAjxpWrapper
             if (empty($this->data)) {
                 Logger::debug(__CLASS__,__FUNCTION__,"Attachement", $this->currentAttachmentData);
                 // EXTRACT ATTACHMENT AND RETURN
-                require_once AJXP_INSTALL_PATH."/plugins/editor.eml/class.EmlParser.php";
                 $emlParser = new EmlParser("", "");
                 $attachMeta = array();
                 $this->data = $emlParser->getAttachmentBody(
@@ -309,7 +307,6 @@ class ImapAccessWrapper implements IAjxpWrapper
             self::$currentCount = count($this->mailboxes);
             $this->pos = $this->dir - 1;
         } else if ($this->fragment == "attachments") {
-            require_once AJXP_INSTALL_PATH.'/plugins/editor.eml/class.EmlParser.php';
             $parser = new EmlParser("", "");
             $ar = explode("#", $path);
             $path = array_shift($ar);// remove fragment
@@ -478,7 +475,11 @@ class ImapAccessWrapper implements IAjxpWrapper
         }
     }
 
-    public static function isRemote()
+    /**
+     * @param $url
+     * @return bool
+     */
+    public static function isRemote($url)
     {
         return true;
     }

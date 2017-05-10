@@ -53,9 +53,10 @@ interface IFeedStore
      * @param integer $limit
      * @param boolean $enlargeToOwned
      * @param string $userId
+     * @param bool $chainLoad
      * @return Notification[]
      */
-    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId);
+    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId = null, $chainLoad = false);
 
     /**
      * Delete feed data
@@ -91,6 +92,12 @@ interface IFeedStore
      * @param $occurrences
      */
     public function dismissAlertById(ContextInterface $ctx, $alertId, $occurrences = 1);
+
+    /**
+     * @param ContextInterface $ctx
+     * @param $objectId
+     */
+    public function dismissMetaObjectById(ContextInterface $ctx, $objectId);
 
     /**
      * @param string $indexPath

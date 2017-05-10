@@ -3,14 +3,14 @@
 [Homepage](https://pydio.com/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
 [Issue-Tracker](https://github.com/pydio/pydio-core/issues) 
-| ![Latest Stable](https://img.shields.io/badge/stable-7.0.1-brightgreen.svg) 
+| ![Latest Stable](https://img.shields.io/badge/stable-7.0.4-brightgreen.svg) 
 | ![License Badge](https://img.shields.io/badge/License-AGPL%203%2B-blue.svg)
 | [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core) 
 |  [![Build Status](https://travis-ci.org/pydio/pydio-core.svg)](https://travis-ci.org/pydio/pydio-core) 
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
-* Latest Stable release : 7.0.1
+* Latest Stable release : 7.0.4
 * Latest Dev release : 6.5.5 (Final Release Candidate for Pydio 7)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/Pydio)

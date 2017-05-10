@@ -1,57 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.exif" openable="true" text="editor.exif.1" iconClass="icon-list-ul" title="editor.exif.2" icon="exif_images/actions/ICON_SIZE/camera_photo.png" className="ExifEditor" mimes="jpg,jpeg" formId="exif_box" label="CONF_MESSAGE[EXIF Extractor]" description="CONF_MESSAGE[Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.exif" openable="true" text="editor.exif.1" iconClass="mdi mdi-camera" title="editor.exif.2"
+        actions="PydioExif.Actions" className="PydioExif" mimes="jpg,jpeg"
+        formId="exif_box" label="CONF_MESSAGE[EXIF Extractor]"
+        description="CONF_MESSAGE[Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data.]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
-            <js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>
-            <js file="plugins/editor.exif/class.ExifEditor.js" className="ExifEditor"/>
             <i18n namespace="editor.exif" path="plugins/editor.exif/i18n" />
-            <img_library alias="exif_images" path="plugins/editor.exif/images"/>
+            <js file="plugins/meta.exif/res/build/PydioExif.js" className="PydioExif"/>
         </resources>
     </client_settings>
-	<clientForm id="exif_box"><![CDATA[
-		<div id="exif_box" action="editer" box_width="60%" box_height="60%" box_padding="0"  class="editor_container">
-			<div class="action_bar full_width_action_bar">
-				<a href="#" onclick="return false;" class="icon-map-marker" id="gpsLocateButton"><img width="22" height="22" src="plugins/meta.exif/world.png" alt="AJXP_MESSAGE[meta.exif.2]" border="0"><br><span message_id="meta.exif.2">AJXP_MESSAGE[meta.exif.2]</span></a>
-			</div>
-            <style>
-            .ajxp_theme_orbit div#exifContainer {
-                background-color: #f5f5f5;
-            }
-            .ajxp_theme_orbit .exifSection {
-                width: 20%;
-                float: left;
-                margin: 7px 4px 0 !important;
-                border: 0 !important;
-                background-color: #fff;
-                border-radius: 2px;
-                padding: 0;
-                min-width: 260px;
-                box-shadow: 0 0px 3px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.43);
-                height: 390px;
-                overflow: auto;
-            }
-            .ajxp_theme_orbit div#exifContainer .infoPanelTable{
-                margin:16px;
-            }
-            .ajxp_theme_orbit div#exifContainer .infoPanelValue{
-                color: rgba(0,0,0,0.76);
-            }
-            .ajxp_theme_orbit div#exifContainer .infoPanelLabel{
-                color: rgba(0,0,0,0.43);
-                padding: 10px 0 3px;
-                font-size: 13px;
-            }
-            #exifContainer .panelHeader.infoPanelGroup {
-                padding: 10px 16px;
-                background-color: rgb(107, 107, 107);
-                color: white;
-                font-size: 14px;
-            }
-            </style>
-		</div>
-	]]></clientForm>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="meta.exif|image.diaporama"/>
+		<activePlugin pluginName="meta.exif"/>
 	</dependencies>
 </editor>

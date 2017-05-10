@@ -90,7 +90,7 @@ class AuthService
         Controller::applyHook("user.before_login", [$tempContext, &$user]);
 
         // Setting session credentials if asked in config
-        if (ConfService::getContextConf($tempContext, "SESSION_SET_CREDENTIALS", "auth")) {
+        if (ConfService::getContextConf($tempContext, "SESSION_SET_CREDENTIALS", "auth") && !empty($pwd)) {
             list($authId, $authPwd) = $authDriver->filterCredentials($user_id, $pwd);
             MemorySafe::storeCredentials($authId, $authPwd);
         }

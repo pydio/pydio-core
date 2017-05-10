@@ -34,6 +34,14 @@
         	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
         	<then>
 		        <phingcall target="deploy"/>
+		    </then>
+		</if>
+        <if>
+            <and>
+            	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
+            	<not><equals arg1="${skip_clean}" arg2="true"/></not>
+            </and>
+        	<then>
 		        <phingcall target="clean"/>
 		    </then>
 		</if>
@@ -303,6 +311,7 @@
         </if>
         <property name="packaged_zip" value="${package_name}.zip"/>
         <property name="packaged_tar" value="${package_name}.tar.gz"/>
+        <property name="packaged_tar_noemptydirs" value="${package_name}-noemptydirs.tar.gz"/>
         <zip
                 destfile="${build.working_folder}/build/${packaged_zip}"
                 includeemptydirs="true"
@@ -310,6 +319,11 @@
         <tar
                 destfile="${build.working_folder}/build/${packaged_tar}"
                 includeemptydirs="true"
+                compression="gzip"
+            ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
+        <tar
+                destfile="${build.working_folder}/build/${packaged_tar_noemptydirs}"
+                includeemptydirs="false"
                 compression="gzip"
             ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
         <if>
@@ -527,11 +541,24 @@
     </target>
 
     <target name="iterate-plugins">
-        <foreach param="plugin" absparam="plugin_abs_dir" target="${target}">
-            <fileset dir="${plugins_dir}" defaultexcludes="false">
-                <include name="*"/>
-            </fileset>
-        </foreach>
+        <if>
+            <isset property="iterate-exclude"/>
+            <then>
+                <foreach param="plugin" absparam="plugin_abs_dir" target="${target}">
+                    <fileset dir="${plugins_dir}" defaultexcludes="false">
+                        <include name="*"/>
+                        <exclude name="${iterate-exclude}"/>
+                    </fileset>
+                </foreach>
+            </then>
+            <else>
+                <foreach param="plugin" absparam="plugin_abs_dir" target="${target}">
+                    <fileset dir="${plugins_dir}" defaultexcludes="false">
+                        <include name="*"/>
+                    </fileset>
+                </foreach>
+            </else>
+        </if>
     </target>
 
     <!-- We should have a ${local_repository_root} and ${upgrade_export} from upper scope -->
@@ -648,13 +675,30 @@
     </target>
 
     <target name="grunt">
+
         <if>
             <available file="${plugin_abs_dir}/package.json"/>
             <then>
+                <pydio-read-package-json file="${plugin_abs_dir}/package.json"/>
+                <if>
+                    <not><equals arg1="${pydio_dependency}" arg2="__NOT_FOUND__"/></not>
+                    <then>
+                        <!-- BUILD JAVASCRIPT -->
+                        <exec command="npm install" dir="${plugin_abs_dir}/../${pydio_dependency}" passthru="true"/>
+                        <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}/../${pydio_dependency}" passthru="true" checkreturn="true"/>
+                    </then>
+                </if>
                 <!-- BUILD JAVASCRIPT -->
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
-                <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}" passthru="true"/>
+                <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}" passthru="true" checkreturn="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
+                <if>
+                    <not><equals arg1="${pydio_dependency}" arg2="__NOT_FOUND__"/></not>
+                    <then>
+                        <!-- DELETE DEPENDENCY NODE MODULE -->
+                        <delete dir="${plugin_abs_dir}/../${pydio_dependency}/node_modules"/>
+                    </then>
+                </if>
             </then>
         </if>
     </target>
@@ -666,6 +710,7 @@
                 <exec command="composer install --optimize-autoloader"
                       dir="${plugin_abs_dir}"
                       passthru="true"
+                      checkreturn="true"
                 />
             </then>
         </if>

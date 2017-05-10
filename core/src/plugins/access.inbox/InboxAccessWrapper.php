@@ -226,9 +226,10 @@ class InboxAccessWrapper implements IAjxpWrapper
     /**
      * Describe whether the current wrapper operates on a remote server or not.
      * @static
-     * @return boolean
+     * @param $url
+     * @return bool
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         return true;
     }

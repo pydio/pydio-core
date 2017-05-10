@@ -1,7 +1,3 @@
-/res/js/ui/prototype/util/he.js
-res/js/core
-res/js/vendor/nodejs/bundle*
-res/js/pydio.min.js
-res/js/ui/reactjs/build/
-res/mui/mui-sources
-/res/themes/orbit/css/allz.css
+res/build
+/plugins/gui.ajax/res/themes/common/css/mui/less/
+/docgen.json

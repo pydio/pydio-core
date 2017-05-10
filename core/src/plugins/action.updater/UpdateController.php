@@ -153,8 +153,13 @@ class UpdateController extends Plugin
                     print("No update is necessary!");
                     break;
                 }
+                $selectedIndex = intval($httpVars['package_index']);
                 include(dirname(__FILE__) . "/output_head.html");
+                $errors = false;
                 foreach ($res["packages"] as $index => $zipPackage) {
+                    if($index > $selectedIndex){
+                        break;
+                    }
                     print("<div class='main_step'>Applying upgrade " . basename($zipPackage) . "</div>");
                     $u = new UpgradeManager(
                         $zipPackage,
@@ -162,7 +167,6 @@ class UpdateController extends Plugin
                         $res["hash_method"],
                         explode(",", $this->pluginConf["PRESERVE_FILES"])
                     );
-                    $errors = false;
                     while ($u->hasNextStep()) {
                         set_time_limit(180);
                         print("<div class='upgrade_step'><div class='upgrade_title'>" . $u->currentStepTitle . "</div>");
@@ -183,10 +187,11 @@ class UpdateController extends Plugin
                     }
                     if ($errors) break;
                 }
-                print('<script type="text/javascript">replaceTop();</script>');
-                print str_repeat(' ', 300);
-                flush();
-
+                if(!$errors){
+                    print('<script type="text/javascript">replaceTop();</script>');
+                    print str_repeat(' ', 300);
+                    flush();
+                }
 
                 break;
 

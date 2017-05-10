@@ -28,6 +28,7 @@ use Pydio\Core\Model\UserInterface;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 define('PYDIO_SESSION_NAME', 'AjaXplorer');
+define('PYDIO_SESSION_NAME_SETTINGS', 'Pydio_Settings');
 define('PYDIO_SESSION_QUERY_PARAM', 'ajxp_sessid');
 
 /**
@@ -47,6 +48,8 @@ class SessionService implements RepositoriesCache
     const CTX_REPOSITORY_ID = "PYDIO_REPO_ID";
     const PENDING_REPOSITORY_ID = "PYDIO_PENDING_REPO_ID";
     const PENDING_FOLDER = "PYDIO_PENDING_FOLDER";
+
+    const USER_TEMPORARY_DISPLAY_NAME = "USER_TEMPORARY_DISPLAY_NAME";
 
     private static $sessionName = PYDIO_SESSION_NAME;
 
@@ -152,13 +155,16 @@ class SessionService implements RepositoriesCache
     /**
      * @param UserInterface $ctxUser
      */
-    public static function checkPendingRepository($ctxUser){
+    public static function checkPendingRepository(&$ctxUser){
         if (self::has(self::PENDING_REPOSITORY_ID) && self::has(self::PENDING_FOLDER)) {
-            $ctxUser->setArrayPref("history", "last_repository", self::fetch(self::PENDING_REPOSITORY_ID));
+            $pendingId = self::fetch(self::PENDING_REPOSITORY_ID);
+            $ctxUser->setArrayPref("history", "last_repository", $pendingId);
             $ctxUser->setPref("pending_folder", self::fetch(self::PENDING_FOLDER));
             self::delete(self::PENDING_REPOSITORY_ID);
             self::delete(self::PENDING_FOLDER);
+            return $pendingId;
         }
+        return null;
     }
 
     /**

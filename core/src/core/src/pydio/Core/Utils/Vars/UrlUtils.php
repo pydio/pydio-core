@@ -44,6 +44,9 @@ class UrlUtils
             },
             $url
         );
+        if($enc_url === null) {
+            return parse_url($url, $part);
+        }
 
         $parts = parse_url($enc_url, $part);
 

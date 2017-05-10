@@ -331,6 +331,15 @@ class UserSelection
     }
 
     /**
+     * Find common base path for current selection
+     * @return mixed
+     */
+    public function commonDirFromSelection(){
+        $items = array_values($this->files);
+        return PathUtils::commonPath($items);
+    }
+
+    /**
      * @return string
      * @throws \Exception
      */
