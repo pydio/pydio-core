@@ -49,4 +49,5 @@ if(!function_exists('updatePluginConfig')){
 
 }
 
+forceRenameConfFile('bootstrap_repositories');
 updatePluginConfig('gui.ajax', 'GUI_THEME', 'material');
