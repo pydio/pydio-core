@@ -84,5 +84,11 @@
 				<clientCallback module="PydioCoreActions.Navigation.splash"/>
 			</processing>
 		</action>
+        <action name="packages_upgrade_script">
+            <processing>
+                <serverCallback methodName="packagesUpgradeScript" restParams="/"
+                                developerComment="Apply necessary upgrade after an external code update, typically when handled via Linux packages"/>
+            </processing>
+        </action>
 	</actions>
 </registry_contributions>

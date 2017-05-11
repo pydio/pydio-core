@@ -44,9 +44,9 @@ let WorkspacesCard = (props) => {
                 {renderRay(-30)}
             </Scheme>
             <p>{props.message('workspaces.2')}</p>
-            <Scheme>
-                <span className="mdi mdi-account" style={{position:'absolute', left: 39, top: 50 -12 -20}}/>
-                <div style={{position:'absolute', top: 46, left:14}}>
+            <Scheme dimension={130}>
+                <span className="mdi mdi-account" style={{position:'absolute', left: 54, top: 32}}/>
+                <div style={{position:'absolute', top: 60, left:30}}>
                     <span className="mdi mdi-folder"/>
                     <span className="mdi mdi-arrow-right"/>
                     <span className="mdi mdi-network"/>
