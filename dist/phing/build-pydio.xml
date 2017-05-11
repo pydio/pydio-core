@@ -715,7 +715,7 @@
             </then>
         </if>
         <if>
-            <avaiblable file="${plugin_abs_dir}/vendor/pear/versioncontrol_git"/>
+            <available type="file" file="${plugin_abs_dir}/vendor/pear/versioncontrol_git"/>
             <then>
                 <phingcall target="delete_me">
                     <property name="filename" value="${plugin_abs_dir}/vendor/pear/versioncontrol_git/.git"/>
