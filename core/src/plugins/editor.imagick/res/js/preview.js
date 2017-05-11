@@ -23,23 +23,15 @@ import { ImageContainer } from './components'
 
 const baseURL = pydio.Parameters.get('ajxpServerAccess');
 
-export default class Preview extends PureComponent {
-    render() {
-        const {node, ...remainingProps} = this.props
+const Preview = ({node, ...remainingProps}) => (
+    <ImageContainer
+        {...remainingProps}
+        src={`${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()}`}
+        imgStyle={{
+            width: "100%",
+            height: "100%"
+        }}
+    />
+)
 
-        console.log(`${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()}`)
-
-        return (
-            <ImageContainer
-                {...remainingProps}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundImage:`url(${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()})`,
-                    backgroundSize : 'cover',
-                    backgroundPosition: 'center center'
-                }}
-            />
-        )
-    }
-}
+export default Preview

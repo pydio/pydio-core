@@ -79,7 +79,7 @@ class Editor extends PureComponent {
     }
 
     render() {
-        const {node, src, editorData, scale} = this.props;
+        const {node, src, editorData} = this.props;
 
         if (!node) return null
 

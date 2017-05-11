@@ -21,22 +21,14 @@
 import React, {Component} from 'react'
 
 export class Image extends Component {
-    static get propTypes() {
-        return {
-            width: React.PropTypes.number,
-            height: React.PropTypes.number,
-        }
-    }
-
     render() {
-        const {src, style, width, height, ...remainingProps} = this.props
+        const {src, style, ...remainingProps} = this.props
 
         return (
             <div
                 {...remainingProps}
                 style={{
-                    width,
-                    height,
+                    ...style,
                     backgroundImage:'url(' + src + ')',
                     backgroundSize : "cover",
                     backgroundPosition: 'center center',
@@ -52,7 +44,10 @@ export class ImageContainer extends Component {
     static get propTypes() {
         return {
             src: React.PropTypes.string.isRequired,
-            imgClassName: React.PropTypes.string
+            imgClassName: React.PropTypes.string,
+            imgStyle: React.PropTypes.object,
+            width: React.PropTypes.number,
+            height: React.PropTypes.number
         }
     }
 
@@ -73,15 +68,18 @@ export class ImageContainer extends Component {
     }
 
     render() {
-        const {src, style, width, height, imgClassName, scale} = this.props
+        const {src, style, width, height, imgStyle, imgClassName, scale = 1} = this.props
 
         return (
             <div style={{...ImageContainer.styles, ...style}}>
                 <Image
                     src={src}
                     className={imgClassName}
-                    width={scale && width * scale || width}
-                    height={scale && height * scale || height}
+                    style={{
+                        width: width && width * scale || "100%",
+                        height: height && height * scale || "100%",
+                        ...imgStyle,
+                    }}
                 />
             </div>
         )

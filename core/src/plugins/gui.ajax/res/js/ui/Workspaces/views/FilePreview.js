@@ -35,6 +35,7 @@ class FilePreview extends PureComponent {
 
         const rootStyle = {
             backgroundColor: light,
+            alignItems: "initial",
             ...style
         };
 
