@@ -622,16 +622,18 @@
                     />
                 );
             }
-            actions.push(
-                <MaterialUI.FlatButton
-                    key="edit"
-                    label={this.state.editMode?MessageHash['meta.user.15']:MessageHash['meta.user.14']}
-                    onClick={()=>{!this.state.editMode?this.openEditMode():this.saveChanges()}}
-                />
-            );
+            if(pydio.user && pydio.user.write){
+                actions.push(
+                    <MaterialUI.FlatButton
+                        key="edit"
+                        label={this.state.editMode?MessageHash['meta.user.15']:MessageHash['meta.user.14']}
+                        onClick={()=>{!this.state.editMode?this.openEditMode():this.saveChanges()}}
+                    />
+                );
+            }
 
             return (
-                <PydioWorkspaces.InfoPanelCard style={this.props.style} title={this.props.pydio.MessageHash['meta.user.1']} actions={actions} icon="tag-multiple" iconColor="#00ACC1">
+                <PydioWorkspaces.InfoPanelCard style={this.props.style} title={this.props.pydio.MessageHash['meta.user.1']} actions={actions.length ? actions : null} icon="tag-multiple" iconColor="#00ACC1">
                     <UserMetaPanel
                         ref="panel"
                         node={this.props.node}

@@ -32,7 +32,7 @@ class Editor extends React.Component {
             autoplay: false,
             controls: true,
             flash: {
-                swf: "plugins/editor.video/node_modules/video.js/dist/video-js.swf"
+                swf: "plugins/editor.video/build/video-js.swf"
             },
             techOrder: ['flash', 'html5'] // TODO - switch the order when the file is MP4 ??
         }

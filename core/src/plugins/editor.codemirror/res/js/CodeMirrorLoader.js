@@ -26,7 +26,7 @@ import CodeMirror from './CodeMirror';
 let {define, require} = window
 
 SystemJS.config({
-    baseURL: 'plugins/editor.codemirror/node_modules',
+    baseURL: 'plugins/editor.codemirror/res/build',
     packages: {
         'codemirror': {},
         '.': {}

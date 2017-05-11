@@ -32,6 +32,15 @@ module.exports = function(grunt) {
                 }
             }
         },
+        copy: {
+            codemirror: {
+                expand: true,
+                cwd: 'node_modules/codemirror/',
+                src: '**/*',
+                dest: './res/build/codemirror',
+                flatten:false
+            }
+        },
         watch: {
             js: {
                 files: [
@@ -46,7 +55,8 @@ module.exports = function(grunt) {
     });
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-babel');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.registerTask('default', ['babel', 'browserify:ui']);
+    grunt.registerTask('default', ['babel', 'browserify:ui', 'copy']);
 
 };
