@@ -1,6 +1,6 @@
 {
   "name": "core.tasks",
-  "version": "6.5.1",
+  "version": "8.0.0",
   "description": "",
   "source_path":"js/react",
   "main": "index.js",
