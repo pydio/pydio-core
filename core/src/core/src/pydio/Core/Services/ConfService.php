@@ -29,6 +29,7 @@ use Pydio\Core\Model\Context;
 
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
+use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -131,6 +132,33 @@ class ConfService
         if(function_exists('opcache_reset')){
             opcache_reset();
         }
+    }
+
+    public static function detectVersionMismatch(){
+        if(AJXP_VERSION_DB === '##DB_VERSION##') return false;
+        $confDriver = self::getConfStorageImpl();
+        if ($confDriver instanceof \Pydio\Conf\Sql\SqlConfDriver) {
+            $conf = OptionsHelper::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
+            if (is_array($conf) && isSet($conf["driver"])) {
+                try{
+                    \dibi::connect($conf);
+                    $res = \dibi::query("select MAX(db_build) from [ajxp_version]");
+                    if (!empty($res)) {
+                        $dbVersion = intval($res->fetchSingle());
+                        \dibi::disconnect();
+                        if($dbVersion < intval(AJXP_VERSION_DB))
+                        return [
+                            'current' => $dbVersion,
+                            'target' => intval(AJXP_VERSION_DB),
+                            'conf' => $conf
+                        ];
+                    }
+                }catch(\DibiException $de){
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     /**

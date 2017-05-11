@@ -585,6 +585,63 @@ class UpgradeManager
     }
 
     /**
+     * @throws DibiException
+     */
+    public static function executeLocalScripts(){
+
+        $workingDir = AJXP_INSTALL_PATH . '/' . AJXP_PLUGINS_FOLDER . '/action.updater/scripts';
+        $dbMismatch = ConfService::detectVersionMismatch();
+        if($dbMismatch !== false){
+            $conf = $dbMismatch['conf'];
+            $dbVersion = $dbMismatch['current'];
+            $targetDb = $dbMismatch['target'];
+
+            switch ($conf["driver"]) {
+                case "sqlite":
+                case "sqlite3":
+                    $ext = "sqlite";
+                    break;
+                case "postgre":
+                    $ext = "pgsql";
+                    break;
+                case "mysql":
+                    $ext = "mysql";
+                    break;
+                default:
+                    throw new PydioException("ERROR!, DB driver " . $conf["driver"] . " not supported yet");
+            }
+
+            dibi::connect($conf);
+            for($i = $dbVersion + 1; $i <= $targetDb; $i++ ){
+                $versionUpgrade = $workingDir.'/sql/'.$i.'.'.$ext;
+                $result[] = 'Applying script for DB version '.$i;
+                if(file_exists($versionUpgrade)){
+                    // Apply Upgrade Script
+                    $sqlInstructions = file_get_contents($versionUpgrade);
+                    $parts = array_map("trim", explode("/* SEPARATOR */", $sqlInstructions));
+                    dibi::begin();
+                    foreach ($parts as $sqlPart) {
+                        if (empty($sqlPart)) continue;
+                        dibi::nativeQuery($sqlPart);
+                        $result[] = ' - ' . $sqlPart;
+                    }
+                    dibi::commit();
+                }
+            }
+            dibi::disconnect();
+
+        }
+
+        $phpUpgrade = $workingDir . '/php/' . AJXP_VERSION . '.php';
+        if(file_exists($phpUpgrade)){
+            include_once($phpUpgrade);
+            $result[] = 'Applied specific script for version '.AJXP_VERSION;
+        }
+        ConfService::clearAllCaches();
+        return $result;
+    }
+
+    /**
      * @param $path
      * @param $dest
      * @return bool

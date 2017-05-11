@@ -23,6 +23,9 @@ import HiddenDownloadForm from './HiddenDownloadForm'
 import PydioContextProvider from './PydioContextProvider'
 import PydioContextConsumer from './PydioContextConsumer'
 
+import CompatMigrationDialog from './compat/CompatMigrationDialog'
+import CompatModal from './compat/CompatModal'
+
 export {
     Builder,
     TemplateBuilder,
@@ -46,6 +49,8 @@ export {
     BackgroundImage,
 
     PydioContextProvider,
-    PydioContextConsumer
+    PydioContextConsumer,
 
+    CompatMigrationDialog,
+    CompatModal
 }
