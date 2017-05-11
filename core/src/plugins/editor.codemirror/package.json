@@ -14,6 +14,7 @@
     "grunt-babel": "~5.0.3",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-browserify": "~4.0.1",
+    "grunt-contrib-copy": "1.0.0",
     "lodash.debounce": "4.0.8",
     "classnames": "2.2.5",
     "codemirror": "^5.24.2",

@@ -7,9 +7,8 @@
         <resources>
             <i18n namespace="code_mirror" path="plugins/editor.codemirror/i18n" autoload="true"/>
             <js file="plugins/editor.codemirror/res/build/PydioCodeMirror.js" className="PydioCodeMirror"/>
-            <css file="plugins/editor.codemirror/node_modules/codemirror/lib/codemirror.css"/>
+            <css file="plugins/editor.codemirror/res/build/codemirror/lib/codemirror.css"/>
             <css file="plugins/editor.codemirror/css/linenumbers.css"/>
-            <img_library alias="codemirror_images" path="plugins/editor.codemirror"/>
         </resources>
     </client_settings>
 	<dependencies>
