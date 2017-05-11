@@ -530,10 +530,10 @@ class BootConfLoader extends AbstractConfDriver
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
                 $ctx,
-                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]),
+                [["adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]]],
                 "Pydio Test Mail",
                 "Body of the test",
-                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"])
+                ["adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]]
             );
             echo 'SUCCESS:Mail sent to the admin adress, please check it is in your inbox!';
 
