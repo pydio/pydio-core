@@ -36,11 +36,8 @@ const withUniqueNode = (Component) => {
         }
 
         render() {
-
-            if (!this.state || !this.state.node) return null
-
             return (
-                <Component {...this.props} node={this.state.node}  />
+                <Component {...this.props} node={this.state && this.state.node}  />
             )
         }
     }
@@ -341,8 +338,11 @@ const FolderMinisite = React.createClass({
 
 const FileMinisite = React.createClass({
 
-    componentDidMount() {
-        const {pydio, node, dispatch} = this.props
+    componentWillReceiveProps(nextProps) {
+
+        const {pydio, node, dispatch} = nextProps
+
+        if (!node) return
 
         pydio.UI.registerEditorOpener(this);
 
@@ -420,11 +420,11 @@ const FileMinisite = React.createClass({
 
     render: function(){
 
-        let node = this.state && this.state.node ?  this.state.node : null;
-
         return (
             <StandardLayout {...this.props}>
-                <Editor styledisplayToolbar={false} style={{display: "flex", flex: 1}}/>
+                <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
+                    <Editor styledisplayToolbar={false} style={{display: "flex", flex: 1}}/>
+                </div>
             </StandardLayout>
         );
 
