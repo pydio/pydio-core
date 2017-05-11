@@ -29,7 +29,7 @@ export class Image extends Component {
                 {...remainingProps}
                 style={{
                     ...style,
-                    backgroundImage:'url(' + src + ')',
+                    backgroundImage: `url('${src}')`,
                     backgroundSize : "cover",
                     backgroundPosition: 'center center',
                     backgroundRepeat: 'no-repeat',
