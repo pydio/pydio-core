@@ -1,7 +1,7 @@
 import Pydio from 'pydio'
 import OpenNodesModel from '../OpenNodesModel'
 import { connect } from 'react-redux';
-import {Editor} from '../editor';
+import { Editor } from '../editor';
 
 const { EditorActions } = Pydio.requireLib('hoc')
 
@@ -36,7 +36,6 @@ class EditionPanel extends React.Component {
         pydio.Registry.loadEditorResources(
             editorData.resourcesManager,
             () => {
-
                 let EditorClass = null
 
                 if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
@@ -108,7 +107,7 @@ class EditionPanel extends React.Component {
 
         return (
             <div style={{position: "relative", zIndex: 1400}}>
-                <Editor/>
+                <Editor />
             </div>
         )
     }

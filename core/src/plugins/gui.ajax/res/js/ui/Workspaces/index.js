@@ -4,7 +4,7 @@ import Breadcrumb from './views/Breadcrumb'
 import FilePreview from './views/FilePreview'
 import FSTemplate from './views/FSTemplate'
 import EditionPanel from './views/EditionPanel'
-import {SearchForm} from './search'
+import { SearchForm } from './search'
 
 import WorkspacesList from './wslist/WorkspacesList'
 import WorkspacesListMaterial from './wslist/WorkspacesListMaterial'
@@ -19,6 +19,8 @@ import InfoRootNode from './detailpanes/RootNode'
 
 import GenericInfoCard from './detailpanes/GenericInfoCard'
 import FileInfoCard from './detailpanes/FileInfoCard'
+
+import { Editor } from './editor/components/Editor'
 
 const classes = {
     OpenNodesModel,
@@ -39,7 +41,9 @@ const classes = {
     InfoPanelCard,
     InfoRootNode,
     FileInfoCard,
-    GenericInfoCard
+    GenericInfoCard,
+
+    Editor
 }
 
 export {classes as default}

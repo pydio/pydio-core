@@ -38,6 +38,7 @@ class Editor extends React.Component {
         }
 
         this.minimise = () => editorModify({isPanelActive: false})
+        this.setFullScreen = () => editorModify({fullscreen: document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement})
 
         this.closeActiveTab = (e) => {
             const {activeTab} = this.props
@@ -55,6 +56,24 @@ class Editor extends React.Component {
         editorModify({isPanelActive: true})
     }
 
+    componentDidMount() {
+        DOMUtils.observeWindowResize(this.setFullScreen);
+    }
+
+    componentWillUnmount() {
+        DOMUtils.stopObservingWindowResize(this.setFullScreen);
+    }    
+
+    enterFullScreen() {
+        if (this.container.requestFullscreen) {
+            this.container.requestFullscreen();
+        } else if (this.container.mozRequestFullScreen) {
+            this.container.mozRequestFullScreen();
+        } else if (this.container.webkitRequestFullscreen) {
+            this.container.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+    }
+
     componentWillReceiveProps(nextProps) {
 
         if (this.state.minimisable) return
@@ -65,22 +84,18 @@ class Editor extends React.Component {
 
         this.recalculate()
 
-        this.setState({
-            minimisable: true
-        })
+        this.setState({minimisable: true})
     }
 
     recalculate() {
 
         const {editorModify} = this.props
 
-        const element = ReactDOM.findDOMNode(this.refs.container)
-
-        if (!element) return
+        if (!this.container) return
 
         editorModify({
             panel: {
-                rect: element.getBoundingClientRect()
+                rect: this.container.getBoundingClientRect()
             }
         })
     }
@@ -124,12 +139,13 @@ class Editor extends React.Component {
     }
 
     render() {
-        const {activeTab, isActive} = this.props
+        const {style, activeTab, isActive, fullscreen, displayToolbar} = this.props
         const {minimisable} = this.state
 
         const title = activeTab ? activeTab.title : ""
         const onClose = activeTab ? this.closeActiveTab : this.close
         const onMinimise = minimisable ? this.minimise : null
+        const onMaximise = this.maximise
 
         let parentStyle = {
             display: "flex",
@@ -149,10 +165,12 @@ class Editor extends React.Component {
         }
 
         return (
-            <div style={{display: "flex", ...this.props.style}}>
+            <div style={{display: "flex", ...style}}>
                 <Draggable cancel=".body" onStop={this.recalculate.bind(this)}>
-                    <AnimatedPaper  ref="container" onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: this.props.style.transformOrigin}}>
-                        <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onMinimise={onMinimise} />
+                    <AnimatedPaper ref={(container) => this.container = ReactDOM.findDOMNode(container)} onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: style.transformOrigin}}>
+                        {displayToolbar && !fullscreen &&
+                            <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onFullScreen={() => this.enterFullScreen()} onMinimise={onMinimise} />
+                        }
 
                         <div className="body" style={parentStyle}>
                             {this.renderChild()}
@@ -174,6 +192,8 @@ function mapStateToProps(state, ownProps) {
     const activeTab = tabs.filter(tab => tab.id === editor.activeTabId)[0]
 
     return  {
+        style: {},
+        displayToolbar: true,
         ...ownProps,
         activeTab,
         tabs,
