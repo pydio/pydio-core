@@ -16,7 +16,7 @@ export default function (pydio) {
             const slug = pydio.user.repositories.get(repoId).getSlug();
             if(slug) repoId = slug;
         }
-        link = url + '?goto=' + repoId + encodeURIComponent(pydio.getUserSelection().getUniqueNode().getPath());
+        link = LangUtils.trimRight(url, '/') + pydio.getUserSelection().getUniqueNode().getPath();
 
         pydio.UI.openComponentInModal('PydioReactUI', 'PromptDialog', {
             dialogTitleId:369,

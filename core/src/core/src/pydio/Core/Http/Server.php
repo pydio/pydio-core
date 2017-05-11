@@ -238,9 +238,9 @@ class Server
         }
         if(AJXP_SERVER_DEBUG){
             if($context instanceof  \Exception){
-                $message .= $context->getTraceAsString();
+                $message .= "\n".$context->getTraceAsString();
             }else{
-                $message .= PydioException::buildDebugBackTrace();
+                $message .= "\n".PydioException::buildDebugBackTrace();
             }
         }
         $req = $this->getRequest();

@@ -719,6 +719,9 @@ $mess=array(
 "619" => "Search limited to current folder and its children",
 "620" => "Search limited to current workspace",
 "621" => "This field cannot be empty",
+"622" => "Error Stack",
+"623" => "Copy",
+"624" => "Copied!",
 /* END SENTENCE */
 /* testador de força de senha */
 );

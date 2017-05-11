@@ -108,7 +108,7 @@ class PydioException extends \Exception
                 }
                 $func .= ')';
 
-                $message .= "\n". str_replace(dirname(__FILE__), '', $entry['file']) . ':' . $entry['line'] . ' - ' . $func . PHP_EOL;
+                $message .= "#".$i . " ". (!empty($entry['file']) ? str_replace(dirname(__FILE__), '', $entry['file']) . ':' . $entry['line'] . ' - ' : '[internal function]  - ') . $func . PHP_EOL;
             }
         }
 

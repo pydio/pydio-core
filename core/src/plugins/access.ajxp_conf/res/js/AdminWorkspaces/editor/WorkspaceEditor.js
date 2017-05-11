@@ -258,6 +258,7 @@ class WorkspaceEditor extends React.Component{
                             driverFields={templateAllFormDefs}
                             selectedFields={selectedFields}
                             onToggleField={this.toggleTemplateField.bind(this)}
+                            style={{padding:'0 16px'}}
                         />;
                     }else if(this.state.edit == 'general'){
                         if(this.state.model.isTemplate()) {

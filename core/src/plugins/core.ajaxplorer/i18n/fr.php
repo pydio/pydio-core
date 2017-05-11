@@ -721,5 +721,8 @@ $mess=array(
 "619" => "Recherche limitée au répertoire courant et ses enfants.",
 "620" => "Recherche limitée au workspace courant seulement.",
 "621" => "Ce champ ne doit pas être vide",
+"622" => "Pile d'erreurs",
+"623" => "Copier",
+"624" => "Copié!",
 /* END SENTENCE */
 );

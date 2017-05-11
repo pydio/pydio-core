@@ -278,7 +278,6 @@ let SimpleList = React.createClass({
             showSelector        : false,
             elements            : this.props.node.isLoaded()?this.buildElements(0, this.props.infiniteSliceCount):[],
             containerHeight     : this.props.containerHeight ? this.props.containerHeight  : (this.props.heightAutoWithMax ? 0 : 500),
-            filterNodes         : this.props.filterNodes,
             sortingInfo         : this.props.defaultSortingInfo || null
         };
         if(this.props.elementHeight instanceof Object){
@@ -297,7 +296,6 @@ let SimpleList = React.createClass({
             showSelector:false,
             elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
             infiniteLoadBeginBottomOffset:200,
-            filterNodes:nextProps.filterNodes ? nextProps.filterNodes : this.props.filterNodes,
             sortingInfo: this.state.sortingInfo || nextProps.defaultSortingInfo || null
         }, () => {if (nextProps.node.isLoaded()) this.updateInfiniteContainerHeight()});
         if(!nextProps.autoRefresh&& this.refreshInterval){
@@ -444,7 +442,7 @@ let SimpleList = React.createClass({
         }else{
             let selection = new Map();
             this.props.node.getChildren().forEach(function(child){
-                if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
+                if(this.props.filterNodes && !this.props.filterNodes(child)){
                     return;
                 }
                 if(child.isLeaf()){
@@ -802,7 +800,7 @@ let SimpleList = React.createClass({
                     const childCursor = parseInt(child.getMetadata().get('cursor'));
                     this._currentCursor = Math.max((this._currentCursor ? this._currentCursor : 0), childCursor);
                 }
-                if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
+                if(this.props.filterNodes && !this.props.filterNodes(child)){
                     return;
                 }
                 const nodeActions = this.getActionsForNode(this.dm, child);

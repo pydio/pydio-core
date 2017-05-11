@@ -726,4 +726,7 @@ $mess=array(
 "619" => "Limitar búsqueda a la carpeta actual",
 "620" => "Limitar búsqueda al workspace actual",
 "621" => "This field cannot be empty",
+"622" => "Error Stack",
+"623" => "Copy",
+"624" => "Copied!",
 );
