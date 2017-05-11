@@ -39,7 +39,8 @@ const Preview = ({node, ...remainingProps}) => {
             src={`${baseURL}${repoString}${mtimeString}&action=preview_data_proxy&get_thumb=true&file=${encodeURIComponent(node.getPath())}`}
             imgStyle={{
                 width: "100%",
-                height: "100%"
+                height: "100%",
+                flex: 1
             }}
         />
     )

@@ -63,7 +63,8 @@ export class ImageContainer extends Component {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            overflow: 'auto'
+            overflow: 'auto',
+            backgroundColor: "#424242"
         }
     }
 

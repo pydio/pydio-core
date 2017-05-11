@@ -96,6 +96,7 @@ class Editor extends PureComponent {
                         height={imgHeight}
                         containerWidth={containerWidth}
                         containerHeight={containerHeight}
+                        imgClassName="diaporama-image-main-block"
                     />
                 }
                 </ImageSizeProvider>
