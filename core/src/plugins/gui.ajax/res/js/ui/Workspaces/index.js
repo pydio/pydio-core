@@ -20,7 +20,7 @@ import InfoRootNode from './detailpanes/RootNode'
 import GenericInfoCard from './detailpanes/GenericInfoCard'
 import FileInfoCard from './detailpanes/FileInfoCard'
 
-import { Editor } from './editor/components/Editor'
+import { Editor } from './editor/components/editor'
 
 const classes = {
     OpenNodesModel,
