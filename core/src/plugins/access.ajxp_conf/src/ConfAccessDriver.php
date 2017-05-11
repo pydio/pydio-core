@@ -261,6 +261,21 @@ class ConfAccessDriver extends AbstractAccessDriver
      */
     protected function getMainTree(ContextInterface $ctx){
         $rootNodes = $this->rootNodes;
+
+        $updater = PluginsService::getInstance($ctx)->getPluginById("action.updater");
+        if ($updater !== false && $updater->isEnabled()){
+            $rootNodes["admin"]["CHILDREN"]["action.updater"] = array(
+                "AJXP_MIME" => "plugins_zone",
+                "LABEL" => "updater.1",
+                "DESCRIPTION" => "updater.2",
+                "INDEX" => ["type" => "plugin", "plugin" => "action.updater"],
+                "METADATA" => array(
+                    "icon_class" => "mdi mdi-update",
+                    "component"  => "AdminPlugins.UpdaterDashboard"
+                )
+            );
+        }
+
         $user = $ctx->getUser();
         if ($user != null && $user->getGroupPath() != "/") {
             // Group Admin
