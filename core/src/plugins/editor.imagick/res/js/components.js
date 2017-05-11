@@ -29,6 +29,7 @@ export class Image extends Component {
                 {...remainingProps}
                 style={{
                     ...style,
+                    flex: 1,
                     backgroundImage: `url('${src}')`,
                     backgroundSize : "cover",
                     backgroundPosition: 'center center',
