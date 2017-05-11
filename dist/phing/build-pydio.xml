@@ -714,6 +714,17 @@
                 />
             </then>
         </if>
+        <if>
+            <avaiblable file="${plugin_abs_dir}/vendor/pear/versioncontrol_git"/>
+            <then>
+                <phingcall target="delete_me">
+                    <property name="filename" value="${plugin_abs_dir}/vendor/pear/versioncontrol_git/.git"/>
+                </phingcall>
+                <phingcall target="delete_me">
+                    <property name="filename" value="${plugin_abs_dir}/vendor/pear/versioncontrol_git/tests"/>
+                </phingcall>
+            </then>
+        </if>
     </target>
 
     <target name="clean" description="Clean all working folders">
