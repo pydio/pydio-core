@@ -849,6 +849,9 @@ let SimpleList = React.createClass({
                     if (a.parent){
                         return -1;
                     }
+                    if (b.parent){
+                        return 1;
+                    }
                     const nodeA = a.node;
                     const nodeB = b.node;
                     // Recycle always last
