@@ -29,7 +29,6 @@ export class Image extends Component {
                 {...remainingProps}
                 style={{
                     ...style,
-                    flex: 1,
                     backgroundImage: `url('${src}')`,
                     backgroundSize : "cover",
                     backgroundPosition: 'center center',
@@ -64,7 +63,8 @@ export class ImageContainer extends Component {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            overflow: 'auto'
+            overflow: 'auto',
+            backgroundColor: "#424242"
         }
     }
 

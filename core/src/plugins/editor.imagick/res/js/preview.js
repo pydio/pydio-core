@@ -29,7 +29,8 @@ const Preview = ({node, ...remainingProps}) => (
         src={`${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()}`}
         imgStyle={{
             width: "100%",
-            height: "100%"
+            height: "100%",
+            flex: 1
         }}
     />
 )
