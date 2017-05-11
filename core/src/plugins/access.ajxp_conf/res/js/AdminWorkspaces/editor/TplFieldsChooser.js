@@ -26,7 +26,7 @@ export default React.createClass({
             );
         }.bind(this));
         return (
-            <div>
+            <div style={this.props.style}>
                 {fields}
             </div>
         );
