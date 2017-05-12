@@ -48,7 +48,7 @@ class Tab extends React.Component {
 
     renderControls(Controls, Actions) {
         const {node, editorData} = this.props
-        const {SelectionControls, ResolutionControls, SizeControls, ContentControls, LocalisationControls} = Controls
+        const {SelectionControls, ResolutionControls, SizeControls, ContentControls, ContentSearchControls, LocalisationControls} = Controls
 
         let actions = {
             ...SizeActions,
@@ -82,6 +82,7 @@ class Tab extends React.Component {
                 {ResolutionControls && <ToolbarGroup>{controls(ResolutionControls)}</ToolbarGroup>}
                 {SizeControls && <ToolbarGroup>{controls(SizeControls)}</ToolbarGroup>}
                 {ContentControls && <ToolbarGroup>{controls(ContentControls)}</ToolbarGroup>}
+                {ContentSearchControls && <ToolbarGroup>{controls(ContentSearchControls)}</ToolbarGroup>}
                 {LocalisationControls && <ToolbarGroup>{controls(LocalisationControls)}</ToolbarGroup>}
             </Toolbar>
         )

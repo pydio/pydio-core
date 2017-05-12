@@ -18,6 +18,6 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-const { ContentControls } = PydioHOCs;
+const { ContentControls, ContentSearchControls } = PydioHOCs;
 
-export { ContentControls }
+export { ContentControls, ContentSearchControls }
