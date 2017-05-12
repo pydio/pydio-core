@@ -22,4 +22,4 @@ import Pydio from 'pydio'
 const { EditorActions } = Pydio.requireLib('hoc')
 
 // Actions definitions
-export const onToggleResolution = ({dispatch, id, resolution}) => dispatch(EditorActions.tabModify({id, resolution: resolution === "hi" ? "lo" : "hi"}))
+export const onToggleResolution = ({dispatch, tab}) => dispatch(EditorActions.tabModify({id: tab.id, resolution: tab.resolution === "hi" ? "lo" : "hi"}))
