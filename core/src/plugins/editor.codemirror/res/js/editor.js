@@ -45,7 +45,7 @@ class Editor extends React.Component {
         pydio.ApiClient.request({
             get_action: 'get_content',
             file: node.getPath()
-        }, ({responseText}) => dispatch(EditorActions.tabModify({id: id || node.getLabel(), content: responseText})));
+        }, ({responseText}) => dispatch(EditorActions.tabModify({id: id || node.getLabel(), lineNumbers: true, content: responseText})));
     }
 
     render() {
@@ -53,7 +53,7 @@ class Editor extends React.Component {
 
         if (!tab) return null
 
-        const {id, codemirror, content, lineWrapping, lineNumbers = true} = tab
+        const {id, codemirror, content, lineWrapping, lineNumbers} = tab
 
         return (
             <CodeMirrorLoader
