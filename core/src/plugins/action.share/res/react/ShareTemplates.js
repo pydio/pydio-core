@@ -423,7 +423,7 @@ const FileMinisite = React.createClass({
         return (
             <StandardLayout {...this.props}>
                 <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
-                    <Editor styledisplayToolbar={false} style={{display: "flex", flex: 1}}/>
+                    <Editor displayToolbar={false} style={{display: "flex", flex: 1}}/>
                 </div>
             </StandardLayout>
         );
