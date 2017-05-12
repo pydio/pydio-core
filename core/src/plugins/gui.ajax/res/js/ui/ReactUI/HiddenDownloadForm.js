@@ -40,7 +40,7 @@ export default class HiddenDownloadForm extends React.Component {
 
     triggerDownload(userSelection, parameters){
         this.setState({
-            nodes: userSelection.getSelectedNodes(),
+            nodes: userSelection ? userSelection.getSelectedNodes() : null,
             parameters: parameters
         }, () => {
             this.refs.form.submit();
@@ -54,7 +54,7 @@ export default class HiddenDownloadForm extends React.Component {
         // Variables to fill
         let url;
 
-        if (this.configs.get("DOWNLOAD_ACTIVE")) {
+        if (nodes && nodes.length === 1 && nodes[0].isLeaf() && this.configs.get("DOWNLOAD_ACTIVE")) {
             let secure = this.configs.get("BOOSTER_MAIN_SECURE");
             if(this.configs.get("BOOSTER_DOWNLOAD_ADVANCED") && this.configs.get("BOOSTER_DOWNLOAD_ADVANCED")['booster_download_advanced'] === 'custom' && this.configs.get("BOOSTER_DOWNLOAD_ADVANCED")['DOWNLOAD_SECURE']){
                 secure = this.configs.get("BOOSTER_DOWNLOAD_ADVANCED")['DOWNLOAD_SECURE'];
