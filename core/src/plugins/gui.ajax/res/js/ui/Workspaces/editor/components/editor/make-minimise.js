@@ -21,10 +21,6 @@ const makeEditorMinimise = (Target) => {
         render() {
             const {minimised} = this.state
 
-            if (typeof minimised === "undefined") {
-                return <Target {...this.props} />
-            }
-
             const motionStyle = {
                 scale: minimised ? spring(ORIGIN, ANIMATION) : TARGET
             };
