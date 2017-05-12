@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2012 Charles du Jeu <charles (at) cdujeu.me>
+* Copyright 2007-2017 Charles du Jeu <charles (at) cdujeu.me>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
