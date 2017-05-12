@@ -57,6 +57,14 @@ if(!function_exists('disconnectNow')){
 
 }
 
+if(!function_exists('clearAllCaches')){
+
+    function clearAllCaches(){
+        \Pydio\Core\Services\ConfService::clearAllCaches();
+    }
+
+}
+
 forceRenameConfFile('bootstrap_repositories');
 updatePluginConfig('gui.ajax', 'GUI_THEME', 'material');
-disconnectNow();
+clearAllCaches();

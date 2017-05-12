@@ -38,15 +38,25 @@ if(!function_exists('blockAllXHRInPage')){
 
 if(!function_exists('crawlPermissions')){
 
-    function crawlPermissions($path){
+    function crawlPermissions($path, $glob = null){
 
-        $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS);
-        $iterator = new \RecursiveIteratorIterator($directory);
         $error = false;
-        foreach ($iterator as $info) {
-            if(!is_writable($info->getPathname())){
-                $error = $info->getPathname();
-                break;
+        if($glob !== null){
+            $files = glob($glob);
+            foreach($files as $file){
+                if(!is_writeable($file)){
+                    $error = $file;
+                    break;
+                }
+            }
+        }else{
+            $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS);
+            $iterator = new \RecursiveIteratorIterator($directory);
+            foreach ($iterator as $info) {
+                if(!is_writable($info->getPathname())){
+                    $error = $info->getPathname();
+                    break;
+                }
             }
         }
         if($error){
@@ -58,6 +68,7 @@ if(!function_exists('crawlPermissions')){
 
 }
 
-blockAllXHRInPage();
+crawlPermissions(null, AJXP_INSTALL_PATH."/*.php");
 crawlPermissions(AJXP_INSTALL_PATH."/core");
 crawlPermissions(AJXP_INSTALL_PATH."/plugins");
+blockAllXHRInPage();
