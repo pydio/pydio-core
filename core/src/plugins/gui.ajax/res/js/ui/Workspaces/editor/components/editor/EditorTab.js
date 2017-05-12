@@ -41,7 +41,6 @@ class Tab extends React.Component {
     }
 
     renderControls(Controls, Actions) {
-
         const {node, editorData} = this.props
         const {SelectionControls, ResolutionControls, SizeControls, ContentControls, LocalisationControls} = Controls
 
@@ -62,12 +61,14 @@ class Tab extends React.Component {
 
         let boundActionCreators = bindActionCreators(actions)
 
-        const controls = (Controls) => Object.keys(Controls)
-            .filter((key) => typeof Controls[key] === 'function')
-            .map((key) => {
-                const Control = Controls[key]
-                return <Control editorData={editorData} node={node} {...boundActionCreators} />
-            })
+        const controls = (Controls) => {
+            return Object.keys(Controls)
+                .filter((key) => typeof Controls[key] === 'function')
+                .map((key) => {
+                    const Control = Controls[key]
+                    return <Control editorData={editorData} node={node} {...boundActionCreators} />
+                })
+        }
 
         return (
             <Toolbar style={Tab.styles.toolbar}>

@@ -74,8 +74,7 @@ class Editor extends Component {
 }
 
 const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
-
-export const mapStateToProps = (state, props) => {
+const mapStateToProps = (state, props) => {
     const {tabs} = state
 
     const tab = tabs.filter(({editorData, node}) => (!editorData || editorData.id === props.editorData.id) && node.getPath() === props.node.getPath())[0] || {}
