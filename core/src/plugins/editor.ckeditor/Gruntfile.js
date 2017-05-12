@@ -32,6 +32,15 @@ module.exports = function(grunt) {
                 }
             }
         },
+        copy: {
+            ckeditor: {
+                expand: true,
+                cwd: 'node_modules/ckeditor/',
+                src: '**/*',
+                dest: './res/build/ckeditor',
+                flatten:false
+            }
+        },
         watch: {
             js: {
                 files: [
@@ -47,6 +56,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.registerTask('default', ['babel', 'browserify:ui']);
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.registerTask('default', ['babel', 'browserify:ui', 'copy']);
 
 };

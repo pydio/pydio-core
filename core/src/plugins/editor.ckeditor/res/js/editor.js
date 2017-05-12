@@ -57,7 +57,7 @@ class Editor extends React.Component {
 
     static get config() {
         return {
-            basePath: `${DOMUtils.getUrlFromBase()}plugins/editor.ckeditor/node_modules/ckeditor/`,
+            basePath: `${DOMUtils.getUrlFromBase()}plugins/editor.ckeditor/res/build/ckeditor/`,
             desktop : {
                 ...Editor.base,
     			toolbar_Ajxp : [
