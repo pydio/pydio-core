@@ -55,7 +55,7 @@ class Editor extends React.Component {
 
         if (!tab) return null
 
-        const {id, codemirror, content, lineNumbers, lineWrapping} = tab
+        const {id, codemirror, content, lineWrapping, lineNumbers = true} = tab
 
         return (
             <CodeMirrorLoader
