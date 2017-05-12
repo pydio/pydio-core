@@ -102,7 +102,7 @@ class App extends React.Component {
             <div>
                 { display ? <div style={overlayStyle} /> : null }
                 <AnimationGroup>
-                    { display ? <Editor displayToolbar={true} style={editorStyle} onMinimise={this.onEditorMinimise.bind(this)} /> : null }
+                    { display ? <Editor style={editorStyle} onMinimise={this.onEditorMinimise.bind(this)} /> : null }
                     { display ? <Menu style={menuStyle} /> : null }
                 </AnimationGroup>
             </div>

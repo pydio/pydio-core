@@ -1,11 +1,11 @@
-CREATE TABLE ajxp_user_prefs_temp (
-  rid serial PRIMARY KEY,
-  login varchar(255) NOT NULL,
-  name varchar(255) NOT NULL,
-  val bytea
+CREATE TABLE IF NOT EXISTS ajxp_user_prefs_temp (
+  rid integer NOT NULL primary key autoincrement,
+  login text NOT NULL,
+  "name" text NOT NULL,
+  val blob DEFAULT NULL
 );
 /* SEPARATOR */
-CREATE UNIQUE INDEX prefs_login_name ON ajxp_user_prefs_temp(login, name);
+CREATE UNIQUE INDEX (ajxp_user_prefs_unique) ON ajxp_user_prefs_temp(`login`,`name`);
 /* SEPARATOR */
 INSERT INTO ajxp_user_prefs_temp (SELECT * from ajxp_user_prefs
 	WHERE NOT EXISTS(
@@ -21,6 +21,8 @@ DROP TABLE ajxp_user_prefs;
 /* SEPARATOR */
 ALTER TABLE ajxp_user_prefs_temp RENAME TO ajxp_user_prefs;
 /* SEPARATOR */
-ALTER TABLE ajxp_roles ADD COLUMN `owner_user_id` VARCHAR(255) DEFAULT NULL;
+ALTER TABLE ajxp_roles ADD COLUMN owner_user_id text DEFAULT NULL
 /* SEPARATOR */
 CREATE UNIQUE INDEX owner_role ON ajxp_roles(`role_id`, `owner_user_id`);
+/* SEPARATOR */
+UPDATE ajxp_version SET db_build=68;

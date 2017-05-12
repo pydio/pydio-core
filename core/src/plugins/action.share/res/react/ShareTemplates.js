@@ -237,7 +237,7 @@ let StandardLayout = React.createClass({
     },
 
     getDefaultProps: function(){
-        return {minisiteMode: 'standard'};
+        return {minisiteMode: 'standard', uniqueNode:true};
     },
 
     render: function(){
@@ -273,7 +273,7 @@ let StandardLayout = React.createClass({
             }
         }
 
-        const {minisiteMode, showSearchForm} = this.props;
+        const {minisiteMode, showSearchForm, uniqueNode, skipDisplayToolbar} = this.props;
 
         if(!this.props.pydio.user){
             return <div className="vertical_fit vertical_layout" style={style}/>;
@@ -293,13 +293,15 @@ let StandardLayout = React.createClass({
                             </div>
                         }
                         <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
-                            <span style={{marginTop:7}}>
-                                <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} secondary={true} controller={this.props.pydio.Controller}/>
-                            </span>
-                            <Toolbar {...this.props} id="main-toolbar" toolbars={["info_panel"]} groupOtherList={["change_main", "more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
+                            {!uniqueNode &&
+                                <span style={{marginTop:7}}>
+                                    <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} secondary={true} controller={this.props.pydio.Controller}/>
+                                </span>
+                            }
+                            <Toolbar {...this.props} id="main-toolbar" toolbars={uniqueNode ? ["minisite_toolbar"] : ["info_panel"]} groupOtherList={uniqueNode ? [] : ["change_main", "more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
                             <div style={{flex:1}}></div>
                             <ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                            {!this.props.skipDisplayToolbar &&
+                            {!skipDisplayToolbar && !uniqueNode &&
                                 <Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font" buttonStyle={styles.iconButtonsStyle}/>
                             }
                         </div>
@@ -324,7 +326,7 @@ const FolderMinisite = React.createClass({
     render: function(){
 
         return (
-            <StandardLayout {...this.props} showSearchForm={this.props.pydio.getPluginConfigs('action.share').get('SHARED_FOLDER_SHOW_SEARCH')}>
+            <StandardLayout {...this.props} uniqueNode={false} showSearchForm={this.props.pydio.getPluginConfigs('action.share').get('SHARED_FOLDER_SHOW_SEARCH')}>
                 <div style={{backgroundColor:'white'}} className="layout-fill vertical-layout">
                     <MainFilesList ref="list" {...this.props}/>
                 </div>
@@ -421,9 +423,9 @@ const FileMinisite = React.createClass({
     render: function(){
 
         return (
-            <StandardLayout {...this.props}>
+            <StandardLayout {...this.props} uniqueNode={true} skipDisplayToolbar={true}>
                 <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
-                    <Editor styledisplayToolbar={false} style={{display: "flex", flex: 1}}/>
+                    <Editor displayToolbar={false} style={{display: "flex", flex: 1}}/>
                 </div>
             </StandardLayout>
         );

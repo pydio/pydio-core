@@ -849,6 +849,9 @@ let SimpleList = React.createClass({
                     if (a.parent){
                         return -1;
                     }
+                    if (b.parent){
+                        return 1;
+                    }
                     const nodeA = a.node;
                     const nodeB = b.node;
                     // Recycle always last
@@ -1110,11 +1113,12 @@ let SimpleList = React.createClass({
         }
 
         const elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
+
         return (
             <div className={containerClasses} onContextMenu={this.contextMenuResponder} tabIndex="0" onKeyDown={this.onKeyDown} style={this.props.style}>
                 {toolbar}
                 {inlineEditor}
-                <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">
+                <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":(emptyState?"layout-fill vertical_layout":"layout-fill")} ref="infiniteParent">
                     {!emptyState && !this.props.verticalScroller &&
                     <Infinite
                         elementHeight={this.state.elementHeight ? this.state.elementHeight : this.props.elementHeight}

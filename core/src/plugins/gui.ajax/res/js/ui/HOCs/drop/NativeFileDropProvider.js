@@ -34,7 +34,7 @@ export default function(PydioComponent, onDropFunction){
 
             let dataTransfer = monitor.getItem().dataTransfer;
             let items;
-            if (dataTransfer.items.length && dataTransfer.items[0] && (dataTransfer.items[0].getAsEntry || dataTransfer.items[0].webkitGetAsEntry)) {
+            if (dataTransfer.items && dataTransfer.items.length && dataTransfer.items[0] && (dataTransfer.items[0].getAsEntry || dataTransfer.items[0].webkitGetAsEntry)) {
                 items = dataTransfer.items;
             }
             onDropFunction(items, dataTransfer.files, props);

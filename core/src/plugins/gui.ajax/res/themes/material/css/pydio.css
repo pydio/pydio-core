@@ -1913,13 +1913,10 @@ div.menu.desktop a span.ajxp_icon_span {
   display: -ms-flexbox;
   display: flex;
   text-align: center;
-  -ms-flex-align: center;
-      align-items: center;
   font-size: 60px;
 }
 #info_panel .panelCard .panelContent div.mimefont-container div.mimefont {
-  -ms-flex: 1;
-      flex: 1;
+  margin: auto;
 }
 #info_panel .panelCard .panelContent div.covering-bg-preview {
   border-radius: 2px 2px 0 0 ;

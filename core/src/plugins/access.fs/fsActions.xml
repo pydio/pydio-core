@@ -99,7 +99,7 @@
 			<gui text="88" title="88" iconClass="mdi mdi-download" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="0_get,inline,info_panel">
+					actionBarGroup="0_get,inline,info_panel,minisite_toolbar">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" enableRoot="true"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -162,7 +162,7 @@
             <gui text="316" title="316" iconClass="mdi mdi-eye-outline" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"
-                    actionBarGroup="0_get,info_panel" inZip="false">
+                    actionBarGroup="0_get,info_panel,minisite_toolbar" inZip="false">
                 </context>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>

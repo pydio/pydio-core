@@ -23,6 +23,7 @@ namespace Pydio\Gui;
 use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Pydio\Action\Update\UpgradeManager;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Http\Response\FileReaderResponse;
 use Pydio\Core\Model\Context;
@@ -173,6 +174,20 @@ class RichClient extends Plugin
     public function loadConfigs($configData)
     {
         parent::loadConfigs($configData);
+        if($dbMismatch = ConfService::detectVersionMismatch()){
+            $this->pluginConf['GUI_THEME'] = 'compat';
+        }else{
+            // Check that current theme is still supported, or switch to the first in the list
+            $themeValue = $this->pluginConf['GUI_THEME'];
+            $themeChoiceString = $this->pluginConfDefinition['GUI_THEME']['choices'];
+            $themeChoices = array_map(function($s){
+                list($key,$value) = explode('|', $s);
+                return $key;
+            }, explode(',', $themeChoiceString));
+            if(!in_array($themeValue, $themeChoices)){
+                $this->pluginConf['GUI_THEME'] = array_shift($themeChoices);
+            }
+        }
         $this->defineThemeConstants($this->pluginConf);
         if (!isSet($configData["CLIENT_TIMEOUT_TIME"])) {
             $this->pluginConf["CLIENT_TIMEOUT_TIME"] = intval(ini_get("session.gc_maxlifetime"));
@@ -375,6 +390,33 @@ class RichClient extends Plugin
         }
 
         return false;
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function packagesUpgradeScript(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        require_once(AJXP_INSTALL_PATH . '/' . AJXP_PLUGINS_FOLDER . '/action.updater/UpgradeManager.php');
+        try{
+            $result = UpgradeManager::executeLocalScripts();
+            $responseInterface = new JsonResponse(['success' => true, 'result' => $result]);
+        }catch(DibiException $de){
+            $responseInterface = new JsonResponse([
+                'error' => 'There was a database error, maybe the changes were too complex and you have to apply them manually.',
+                'exception' => $de->getMessage()
+            ]);
+        }catch(\Exception $e){
+            $mismatch = ConfService::detectVersionMismatch();
+            if($mismatch) unset($mismatch['conf']);
+            $responseInterface = new JsonResponse([
+                'error' => 'There was an unexpected error, please refer to the upgrade instructions, some changes may have to be applied manually.',
+                'exception' => $e->getMessage(),
+                'db_mismatch' => $mismatch
+            ]);
+        }
+
     }
 
     /************************
