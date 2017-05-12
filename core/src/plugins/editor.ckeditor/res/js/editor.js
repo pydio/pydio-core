@@ -87,55 +87,30 @@ class Editor extends React.Component {
         }
     }
 
-    constructor(props) {
-        super(props)
-
-        const {pydio, node, id, dispatch} = this.props
-
-        if (typeof dispatch === 'function') {
-            // We have a redux dispatch so we use it
-            this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
-        }
-    }
-
-    // Static functions
-    static getPreviewComponent(node, rich = false) {
-        if (rich) {
-            return {
-                element: PydioCKEditor.Editor,
-                props: {
-                    node: node,
-                    rich: rich
-                }
-            }
-        } else {
-
-            // We don't have a player for the file icon
-            return null;
-        }
-    }
-
     componentDidMount() {
-        const {pydio, url} = this.props
+        const {pydio, node, tab, dispatch} = this.props
+
+        const {id} = tab
 
         pydio.ApiClient.request({
             get_action: 'get_content',
-            file: url
-        }, ({responseText}) => this.setState({content: responseText}))
+            file: node.getPath()
+        }, ({responseText}) => dispatch(EditorActions.tabModify({id, content: responseText})))
     }
 
     render() {
-        const {url, content} = this.props
+        const {pydio, node, tab, dispatch} = this.props
         const {desktop, mobile} = Editor.config
+        const {id, content} = tab
 
         if (!content) return null
 
         return (
             <CKEditor
-                url={this.props.url}
-                content={this.props.content}
-                config={this.props.pydio.UI.MOBILE_EXTENSIONS ? mobile : desktop}
-                onChange={content => this.setState({content})}
+                url={node.getPath()}
+                content={content}
+                config={pydio.UI.MOBILE_EXTENSIONS ? mobile : desktop}
+                onChange={content => dispatch(EditorActions.tabModify({id, content}))}
             />
         );
     }
@@ -144,16 +119,16 @@ class Editor extends React.Component {
 CKEDITOR.basePath = Editor.config.basePath
 CKEDITOR.contentsCss = Editor.config.basePath + '../../res/css/ckeditor.css'
 
-/*const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+const mapStateToProps = (state, props) => {
+    const {tabs} = state
 
-//let CompositeEditor = compose(withControls(PydioCKEditor.controls), withMenu, withLoader, withErrors)(CKEditor)
+    const tab = tabs.filter(({editorData, node}) => (!editorData || editorData.id === props.editorData.id) && node.getPath() === props.node.getPath())[0] || {}
 
-// We need to attach the element to window else it won't be found
-window.PydioCKEditor = {
-    Editor: PydioCKEditor,
-    Actions: {
-        onUndo: () => console.log("Whatever dude")
+    return {
+        id: tab.id,
+        tab,
+        ...props
     }
-}*/
+}
 
-export default connect()(Editor)
+export default connect(mapStateToProps)(Editor)
