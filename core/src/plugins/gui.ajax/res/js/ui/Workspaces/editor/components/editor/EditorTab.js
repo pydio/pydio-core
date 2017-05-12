@@ -62,48 +62,20 @@ class Tab extends React.Component {
 
         let boundActionCreators = bindActionCreators(actions)
 
+        const controls = (Controls) => Object.keys(Controls)
+            .filter((key) => typeof Controls[key] === 'function')
+            .map((key) => {
+                const Control = Controls[key]
+                return <Control editorData={editorData} node={node} {...boundActionCreators} />
+            })
+
         return (
             <Toolbar style={Tab.styles.toolbar}>
-                {SelectionControls &&
-                    <ToolbarGroup>
-                        <SelectionControls.Prev editorData={editorData} node={node} {...boundActionCreators} />
-                        <SelectionControls.Play editorData={editorData} node={node} {...boundActionCreators} />
-                        <SelectionControls.Pause editorData={editorData} node={node} {...boundActionCreators} />
-                        <SelectionControls.Next editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {ResolutionControls &&
-                    <ToolbarGroup>
-                        <ResolutionControls.ToggleResolution editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {SizeControls &&
-                    <ToolbarGroup>
-                        <SizeControls.AspectRatio editorData={editorData} node={node} {...boundActionCreators} />
-                        <SizeControls.Scale editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {ContentControls &&
-                    <ToolbarGroup>
-                        <ContentControls.Save editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Undo editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Redo editorData={editorData} node={node} {...boundActionCreators} />
-
-                        <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {ContentControls &&
-                    <ToolbarGroup>
-                        <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {LocalisationControls &&
-                    <ToolbarGroup>
-                        <LocalisationControls.Locate editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
+                {SelectionControls && <ToolbarGroup>{controls(SelectionControls)}</ToolbarGroup>}
+                {ResolutionControls && <ToolbarGroup>{controls(ResolutionControls)}</ToolbarGroup>}
+                {SizeControls && <ToolbarGroup>{controls(SizeControls)}</ToolbarGroup>}
+                {ContentControls && <ToolbarGroup>{controls(ContentControls)}</ToolbarGroup>}
+                {LocalisationControls && <ToolbarGroup>{controls(LocalisationControls)}</ToolbarGroup>}
             </Toolbar>
         )
     }

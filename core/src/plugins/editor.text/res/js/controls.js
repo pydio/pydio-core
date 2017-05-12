@@ -1,4 +1,4 @@
-const { ContentControls } = PydioHOCs;
+const { Save, ..._ } = PydioHOCs.ContentControls;
 
-
+const ContentControls = { Save }
 export { ContentControls }

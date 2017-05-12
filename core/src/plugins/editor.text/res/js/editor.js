@@ -37,17 +37,6 @@ class Editor extends Component {
         }
     }
 
-    constructor(props) {
-        super(props);
-
-        const {pydio, node, id, dispatch} = this.props
-
-        if (typeof dispatch === 'function') {
-            // We have a redux dispatch so we use it
-            this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
-        }
-    }
-
     componentWillMount() {
         this.loadNode(this.props)
     }
@@ -59,24 +48,26 @@ class Editor extends Component {
     }
 
     loadNode(props) {
-        const {pydio, node} = this.props
+        const {pydio, node, tab, dispatch} = this.props
+        const {id, content} = tab
 
         pydio.ApiClient.request({
             get_action: 'get_content',
             file: node.getPath(),
         }, ({responseText}) => {
-            this.setState({
-                content: responseText
-            });
+            dispatch(EditorActions.tabModify({id, content: responseText}))
         });
     }
 
     render() {
+        const {tab, dispatch} = this.props
+        const {id, content} = tab
+
         return (
             <textarea
                 style={Editor.styles.textarea}
-                onChange={({target}) => this.setState({content: target.value})}
-                value={this.props.content}
+                onChange={({target}) => dispatch(EditorActions.tabModify({id, content: target.value}))}
+                value={content}
             />
         );
     }
@@ -84,13 +75,18 @@ class Editor extends Component {
 
 const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-/*let Viewer = compose(
-    withControls(TextEditor.controls),
-    withMenu,
-    withLoader,
-    withErrors
-)(props => <textarea {...props} />)*/
+export const mapStateToProps = (state, props) => {
+    const {tabs} = state
+
+    const tab = tabs.filter(({editorData, node}) => (!editorData || editorData.id === props.editorData.id) && node.getPath() === props.node.getPath())[0] || {}
+
+    return {
+        id: tab.id,
+        tab,
+        ...props
+    }
+}
 
 export default compose(
-    connect()
+    connect(mapStateToProps)
 )(Editor)
