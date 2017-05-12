@@ -1,12 +1,4 @@
-const {Component} = require('react')
-
-class PydioEtherpadEditor extends Component{
-    render(){
-
-    }
-}
-
-class PydioEtherpadActions{
+class Actions{
 
     static makePad(){
 
@@ -38,5 +30,4 @@ class PydioEtherpadActions{
 
 }
 
-
-export default {Editor: PydioEtherpadEditor, Actions: PydioEtherpadActions};
+export {Actions as default}

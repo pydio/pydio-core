@@ -49,5 +49,14 @@ if(!function_exists('updatePluginConfig')){
 
 }
 
+if(!function_exists('disconnectNow')){
+
+    function disconnectNow(){
+        \Pydio\Core\Services\AuthService::disconnect();
+    }
+
+}
+
 forceRenameConfFile('bootstrap_repositories');
 updatePluginConfig('gui.ajax', 'GUI_THEME', 'material');
+disconnectNow();

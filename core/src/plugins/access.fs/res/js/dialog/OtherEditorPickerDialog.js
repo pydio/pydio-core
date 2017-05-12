@@ -96,7 +96,7 @@ let OtherEditorPickerDialog = React.createClass({
         guiPrefs["other_editor_extensions"] = exts;
         user.setPreference("gui_preferences", guiPrefs, true);
         user.savePreference("gui_preferences");
-        openInEditor(pydio)(null, editor);
+        openInEditor(pydio)(null, [editor]);
         this.dismiss();
     },
 
