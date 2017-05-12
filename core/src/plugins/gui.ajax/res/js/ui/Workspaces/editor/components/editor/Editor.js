@@ -38,7 +38,7 @@ class Editor extends React.Component {
         }
 
         this.minimise = () => editorModify({isPanelActive: false})
-        this.setFullScreen = () => editorModify({fullscreen: document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement})
+        this.setFullScreen = () => editorModify({fullscreen: typeof (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) !== 'undefined'})
 
         this.closeActiveTab = (e) => {
             const {activeTab} = this.props
@@ -62,7 +62,7 @@ class Editor extends React.Component {
 
     componentWillUnmount() {
         DOMUtils.stopObservingWindowResize(this.setFullScreen);
-    }    
+    }
 
     enterFullScreen() {
         if (this.container.requestFullscreen) {
@@ -139,7 +139,7 @@ class Editor extends React.Component {
     }
 
     render() {
-        const {style, activeTab, isActive, fullscreen, displayToolbar} = this.props
+        const {style, activeTab, isActive, displayToolbar} = this.props
         const {minimisable} = this.state
 
         const title = activeTab ? activeTab.title : ""
@@ -168,7 +168,7 @@ class Editor extends React.Component {
             <div style={{display: "flex", ...style}}>
                 <Draggable cancel=".body" onStop={this.recalculate.bind(this)}>
                     <AnimatedPaper ref={(container) => this.container = ReactDOM.findDOMNode(container)} onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: style.transformOrigin}}>
-                        {displayToolbar && !fullscreen &&
+                        {displayToolbar &&
                             <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onFullScreen={() => this.enterFullScreen()} onMinimise={onMinimise} />
                         }
 
@@ -193,7 +193,7 @@ function mapStateToProps(state, ownProps) {
 
     return  {
         style: {},
-        displayToolbar: true,
+        displayToolbar: !editor.fullscreen,
         ...ownProps,
         activeTab,
         tabs,
