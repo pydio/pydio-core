@@ -18,6 +18,8 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+
+
 import Media from './Media';
 
 class Editor extends React.Component {
