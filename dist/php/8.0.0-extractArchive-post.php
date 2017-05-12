@@ -36,4 +36,28 @@ if(!function_exists('blockAllXHRInPage')){
 
 }
 
+if(!function_exists('crawlPermissions')){
+
+    function crawlPermissions($path){
+
+        $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS);
+        $iterator = new \RecursiveIteratorIterator($directory);
+        $error = false;
+        foreach ($iterator as $info) {
+            if(!is_writable($info->getPathname())){
+                $error = $info->getPathname();
+                break;
+            }
+        }
+        if($error){
+            throw new Exception("Crawling folder $path to check all files are writeable : File $info FAIL! Please make sure that the whole tree is currently writeable by the webserver, or upgrade may probably fail at one point.");
+        }else{
+            print "<div class='upgrade_result success'>Crawling folder $path to check all files are writeable : OK</div>";
+        }
+    }
+
+}
+
 blockAllXHRInPage();
+crawlPermissions(AJXP_INSTALL_PATH."/core");
+crawlPermissions(AJXP_INSTALL_PATH."/plugins");

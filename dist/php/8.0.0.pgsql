@@ -21,8 +21,8 @@ DROP TABLE ajxp_user_prefs;
 /* SEPARATOR */
 ALTER TABLE ajxp_user_prefs_temp RENAME TO ajxp_user_prefs;
 /* SEPARATOR */
-ALTER TABLE ajxp_roles ADD COLUMN `owner_user_id` VARCHAR(255) DEFAULT NULL;
+ALTER TABLE ajxp_roles ADD COLUMN owner_user_id VARCHAR(255) DEFAULT NULL;
 /* SEPARATOR */
-CREATE UNIQUE INDEX owner_role ON ajxp_roles(`role_id`, `owner_user_id`);
+CREATE UNIQUE INDEX owner_role ON ajxp_roles(role_id, owner_user_id);
 /* SEPARATOR */
 UPDATE ajxp_version SET db_build=68;
