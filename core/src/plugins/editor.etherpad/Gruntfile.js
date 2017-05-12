@@ -13,7 +13,7 @@ module.exports = function(grunt) {
                         cwd: 'res/js/',
                         src: ['**/*.js'],
                         dest: 'res/build/',
-                        ext: '.babel.js'
+                        ext: '.js'
                     }
                 ]
             }
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'res/build/PydioEtherpad.js':'res/build/PydioEtherpad.babel.js'
+                    'res/build/PydioEtherpad.js':'res/build/index.js'
                 }
             }
         },

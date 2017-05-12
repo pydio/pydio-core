@@ -1,50 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor enabled="false" id="editor.etherpad" openable="true" iconClass="mdi mdi-comment-account" order="10"
-        text="etherpad.2" title="etherpad.3" className="EtherpadLauncher" canWrite="true"
-        mimes="pad" formId="ether_box" label="CONF_MESSAGE[Etherpad]" description="CONF_MESSAGE[Collaborative edition of text files]"
+        text="etherpad.2" title="etherpad.3" className="PydioEtherpad" actions="PydioEtherpad.Actions" canWrite="true"
+        mimes="pad,html" label="CONF_MESSAGE[Etherpad]" description="CONF_MESSAGE[Collaborative edition of text files]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
             <js file="plugins/editor.etherpad/res/build/PydioEtherpad.js" className="PydioEtherpad"/>
             <i18n path="plugins/editor.etherpad/i18n" namespace="etherpad"/>
-            <img_library alias="etherpad" path="plugins/editor.etherpad"/>
         </resources>
 	</client_settings>
     <server_settings>
         <global_param name="ETHERPAD_SERVER" type="string" label="Server Host" description="Etherpad server host"/>
         <global_param name="ETHERPAD_APIKEY" type="string" label="Api Key" description="Etherpad api key"/>
     </server_settings>
-	<clientForm id="ether_box"><![CDATA[
-		<div id="ether_box" action="editer" box_width="80%" box_height="90%" box_padding="0"  class="editor_container">
-            <style>
-                #ether_box div.action_bar.editor_action_bar {margin-right: 220px;}
-                #ether_box .action_bar a {
-                    background: #fff;
-                    background: -webkit-linear-gradient(#fff, #f0f0f0);
-                    background: -moz-linear-gradient(#fff, #f0f0f0);
-                    background: -o-linear-gradient(#fff, #f0f0f0);
-                    background: -ms-linear-gradient(#fff, #f0f0f0);
-                    background: linear-gradient(#fff, #f0f0f0);
-                    border: 1px solid #ccc;
-                    border-radius: 3px;
-                    cursor: pointer;
-                    display: inline-block;
-                    min-height: 18px;
-                    overflow: hidden;
-                    padding: 4px 5px;
-                    text-align: center;
-                    text-decoration: none;
-                    min-width: 18px;
-                }
-            </style>
-			<div class="action_bar">
-				<a href="#" onclick="return false;" class="icon-save" id="saveButton" onclick="saveForm();return false;"><img src="AJXP_IMAGES_FOLDER/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a>
-				<a href="#" onclick="return false;" class="icon-download" id="downloadFileButton"><img width="22" height="22" src="AJXP_IMAGES_FOLDER/actions/22/download_manager.png" alt="AJXP_MESSAGE[88]" border="0"><br><span message_id="88">AJXP_MESSAGE[88]</span></a>
-			</div>
-			<iframe id="ether_box_frame" style="width:100%;border: none;" src=""></iframe>
-			<div class="ether_box_bottom" style="background-color: #F2F2F2;  height: 25px;  border-top: 1px solid #CCC;  margin-top: -3px;"></div>
-		</div>
-	]]></clientForm>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
@@ -83,7 +51,7 @@
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
-                    <clientCallback module="PydioEtherpad.Actions.makePad"/>
+                    <clientCallback module="PydioEtherpad.Callbacks.makePad"/>
                 </processing>
             </action>
         </actions>
