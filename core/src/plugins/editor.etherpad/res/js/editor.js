@@ -33,18 +33,37 @@ class Viewer extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.node !== this.props.node) {
+        if (nextProps.node && (!this.props.node || nextProps.node.getPath() !== this.props.node.getPath() )) {
             this.loadNode(nextProps)
         }
     }
 
-    observeChanges(){
+    componentWillUnmount(){
 
-        if(!this.padID || !this.props.node) return;
+        const {pydio, node, tab} = this.props
+        if(tab && tab.padID && tab.sessionID){
+            PydioApi.getClient().request({
+                get_action: 'etherpad_close',
+                file: node.getPath(),
+                pad_id: tab.padID,
+                session_id: tab.sessionID
+            });
+        }
+        if(this.pe){
+            this.pe.stop();
+        }
+
+    }
+
+    observeChanges(padID){
+
+        const {pydio, node} = this.props
+
+        if(!padID || !node) return;
         PydioApi.getClient().request({
             get_action: 'etherpad_get_content',
-            file: this.props.node.getPath(),
-            pad_id: this.padID
+            file: node.getPath(),
+            pad_id: padID
         }, (transport) => {
             var content = transport.responseText;
             if(this.previousContent && this.previousContent != content){
@@ -67,6 +86,7 @@ class Viewer extends Component {
     loadNode(props) {
         const {pydio, node, dispatch, tab} = props;
         const {id} = tab;
+        if(this.pe) this.pe.stop();
 
         let url;
         let base = DOMUtils.getUrlFromBase();
@@ -77,13 +97,12 @@ class Viewer extends Component {
             file : node.getPath()
         }, (transport) => {
             var data = transport.responseJSON;
-            this.padID = data.padID;
-            this.sessionID = data.sessionID;
             dispatch(EditorActions.tabModify({id: id, padID: data.padID, frameUrl: data.url, sessionID: data.sessionID}));
 
             if(extension !== "pad"){
-                this.observeChanges();
-                this.pe = new PeriodicalExecuter(this.observeChanges.bind(this), 5);
+                this.observeChanges(data.padID);
+                if(this.pe) this.pe.stop();
+                this.pe = new PeriodicalExecuter(() => this.observeChanges(data.padID), 5);
             }
         });
 
