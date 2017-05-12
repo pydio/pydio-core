@@ -172,7 +172,6 @@ kbd {
   display: flex;
   -ms-flex-direction: column;
       flex-direction: column;
-  -webkit-flex-direction: column;
 }
 .vertical_layout > * {
   -ms-flex-negative: 0;
@@ -183,7 +182,6 @@ kbd {
   display: flex;
   -ms-flex-direction: row;
       flex-direction: row;
-  -webkit-flex-direction: row;
   -ms-flex-align: stretch;
       align-items: stretch;
   -webkit-align-items: stretch;
@@ -738,8 +736,7 @@ div.dialogBox div#element_overlay {
   left: 0;
   background-size: cover;
   background-position: center center;
-  -webkit-filter: blur(7px);
-          filter: blur(7px);
+  filter: blur(7px);
 }
 .react-mui-context div[data-reactroot].dialogRootBlur > div > div.dialogRootBlur div.blurDialogTextField label {
   color: rgba(255, 255, 255, 0.73) !important;
@@ -1942,7 +1939,6 @@ div.menu.desktop a span.ajxp_icon_span {
 #info_panel .panelCard .primaryToolbar {
   padding: 12px 4px 12px !important;
   -ms-flex-align: start;
-      -ms-grid-row-align: flex-start;
       align-items: flex-start;
   -ms-flex-pack: center;
       justify-content: center;
@@ -2119,7 +2115,6 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
   border-radius: 2px;
   color: #555;
   cursor: default;
-  -webkit-filter: drop-shadow(-1px -2px 3px rgba(0, 0, 0, 0.3)) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.3));
   filter: drop-shadow(-1px -2px 3px rgba(0, 0, 0, 0.3)) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.3));
   opacity: 0;
   padding: 16px;
@@ -2429,7 +2424,6 @@ body,
   display: flex;
   -ms-flex-direction: column;
       flex-direction: column;
-  -webkit-flex-direction: column;
 }
 #orbit_content > * {
   -ms-flex-negative: 0;
