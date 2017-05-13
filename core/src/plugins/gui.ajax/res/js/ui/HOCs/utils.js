@@ -57,9 +57,9 @@ export const getBoundingRect = (element) => {
     const style = window.getComputedStyle(element);
     const keys = ["left", "right", "top", "bottom"];
 
-    const margin = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`margin-${key}`])}), {})
-    const padding = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`padding-${key}`])}), {})
-    const border = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`border-${key}`])}), {})
+    const margin = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`margin-${key}`]) || 0}), {})
+    const padding = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`padding-${key}`]) || 0}), {})
+    const border = keys.reduce((current, key) => ({...current, [key]: parseInt(style[`border-${key}`]) || 0}), {})
 
     const rect = element.getBoundingClientRect();
 

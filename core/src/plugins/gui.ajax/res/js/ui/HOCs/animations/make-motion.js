@@ -63,7 +63,6 @@ const makeTransition = (originStyles, targetStyles, enter, leave) => {
 
             willEnter(transitionStyle) {
 
-                console.log("Will enter ", this.props)
                 return {
                     ...stripStyle(transitionStyle.style),
                     ...originStyles
@@ -82,8 +81,6 @@ const makeTransition = (originStyles, targetStyles, enter, leave) => {
                 // Making sure we fliter out properties
                 const {ready, ...props} = this.props
 
-                console.log("Transition styles ", this.state.styles)
-
                 return (
                     <TransitionMotion
                         styles={this.state.styles}
@@ -93,8 +90,6 @@ const makeTransition = (originStyles, targetStyles, enter, leave) => {
                         {styles =>
                             <Target {...props}>
                             {styles.map(({key, style, data}) => {
-
-                                console.log("Transition child being rendered")
 
                                 const Child = data.element.type
                                 const itemProps = data.element.props

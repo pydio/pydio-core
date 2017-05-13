@@ -172,7 +172,6 @@ class Editor extends React.Component {
 
         return (
             <div style={{display: "flex", ...style}}>
-                <Draggable cancel=".body" onStop={this.recalculate.bind(this)}>
                     <AnimatedPaper ref={(container) => this.container = ReactDOM.findDOMNode(container)} onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: style.transformOrigin}}>
                         {displayToolbar &&
                             <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onFullScreen={() => this.enterFullScreen()} onMinimise={onMinimise} />
@@ -182,7 +181,6 @@ class Editor extends React.Component {
                             {this.renderChild()}
                         </div>
                     </AnimatedPaper>
-                </Draggable>
             </div>
         );
     }

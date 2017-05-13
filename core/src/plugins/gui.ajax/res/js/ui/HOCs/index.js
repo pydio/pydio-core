@@ -22,7 +22,7 @@ import withContextMenu from './context-menu'
 import {withMenu, withControls} from './controls'
 import withErrors from './errors'
 import withLoader from './loader'
-import {ContentActions, ContentControls} from './content/index'
+import {ContentActions, ContentControls, ContentSearchControls} from './content/index'
 import {SelectionProviders, SelectionActions, SelectionControls, withSelection} from './selection/index'
 import {SizeActions, SizeControls, SizeProviders, withResize} from './size/index'
 import {ResolutionActions, ResolutionControls, withResolution} from './resolution/index'
@@ -37,10 +37,11 @@ import dropProvider from './drop/dropProvider'
 import NativeFileDropProvider from './drop/NativeFileDropProvider'
 
 const PydioHOCs = {
-    ContentActions,
     EditorActions: actions,
     EditorReducers: reducers,
+    ContentActions,
     ContentControls,
+    ContentSearchControls,
     ResolutionActions,
     ResolutionControls,
     SizeActions,

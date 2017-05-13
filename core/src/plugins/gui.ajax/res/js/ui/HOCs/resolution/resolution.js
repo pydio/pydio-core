@@ -31,12 +31,9 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                 super(props)
 
                 const {node, tab, dispatch} = this.props
-                const {id} = tab || {}
+                const {id} = tab
 
-                if (typeof dispatch === 'function') {
-                    // We have a redux dispatch so we use it
-                    this.setState = (data) => dispatch(EditorActions.tabModify({id, ...data}))
-                }
+                if (!id) dispatch(EditorActions.tabCreate({id: node.getLabel(), node}))
             }
 
             static get displayName() {
@@ -51,9 +48,9 @@ const withResolution = (sizes, highResolution, lowResolution) => {
 
             componentDidMount() {
                 const {tab} = this.props
-                const {id, resolution} = tab
+                const {id, resolution = "hi"} = tab
 
-                this.setState({id, resolution})
+                dispatch(EditorActions.tabModify({id, resolution}))
             }
 
             onHi() {
@@ -79,7 +76,7 @@ const withResolution = (sizes, highResolution, lowResolution) => {
 
             render() {
                 const {tab, dispatch, ...remainingProps} = this.props
-                const {resolution = "hi"} = tab
+                const {resolution} = tab
 
                 return (
                     <ResolutionURLProvider

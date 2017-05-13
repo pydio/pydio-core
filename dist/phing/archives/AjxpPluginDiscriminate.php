@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * Copyright 2007-2017 Charles du Jeu <contact (at) cdujeu.me>
  * This file is part of AjaXplorer.
  *
  * AjaXplorer is free software: you can redistribute it and/or modify

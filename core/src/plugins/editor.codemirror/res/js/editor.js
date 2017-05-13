@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,6 +17,8 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
+
 
 import Pydio from 'pydio'
 import React from 'react';
@@ -45,7 +47,7 @@ class Editor extends React.Component {
         pydio.ApiClient.request({
             get_action: 'get_content',
             file: node.getPath()
-        }, ({responseText}) => dispatch(EditorActions.tabModify({id: id || node.getLabel(), content: responseText})));
+        }, ({responseText}) => dispatch(EditorActions.tabModify({id: id || node.getLabel(), lineNumbers: true, content: responseText})));
     }
 
     render() {
@@ -53,7 +55,7 @@ class Editor extends React.Component {
 
         if (!tab) return null
 
-        const {id, codemirror, content, lineNumbers, lineWrapping} = tab
+        const {id, codemirror, content, lineWrapping, lineNumbers} = tab
 
         return (
             <CodeMirrorLoader

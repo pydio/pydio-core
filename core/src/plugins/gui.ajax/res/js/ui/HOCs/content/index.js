@@ -18,8 +18,9 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import * as ContentControls from './controls'
+import { ContentControls, ContentSearchControls } from './controls'
 import * as ContentActions from './actions'
 
-export {ContentControls}
-export {ContentActions}
+export { ContentActions }
+export { ContentControls }
+export { ContentSearchControls }
