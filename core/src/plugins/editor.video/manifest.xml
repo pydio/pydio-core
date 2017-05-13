@@ -8,7 +8,7 @@
     <client_settings>
         <resources>
             <js file="plugins/editor.video/res/build/PydioVideo.js" className="PydioVideo"/>
-            <css file="plugins/editor.video/node_modules/video.js/dist/video-js.min.css"/>
+            <css file="plugins/editor.video/res/build/video-js.min.css"/>
             <i18n path="plugins/editor.video/i18n" namespace="video_editor"/>
         </resources>
     </client_settings>

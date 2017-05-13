@@ -84,7 +84,6 @@ class Viewer extends React.Component {
     // Plugin Main Editor rendering
     render() {
         const {url} = this.state || {}
-
         // Only display the video when we know the URL
         const editor = url ? <Player url={url} /> : null;
 
