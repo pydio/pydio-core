@@ -73,6 +73,7 @@ let SimpleList = React.createClass({
         entryHandleClicks   : React.PropTypes.func,
         hideToolbar         : React.PropTypes.bool,
         computeActionsForNode: React.PropTypes.bool,
+        multipleActions     : React.PropTypes.array,
 
         openEditor          : React.PropTypes.func,
         openCollection      : React.PropTypes.func,
@@ -1013,7 +1014,7 @@ let SimpleList = React.createClass({
             );
             rightButtons = <ReactMUI.RaisedButton key={1} label={this.context.getMessage('react.4')} primary={true} onClick={this.props.searchResultData.toggleState} />;
 
-        }else if(this.actionsCache.multiple.size){
+        }else if(this.actionsCache.multiple.size || this.props.multipleActions){
             let bulkLabel = this.context.getMessage('react.2');
             if(this.state.selection && this.state.showSelector){
                 bulkLabel +=" (" + this.state.selection.size + ")";
@@ -1028,7 +1029,8 @@ let SimpleList = React.createClass({
             if(this.state.showSelector) {
                 rightButtons = [];
                 let index = 0;
-                this.actionsCache.multiple.forEach(function(a){
+                const actions = this.props.multipleActions || this.actionsCache.multiple;
+                actions.forEach(function(a){
                     rightButtons.push(<ReactMUI.RaisedButton
                         key={index}
                         label={a.options.text}
