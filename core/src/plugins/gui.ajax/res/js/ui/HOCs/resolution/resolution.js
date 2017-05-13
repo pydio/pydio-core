@@ -47,8 +47,8 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
 
             componentDidMount() {
-                const {tab} = this.props
-                const {id, resolution = "hi"} = tab
+                const {tab, dispatch} = this.props
+                const {id, resolution = "lo"} = tab
 
                 dispatch(EditorActions.tabModify({id, resolution}))
             }
@@ -76,7 +76,7 @@ const withResolution = (sizes, highResolution, lowResolution) => {
 
             render() {
                 const {tab, dispatch, ...remainingProps} = this.props
-                const {resolution} = tab
+                const {resolution = "lo"} = tab
 
                 return (
                     <ResolutionURLProvider
