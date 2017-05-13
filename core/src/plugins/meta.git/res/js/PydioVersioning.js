@@ -151,9 +151,9 @@
                 <div>
                     <MaterialUI.Toolbar>
                         <MaterialUI.ToolbarGroup firstChild={true}>
-                            <MaterialUI.FlatButton disabled={disabled} label={mess['meta.git.3']} tooltip={mess['meta.git.4']} onTouchTap={this.applyAction.bind(this, 'dl')}/>
-                            <MaterialUI.FlatButton disabled={disabled} label={mess['meta.git.5']} tooltip={mess['meta.git.6']} onTouchTap={this.applyAction.bind(this, 'open')}/>
-                            <MaterialUI.FlatButton disabled={disabled} label={mess['meta.git.7']} tooltip={mess['meta.git.8']} onTouchTap={this.applyAction.bind(this, 'revert')}/>
+                            <MaterialUI.FlatButton style={!disabled?{color:'white'}:{}} disabled={disabled} label={mess['meta.git.3']} tooltip={mess['meta.git.4']} onTouchTap={this.applyAction.bind(this, 'dl')}/>
+                            <MaterialUI.FlatButton style={!disabled?{color:'white'}:{}} disabled={disabled} label={mess['meta.git.5']} tooltip={mess['meta.git.6']} onTouchTap={this.applyAction.bind(this, 'open')}/>
+                            <MaterialUI.FlatButton style={!disabled?{color:'white'}:{}} disabled={disabled} label={mess['meta.git.7']} tooltip={mess['meta.git.8']} onTouchTap={this.applyAction.bind(this, 'revert')}/>
                         </MaterialUI.ToolbarGroup>
                     </MaterialUI.Toolbar>
                     <PydioComponents.NodeListCustomProvider
@@ -193,9 +193,10 @@
 
         getDefaultProps: function(){
             return {
-                dialogTitle: "File History",
+                dialogTitle: '',
                 dialogIsModal: false,
-                dialogSize:'lg'
+                dialogSize:'lg',
+                dialogPadding: false
             };
         },
         submit(){
