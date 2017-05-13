@@ -295,7 +295,7 @@ let StandardLayout = React.createClass({
                         <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
                             {!uniqueNode &&
                                 <span style={{marginTop:7}}>
-                                    <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} secondary={true} controller={this.props.pydio.Controller}/>
+                                    <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle={this.props.pydio.MessageHash['198']} raised={true} secondary={true} controller={this.props.pydio.Controller}/>
                                 </span>
                             }
                             <Toolbar {...this.props} id="main-toolbar" toolbars={uniqueNode ? ["minisite_toolbar"] : ["info_panel"]} groupOtherList={uniqueNode ? [] : ["change_main", "more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>

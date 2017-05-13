@@ -93,6 +93,8 @@ const ButtonMenu = React.createClass({
                     anchorOrigin={{horizontal: this.props.direction || 'left', vertical: 'bottom'}}
                     targetOrigin={{horizontal: this.props.direction || 'left', vertical: 'top'}}
                     onRequestClose={() => {this.setState({showMenu: false})}}
+                    style={{marginTop: 1}}
+                    useLayerForClickAway={false}
                 >
                     {Utils.itemsToMenu(menuItems, this.menuClicked)}
                 </MaterialUI.Popover>
