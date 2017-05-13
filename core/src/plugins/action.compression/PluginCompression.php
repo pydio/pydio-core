@@ -189,7 +189,8 @@ class PluginCompression extends Plugin
 
             case "extraction":
 
-                $fileArchive = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["file"]), InputFilter::SANITIZE_DIRNAME);
+                //$fileArchive = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["file"]), InputFilter::SANITIZE_FILENAME);
+                $fileArchive = $userSelection->getUniqueFile();
                 $fileArchive = substr(strrchr($fileArchive, DIRECTORY_SEPARATOR), 1);
                 $authorizedExtension = array("tar" => 4, "gz" => 7, "bz2" => 8);
                 $acceptedArchive = false;

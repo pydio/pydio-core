@@ -139,13 +139,15 @@
                         <MaterialUI.Divider />
                     </MaterialUI.Paper>
 
-                    <MaterialUI.Toolbar style={{backgroundColor: '#fff'}}>
-                        <div style={{display:'flex', justifyContent: 'space-between', padding: '0px 24px', width: '100%', height: '100%'}}>
-                            <div style={{display:'flex', alignItems: 'center', marginLeft: '-48px'}}>
-                                <MaterialUI.RaisedButton primary={true} label="OK" onClick={this._handleSubmit}/>
+                    {urls.length > 0 &&
+                        <MaterialUI.Toolbar style={{backgroundColor: '#fff'}}>
+                            <div style={{display:'flex', justifyContent: 'space-between', padding: '0px 24px', width: '100%', height: '100%'}}>
+                                <div style={{display:'flex', alignItems: 'center', marginLeft: '-48px'}}>
+                                    <MaterialUI.RaisedButton primary={true} label="Start" onClick={this._handleSubmit}/>
+                                </div>
                             </div>
-                        </div>
-                    </MaterialUI.Toolbar>
+                        </MaterialUI.Toolbar>
+                    }
                 </div>
             );
         }
