@@ -52,17 +52,15 @@ const MainRouterWrapper = (pydio) => {
 
         componentDidMount() {
             pydio.getContextHolder().observe("context_changed", this._ctxObs);
+            pydio.getContextHolder().observe("repository_list_refreshed", this._ctxObs);
         }
 
         componentWillUnmount() {
             pydio.getContextHolder().stopObserving("context_changed", this._ctxObs);
+            pydio.getContextHolder().stopObserving("repository_list_refreshed", this._ctxObs);
         }
 
         componentDidUpdate(prevProps, prevState) {
-
-            if (!pydio.user) {
-                return
-            }
 
             if (prevState !== this.state) {
                 const uri = this.getURI(this.state)

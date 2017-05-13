@@ -19,24 +19,24 @@
  */
 
 const FuncUtils = require('pydio/util/func')
+const DOMUtils = require('pydio/util/dom')
+const LangUtils = require('pydio/util/lang')
 
 export default function (pydio) {
 
     return function(){
         let link;
-        let url = global.document.location.href;
-        if(url.indexOf('#') > 0){
-            url = url.substring(0, url.indexOf('#'));
-        }
-        if(url.indexOf('?') > 0){
-            url = url.substring(0, url.indexOf('?'));
-        }
+        const url = DOMUtils.getUrlFromBase();
+
         let repoId = pydio.repositoryId || (pydio.user ? pydio.user.activeRepository : null);
         if(pydio.user){
             const slug = pydio.user.repositories.get(repoId).getSlug();
-            if(slug) repoId = slug;
+            if(slug) {
+                repoId = 'ws-' + slug;
+            }
         }
-        link = LangUtils.trimRight(url, '/') + pydio.getUserSelection().getUniqueNode().getPath();
+
+        link = LangUtils.trimRight(url, '/') + '/' + repoId + pydio.getUserSelection().getUniqueNode().getPath();
 
         pydio.UI.openComponentInModal('PydioReactUI', 'PromptDialog', {
             dialogTitleId:369,
