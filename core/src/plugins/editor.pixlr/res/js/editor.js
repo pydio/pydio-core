@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,16 +18,20 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+
+
 class CustomIframe extends React.Component {
 
     onUnload(e) {
-        let href = this.myIframe.contentDocument.location.href;
+        try{
+            let href = this.myIframe.contentDocument.location.href;
 
-        if(href && href.indexOf('image=') > -1){
-            this.save(href);
-        }else if(href && (href.indexOf('close_pixlr')>-1 || href.indexOf('error_pixlr')>-1)){
-            // TODO: Close the editor
-        }
+            if(href && href.indexOf('image=') > -1){
+                this.save(href);
+            }else if(href && (href.indexOf('close_pixlr')>-1 || href.indexOf('error_pixlr')>-1)){
+                // TODO: Close the editor
+            }
+        }catch(e){}
     }
 
     save(pixlrUrl) {
@@ -44,11 +48,15 @@ class CustomIframe extends React.Component {
     }
 
     componentDidMount() {
-        this.myIframe.contentWindow.addEventListener("onbeforeunload", this.onUnload)
+        try{
+            this.myIframe.contentWindow.addEventListener("onbeforeunload", this.onUnload)
+        }catch(e){}
     }
 
     componentWillUnmount() {
-        this.myIframe.contentWindow.removeEventListener("onbeforeunload", this.onUnload)
+        try{
+            this.myIframe.contentWindow.removeEventListener("onbeforeunload", this.onUnload)
+        }catch(e){}
     }
 
     render() {
@@ -85,6 +93,9 @@ class Editor extends React.Component {
     }
 
     render() {
+        if(!this.state){
+            return null;
+        }
         return (
             <CustomIframe
                 {...this.props}

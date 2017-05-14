@@ -1,3 +1,23 @@
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
+
 import cx from 'classnames';
 import vjs from 'video.js';
 import _  from   'lodash';
@@ -252,8 +272,8 @@ class Media extends React.Component {
 
         // We have a reference to the parent so that if the video tag has disappeared, no errors is thrown when unmounting
         return (
-            <div ref="videoPlayerMountPoint" style={{padding: 0, margin: 0}}>
-                <video ref="videoPlayer" className={videoPlayerClasses}>
+            <div ref="videoPlayerMountPoint" style={{padding: 0, margin: 0, height:'100%'}}>
+                <video ref="videoPlayer" className={videoPlayerClasses} style={{height:'100%'}}>
                 {this.props.children || this.renderDefaultWarning()}
                 </video>
             </div>

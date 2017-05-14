@@ -1,15 +1,21 @@
-/**
- * Copyright (c) 2013-present, Facebook, Inc. All rights reserved.
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * This file provided by Facebook is for non-commercial testing and evaluation
- * purposes only. Facebook reserves all rights not expressly granted.
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
  */
 
 // IMPORT
@@ -166,7 +172,6 @@ class Editor extends React.Component {
 
         return (
             <div style={{display: "flex", ...style}}>
-                <Draggable cancel=".body" onStop={this.recalculate.bind(this)}>
                     <AnimatedPaper ref={(container) => this.container = ReactDOM.findDOMNode(container)} onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: style.transformOrigin}}>
                         {displayToolbar &&
                             <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onFullScreen={() => this.enterFullScreen()} onMinimise={onMinimise} />
@@ -176,7 +181,6 @@ class Editor extends React.Component {
                             {this.renderChild()}
                         </div>
                     </AnimatedPaper>
-                </Draggable>
             </div>
         );
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.pixlr" openable="true" iconClass="mdi mdi-image-filter" text="333" title="333" className="PixlrEditor" mimes="jpg,jpeg,png,bmp,pxd"
-        formId="pixlr_box" write="true" canWrite="true" label="CONF_MESSAGE[Pixlr Editor]"
+<editor id="editor.pixlr" openable="true" iconClass="mdi mdi-image-filter" text="333" title="333" className="PydioPixlr" mimes="jpg,jpeg,png,bmp,pxd"
+        write="true" canWrite="true" label="CONF_MESSAGE[Pixlr Editor]"
         description="CONF_MESSAGE[Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI.]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.pixlr/PixlrEditor.php" classname="Pydio\Editor\Image\PixlrEditor"/>
@@ -12,16 +12,11 @@
 	<client_settings>
         <resources>
             <js file="plugins/editor.diaporama/res/build/PydioDiaporama.js" className="PydioDiaporama"/>
-            <js file="plugins/editor.pixlr/res/build/PixlrEditor.js" className="PixlrEditor"/>
+            <js file="plugins/editor.pixlr/res/build/PydioPixlr.js" className="PydioPixlr"/>
             <img_library alias="pixlr_images" path="plugins/editor.pixlr/images"/>
             <i18n path="plugins/editor.pixlr/i18n" namespace="pixlr_editor"/>
         </resources>
 	</client_settings>
-	<clientForm id="pixlr_box"><![CDATA[
-		<div id="pixlr_box" style="background-color:white;" action="edit_image" box_width="90%" box_height="90%" box_padding="0">
-			<div id="pixlrContainer"></div>
-		</div>
-	]]></clientForm>
 	<registry_contributions>
 		<actions>
 			<action name="post_to_server">

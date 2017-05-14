@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,6 +17,8 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
+
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
@@ -84,7 +86,6 @@ class Viewer extends React.Component {
     // Plugin Main Editor rendering
     render() {
         const {url} = this.state || {}
-
         // Only display the video when we know the URL
         const editor = url ? <Player url={url} /> : null;
 

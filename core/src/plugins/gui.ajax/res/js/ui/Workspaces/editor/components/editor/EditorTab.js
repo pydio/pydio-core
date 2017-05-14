@@ -1,15 +1,21 @@
-/**
- * Copyright (c) 2013-present, Facebook, Inc. All rights reserved.
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * This file provided by Facebook is for non-commercial testing and evaluation
- * purposes only. Facebook reserves all rights not expressly granted.
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
  */
 
 import Pydio from 'pydio'
@@ -41,9 +47,8 @@ class Tab extends React.Component {
     }
 
     renderControls(Controls, Actions) {
-
         const {node, editorData} = this.props
-        const {SelectionControls, ResolutionControls, SizeControls, ContentControls, LocalisationControls} = Controls
+        const {SelectionControls, ResolutionControls, SizeControls, ContentControls, ContentSearchControls, LocalisationControls} = Controls
 
         let actions = {
             ...SizeActions,
@@ -62,48 +67,23 @@ class Tab extends React.Component {
 
         let boundActionCreators = bindActionCreators(actions)
 
+        const controls = (Controls) => {
+            return Object.keys(Controls)
+                .filter((key) => typeof Controls[key] === 'function')
+                .map((key) => {
+                    const Control = Controls[key]
+                    return <Control editorData={editorData} node={node} {...boundActionCreators} />
+                })
+        }
+
         return (
             <Toolbar style={Tab.styles.toolbar}>
-                {SelectionControls &&
-                    <ToolbarGroup>
-                        <SelectionControls.Prev editorData={editorData} node={node} {...boundActionCreators} />
-                        <SelectionControls.Play editorData={editorData} node={node} {...boundActionCreators} />
-                        <SelectionControls.Pause editorData={editorData} node={node} {...boundActionCreators} />
-                        <SelectionControls.Next editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {ResolutionControls &&
-                    <ToolbarGroup>
-                        <ResolutionControls.ToggleResolution editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {SizeControls &&
-                    <ToolbarGroup>
-                        <SizeControls.AspectRatio editorData={editorData} node={node} {...boundActionCreators} />
-                        <SizeControls.Scale editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {ContentControls &&
-                    <ToolbarGroup>
-                        <ContentControls.Save editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Undo editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Redo editorData={editorData} node={node} {...boundActionCreators} />
-
-                        <ContentControls.ToggleLineNumbers editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.ToggleLineWrapping editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {ContentControls &&
-                    <ToolbarGroup>
-                        <ContentControls.JumpTo editorData={editorData} node={node} {...boundActionCreators} />
-                        <ContentControls.Search editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
-                {LocalisationControls &&
-                    <ToolbarGroup>
-                        <LocalisationControls.Locate editorData={editorData} node={node} {...boundActionCreators} />
-                    </ToolbarGroup>
-                }
+                {SelectionControls && <ToolbarGroup>{controls(SelectionControls)}</ToolbarGroup>}
+                {ResolutionControls && <ToolbarGroup>{controls(ResolutionControls)}</ToolbarGroup>}
+                {SizeControls && <ToolbarGroup>{controls(SizeControls)}</ToolbarGroup>}
+                {ContentControls && <ToolbarGroup>{controls(ContentControls)}</ToolbarGroup>}
+                {ContentSearchControls && <ToolbarGroup>{controls(ContentSearchControls)}</ToolbarGroup>}
+                {LocalisationControls && <ToolbarGroup>{controls(LocalisationControls)}</ToolbarGroup>}
             </Toolbar>
         )
     }

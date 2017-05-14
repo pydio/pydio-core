@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -36,4 +36,52 @@ if(!function_exists('blockAllXHRInPage')){
 
 }
 
+if(!function_exists('crawlPermissions')){
+
+    function crawlPermissions($path, $glob = null){
+
+        $error = false;
+        if($glob !== null){
+            $files = glob($glob);
+            foreach($files as $file){
+                if(!is_writeable($file)){
+                    $error = $file;
+                    break;
+                }
+            }
+        }else{
+            $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS);
+            $iterator = new \RecursiveIteratorIterator($directory);
+            foreach ($iterator as $info) {
+                if(!is_writable($info->getPathname())){
+                    $error = $info->getPathname();
+                    break;
+                }
+            }
+        }
+        if($error){
+            throw new Exception("Crawling folder $path to check all files are writeable : File $info FAIL! Please make sure that the whole tree is currently writeable by the webserver, or upgrade may probably fail at one point.");
+        }else{
+            print "<div class='upgrade_result success'>Crawling folder $path to check all files are writeable : OK</div>";
+        }
+    }
+
+}
+
+if(!function_exists('disablePlugin')){
+
+    function disablePlugin($pluginId){
+
+        if(file_exists(AJXP_INSTALL_PATH."/plugins/".$pluginId."/manifest.xml")){
+            rename(AJXP_INSTALL_PATH."/plugins/".$pluginId."/manifest.xml", AJXP_INSTALL_PATH."/plugins/".$pluginId."/manifest.xml.disabled");
+        }
+
+    }
+
+}
+
+crawlPermissions(null, AJXP_INSTALL_PATH."/*.php");
+crawlPermissions(AJXP_INSTALL_PATH."/core");
+crawlPermissions(AJXP_INSTALL_PATH."/plugins");
+disablePlugin("access.sftp_psl");
 blockAllXHRInPage();

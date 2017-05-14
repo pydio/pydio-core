@@ -1,3 +1,23 @@
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
+
 const React = require('react')
 const Color = require('color')
 const {withContextMenu, dropProvider} = require('pydio').requireLib('hoc')
@@ -143,6 +163,7 @@ let FSTemplate = React.createClass({
         }
 
         const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
+        const inboxWorkspace = this.props.pydio.user && this.props.pydio.user.activeRepository === 'inbox';
 
         // Making sure we only pass the style to the parent element
         const {style, ...props} = this.props
@@ -157,21 +178,23 @@ let FSTemplate = React.createClass({
                             <span className="drawer-button"><MaterialUI.IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <Breadcrumb {...props} startWithSeparator={false}/>
                             <span style={{flex:1}}/>
-                            <SearchForm {...props}/>
+                            {!inboxWorkspace && <SearchForm {...props}/>}
                         </div>
                         <div id="main_toolbar">
-                            <PydioComponents.ButtonMenu
-                                {...props}
-                                buttonStyle={styles.raisedButtonStyle}
-                                buttonLabelStyle={styles.raisedButtonLabelStyle}
-                                id="create-button-menu"
-                                toolbars={["upload", "create"]}
-                                buttonTitle="New"
-                                raised={true}
-                                secondary={true}
-                                controller={props.pydio.Controller}
-                                openOnEvent={'tutorial-open-create-menu'}
-                            />
+                            {!inboxWorkspace &&
+                                <PydioComponents.ButtonMenu
+                                    {...props}
+                                    buttonStyle={styles.raisedButtonStyle}
+                                    buttonLabelStyle={styles.raisedButtonLabelStyle}
+                                    id="create-button-menu"
+                                    toolbars={["upload", "create"]}
+                                    buttonTitle={this.props.pydio.MessageHash['198']}
+                                    raised={true}
+                                    secondary={true}
+                                    controller={props.pydio.Controller}
+                                    openOnEvent={'tutorial-open-create-menu'}
+                                />
+                            }
                             {!mobile &&
                                 <PydioComponents.Toolbar
                                     {...props}

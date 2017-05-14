@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify

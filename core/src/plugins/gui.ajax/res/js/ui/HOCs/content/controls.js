@@ -31,14 +31,22 @@ const _Redo = (props) => <IconButton onClick={() => handler("onRedo", props)} ic
 const _ToggleLineNumbers = (props) => <IconButton onClick={() => handler("onToggleLineNumbers", props)} iconClassName="mdi mdi-format-list-numbers" />
 const _ToggleLineWrapping = (props) => <IconButton onClick={() => handler("onToggleLineWrapping", props)} iconClassName="mdi mdi-wrap" />
 
-const _JumpTo = (props) => <TextField onKeyUp={({key, target}) => key === 'Enter' && handler("onJumpTo", props)(target.value)} hintText="Jump to Line" />
+const _JumpTo = (props) => <TextField onKeyUp={({key, target}) => key === 'Enter' && handler("onJumpTo", props)(target.value)} hintText="Jump to Line" style={{width: 150, marginRight: 40}}/>
 const _Search = (props) => <TextField onKeyUp={({key, target}) => key === 'Enter' && handler("onSearch", props)(target.value)} hintText="Search..." />
 
 // Final export and connection
-export const Save = connect(mapStateToProps)(_Save)
-export const Undo = connect(mapStateToProps)(_Undo)
-export const Redo = connect(mapStateToProps)(_Redo)
-export const ToggleLineNumbers = connect(mapStateToProps)(_ToggleLineNumbers)
-export const ToggleLineWrapping = connect(mapStateToProps)(_ToggleLineWrapping)
-export const JumpTo = connect(mapStateToProps)(_JumpTo)
-export const Search = connect(mapStateToProps)(_Search)
+const ContentControls = {
+    Save: connect(mapStateToProps)(_Save),
+    Undo: connect(mapStateToProps)(_Undo),
+    Redo: connect(mapStateToProps)(_Redo),
+    ToggleLineNumbers: connect(mapStateToProps)(_ToggleLineNumbers),
+    ToggleLineWrapping: connect(mapStateToProps)(_ToggleLineWrapping)
+}
+
+const ContentSearchControls = {
+    JumpTo: connect(mapStateToProps)(_JumpTo),
+    Search: connect(mapStateToProps)(_Search)
+}
+
+export { ContentControls }
+export { ContentSearchControls }

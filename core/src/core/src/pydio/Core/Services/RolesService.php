@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -381,6 +381,22 @@ class RolesService
         }
         RolesService::updateRole($rootRole);
 
+        $miniRole = RolesService::getRole("EXTERNAL_USERS");
+        if ($miniRole === false) {
+            $rootRole = new AJXP_Role("EXTERNAL_USERS");
+            $rootRole->setLabel("External users");
+            $actions = array(
+                "action.share" => ["open_user_shares"],
+                "action.user" => ["open_address_book"]
+            );
+            $rootRole->setAutoApplies(array("shared"));
+            foreach ($actions as $pluginId => $acts) {
+                foreach ($acts as $act) {
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_ALL, false);
+                }
+            }
+            RolesService::updateRole($rootRole);
+        }
         $miniRole = RolesService::getRole("MINISITE");
         if ($miniRole === false) {
             $rootRole = new AJXP_Role("MINISITE");

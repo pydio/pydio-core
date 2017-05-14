@@ -25,7 +25,7 @@ import { ImageSizeProvider, ContainerSizeProvider } from './providers';
 import { EditorActions, getRatio, getDisplayName, getBoundingRect } from '../utils';
 
 const withResize = (Component) => {
-    class WithResize extends React.PureComponent {
+    class WithResize extends React.Component {
         constructor(props) {
             super(props)
 
@@ -73,6 +73,7 @@ const withResize = (Component) => {
                 containerWidth !== this.props.containerWidth ||
                 containerHeight !== this.props.containerHeight
             ) {
+
                 this.loadSize(nextProps)
             }
         }
