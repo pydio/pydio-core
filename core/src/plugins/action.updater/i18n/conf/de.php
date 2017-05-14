@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Update Engine" => "Versionsaktualisierung",
-"Automatic update of Pydio. Since version 3.3.3" => "Automatic update of Pydio. Since version 3.3.3",
+"Automatic update of Pydio. Since version 3.3.3" => "Automatische Aktualisierung von Pydio (ab Version 3.3.3)",
 "Update Site" => "Update-URL",
 "Where to update" => "Die Update-URL mit /pub/ wird für die Community-Version verwendet und /auth/ für die Enterprise-Version. Stellen Sie sicher, dass die Authentifizierungs-Informationen aus Ihrem Pydio.com-Zugang hinterlegt sind.",
 "Preserve Files" => "Dateien beibehalten",

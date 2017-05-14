@@ -36,7 +36,7 @@ $mess = array(
 "13"=> "Name des Korbs",
 "14"=> "Archiv aus allen Dateien des Korbs erstellen. Bitte einen Namen für das Archiv angeben:",
 "15"=> "Elemente in den Korb legen, um sie später herunterzuladen oder freizugeben.",
-"16"=> "Remove from cart",
-"17" => "No items selected",
-"18" => "Use this cart to select files from any place and then download them at once.",
+"16"=> "Aus Korb entfernen",
+"17" => "Keine Elemente ausgewählt",
+"18" => "Verwenden Sie diesen Korb, um Dateien aus verschiedenen Ordnern auf einmal herunterzuladen.",
 );

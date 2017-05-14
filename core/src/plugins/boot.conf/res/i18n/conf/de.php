@@ -77,5 +77,5 @@ $mess = array(
 "Select a language activated by default( users will still be able to switch)" => "Wählen Sie die Standard-Sprache der Installation aus. Alle Benutzer können ihre Sprache im Benutzerprofil ändern.",
 "Enable cache (recommended)" => "Cache aktivieren (empfohlen)",
 "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Server-Daten werden im Arbeitsspeicher zwischengespeichert. Diese Einstellung wird mit APC/APCu standardmäßig aktiviert. Es ist später möglich auf einen externen Server, wie z.B. Redis oder Memcache zu wechseln.",
-"Login of the administrative user, typically an email address." => "Login of the administrative user, typically an email address.",
+"Login of the administrative user, typically an email address." => "Administragor-Login (üblicherweise eine E-Mail-Adresse).",
 );

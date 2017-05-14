@@ -16,17 +16,13 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <https://pydio.com>.
+* The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Chiffre Ordner",
-"2" => "Ordnerinhalt verschlüsseln",
-"3" => "Ordner entschlüsseln",
-"4" => "Ordnerinhalt entschlüsseln",
-"5" => "Chiffre Ordner",
-"6" => "Ordnerinhalt verschlüsseln",
-    "7" => "Geben Sie den Schlüssel ein, den Sie beim verschlüsseln dieses Ordners angegeben haben.",
-    "8" => "Schlüssel",
-    "9" => "Schlüssel bestätigen",
-    "10" => "Legen Sie einen Schlüssel fest, damit kein Anderer auf die Dateien zugreifen kann. Achtung: Wenn Sie diesen verlieren können Sie nicht mehr auf die Dateien zugreifen!",
+    "Collabora Online" => "Collabora-Online",
+    "Collabora Online Editor for office documents" => "Collabora-Online-Editor für Office-Dokumente",
+    "URL to the Libre Office Editor Iframe" => "URL zum Libre-Office Editor-Iframe",
+    "Websocket Uses TLS" => "Websocket mit TLS",
+    "Web Socket Connector Host" => "Websocket Host",
+    "Web Socket Connector Port" => "Websocket Port",
 );

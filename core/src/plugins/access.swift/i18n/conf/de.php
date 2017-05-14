@@ -32,5 +32,5 @@ $mess=array(
 "Your region identifier" => "Identifikatur für die Region",
 "Container" => "Container",
 "Base Container" => "Der Basis-Container",
-"Console password" => "Consolen-Passwort",
+"Console password" => "Konsolen-Passwort",
 );

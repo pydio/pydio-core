@@ -8,6 +8,6 @@ $mess = [
     "6" => "Ihr Google-Schlüssel ist bereits konfiguriert. Bitte wenden Sie sich zum Zurücksetzen an Ihren Administrator.",
     "7" => "Der Code kann nicht überprüft werden. Haben Sie Google Authenticator korrekt installiert?",
     "8" => "Es trat ein Fehler auf. Der Schlüssel darf nicht leer sein.",
-    "9" => "One-Time-Password authentication is active, please append the code to your password.",
-    "10"=> "One Time Code (6 digits)",
+    "9" => "Einmal-Code ist aktiv. Bitte hängen Sie den Code an das Passwort an.",
+    "10"=> "Einmal-Code (6 Zeichen)",
 ];

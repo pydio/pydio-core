@@ -39,6 +39,6 @@ $mess=array(
 "11" => "Datei-Aktivitäten",
 "12" => "Abhängig von Ihrem Browser werden Sie eine Abfrage erhalten um Benachrichtigungen zu erlauben. Diese Funktion kann über die Einstellungen des Browsers wieder deaktiviert werden.",
 "13" => "Ihr Browser unterstützt noch keine Desktop-Benachrichtigungen.",
-"14" => "No alerts",
-"15" => "Notifications about files that you monitor will appear here",
+"14" => "Keine Benachrichtigungen",
+"15" => "Hier erscheinen Benachrichtigungen zu Dateien, die Sie überwachen",
 );
