@@ -29,10 +29,12 @@ let Template = ({id, style, children}) => {
     return <div id={id} style={style}>{children}</div>
 }
 
+/*
 Template = compose(
     Animations.makeAsync,
     Animations.makeTransition(originStyles, targetStyles),
 )(Template)
+*/
 
 class InfoPanel extends React.Component {
 
