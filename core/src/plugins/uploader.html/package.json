@@ -1,6 +1,6 @@
 {
   "name": "uploader.html",
-  "version": "6.5.1",
+  "version": "8.0.0",
   "description": "XHR based Uploader",
   "source_path":"js/react",
   "main": "index.js",

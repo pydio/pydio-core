@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -719,4 +719,7 @@ $mess=array(
 "619" => "Search limited to current folder and its children",
 "620" => "Search limited to current workspace",
 "621" => "This field cannot be empty",
+"622" => "Error Stack",
+"623" => "Copy",
+"624" => "Copied!",
 );

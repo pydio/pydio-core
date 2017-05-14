@@ -32,6 +32,14 @@ module.exports = function(grunt) {
                 }
             }
         },
+        copy: {
+            swf: {
+                expand: true,
+                src: ['node_modules/video.js/dist/video-js.swf', 'node_modules/video.js/dist/video-js.min.css'],
+                dest: './res/build/',
+                flatten:true
+            }
+        },
         watch: {
             js: {
                 files: [
@@ -46,7 +54,8 @@ module.exports = function(grunt) {
     });
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-babel');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.registerTask('default', ['babel', 'browserify:ui']);
+    grunt.registerTask('default', ['babel', 'browserify:ui', 'copy']);
 
 };

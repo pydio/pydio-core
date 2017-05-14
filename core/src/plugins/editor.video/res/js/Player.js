@@ -18,6 +18,8 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+
+
 import Media from './Media';
 
 class Editor extends React.Component {
@@ -32,13 +34,13 @@ class Editor extends React.Component {
             autoplay: false,
             controls: true,
             flash: {
-                swf: "plugins/editor.video/node_modules/video.js/dist/video-js.swf"
+                swf: "plugins/editor.video/res/build/video-js.swf"
             },
             techOrder: ['flash', 'html5'] // TODO - switch the order when the file is MP4 ??
         }
 
         return (
-            <div style={{position: "relative", padding: 0, margin: 0}}>
+            <div style={{position: "relative", padding: 0, margin: 0, overflow:'hidden', height:'100%', backgroundColor:'#424242'}}>
                 <Media options={options} src={this.props.url} resize={true} onReady={() => this.onReady}></Media>
             </div>
         )

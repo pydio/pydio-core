@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -530,10 +530,10 @@ class BootConfLoader extends AbstractConfDriver
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
                 $ctx,
-                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]),
+                [["adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]]],
                 "Pydio Test Mail",
                 "Body of the test",
-                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"])
+                ["adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]]
             );
             echo 'SUCCESS:Mail sent to the admin adress, please check it is in your inbox!';
 

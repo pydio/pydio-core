@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -726,6 +726,9 @@ $mess=array(
 "619" => "Suche auf aktuellen Ordner und Unterordner beschränkt",
 "620" => "Suche auf aktuelle Arbeitsumgebung beschränkt",
 "621" => "Dieses Feld darf nicht leer sein",
+"622" => "Fehlerstapel",
+"623" => "Kopieren",
+"624" => "Erfolgreich kopiert!",
 /* END SENTENCE */
 /* password strength tester */
 );

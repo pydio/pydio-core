@@ -1,3 +1,23 @@
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
+
 import {Component} from 'react'
 import Pydio from 'pydio'
 const {AsyncComponent, PydioContextConsumer} = Pydio.requireLib('boot');
@@ -44,9 +64,9 @@ let WorkspacesCard = (props) => {
                 {renderRay(-30)}
             </Scheme>
             <p>{props.message('workspaces.2')}</p>
-            <Scheme>
-                <span className="mdi mdi-account" style={{position:'absolute', left: 39, top: 50 -12 -20}}/>
-                <div style={{position:'absolute', top: 46, left:14}}>
+            <Scheme dimension={130}>
+                <span className="mdi mdi-account" style={{position:'absolute', left: 54, top: 32}}/>
+                <div style={{position:'absolute', top: 60, left:30}}>
                     <span className="mdi mdi-folder"/>
                     <span className="mdi mdi-arrow-right"/>
                     <span className="mdi mdi-network"/>

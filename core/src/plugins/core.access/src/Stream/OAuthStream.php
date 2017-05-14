@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Abstrium SAS <team (at) pyd.io>
  * This file is part of the Pydio Enterprise Distribution.
  * It is subject to the End User License Agreement that you should have
  * received and accepted along with this distribution.

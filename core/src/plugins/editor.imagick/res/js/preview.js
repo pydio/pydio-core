@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,28 +18,23 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+
+
 import React, {PureComponent} from 'react'
 import { ImageContainer } from './components'
 
 const baseURL = pydio.Parameters.get('ajxpServerAccess');
 
-export default class Preview extends PureComponent {
-    render() {
-        const {node, ...remainingProps} = this.props
+const Preview = ({node, ...remainingProps}) => (
+    <ImageContainer
+        {...remainingProps}
+        src={`${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()}`}
+        imgStyle={{
+            width: "100%",
+            height: "100%",
+            flex: 1
+        }}
+    />
+)
 
-        console.log(`${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()}`)
-
-        return (
-            <ImageContainer
-                {...remainingProps}
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundImage:`url(${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()})`,
-                    backgroundSize : 'cover',
-                    backgroundPosition: 'center center'
-                }}
-            />
-        )
-    }
-}
+export default Preview

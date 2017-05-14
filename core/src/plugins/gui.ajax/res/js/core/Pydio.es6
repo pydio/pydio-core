@@ -1,3 +1,23 @@
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
+
 import Observable from './lang/Observable'
 import Logger from './lang/Logger'
 import PydioApi from './http/PydioApi'
@@ -313,6 +333,11 @@ class Pydio extends Observable{
                 return;
             }
         }
+        if(this._repositoryCurrentlySwitching && this.user){
+            this.user.setPreference("pending_folder", gotoNode.getPath());
+            this._initLoadRep = gotoNode.getPath();
+            return;
+        }
         const current = this._contextHolder.getContextNode();
         if(current && current.getPath() == path){
             return;
@@ -351,6 +376,7 @@ class Pydio extends Observable{
      */
     triggerRepositoryChange(repositoryId, callback){
         this.fire("trigger_repository_switch");
+        this._repositoryCurrentlySwitching = true;
         const onComplete = (transport) => {
             if(transport.responseXML){
                 this.ApiClient.parseXmlMessage(transport.responseXML);
@@ -358,7 +384,8 @@ class Pydio extends Observable{
             this.loadXmlRegistry(false,  null, null, repositoryId);
             this.repositoryId = null;
 
-            if (typeof callback == "function") callback()
+            if (typeof callback == "function") callback();
+            this._repositoryCurrentlySwitching = false;
         };
 
         const root = this._contextHolder.getRootNode();
@@ -383,8 +410,9 @@ class Pydio extends Observable{
     /**
      * Reload all messages from server and trigger updateI18nTags
      * @param newLanguage String
+     * @param callback Function
      */
-    loadI18NMessages(newLanguage){
+    loadI18NMessages(newLanguage, callback = null){
         this.ApiClient.switchLanguage(newLanguage, function(transport){
             if(transport.responseJSON){
                 this.MessageHash = transport.responseJSON;
@@ -400,6 +428,7 @@ class Pydio extends Observable{
                 this.loadXmlRegistry();
                 this.fireContextRefresh();
                 this.currentLanguage = newLanguage;
+                if(callback) callback();
             }
 
         }.bind(this));

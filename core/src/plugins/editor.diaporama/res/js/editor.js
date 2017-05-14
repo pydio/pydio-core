@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,6 +17,8 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
+
 
 import React, {PureComponent} from 'react'
 import { connect } from 'react-redux'
@@ -79,7 +81,7 @@ class Editor extends PureComponent {
     }
 
     render() {
-        const {node, src, editorData, scale} = this.props;
+        const {node, src, editorData} = this.props;
 
         if (!node) return null
 
@@ -96,6 +98,9 @@ class Editor extends PureComponent {
                         height={imgHeight}
                         containerWidth={containerWidth}
                         containerHeight={containerHeight}
+                        imgClassName="diaporama-image-main-block"
+                        style={{backgroundColor:'#424242'}}
+                        imgStyle={{boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px'}}
                     />
                 }
                 </ImageSizeProvider>

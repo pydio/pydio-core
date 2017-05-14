@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -246,4 +246,21 @@ export default class PydioBootstrap{
         cssNode.media = 'screen';
         head.appendChild(cssNode);
     }
+
+
+    /**
+     * Try to load something under data/cache/
+     * @param onError Function
+     */
+    static testDataFolderAccess(onError){
+        var c = new Connexion('data/cache/index.html');
+        c.setMethod('get');
+        c.onComplete = function(response){
+            if(200 === response.status){
+                onError();
+            }
+        }
+        c.sendAsync();
+    }
+
 }

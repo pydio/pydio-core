@@ -2,11 +2,46 @@ const {Textfit} = require('react-textfit');
 import Pydio from 'pydio'
 const Color = require('color');
 import {muiThemeable} from 'material-ui/styles';
+import {connect} from 'react-redux';
+import {compose} from 'redux';
 
-const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = Pydio.requireLib('workspaces');
-const {ContextMenu, ButtonMenu, Toolbar, ListPaginator, ReactEditorOpener, ClipboardTextField} = Pydio.requireLib('components');
-const {BackgroundImage} = Pydio.requireLib('boot')
-const {dropProvider} = Pydio.requireLib('hoc')
+const { Breadcrumb, SearchForm, MainFilesList, Editor, EditionPanel } = Pydio.requireLib('workspaces');
+const { ContextMenu, ButtonMenu, Toolbar, ListPaginator, ClipboardTextField } = Pydio.requireLib('components');
+const { BackgroundImage } = Pydio.requireLib('boot');
+const { EditorActions, dropProvider } = Pydio.requireLib('hoc');
+
+const withUniqueNode = (Component) => {
+    return class WithUniqueNode extends React.PureComponent {
+
+        componentDidMount() {
+            this.detectFirstNode()
+        }
+
+        detectFirstNode() {
+            let dm = this.props.pydio.getContextHolder();
+
+            if (!dm.getSelectedNodes().length) {
+                let first = dm.getRootNode().getFirstChildIfExists();
+                if (first) {
+                    dm.setSelectedNodes([first], "dataModel");
+                    this.setState({node: first});
+                } else {
+                    setTimeout(() => this.detectFirstNode(), 1000);
+                }
+            } else {
+                if (!this.state || !this.state.node) {
+                    this.setState({node: dm.getSelectedNodes()[0]});
+                }
+            }
+        }
+
+        render() {
+            return (
+                <Component {...this.props} node={this.state && this.state.node}  />
+            )
+        }
+    }
+}
 
 const UniqueNodeTemplateMixin = {
 
@@ -202,7 +237,7 @@ let StandardLayout = React.createClass({
     },
 
     getDefaultProps: function(){
-        return {minisiteMode: 'standard'};
+        return {minisiteMode: 'standard', uniqueNode:true};
     },
 
     render: function(){
@@ -238,7 +273,7 @@ let StandardLayout = React.createClass({
             }
         }
 
-        const {minisiteMode, showSearchForm} = this.props;
+        const {minisiteMode, showSearchForm, uniqueNode, skipDisplayToolbar} = this.props;
 
         if(!this.props.pydio.user){
             return <div className="vertical_fit vertical_layout" style={style}/>;
@@ -258,13 +293,15 @@ let StandardLayout = React.createClass({
                             </div>
                         }
                         <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
-                            <span style={{marginTop:7}}>
-                                <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} secondary={true} controller={this.props.pydio.Controller}/>
-                            </span>
-                            <Toolbar {...this.props} id="main-toolbar" toolbars={["info_panel"]} groupOtherList={["change_main", "more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
+                            {!uniqueNode &&
+                                <span style={{marginTop:7}}>
+                                    <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle={this.props.pydio.MessageHash['198']} raised={true} secondary={true} controller={this.props.pydio.Controller}/>
+                                </span>
+                            }
+                            <Toolbar {...this.props} id="main-toolbar" toolbars={uniqueNode ? ["minisite_toolbar"] : ["info_panel"]} groupOtherList={uniqueNode ? [] : ["change_main", "more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
                             <div style={{flex:1}}></div>
                             <ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                            {!this.props.skipDisplayToolbar &&
+                            {!skipDisplayToolbar && !uniqueNode &&
                                 <Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font" buttonStyle={styles.iconButtonsStyle}/>
                             }
                         </div>
@@ -289,7 +326,7 @@ const FolderMinisite = React.createClass({
     render: function(){
 
         return (
-            <StandardLayout {...this.props} showSearchForm={this.props.pydio.getPluginConfigs('action.share').get('SHARED_FOLDER_SHOW_SEARCH')}>
+            <StandardLayout {...this.props} uniqueNode={false} showSearchForm={this.props.pydio.getPluginConfigs('action.share').get('SHARED_FOLDER_SHOW_SEARCH')}>
                 <div style={{backgroundColor:'white'}} className="layout-fill vertical-layout">
                     <MainFilesList ref="list" {...this.props}/>
                 </div>
@@ -301,86 +338,96 @@ const FolderMinisite = React.createClass({
 
 });
 
-const InlineEditor = React.createClass({
-
-    getInitialState: function(){
-        return {node: this.props.node};
-    },
-
-    componentDidMount: function(){
-        this.props.pydio.UI.registerEditorOpener(this);
-    },
-
-    componentWillUnmount: function(){
-        this.props.pydio.UI.unregisterEditorOpener(this);
-    },
-
-    openEditorForNode: function(node, editorData){
-        this.setState({node, editorData});
-    },
-
-    _getEditorData: function(node) {
-        const {pydio} = this.props;
-        const selectedMime = PathUtils.getAjxpMimeType(node);
-        const editors = pydio.Registry.findEditorsForMime(selectedMime, false);
-        if (editors.length && editors[0].openable){
-            return editors[0];
-        }
-    },
-
-    render: function(){
-        const {pydio} = this.props;
-        const {node, editorData} = this.state;
-        return (
-            <ReactEditorOpener
-                pydio={pydio}
-                node={node}
-                registry={pydio.Registry}
-                editorData={editorData || this._getEditorData(node)}
-            />
-        );
-    }
-
-});
-
 const FileMinisite = React.createClass({
 
-    mixins: [UniqueNodeTemplateMixin],
+    componentWillReceiveProps(nextProps) {
 
-    componentDidMount: function(){
-        this.detectFirstNode();
+        const {pydio, node, dispatch} = nextProps
+
+        if (!node) return
+
+        pydio.UI.registerEditorOpener(this);
+
+        const selectedMime = PathUtils.getAjxpMimeType(node);
+        const editors = pydio.Registry.findEditorsForMime(selectedMime, false);
+        if (editors.length && editors[0].openable) {
+
+            const editorData = editors[0]
+
+            pydio.Registry.loadEditorResources(
+                editorData.resourcesManager,
+                () => {
+                    let EditorClass = null
+
+                    if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+                        this.setState({
+                            error: "Cannot find editor component (" + editorData.editorClass + ")!"
+                        })
+                        return
+                    }
+
+                    let tabId = dispatch(EditorActions.tabCreate({
+                        id: node.getLabel(),
+                        title: node.getLabel(),
+                        url: node.getPath(),
+                        icon: PydioWorkspaces.FilePreview,
+                        Editor: EditorClass.Editor,
+                        Controls: EditorClass.Controls,
+                        pydio,
+                        node,
+                        editorData,
+                        registry: pydio.Registry
+                    })).id
+
+                    dispatch(EditorActions.editorSetActiveTab(tabId))
+                }
+            )
+        }
     },
 
-    _getEditorData: function(node) {
-        const selectedMime = PathUtils.getAjxpMimeType(node);
-        const editors = this.props.pydio.Registry.findEditorsForMime(selectedMime, false);
-        if (editors.length && editors[0].openable){
-            return editors[0];
-        }
+    openEditorForNode(node, editorData) {
+        const {dispatch} = this.props
+
+        pydio.Registry.loadEditorResources(
+            editorData.resourcesManager,
+            () => {
+                let EditorClass = null
+
+                if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+                    this.setState({
+                        error: "Cannot find editor component (" + editorData.editorClass + ")!"
+                    })
+                    return
+                }
+
+                dispatch(EditorActions.tabModify({
+                    id: node.getLabel(),
+                    title: node.getLabel(),
+                    url: node.getPath(),
+                    icon: PydioWorkspaces.FilePreview,
+                    Editor: EditorClass.Editor,
+                    Controls: EditorClass.Controls,
+                    pydio,
+                    node,
+                    editorData,
+                    registry: pydio.Registry
+                }))
+            }
+        )
+    },
+
+    componentWillUnmount() {
+        pydio.UI.unregisterEditorOpener(this);
     },
 
     render: function(){
 
-        let node = this.state && this.state.node ?  this.state.node : null;
-
-        let content;
-        if(node){
-            content = (
-                <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
-                    <InlineEditor
-                        pydio={this.props.pydio}
-                        node={node}
-                    />
-                </div>
-            );
-        }else{
-            content = (
-                <PydioReactUI.Loader />
-            );
-        }
-
         return (
-            <StandardLayout {...this.props}>{content}</StandardLayout>
+            <StandardLayout {...this.props} uniqueNode={true} skipDisplayToolbar={true}>
+                <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
+                    <Editor displayToolbar={false} style={{display: "flex", flex: 1}}/>
+                </div>
+            </StandardLayout>
         );
 
 
@@ -451,7 +498,11 @@ const FilmStripMinisite = React.createClass({
 
 window.ShareTemplates = {
     FolderMinisite      : muiThemeable()(FolderMinisite),
-    FileMinisite        : muiThemeable()(FileMinisite),
+    FileMinisite        : compose(
+        withUniqueNode,
+        muiThemeable(),
+        connect()
+    )(FileMinisite),
     DLTemplate          : muiThemeable()(DLTemplate),
     DropZoneMinisite    : muiThemeable()(DropZoneMinisite),
     FilmStripMinisite   : muiThemeable()(FilmStripMinisite)

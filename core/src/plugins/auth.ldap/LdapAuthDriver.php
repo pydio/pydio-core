@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2011 Pierre Wirtz
+ * Copyright 2007-2017 Pierre Wirtz
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify

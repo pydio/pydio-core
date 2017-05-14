@@ -5,7 +5,7 @@
         <base href="AJXP_PATH_TO_ROOT"/>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-        <link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/build/themes/AJXP_THEME/images/html-folder.png">
+        <link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/common/images/html-folder.png">
         <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/build/pydio.AJXP_THEME.min.css?v=AJXP_CURRENT_VERSION">
         <link rel="stylesheet" href="plugins/action.share/res/minisite.css"/>
         <style type="text/css">

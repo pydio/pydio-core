@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,47 +18,34 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+
+
 import React, {Component} from 'react'
 import { ImageContainer } from './components'
 
 const baseURL = pydio.Parameters.get('ajxpServerAccess');
-const {URLProvider} = PydioHOCs;
-const ThumbnailURLProvider = URLProvider(["thumbnail"]);
 
-class Badge extends Component {
-    onThumbnail() {
-        const {pydio, node} = this.props
-        const repositoryId = node.getMetadata().get("repository_id")
+const Preview = ({node, ...remainingProps}) => {
+    const repositoryId = node.getMetadata().get("repository_id")
 
-        let repoString = "";
-        if (typeof pydio !== "undefined" && repositoryId && repositoryId !== pydio.repositoryId){
-            repoString = "&tmp_repository_id=" + repositoryId;
-        }
-
-        const mtimeString = node.buildRandomSeed();
-
-        return `${baseURL}${repoString}${mtimeString}&action=preview_data_proxy&get_thumb=true&file=${encodeURIComponent(node.getPath())}`
+    let repoString = "";
+    if (typeof pydio !== "undefined" && repositoryId && repositoryId !== pydio.repositoryId){
+        repoString = "&tmp_repository_id=" + repositoryId;
     }
 
-    render() {
-        const {node, scale, ...remainingProps} = this.props
-        return (
-            <ThumbnailURLProvider urlType="thumbnail" onThumbnail={() => this.onThumbnail()}>
-            {src => src && 
-                <ImageContainer
-                    {...remainingProps}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        backgroundImage:'url(' + src + ')',
-                        backgroundSize : 'cover',
-                        backgroundPosition: 'center center'
-                    }}
-                />
-            }
-            </ThumbnailURLProvider>
-        )
-    }
+    const mtimeString = node.buildRandomSeed();
+
+    return (
+        <ImageContainer
+            {...remainingProps}
+            src={`${baseURL}${repoString}${mtimeString}&action=preview_data_proxy&get_thumb=true&file=${encodeURIComponent(node.getPath())}`}
+            imgStyle={{
+                width: "100%",
+                height: "100%",
+                flex: 1
+            }}
+        />
+    )
 }
 
-export default Badge
+export default Preview

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -16,8 +16,9 @@
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
  * The latest code can be found at <https://pydio.com>.
- * Description : Simple display of SVN logs.
  */
+
+
 Class.create("SVNLogger", {
 initialize:function(form){
 		this.element = form.select('[id="svnlog_box"]')[0];

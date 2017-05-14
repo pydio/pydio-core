@@ -1,3 +1,24 @@
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
+
+
 const React = require('react')
 const Infinite = require('react-infinite')
 import ScrollArea from 'react-scrollbar'
@@ -52,6 +73,7 @@ let SimpleList = React.createClass({
         entryHandleClicks   : React.PropTypes.func,
         hideToolbar         : React.PropTypes.bool,
         computeActionsForNode: React.PropTypes.bool,
+        multipleActions     : React.PropTypes.array,
 
         openEditor          : React.PropTypes.func,
         openCollection      : React.PropTypes.func,
@@ -278,7 +300,6 @@ let SimpleList = React.createClass({
             showSelector        : false,
             elements            : this.props.node.isLoaded()?this.buildElements(0, this.props.infiniteSliceCount):[],
             containerHeight     : this.props.containerHeight ? this.props.containerHeight  : (this.props.heightAutoWithMax ? 0 : 500),
-            filterNodes         : this.props.filterNodes,
             sortingInfo         : this.props.defaultSortingInfo || null
         };
         if(this.props.elementHeight instanceof Object){
@@ -297,7 +318,6 @@ let SimpleList = React.createClass({
             showSelector:false,
             elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
             infiniteLoadBeginBottomOffset:200,
-            filterNodes:nextProps.filterNodes ? nextProps.filterNodes : this.props.filterNodes,
             sortingInfo: this.state.sortingInfo || nextProps.defaultSortingInfo || null
         }, () => {if (nextProps.node.isLoaded()) this.updateInfiniteContainerHeight()});
         if(!nextProps.autoRefresh&& this.refreshInterval){
@@ -444,7 +464,7 @@ let SimpleList = React.createClass({
         }else{
             let selection = new Map();
             this.props.node.getChildren().forEach(function(child){
-                if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
+                if(this.props.filterNodes && !this.props.filterNodes(child)){
                     return;
                 }
                 if(child.isLeaf()){
@@ -802,7 +822,7 @@ let SimpleList = React.createClass({
                     const childCursor = parseInt(child.getMetadata().get('cursor'));
                     this._currentCursor = Math.max((this._currentCursor ? this._currentCursor : 0), childCursor);
                 }
-                if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
+                if(this.props.filterNodes && !this.props.filterNodes(child)){
                     return;
                 }
                 const nodeActions = this.getActionsForNode(this.dm, child);
@@ -850,6 +870,9 @@ let SimpleList = React.createClass({
                 sortFunction = (a, b) => {
                     if (a.parent){
                         return -1;
+                    }
+                    if (b.parent){
+                        return 1;
                     }
                     const nodeA = a.node;
                     const nodeB = b.node;
@@ -991,7 +1014,7 @@ let SimpleList = React.createClass({
             );
             rightButtons = <ReactMUI.RaisedButton key={1} label={this.context.getMessage('react.4')} primary={true} onClick={this.props.searchResultData.toggleState} />;
 
-        }else if(this.actionsCache.multiple.size){
+        }else if(this.actionsCache.multiple.size || this.props.multipleActions){
             let bulkLabel = this.context.getMessage('react.2');
             if(this.state.selection && this.state.showSelector){
                 bulkLabel +=" (" + this.state.selection.size + ")";
@@ -1006,7 +1029,8 @@ let SimpleList = React.createClass({
             if(this.state.showSelector) {
                 rightButtons = [];
                 let index = 0;
-                this.actionsCache.multiple.forEach(function(a){
+                const actions = this.props.multipleActions || this.actionsCache.multiple;
+                actions.forEach(function(a){
                     rightButtons.push(<ReactMUI.RaisedButton
                         key={index}
                         label={a.options.text}
@@ -1112,11 +1136,12 @@ let SimpleList = React.createClass({
         }
 
         const elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
+
         return (
             <div className={containerClasses} onContextMenu={this.contextMenuResponder} tabIndex="0" onKeyDown={this.onKeyDown} style={this.props.style}>
                 {toolbar}
                 {inlineEditor}
-                <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">
+                <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":(emptyState?"layout-fill vertical_layout":"layout-fill")} ref="infiniteParent">
                     {!emptyState && !this.props.verticalScroller &&
                     <Infinite
                         elementHeight={this.state.elementHeight ? this.state.elementHeight : this.props.elementHeight}

@@ -1,22 +1,28 @@
-/**
- * Copyright (c) 2013-present, Facebook, Inc. All rights reserved.
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * This file provided by Facebook is for non-commercial testing and evaluation
- * purposes only. Facebook reserves all rights not expressly granted.
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
  */
 
 const {ModalAppBar} = PydioComponents
-const {IconButton} = require('material-ui');
+const {ToolbarGroup, IconButton} = require('material-ui');
 
 // Display components
-const EditorToolbar = ({title, className, style, onMinimise, onClose}) => {
+const EditorToolbar = ({title, className, style, onFullScreen, onMinimise, onClose}) => {
 
     const innerStyle = {color: "#FFFFFF", fill: "#FFFFFF"}
 
@@ -28,8 +34,10 @@ const EditorToolbar = ({title, className, style, onMinimise, onClose}) => {
             titleStyle={innerStyle}
             iconElementLeft={<IconButton iconClassName="mdi mdi-close" iconStyle={innerStyle} disabled={typeof onClose !== "function"} touch={true} onTouchTap={onClose}/>}
             iconElementRight={
-
-                <IconButton iconClassName="mdi mdi-window-minimize" iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}/>
+                <ToolbarGroup>
+                    <IconButton iconClassName="mdi mdi-window-minimize" iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}/>
+                    <IconButton iconClassName="mdi mdi-window-maximize" iconStyle={innerStyle} disabled={typeof onFullScreen !== "function"} touch={true} onTouchTap={onFullScreen}/>
+                </ToolbarGroup>
             }
         />
     )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,26 +18,20 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+
+
 import React, {Component} from 'react'
 
 export class Image extends Component {
-    static get propTypes() {
-        return {
-            width: React.PropTypes.number,
-            height: React.PropTypes.number,
-        }
-    }
-
     render() {
-        const {src, style, width, height, ...remainingProps} = this.props
+        const {src, style, ...remainingProps} = this.props
 
         return (
             <div
                 {...remainingProps}
                 style={{
-                    width,
-                    height,
-                    backgroundImage:'url(' + src + ')',
+                    ...style,
+                    backgroundImage: `url('${src}')`,
                     backgroundSize : "cover",
                     backgroundPosition: 'center center',
                     backgroundRepeat: 'no-repeat',
@@ -52,7 +46,10 @@ export class ImageContainer extends Component {
     static get propTypes() {
         return {
             src: React.PropTypes.string.isRequired,
-            imgClassName: React.PropTypes.string
+            imgClassName: React.PropTypes.string,
+            imgStyle: React.PropTypes.object,
+            width: React.PropTypes.number,
+            height: React.PropTypes.number
         }
     }
 
@@ -68,20 +65,24 @@ export class ImageContainer extends Component {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            overflow: 'auto'
+            overflow: 'auto',
+            backgroundColor: "#424242"
         }
     }
 
     render() {
-        const {src, style, width, height, imgClassName, scale} = this.props
+        const {src, style, width, height, imgStyle, imgClassName, scale = 1} = this.props
 
         return (
             <div style={{...ImageContainer.styles, ...style}}>
                 <Image
                     src={src}
                     className={imgClassName}
-                    width={scale && width * scale || width}
-                    height={scale && height * scale || height}
+                    style={{
+                        width: width && width * scale || "100%",
+                        height: height && height * scale || "100%",
+                        ...imgStyle,
+                    }}
                 />
             </div>
         )

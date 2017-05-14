@@ -548,7 +548,8 @@ div.dialogBox div#element_overlay {
       flex: 1;
 }
 .react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-icon div.mimefont-container .mimefont {
-  margin-bottom: 10%;
+  margin: auto;
+  padding-bottom: 10%;
 }
 .react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-text {
   position: absolute;
@@ -601,15 +602,16 @@ div.dialogBox div#element_overlay {
   line-height: 12px;
 }
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry div.mimefont-container .mimefont {
-  margin-bottom: 0;
+  margin: auto;
   font-size: 30px !important;
 }
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry:hover .material-list-text {
   display: block;
 }
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-320 .material-list-entry div.mimefont-container .mimefont {
+  margin: auto;
   font-size: 60px !important;
-  margin-bottom: 10%;
+  padding-bottom: 10%;
 }
 .react-mui-context .material-list.files-list.material-list-grid.horizontal-ribbon > div.layout-fill > div {
   overflow-y: hidden !important;
@@ -1913,13 +1915,10 @@ div.menu.desktop a span.ajxp_icon_span {
   display: -ms-flexbox;
   display: flex;
   text-align: center;
-  -ms-flex-align: center;
-      align-items: center;
   font-size: 60px;
 }
 #info_panel .panelCard .panelContent div.mimefont-container div.mimefont {
-  -ms-flex: 1;
-      flex: 1;
+  margin: auto;
 }
 #info_panel .panelCard .panelContent div.covering-bg-preview {
   border-radius: 2px 2px 0 0 ;

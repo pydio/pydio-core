@@ -1,6 +1,5 @@
-<?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,9 +17,20 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-$mess=array(
-"User Dashboard"=> "Panel de Usuario",
-"User home dashboard, can be displayed before accessing to workspaces" => "Panel de Usuario, se puede mostrar antes de acceder a los workspaces",
-"Disable Address Book" => "Desactivar Agenda",
-"Do not display address book in user account panel." => "No mostrar agenda en el panel de usuario.",
-);
+
+import Pydio from 'pydio'
+const { EditorActions } = Pydio.requireLib('hoc')
+
+// Actions definitions
+export const onSave = ({pydio, content, dispatch, padID, node, id}) => {
+
+    return pydio.ApiClient.request({
+        get_action:'etherpad_save',
+        file: node.getPath(),
+        pad_id: padID
+
+    }, () => {
+        dispatch(EditorActions.tabModify({id, title: node.getLabel()}));
+    })
+
+}

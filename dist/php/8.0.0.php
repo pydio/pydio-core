@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -49,4 +49,22 @@ if(!function_exists('updatePluginConfig')){
 
 }
 
+if(!function_exists('disconnectNow')){
+
+    function disconnectNow(){
+        \Pydio\Core\Services\AuthService::disconnect();
+    }
+
+}
+
+if(!function_exists('clearAllCaches')){
+
+    function clearAllCaches(){
+        \Pydio\Core\Services\ConfService::clearAllCaches();
+    }
+
+}
+
+forceRenameConfFile('bootstrap_repositories');
 updatePluginConfig('gui.ajax', 'GUI_THEME', 'material');
+clearAllCaches();

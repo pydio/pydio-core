@@ -1,3 +1,23 @@
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
+
 (function(global){
 
     var Uploader = React.createClass({
@@ -119,13 +139,15 @@
                         <MaterialUI.Divider />
                     </MaterialUI.Paper>
 
-                    <MaterialUI.Toolbar style={{backgroundColor: '#fff'}}>
-                        <div style={{display:'flex', justifyContent: 'space-between', padding: '0px 24px', width: '100%', height: '100%'}}>
-                            <div style={{display:'flex', alignItems: 'center', marginLeft: '-48px'}}>
-                                <MaterialUI.RaisedButton primary={true} label="OK" onClick={this._handleSubmit}/>
+                    {urls.length > 0 &&
+                        <MaterialUI.Toolbar style={{backgroundColor: '#fff'}}>
+                            <div style={{display:'flex', justifyContent: 'space-between', padding: '0px 24px', width: '100%', height: '100%'}}>
+                                <div style={{display:'flex', alignItems: 'center', marginLeft: '-48px'}}>
+                                    <MaterialUI.RaisedButton primary={true} label="Start" onClick={this._handleSubmit}/>
+                                </div>
                             </div>
-                        </div>
-                    </MaterialUI.Toolbar>
+                        </MaterialUI.Toolbar>
+                    }
                 </div>
             );
         }
