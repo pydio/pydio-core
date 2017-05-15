@@ -3,18 +3,12 @@
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
 			<i18n namespace="user_home" path="plugins/access.ajxp_home/res/i18n" />
-            <js className="WelcomeComponents" file="plugins/access.ajxp_home/res/build/WelcomeComponents.js" depends="React,ReactPydio,LeftNavigation"/>
+            <js className="WelcomeComponents" file="plugins/access.ajxp_home/res/build/WelcomeComponents.js" depends="React,PydioComponents,PydioWorkspaces,PydioForm"/>
             <css file="plugins/access.ajxp_home/res/home.css" autoload="true"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
-        <global_param name="SIMPLE_CLICK_WS_OPEN" type="boolean" label="CONF_MESSAGE[Open workspace by simple click]"
-                      description="CONF_MESSAGE[Open workspace by simple click instead of double click.]" default="true" expose="true"/>
-        <global_param name="ENABLE_GETTING_STARTED" type="boolean"
-                      label="CONF_MESSAGE[Enable Getting Started]" description="CONF_MESSAGE[Enable addition tabulation to access getting started videos]" default="true" expose="true"/>
-        <global_param name="ENABLE_GLOBAL_SEARCH" type="boolean"
-                      label="CONF_MESSAGE[Enable Global Search]" description="CONF_MESSAGE[Enable cross-workspaces search form on home page]" default="true" expose="true"/>
         <global_param name="URL_APP_IOSAPPSTORE" type="string" expose="true"
                       label="CONF_MESSAGE[iOS App URL]" description="CONF_MESSAGE[URL of the iOS application]" default="https://itunes.apple.com/us/app/pydiopro/id1109419882?mt=8"/>
         <global_param name="URL_APP_ANDROID" type="string" expose="true"
@@ -23,30 +17,10 @@
                       label="CONF_MESSAGE[Windows PydioSync URL]" description="CONF_MESSAGE[URL of the windows sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
         <global_param name="URL_APP_SYNC_MAC" type="string" expose="true"
                       label="CONF_MESSAGE[Mac PydioSync URL]" description="CONF_MESSAGE[URL of the mac sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
-        <global_param name="DISPLAY_SERVER_QRCODE_ACTION" type="boolean" label="CONF_MESSAGE[Display Server QRCode]"
-                      description="CONF_MESSAGE[Let users connect easily to the latest mobile applications by displaying a QRCode]" default="false"/>
     </server_settings>
 	<registry_contributions>
-        <actions>
-            <action name="display-server-qrcode">
-                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.74">
-                    <context actionBarGroup="utils" actionBar="true" dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
-                        var dialog = new AjxpReactDialogLoader('WelcomeComponents', 'QRCodeDialogLoader', {});
-                        dialog.openDialog('qrcode_dialog_form', true);
-                    ]]></clientCallback>
-                    <clientForm id="qrcode_dialog_form"><![CDATA[
-                        <div id="qrcode_dialog_form" box_width="296" box_padding="0" class="react-mui-context SF_material"></div>
-                    ]]></clientForm>
-                </processing>
-            </action>
-        </actions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
-                <div id="home_account_pane" style="opacity:0;" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
-			]]></template_part>
+            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="HomeDashboard" dependencies="PydioComponents,PydioTasks" props='{"rootId":"home_account_pane","style": {}}'/>
         </client_configs>
 	</registry_contributions>
     <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>

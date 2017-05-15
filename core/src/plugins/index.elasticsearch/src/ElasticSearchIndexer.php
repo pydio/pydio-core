@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -88,6 +88,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
      */
     public function initMeta(ContextInterface $ctx, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
     {
+        $messages = LocaleService::getMessages();
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             /** @var \DOMElement $el */
@@ -95,7 +96,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
                 $data = ["indexed_meta_fields" => $metaFields,
-                    "additionnal_meta_columns" => ["ajxp_document_content" => "Content"]
+                    "additionnal_meta_columns" => ["ajxp_document_content" => $messages["index.lucene.13"]]
                 ];
                 $el->setAttribute("indexed_meta_fields", json_encode($data));
             } else {

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -61,4 +61,15 @@ $mess = array(
     "24" => "Parameter",
     "25" => "Aufgabe beenden",
     "26" => "Laufende Aufgabe beenden",
+    "27" => "Eingeplant",
+    "28" => "Aufgabe erfolgreich bearbeitet/hinzugefügt",
+    "29" => "Diese Aufgabe läuft gerade. Bitte warten Sie bis sie beendet ist.",
+    "30" => "Die Aufgabe wurde erfolgreich gelöscht",
+    "31" => "Starte...",
+    "32" => "Starte ",
+    "33" => "Nichts auszuführen",
+    "34" => "Die Aufgabe wird sofort gestartet",
+    "35" => "LAUFENDE AUFGABE",
+    "36" => "FEHLER",
+    "37" => "Gestartet am ",
 );

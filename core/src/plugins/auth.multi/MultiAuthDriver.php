@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -103,7 +103,9 @@ class MultiAuthDriver extends AbstractAuthDriver
         $contribs = parent::getRegistryContributions($ctx, $extendedVersion);
         if(count($this->drivers)){
             foreach($this->drivers as $dPlugin){
-                $contribs = array_merge($contribs, $dPlugin->getRegistryContributions($ctx));
+                if(method_exists($dPlugin, 'getChildRegistryContributions')){
+                    $contribs = array_merge($contribs, $dPlugin->getChildRegistryContributions($ctx));
+                }
             }
         }
         return $contribs; // parent::getRegistryContributions($ctx, $extendedVersion);

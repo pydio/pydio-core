@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -21,11 +21,10 @@
 $mess=array(
 "timestamp" => "Universign",
 "Allow timestamp files with Universign." => "Dokumente mit Universign digital signieren und mit einem Zeitstempel versehen.",
-"msgBox1" => "Soll diese Datei wirklich mit Universign signiert werden?",
 "URL" => "URL zum Universign API Webservice",
 "Timestamp provider API URL" => "Universign-API URL",
 "User Mail" => "E-Mail-Adresse",
-"Password" => "Passwort wählen",
+"Password" => "Passwort",
 "User account" => "Die bei Universign registrierte E-Mail-Adresse",
 "User Password" => "Das Passwort zum Universign-Benutzer",
 );

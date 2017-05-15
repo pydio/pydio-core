@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -28,5 +28,5 @@ $mess = array(
     "6" => "Invalide toutes les clés existantes et requiert leur régéneration par les clients.",
     "7" => "Etes-vous sûr de vouloir révoquer cette clé?",
     "8" => "Clé supprimée avec succès!",
-    "9" => "Appareils connectés à votre compte:"
+    "9" => "Appareils connectés à votre compte"
 );

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -167,6 +167,9 @@ class TreeManager extends AbstractManager
             $hash = null;
             if (strstr(urldecode($dir), "#") !== false) {
                 list($dir, $hash) = explode("#", urldecode($dir));
+            }
+            if(isSet($httpVars['page'])){
+                $hash = intval($httpVars['page']);
             }
             $splits = explode("/", $dir);
             $root = array_shift($splits);

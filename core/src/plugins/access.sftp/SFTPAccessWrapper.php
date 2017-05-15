@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -127,7 +127,8 @@ class SFTPAccessWrapper extends FsAccessWrapper
             $path = substr($path, 1);
         }
         // SHOULD RETURN ssh2.sftp://Resource #23/server/path/folder/path
-        return  "ssh2.sftp://".self::getSftpResource($ctx).$basePath."/".$path;
+        // BUT SINCE PHP 5.6 there's a php issue, wrap resource in intval()
+        return  "ssh2.sftp://".intval(self::getSftpResource($ctx)).$basePath."/".$path;
     }
 
     /**
@@ -301,9 +302,10 @@ class SFTPAccessWrapper extends FsAccessWrapper
     }
 
     /**
+     * @param $url
      * @return bool
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         return true;
     }

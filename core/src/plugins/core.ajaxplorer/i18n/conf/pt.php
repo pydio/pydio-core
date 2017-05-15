@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -26,10 +26,10 @@ $mess=array(
 "Default Language" => "Língua Pré-Definida",
 "Default language when a user does not have set his/her own." => "Língua a ser utilizada por pré-Definição quando um utilizador ainda não tenha escolhido uma a seu gosto.",
 "Sharing" => "Partilhas",
-"Download Folder" => "Pasta de Transferências",
-"Absolute path to the public folder where temporary download URLs will be created. Setting this empty will disable the sharing feature." => "Caminho completo para a pasta pública de transferências, onde todos os URLs serão gerados. Deixar este campo vazio irá desactivar as funções de partilha.",
+"Download Folder (Legacy)" => "Download Folder (Legacy)",
+"Absolute path to the public folder where temporary download links will be created. This is used for legacy purpose, newly created links do not use it anymore, but use the Base URI instead." => "Absolute path to the public folder where temporary download links will be created. This is used for legacy purpose, newly created links do not use it anymore, but use the Base URI instead.",
 "Download URL" => "URL de Transferência",
-"If not inferred directly from the current ajaxplorer URI plus the public download folder name, replace the public access URL here." => "Caso não seja especificado neste campo, o URL de transferência a ser utilizado será o endereço pelo qual o Pydio se encontra a ser acedido de momento mais o caminho interno de transferência do Pydio.",
+"If not inferred directly from the current pydio URL plus the public base URI, replace the public access URL here." => "If not inferred directly from the current pydio URL plus the public base URI, replace the public access URL here.",
 "Existing users" => "Utilizadores Existentes",
 "Allow the users to pick an existing user when sharing a folder" => "Permite aos utilizadores escolherem um outro utilizador ao partilhar uma pasta",
 "Compression Features" => "Opções de Compressão",
@@ -181,5 +181,12 @@ $mess=array(
 "Redirect URL" => "Redirect URL",
 "API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app",
 "API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API endpoint - Used to refresh or validate the token retrieved in the authentication part",
-"API setting - Redirect URL for the OAuth Application" => "API setting - Redirect URL for the OAuth Application"
+"API setting - Redirect URL for the OAuth Application" => "API setting - Redirect URL for the OAuth Application",
+"Public Base URI" => "Public Base URI",
+"URI where to serve the public links" => "URI where to serve the public links",
+"Enable for all users" => "Enable for all users",
+"Enable WebDAV for all users by default. If set to false, users will have to manually enable WebDAV via their preferences panel." => "Enable WebDAV for all users by default. If set to false, users will have to manually enable WebDAV via their preferences panel.",
+"Download Delegation" => "Download Delegation",
+"Delegates download operations to an alternative agent, either webserver or pydio agent. Warning, this requires external modules to be installed. When using XSendFile/XaccelRedirect, you have to manually add the folders where files will be downloaded in the module configuration" => "Delegates download operations to an alternative agent, either webserver or pydio agent. Warning, this requires external modules to be installed. When using XSendFile/XaccelRedirect, you have to manually add the folders where files will be downloaded in the module configuration",
+"Core Connexion" => "Core Connexion",
 );

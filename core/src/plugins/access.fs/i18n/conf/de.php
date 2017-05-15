@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -22,9 +22,9 @@ $mess=array(
 "File System (Standard)" => "Dateisystem (Standard)",
 "The most standard access to a filesystem located on the server." => "Zugriff auf das Dateisystem des Servers",
 "Path" => "Pfad",
-"Real path to the root folder on the server" => "Absoluter Pfad zum Haupt-Verzeichnis auf dem Server",
-"Create" => "Erstellen",
-"Create folder if it does not exists" => "Erstelle Verzeichnis wenn dieses nicht existiert",
+"Absolute path to the folder on the server. You can use AJXP_DATA_PATH and AJXP_INSTALL_PATH to point to Pydio default data path and root install path." => "Absoluter Pfad zu einem Ordner auf dem Server. Verwenden Sie AJXP_DATA_PATH als Platzhalter für den Pydio-Daten-Ordner oder AJXP_INSTALL_PATH für den Installations-Ordner",
+"Create" => "Ordner erstellen",
+"Create folder if it does not exists" => "Nicht vorhandene Ordner erstellen",
 "File Creation Mask" => "Maske für Dateirechte",
 "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optional kann eine chmod-Operation ausgeführt werden. Der Wert muss numerisch sein, z.B. 0777 oder 0644.",
 "Purge Days" => "Tage bis zum Löschen",
@@ -32,7 +32,7 @@ $mess=array(
 "Real Size Probing" => "Reale Größe ermitteln",
 "Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)" => "Verwendet die Systemfunktion zum Ermitteln der Dateigröße statt der integrierten PHP-Funktion (beseitigt das 2GB Limit). ",
 "X-SendFile Active" => "X-SendFile Aktiv",
-"Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)" => "Alle Downloadoperationen zum Webserver verwenden den X-SendFile-Header. Achtung dies ist ein externes Modul zum Installieren für Apache. Das Modul ist bei Lighttpd standardmäßig aktiv. Achtung, in der Modul-Konfiguration müssen die Download-Verzeichnisse von Hand angegeben werden (XSendFilePath directive)",
+"Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)" => "Alle Downloadoperationen zum Webserver verwenden den X-SendFile-Header. Achtung dies ist ein externes Modul zum Installieren für Apache. Das Modul ist bei Lighttpd standardmäßig aktiv. Achtung, in der Modul-Konfiguration müssen die Download-Ordner von Hand angegeben werden (XSendFilePath directive)",
 "Data template" => "Daten-Vorlage",
 "Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded." => "Die Dateien aus dem konfigurierten Ordner werden beim ersten Laden in die Arbeitsumgebung kopiert.",
 "Purge Days (Hard limit)" => "Tage bis Bereinigung (Hard limit)",

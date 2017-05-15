@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -151,9 +151,12 @@ class SessionRepositoryMiddleware
                 if(empty($userRepositories)){
                     throw new NoActiveWorkspaceException();
                 }
+                $pendingId = SessionService::checkPendingRepository($user);
                 $default = $user->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
                 $lastVisited = $user->getArrayPref("history", "last_repository");
-                if($default !== -1 && array_key_exists($default, $userRepositories)){
+                if(!$pendingId !== null && array_key_exists($pendingId, $userRepositories)){
+                    $repoObject = $userRepositories[$pendingId];
+                }else if($default !== -1 && array_key_exists($default, $userRepositories)){
                     $repoObject = $userRepositories[$default];
                 }else if($lastVisited !== "" && array_key_exists($lastVisited, $userRepositories)){
                     $repoObject = $userRepositories[$lastVisited];

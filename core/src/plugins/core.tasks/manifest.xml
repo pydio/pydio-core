@@ -4,7 +4,7 @@
     <class_definition classname="Pydio\Tasks\TaskController" filename="plugins/core.tasks/src/TaskController.php"/>
     <client_settings>
         <resources>
-            <js className="PydioTasks" file="plugins/core.tasks/js/build/PydioTasks.js" depends="React,ReactPydio"/>
+            <js className="PydioTasks" file="plugins/core.tasks/js/build/PydioTasks.js" depends="React,PydioComponents"/>
         </resources>
     </client_settings>
     <registry_contributions>
@@ -51,9 +51,7 @@
         </hooks>
         -->
         <client_configs>
-            <template name="pydio-tasks-panel" element="ajxp_desktop" position="bottom"><![CDATA[
-                <div id="tasks_panel" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"PydioTasks","componentName":"Panel"}'></div>
-            ]]></template>
+            <template name="pydio-tasks-panel" element="ajxp_desktop" position="bottom" namespace="PydioTasks" component="Panel" props='{}' style="position:fixed;right:0;bottom:0;"/>
         </client_configs>
     </registry_contributions>
 </ajxp_plugin>

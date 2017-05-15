@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -180,7 +180,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         }
         if($GROUP_PATH == null) $GROUP_PATH = false;
         if(strpos($channelName, "nodes:") === 0 && $channelName !== "nodes:*"){
-            $repositoryId = substr($channelName, strlen("nodes:*"));
+            $repositoryId = substr($channelName, strlen("nodes:"));
             // Make sure current user has Read access on this workspace
             if(!empty($user) && !$user->canRead($repositoryId)){
                 $this->suscribeToChannel($ctx, "nodes:*", $clientId);

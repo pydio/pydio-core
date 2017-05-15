@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -41,4 +41,5 @@ $mess = [
     "19" => "Interrompre et me demander",
     "20" => "Renommer automatiquement",
     "21" => "Remplacer le fichier existant",
+    "22" => "Options",
 ];

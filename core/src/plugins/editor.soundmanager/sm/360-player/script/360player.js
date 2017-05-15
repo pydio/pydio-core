@@ -21,7 +21,7 @@
 var threeSixtyPlayer, // instance
     ThreeSixtyPlayer; // constructor
 
-(function(window) {
+(function(window, _undefined) {
 
 function ThreeSixtyPlayer() {
 
@@ -341,7 +341,7 @@ function ThreeSixtyPlayer() {
         }
       pl.removeClass(this._360data.oUIBox,this._360data.className);
       this._360data.className = pl.css.sPlaying;
-      pl.addClass(this._360data.oUIBox,this._360data.className);      
+      pl.addClass(this._360data.oUIBox,this._360data.className);
     },
 
     finish: function() {
@@ -781,7 +781,7 @@ function ThreeSixtyPlayer() {
   this.getArcEndpointCoords = function(radius, radians) {
 
     return {
-      x: radius * Math.cos(radians), 
+      x: radius * Math.cos(radians),
       y: radius * Math.sin(radians)
     };
 
@@ -1087,7 +1087,7 @@ function ThreeSixtyPlayer() {
           oUI.appendChild(o2);
           window.G_vmlCanvasManager.initElement(o2); // Apply ExCanvas compatibility magic
           oCanvas = document.getElementById(oID);
-        } else { 
+        } else {
           // add a handler for the button
           oCanvas = oLinks[i].parentNode.getElementsByTagName('canvas')[0];
         }
@@ -1218,7 +1218,7 @@ ThreeSixtyPlayer.prototype.VUMeter = function(oParent) {
         // for debugging VU images
         /*
         var o = document.createElement('img');
-        o.style.marginRight = '5px'; 
+        o.style.marginRight = '5px';
         o.src = vuMeterData[i][j];
         document.documentElement.appendChild(o);
         */
@@ -1396,11 +1396,64 @@ if (soundManager.debugMode) {
   },1000);
 }
 
-window.ThreeSixtyPlayer = ThreeSixtyPlayer; // constructor
+// SM2_DEFER details: http://www.schillmania.com/projects/soundmanager2/doc/getstarted/#lazy-loading
+
+if (window.SM2_DEFER === _undefined || !SM2_DEFER) {
+  threeSixtyPlayer = new ThreeSixtyPlayer();
+}
+
+/**
+ * SoundManager public interfaces
+ * ------------------------------
+ */
+
+if (typeof module === 'object' && module && typeof module.exports === 'object') {
+
+  /**
+   * commonJS module
+   */
+
+  module.exports.ThreeSixtyPlayer = ThreeSixtyPlayer;
+  module.exports.threeSixtyPlayer = threeSixtyPlayer;
+
+} else if (typeof define === 'function' && define.amd) {
+
+  define(function() {
+    /**
+     * Retrieve the global instance of SoundManager.
+     * If a global instance does not exist it can be created using a callback.
+     *
+     * @param {Function} smBuilder Optional: Callback used to create a new SoundManager instance
+     * @return {SoundManager} The global SoundManager instance
+     */
+    function getInstance(smBuilder) {
+      if (!window.threeSixtyPlayer && smBuilder instanceof Function) {
+        var instance = smBuilder(ThreeSixtyPlayer);
+        if (instance instanceof ThreeSixtyPlayer) {
+          window.threeSixtyPlayer = instance;
+        }
+      }
+      return window.threeSixtyPlayer;
+    }
+    return {
+      constructor: ThreeSixtyPlayer,
+      getInstance: getInstance
+    }
+  });
+
+}
+
+// standard browser case
+
+// constructor
+window.ThreeSixtyPlayer = ThreeSixtyPlayer;
+
+/**
+ * note: SM2 requires a window global due to Flash, which makes calls to window.soundManager.
+ * Flash may not always be needed, but this is not known until async init and SM2 may even "reboot" into Flash mode.
+ */
+
+// public API, flash callbacks etc.
+window.threeSixtyPlayer = threeSixtyPlayer;
 
 }(window));
-
-threeSixtyPlayer = new ThreeSixtyPlayer();
-
-// hook into SM2 init
-//soundManager.onready(threeSixtyPlayer.init);

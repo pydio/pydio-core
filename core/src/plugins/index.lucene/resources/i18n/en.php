@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -32,4 +32,5 @@ $mess = array(
     "10" => "Indexing subfolders in background",
     "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
     "12" => "Workspace is not indexed, try launching indexation manually!",
+    "13" => "Content",
 );

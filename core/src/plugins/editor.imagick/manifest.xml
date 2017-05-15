@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.imagick" enabled="false" openable="true" order="11" iconClass="icon-picture" previewProvider="true"
-        formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer"
+<editor id="editor.imagick" enabled="false" openable="true" order="9" iconClass="mdi mdi-camera-burst" previewProvider="true"
+        text="328" title="329" className="PydioImagick"
         mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf,cr2,ai" label="CONF_MESSAGE[Image Magick]"
         description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/editor.imagick/IMagickPreviewer.php" classname="Pydio\Editor\Image\IMagickPreviewer"/>
     <client_settings>
         <resources>
-            <js file="plugins/editor.imagick/class.IMagickPreviewer.js" className="IMagickPreviewer"/>
-            <i18n namespace="imagick_editor" path="plugins/editor.imagick/i18n"/>
+            <js file="plugins/editor.imagick/res/build/PydioImagick.js" className="PydioImagick" depends="PydioDiaporama"/>
+            <i18n namespace="imagick_editor" path="plugins/editor.imagick/res/i18n"/>
         </resources>
     </client_settings>
 	<server_settings>
-		<global_param name="IMAGE_MAGICK_CONVERT" type="string" label="CONF_MESSAGE[Convert Path]" description="CONF_MESSAGE[Full path on the server to the 'convert' binary]" default="/usr/bin/convert" mandatory="true"/>
+		<global_param name="IMAGE_MAGICK_CONVERT" type="string" label="CONF_MESSAGE[Convert Path]" description="CONF_MESSAGE[Full path on the server to the 'convert' binary]" default="/opt/local/bin/convert" mandatory="true"/>
 		<global_param name="IM_THUMB_QUALITY" type="string" label="CONF_MESSAGE[Thumbs Options]" description="CONF_MESSAGE[Imagick Options used for generating the thumbnails]" default="-quality 65 -density 150 -resize 250 -flatten"/>
 		<global_param name="IM_VIEWER_QUALITY" type="string" label="CONF_MESSAGE[Images Options]" description="CONF_MESSAGE[Imagick Options used for generation the high scale images]" default="-quality 90 -density 250"/>
         <global_param name="IM_CUSTOM_OPTIONS" type="string" label="CONF_MESSAGE[Shared Options]" description="CONF_MESSAGE[You can add any Image Magick options you want here, applied to both thumbs and big images]" default=""/>

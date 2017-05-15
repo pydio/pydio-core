@@ -1,6 +1,6 @@
 <?php
     /*
-    * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+    * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
     * This file is part of Pydio.
     *
     * Pydio is free software: you can redistribute it and/or modify
@@ -22,8 +22,8 @@
 $mess=array(
     "workspace.normal" => "Repositorio AJXP_REPOSITORY_LABEL",
     "workspace.shared.folder" => "Carpeta compartida AJXP_REPOSITORY_LABEL",
-    "workspace.shared.file" => "Fichero compartido AJXP_REPOSITORY_LABEL",
-    "minisite.file" => "Fichero público AJXP_REPOSITORY_LABEL",
+    "workspace.shared.file" => "Archivo compartido AJXP_REPOSITORY_LABEL",
+    "minisite.file" => "Archivo público AJXP_REPOSITORY_LABEL",
     "minisite.folder" => "Carpeta pública AJXP_REPOSITORY_LABEL",
     "public_user" => "Usuario público (conexión desde '%s')",
 );

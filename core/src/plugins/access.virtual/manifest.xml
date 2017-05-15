@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="virtual" enabled="true" label="CONF_MESSAGE[Virtual Workspace]" description="CONF_MESSAGE[Gather various routes into one workspace]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="7.1"/>
+    </plugin_info>
+    <client_settings icon="plugins/access.virtual/icon.png" description_template="{SERV}{PATH}" iconClass="icon-sitemap">
+        <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
+    </client_settings>
+
+	<class_definition filename="plugins/access.virtual/VirtualAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Virtual\VirtualAccessDriver"/>
+	<registry_contributions>
+        <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+	<dependencies>
+		<pluginClass pluginName="access.fs"/>
+	</dependencies>
+    <class_stream_wrapper filename="plugins/access.virtual/VirtualAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Virtual\VirtualAccessWrapper" protocol="ajxp.virtual"/>
+</ajxpdriver>

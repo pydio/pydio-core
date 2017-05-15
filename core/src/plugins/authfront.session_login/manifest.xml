@@ -17,7 +17,7 @@
     <registry_contributions>
         <actions>
             <action name="login">
-                <gui text="163" title="168" src="encrypted.png" iconClass="icon-signin"
+                <gui text="163" title="168" iconClass="icon-signin"
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
                              actionBar="true" contextMenu="false" infoPanel="false"
@@ -26,180 +26,29 @@
                 </gui>
                 <rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
+                    <clientCallback><![CDATA[
 					var loginRedirect = AJXP_LOGIN_REDIRECT;
 					if(loginRedirect){
 						document.location.href=loginRedirect;
 					}else{
-					    modal.setCloseValidation(function(){
-					        return (!!ajaxplorer && !!ajaxplorer.user && ajaxplorer.user.id == "guest")
+					    ResourcesManager.loadClassesAndApply(["AuthfrontCoreActions"], function(){
+					        AuthfrontCoreActions.Callbacks.loginPassword();
 					    });
-					    if(ajaxplorer.user && ajaxplorer.user.id == 'guest') $$('html')[0].addClassName('ajxp_guest_enabled');
-						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
-						function(oForm){
-						    $("generic_dialog_box").setStyle({
-						        top:$("progressBox").getStyle('top'),
-						        left:$("progressBox").getStyle('left')
-						    });
-                            var authConfs = ajaxplorer.getPluginConfigs("auth");
-                            if(!authConfs) authConfs = $H();
-						    if(!Modernizr.input.placeholder) oForm.addClassName('no_placeholder');
-						    if(window.ajxpBootstrap.parameters.get('PRESET_LOGIN')){
-						        oForm.addClassName('ajxp_preset_login');
-						        oForm.down('input[name="userid"]').setValue(window.ajxpBootstrap.parameters.get('PRESET_LOGIN'));
-						    }
-						    if(window.ajxpBootstrap.parameters.get('PRESET_PASSWORD')){
-						        oForm.addClassName('ajxp_preset_password');
-						        oForm.down('input[name="password"]').setValue(window.ajxpBootstrap.parameters.get('PRESET_PASSWORD'));
-						    }
-						    if(window.ajxpBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
-						        oForm.addClassName('ajxp_password_auth');
-						        authConfs.set('SECURE_LOGIN_FORM', true);
-						        authConfs.set('ENABLE_FORGOT_PASSWORD', false);
-						        oForm.down('.dialogLegend').update(pydio.MessageHash[552]);
-                            }else{
-                                oForm.down('.dialogLegend').update(pydio.MessageHash[180]);
-                            }
-						    $("generic_dialog_box").down(".titleString").hide();
-						    $("generic_dialog_box").down("#modalCloseBtn").hide();
-						    $("generic_dialog_box").down(".dialogTitle").setAttribute("style", $("progressBox").down(".dialogTitle").getAttribute("style"));
-						    if(!$("generic_dialog_box").down("#progressCustomMessage")){
-                                if($("progressBox").down("#progressCustomMessage")) $("generic_dialog_box").down(".dialogContent").insert({top:$("progressBox").down("#progressCustomMessage").cloneNode(true)});
-						    }
-						    oForm.setStyle({display:'block'});
-						    oForm.up(".dialogContent").setStyle({backgroundImage:'none', borderWidth:0});
-
-							ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-							if(Prototype.Browser.IE && !Modernizr.borderradius && !oForm.down('input[type="text"]').key_enter_attached){
-								oForm.select('input').invoke("observe", "keydown", function(event){
-									if(event.keyCode == Event.KEY_RETURN){
-										var el = Event.findElement(event);
-										if(el.hasClassName('dialogButton')){
-											el.click();
-										}else{
-											el.form.down('input.dialogButton').click();
-										}
-									}
-								});
-								oForm.down('input[type="text"]').key_enter_attached = true;
-							}
-
-                            if(authConfs && authConfs.get("SECURE_LOGIN_FORM")){
-                                try{
-                                    oForm.down('input[name="remember_me"]').up("div.SF_element").remove();
-                                    oForm.down('input[name="userid"]').setAttribute("autocomplete", "off");
-                                    oForm.down('input[name="password"]').setAttribute("autocomplete", "off");
-                                    oForm.setAttribute("autocomplete", "off");
-                                }catch(e){}
-                            }
-                            if(authConfs && authConfs.get("ENABLE_FORGOT_PASSWORD") && !oForm.down('a.forgot-password-link')){
-                                try{
-                                    var after = oForm.down('input[name="remember_me"]') ? oForm.down('input[name="remember_me"]').up("div.SF_element") : oForm.down('input[name="password"]').up("div.SF_element");
-                                    after.insert({after:'<div class="SF_element" id="forgot_element"><span class="icon-question-sign"></span><a href="#" class="forgot-password-link" ajxp_message_id="479">AJXP_MESSAGE[479]</a></div>'});
-                                    oForm.down('a.forgot-password-link').observe("click", function(e){
-                                        Event.stop(e);
-                                        pydio.getController().fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
-                                    });
-                                }catch(e){ if(console) console.log(e); }
-                            }
-                            modal.refreshDialogPosition();
-						},
-						function(){
-							var oForm = modal.getForm();
-							var connexion = new Connexion();
-							connexion.addParameter('get_action', 'login');
-							connexion.addParameter('userid', window.ajxpBootstrap.parameters.get('PRESET_LOGIN')?window.ajxpBootstrap.parameters.get('PRESET_LOGIN'):oForm.userid.value);
-							connexion.addParameter('login_seed', oForm.login_seed.value);
-							connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
-							if(oForm.login_seed.value != '-1'){
-								connexion.addParameter('password', HasherUtils.hex_md5(HasherUtils.hex_md5(oForm.password.value)+oForm.login_seed.value));
-							}else{
-								connexion.addParameter('password', oForm.password.value);
-							}
-							if(oForm.captcha_code){
-								connexion.addParameter('captcha_code', oForm.captcha_code.value);
-							}
-							oForm.select('input[data-ajxpLoginAdditionalParameter]').each(function(i){
-							    connexion.addParameter(i.name, i.getValue());
-							});
-                            if(oForm.down(".ajxp_login_error")){
-                                oForm.down(".ajxp_login_error").remove();
-                            }
-							connexion.onComplete = function(transport){
-                                oForm.userid.value = '';
-                                oForm.password.value = '';
-								var success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
-								if(success){
-        						    $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");
-        						    oForm.up('.dialogContent').writeAttribute("style", "");
-    						        $("generic_dialog_box").select("#progressCustomMessage").invoke("remove");
-                                    modal.setCloseValidation(null);
-                                    hideLightBox(true);
-        						}else{
-        						    var errorId = PydioApi.getClient().LAST_ERROR_ID;
-        						    if(errorId == '285' && window.ajxpBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
-        						        errorId = '553';
-        						    }
-                                    if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-                                        ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-                                    }
-                                    if(errorId && oForm.visible() && oForm.down("div.dialogLegend")){
-                                        oForm.down("div.dialogLegend").insert({bottom:'<div class="ajxp_login_error" style="background-color: #D33131;display: block;font-size: 9px;color: white;border-radius: 3px;padding: 2px 6px;">'+MessageHash[errorId]+'</div>'});
-                                        Effect.ErrorShake(oForm.down('.ajxp_login_error'));
-                                    }else{
-                                        alert(MessageHash[errorId]);
-                                    }
-        						}
-
-							};
-							connexion.setMethod('put');
-							connexion.sendAsync();
-							return false;
-						}, function(){}, true);
 					}
 					]]></clientCallback>
-                    <clientForm id="login_form_dynamic"><![CDATA[
-                        <form id="login_form_dynamic" action="login" style="display:none;" box_width="320" box_padding="0" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}'>
-                            <input type="hidden" name="get_action" value="login">
-                            <input type="hidden" name="login_seed" id="login_seed" value="">
-                            <a style="float:right;font-size: 16px;" href="javascript:pydio.getController().fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]" class="icon-flag">&nbsp;</a>
-                            <div class="dialogLegend" style="margin-bottom: 3px;margin-top: 4px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
-                            <div style="width:100%;">
-                                <div class="SF_element">
-                                    <div class="SF_label"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message></div>
-                                    <div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus" placeholder="AJXP_MESSAGE[181]"></div>
-                                </div>
-                                <div class="SF_element">
-                                    <div class="SF_label"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message></div>
-                                    <div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;" placeholder="AJXP_MESSAGE[182]"></div>
-                                </div>
-                                <div class="SF_element" id="remember_element">
-                                    <input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message>
-                                </div>
-                            </div>
-                        </form>
-					]]></clientForm>
                     <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
             <action name="logout" expireDefault="true">
-                <gui text="164" title="169" src="decrypted.png" iconClass="icon-signout"
+                <gui text="164" title="169" iconClass="mdi mdi-logout"
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
-                             contextMenu="false" actionBar="true" actionBarGroup="minisite" ajxpWidgets="UserWidget::logging_string">
+                             contextMenu="false" actionBar="true" actionBarGroup="zlogin,minisite">
                     </context>
                 </gui>
-                <rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
+                <rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
-					clearRememberData();
-					var connexion = new Connexion();
-					connexion.addParameter('get_action', 'logout');
-					connexion.onComplete = function(transport){
-						PydioApi.getClient().parseXmlMessage(transport.responseXML);
-						};
-					connexion.sendAsync();
-					]]></clientCallback>
+                    <clientCallback module="AuthfrontCoreActions.Callbacks.sessionLogout"/>
                     <serverCallback methodName="switchAction"></serverCallback>
                 </processing>
             </action>

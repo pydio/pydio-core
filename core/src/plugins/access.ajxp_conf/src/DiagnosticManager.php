@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -68,7 +68,6 @@ class DiagnosticManager extends AbstractManager
                 foreach ($diagResults as $id => $value) {
                     $nodeKey = $path."/".$id;
                     $meta = [
-                        "icon"      => "susehelpcenter.png",
                         "text"      => $id,
                         "data"      => $value,
                         "ajxp_mime" => "testResult"

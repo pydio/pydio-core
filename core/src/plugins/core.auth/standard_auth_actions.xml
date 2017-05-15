@@ -7,109 +7,12 @@
             </processing>
         </action>
         <action name="pass_change">
-            <gui text="194" title="194" src="yast_security.png" iconClass="icon-key" accessKey="" hasAccessKey="false">
+            <gui text="194" title="194" iconClass="icon-key" accessKey="" hasAccessKey="false">
                 <context selection="false" dir="" recycle="true" actionBarGroup="utils"/>
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback prepareModal="true" dialogOpenForm="pass_change_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
-                    <dialogOnOpen><![CDATA[
-					    if(pydio.user.lock){
-					        modal.getForm().insert({top:new Element("div", {className:"dialogLegend"}).update(MessageHash[444])});
-					    }
-						$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
-						// Update pass_seed
-						var connexion = new Connexion();
-						connexion.addParameter("get_action", "get_seed");
-						connexion.onComplete = function(transport){
-							$('pass_seed').value = transport.responseText;
-						};
-						connexion.sendSync();
-						new Protopass($('user_change_ownpass1'), {
-							barContainer:$('pwd_strength_container'),
-							barPosition:'bottom'
-						});
-					]]></dialogOnOpen>
-                    <dialogOnComplete hideDialog="false"><![CDATA[
-						var userOldPass = null;
-						var userPass = null;
-						var passSeed = null;
-						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
-						{
-							if($('user_change_ownpass1').value.length < parseInt(window.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
-								alert(MessageHash[378]);
-								return false;
-							}
-							if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
-								alert(MessageHash[238]);
-								return false;
-							}
-							if($('user_change_ownpass_old').value == ''){
-								alert(MessageHash[239]);
-								return false;
-							}
-							passSeed = $('pass_seed').value;
-							if(passSeed == '-1'){
-								userPass = $('user_change_ownpass1').value;
-								userOldPass = $('user_change_ownpass_old').value;
-							}else{
-								userPass = HasherUtils.hex_md5($('user_change_ownpass1').value);
-								userOldPass = HasherUtils.hex_md5( HasherUtils.hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
-							}
-							var onComplete = function(transport){
-								var addition = '';
-								var logout = false;
-								if(pydio.user.lock){
-								    addition = '\n ' + MessageHash[445];
-								}
-								if(userPass != null){
-									if(transport.responseText == 'PASS_ERROR'){
-										alert(MessageHash[240]);
-									}else if(transport.responseText == 'SUCCESS'){
-										pydio.displayMessage('SUCCESS', MessageHash[197] + addition);
-										if(addition) logout = true;
-										hideLightBox(true);
-									}
-								}else{
-									pydio.displayMessage('SUCCESS', MessageHash[241] + addition);
-									if(addition) logout = true;
-									hideLightBox(true);
-								}
-								if(logout){
-								    pydio.getController().fireAction("logout");
-								}
-							};
-							var conn = new Connexion();
-							conn.setMethod('POST');
-							conn.addParameter("get_action", "pass_change");
-							conn.addParameter("old_pass", userOldPass);
-							conn.addParameter("new_pass", userPass);
-							conn.addParameter("pass_seed", passSeed);
-							conn.onComplete = onComplete;
-							conn.sendAsync();
-						}
-					]]></dialogOnComplete>
-                    <dialogOnCancel><![CDATA[
-                        if(pydio.user.lock){
-                            throw new Error();
-                        }
-                    ]]></dialogOnCancel>
-                </clientCallback>
-                <clientForm id="pass_change_form"><![CDATA[
-					<div id="pass_change_form" action="pass_change_form" box_width="260">
-						<input type="hidden" name="pass_seed" id="pass_seed" value="">
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="237">AJXP_MESSAGE[237] : </div><input id="user_change_ownpass_old" type="password" class="dialogFocus SF_input"/>
-						</div>
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input id="user_change_ownpass1" value="" type="password" class="SF_input"/>
-						</div>
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input id="user_change_ownpass2" value="" type="password" class="SF_input"/>
-						</div>
-						<div class="SF_element" id="pwd_strength_container"></div>
-					</div>
-				]]></clientForm>
+                <clientCallback module="PydioCoreActions.Callbacks.changePass"/>
                 <serverCallback methodName="switchAction" restParams="/pass_seed/old_pass/new_pass">
                     <input_param name="pass_seed" type="string" description="A unique seed sent by server, generally -1" default="-1"/>
                     <input_param name="old_pass" type="string" description="Current active pass for logged user"/>

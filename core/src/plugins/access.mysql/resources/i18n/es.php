@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Crear Tabla",
-"2" => "Escriba sy consulta SQL aquí",
-"3"	=> "Consultar",
+"2" => "Escriba su búsqueda SQL aquí",
+"3"	=> "Buscar",
 "4"	=> "Limpiar"
 );

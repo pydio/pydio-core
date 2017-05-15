@@ -310,6 +310,11 @@ class AjxpPluginDiscriminate extends Task
                 }else{
                     $this->project->setProperty('css_source_path', '__NOT_FOUND__');
                 }
+                if(isSet($data["pydioDependency"])){
+                    $this->project->setProperty('pydio_dependency', $data["pydioDependency"]);
+                }else{
+                    $this->project->setProperty('pydio_dependency', '__NOT_FOUND__');
+                }
             }
         }
     ]]></adhoc-task>

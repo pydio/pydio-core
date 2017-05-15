@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -64,6 +64,10 @@ class Notification implements ContextProviderInterface
      * @var String
      */
     public $author;
+    /**
+     * @var String
+     */
+    public $authorTemporaryLabel;
     /**
      * @var int
      */
@@ -328,8 +332,11 @@ class Notification implements ContextProviderInterface
      */
     protected function getPublicAuthorLabel(){
         $m = LocaleService::getMessages();
-        $label = str_replace("%s", Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
-        return $label;
+        if(!empty($this->authorTemporaryLabel)){
+            return $this->authorTemporaryLabel . ' (' . Logger::getClientAdress().')';
+        }else{
+            return str_replace("%s", Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
+        }
     }
 
     /**
@@ -409,7 +416,7 @@ class Notification implements ContextProviderInterface
     }
 
     /**
-     * @return Notification
+     * @return Notification[]
      */
     public function getRelatedNotifications()
     {
@@ -423,5 +430,21 @@ class Notification implements ContextProviderInterface
     public function getContext()
     {
         return $this->getNode()->getContext();
+    }
+
+    /**
+     * @return String
+     */
+    public function getAuthorTemporaryLabel()
+    {
+        return $this->authorTemporaryLabel;
+    }
+
+    /**
+     * @param String $authorTemporaryLabel
+     */
+    public function setAuthorTemporaryLabel($authorTemporaryLabel)
+    {
+        $this->authorTemporaryLabel = $authorTemporaryLabel;
     }
 }

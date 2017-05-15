@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -73,29 +73,7 @@ class ExifMetaManager extends AbstractMetaSource
         if (!count($def)) {
             return ;
         }
-        $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup" colspan="2"><span class="user_meta_change" title="AJXP_MESSAGE[meta.exif.1]">AJXP_MESSAGE[meta.exif.2]</span>AJXP_MESSAGE[meta.exif.3]</div>
-                        <div class="infoPanelTable exifPanelTable" cellspacing="0" border="0" cellpadding="0">';
-        $cdataFoot = '</div></div>';
-        $cdataParts = "";
-        $even = false;
-        foreach ($def as $key=>$label) {
-            $trClass = ($even?" class=\"even\"":"");
-            $even = !$even;
-            $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</div></div>';
-        }
-
-        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
-        /** @var \DOMElement $contrib */
-        $contrib = $selection->item(0);
-        $contrib->setAttribute("attributes", implode(",", array_keys($def)));
-        $contrib->setAttribute("modifier", "ExifCellRenderer.prototype.infoPanelModifier");
-        $htmlSel = $this->getXPath()->query('html', $contrib);
-        $html = $htmlSel->item(0);
-        $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
-        $html->appendChild($cdata);
-
-        parent::init($ctx, $this->options);
+        $this->exposeConfigInManifest("meta_definitions", $def);
 
     }
 

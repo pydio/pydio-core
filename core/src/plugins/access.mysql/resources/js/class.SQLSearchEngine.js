@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -16,12 +16,13 @@
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
  * The latest code can be found at <https://pydio.com>.
- * Description : Extension of the SearchEngine class for SQL search.
  */
+
+
 Class.create("SQLSearchEngine", SearchEngine, {
 	
 	initGUI:function(){
-		this.htmlElement.update('<div style="font-style:italic;color:#999;margin-top:5px;">'+MessageHash["sql.2"]+'</div><textarea id="sql_query" style="width:100%; overflow:auto;"></textarea><div class="dialogButtons"><img height="16" width="16" id="search_button" value="Search" style="margin-top:5px;cursor:pointer;" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" title="'+MessageHash["sql.3"]+'"/> <img height="16" width="16" id="clear_button" value="Clear" style="margin-top:5px;cursor:pointer;margin-right:5px;" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" title="'+MessageHash["sql.4"]+'"/></div>');
+		this.htmlElement.update('<div style="font-style:italic;color:#999;margin-top:5px;">'+MessageHash["sql.2"]+'</div><textarea id="sql_query" style="width:100%; overflow:auto;"></textarea><div class="dialogButtons"><img height="16" width="16" id="search_button" value="Search" style="margin-top:5px;cursor:pointer;" src="'+ResourcesManager.resolveImageSource('actions/16/search.png')+'" title="'+MessageHash["sql.3"]+'"/> <img height="16" width="16" id="clear_button" value="Clear" style="margin-top:5px;cursor:pointer;margin-right:5px;" src="'+ResourcesManager.resolveImageSource('actions/16/fileclose.png')+'" title="'+MessageHash["sql.4"]+'"/></div>');
 		this.sqlQuery = $('sql_query');
 		
 		this.sqlQuery.observe("focus", function(e){

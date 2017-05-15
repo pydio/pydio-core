@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu <contact (at) cdujeu.me>
+* Copyright 2007-2017 Charles du Jeu <contact (at) cdujeu.me>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -32,4 +32,6 @@ $mess=array(
 "Instance Params" => "Parameter des Ereignisspeichers",
 "Feed Instance" => "Ereignisspeicher",
 "Choose the plugin" => "Eine Erweiterung auswählen",
+"Display Workspaces Activity" => "Arbeitsumgebungs-Aktivitäten anzeigen",
+"Display workspaces activity to the users in the right-hand information panel" => "Arbeitsumgebungs-Aktivitäten im Info-Bereich auf der rechten Seite anzeigen",
 );

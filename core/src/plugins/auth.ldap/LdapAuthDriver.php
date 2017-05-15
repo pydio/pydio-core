@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2011 Pierre Wirtz
+ * Copyright 2007-2017 Pierre Wirtz
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -218,9 +218,6 @@ class LdapAuthDriver extends AbstractAuthDriver
             if ($this->ldapconn == null) {
                 $this->logError(__FUNCTION__, 'LDAP Server connexion could NOT be established');
             }
-            if ($this->ldapconn !== null && isSet($this->options["LDAP_PROTOCOL"]) && $this->options["LDAP_PROTOCOL"] === 'starttls') {
-                ldap_start_tls($this->ldapconn);
-            }
         }
     }
 
@@ -240,6 +237,11 @@ class LdapAuthDriver extends AbstractAuthDriver
             $this->logDebug(__FUNCTION__, 'ldap_connect(' . $this->ldapUrl . ',' . $this->ldapPort . ') OK');
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
             //ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
+
+            if (isSet($this->options["LDAP_PROTOCOL"]) &&
+                $this->options["LDAP_PROTOCOL"] === 'starttls') {
+                ldap_start_tls($ldapconn);
+            }
 
             if ($this->ldapAdminUsername === null) {
                 //connecting anonymously

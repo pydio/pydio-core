@@ -8,4 +8,6 @@ $mess = [
     "6" => "Votre clé est déjà configurée, veuillez contacter l'administrateur pour la remettre à zéro.",
     "7" => "La vérification a échoué, avez vous correctement configuré l'application?",
     "8" => "Erreur interne, la clé ne devrait pas être vide.",
+    "9" => "L'authentification avec mot de passe à usage unique est active, vous devez ajouter le code à votre mot de passe.",
+    "10"=> "Code à usage unique (6 chiffres)",
 ];

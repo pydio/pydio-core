@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -448,7 +448,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }else{
                 $userfile_name= InputFilter::sanitize(InputFilter::fromPostedFileName($uploadedFile->getClientFileName()), InputFilter::SANITIZE_FILENAME, true);
             }
-            $userfile_name = substr($userfile_name, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
+            $userfile_name = cropFilename($userfile_name, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
             $this->logDebug("User filename ".$userfile_name);
             if(class_exists("Normalizer")){
                 $userfile_name = Normalizer::normalize($userfile_name, Normalizer::FORM_C);
@@ -1151,7 +1151,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 foreach($files as $newDirPath){
                     $parentDir = PathUtils::forwardSlashDirname($newDirPath);
                     $basename = PathUtils::forwardSlashBasename($newDirPath);
-                    $basename = substr($basename, 0, $max_length);
+                    $basename = cropFilename($basename, $max_length);
                     $this->filterUserSelectionToHidden($ctx, [$basename]);
                     $parentNode = $selection->nodeForPath($parentDir);
                     try{
@@ -1203,7 +1203,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $parent = rtrim(InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME), "/");
                     $filename = $parent ."/" . InputFilter::decodeSecureMagic($httpVars["filename"], InputFilter::SANITIZE_FILENAME);
                 }
-                $filename = substr($filename, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
+                $filename = cropFilename($filename, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden($ctx, [$filename]);
                 $node = $selection->nodeForPath($filename);
                 $content = "";
@@ -1233,7 +1233,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $recursive = $httpVars["recursive"];
                 $recur_apply_to = $httpVars["recur_apply_to"];
                 foreach ($nodes as $node) {
-                    $this->chmod($node, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
+                    $this->chmod($node, $chmod_value, ($recursive==="on"), ($recursive==="on"?$recur_apply_to:"both"), $changedFiles);
+                    clearstatcache(true, $node->getUrl());
+                    $node->loadNodeInfo(true);
                 }
                 $logMessage= new UserMessage("Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders");
                 $this->logInfo("Chmod", [
@@ -2084,7 +2086,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         if(!empty($filename_new)){
             $filename_new= InputFilter::sanitize(InputFilter::magicDequote($filename_new), InputFilter::SANITIZE_FILENAME, true);
-            $filename_new = substr($filename_new, 0, ConfService::getContextConf($originalNode->getContext(), "NODENAME_MAX_LENGTH"));
+            $filename_new = cropFilename($filename_new, ConfService::getContextConf($originalNode->getContext(), "NODENAME_MAX_LENGTH"));
         }
 
         if (empty($filename_new) && empty($dest)) {
@@ -2562,3 +2564,13 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
 
 }
+
+function cropFilename($filename, $max_length)
+{
+    if(mb_strlen($filename, "8bit") <= $max_length) return $filename;
+    $utf8_name = SystemTextEncoding::toUTF8($filename);
+    $utf8_name = mb_substr($utf8_name, 0, $max_length, "8bit");
+    $utf8_name = rtrim(iconv("UTF-8", "UTF-8//IGNORE", $utf8_name));
+    return SystemTextEncoding::fromUTF8($utf8_name);
+}
+

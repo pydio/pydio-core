@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -466,7 +466,7 @@ class BootConfLoader extends AbstractConfDriver
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
         $uObj = UsersService::createUser($adminLogin, $adminPass, true);
-        if ($loginIsEmail) {
+        if ($loginIsEmail && strpos($data["ADMIN_USER_LOGIN"], '@') !== false) {
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["ADMIN_USER_LOGIN"]);
         } else if (isSet($data["MAILER_ADMIN"])) {
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
@@ -530,10 +530,10 @@ class BootConfLoader extends AbstractConfDriver
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
                 $ctx,
-                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]),
+                [["adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]]],
                 "Pydio Test Mail",
                 "Body of the test",
-                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"])
+                ["adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]]
             );
             echo 'SUCCESS:Mail sent to the admin adress, please check it is in your inbox!';
 
@@ -705,12 +705,22 @@ class BootConfLoader extends AbstractConfDriver
     /**
      * Must return an associative array of roleId => AjxpRole objects.
      * @param array $roleIds
-     * @param boolean $excludeReserved ,
+     * @param boolean $excludeReserved
+     * @param boolean $includeOwnedRoles
      * @return array AjxpRole[]
      */
-    public function listRoles($roleIds = array(), $excludeReserved = false)
+    public function listRoles($roleIds = array(), $excludeReserved = false, $includeOwnedRoles = false)
     {
         return array();
+    }
+
+    /**
+     * Get Roles owned by a given user ( = teams )
+     * @param $ownerId
+     * @return array
+     */
+    public function listRolesOwnedBy($ownerId){
+        return [];
     }
 
     /**

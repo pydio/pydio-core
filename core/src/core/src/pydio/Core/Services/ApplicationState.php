@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -46,6 +46,16 @@ class ApplicationState
      * @var string
      */
     private static $minisiteHash = null;
+
+    /**
+     * @var bool
+     */
+    public static $silenceInstantMessages = false;
+
+    /**
+     * @var bool
+     */
+    private static $isAdminMode = false;
 
     /**
      * @param string $restBase
@@ -99,6 +109,20 @@ class ApplicationState
      */
     public static function getMinisiteHash(){
         return self::$minisiteHash;
+    }
+
+    /**
+     * Set application in admin only mode
+     */
+    public static function setAdminMode(){
+        self::$isAdminMode = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isAdminMode(){
+        return self::$isAdminMode;
     }
 
     /**
@@ -240,6 +264,11 @@ class ApplicationState
             return AJXP_TMP_DIR;
         }
         return realpath(sys_get_temp_dir());
+    }
+
+    public static function getTemporaryBinariesFolder(){
+
+        return self::getTemporaryFolder() . '/' . 'pydio_binaries_uploads';
     }
 
     /**

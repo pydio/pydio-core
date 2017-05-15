@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -28,5 +28,5 @@ $mess = array(
     "6" => "Invalida le chiavi API esistenti",
     "7" => "Sicuro di voler revocare questa/e chiave/i?",
     "8" => "Chiave/i rimossa/e correttamente!",
-    "9" => "Dispositivi connessi al tuo account:",
+    "9" => "Dispositivi connessi al tuo account",
 );

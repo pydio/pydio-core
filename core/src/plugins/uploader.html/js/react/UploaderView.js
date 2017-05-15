@@ -1,17 +1,18 @@
 (function(global){
-    
-    var DropUploader = React.createClass({
 
-        onDrop: function(files, event, sourceComponent){
-            var items, files;
-            if(event.dataTransfer){
-                items = event.dataTransfer.items || [];
-                files = event.dataTransfer.files;
-            }else if(event.target){
-                files = event.target.files;
-            }
+    let DropUploader = React.createClass({
+
+        propTypes: {
+            onDismiss: React.PropTypes.func
+        },
+
+        getInitialState: function() {
+            return {};
+        },
+
+        onDrop: function(files){
             let contextNode = global.pydio.getContextHolder().getContextNode();
-            UploaderModel.Store.getInstance().handleDropEventResults(items, files, contextNode);
+            UploaderModel.Store.getInstance().handleDropEventResults(null, files, contextNode);
         },
 
         onFolderPicked: function(files){
@@ -28,9 +29,12 @@
             UploaderModel.Store.getInstance().clearAll();
         },
         toggleOptions: function(e){
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             let crtOptions = this.state && this.state.options ? this.state.options : false;
-            this.setState({options:!crtOptions});
+            this.setState({
+                options: !crtOptions,
+                optionsAnchorEl: e.currentTarget,
+            });
         },
 
         openFilePicker: function(e){
@@ -45,50 +49,59 @@
 
         render: function(){
 
-            let options;
+            let optionsEl;
             let messages = global.pydio.MessageHash;
+            const connectDropTarget = this.props.connectDropTarget || (c => {return c});
+            const {options} = this.state;
 
-            if(this.state && this.state.options){
-                let dismiss = function(e){
-                    this.toggleOptions(e);
-                    if(UploaderModel.Configs.getInstance().getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
-                        UploaderModel.Store.getInstance().processNext();
-                    }
-                }.bind(this);
-                options = <UploadOptionsPane onDismiss={dismiss}/>
-            }
+            let dismiss = function(e){
+                this.toggleOptions(e);
+                if(UploaderModel.Configs.getInstance().getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
+                    UploaderModel.Store.getInstance().processNext();
+                }
+            }.bind(this);
+            optionsEl = <UploadOptionsPane open={options} anchorEl={this.state.optionsAnchorEl} onDismiss={dismiss}/>
+
             let folderButton, startButton;
             let e = global.document.createElement('input');
             e.setAttribute('type', 'file');
             if('webkitdirectory' in e){
-                folderButton = <ReactMUI.RaisedButton label={messages['html_uploader.5']} onClick={this.openFolderPicker}/>;
+                folderButton = <ReactMUI.RaisedButton style={{marginRight: 10}} label={messages['html_uploader.5']} onClick={this.openFolderPicker}/>;
             }
             e = null;
             let configs = UploaderModel.Configs.getInstance();
             if(!configs.getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
-                startButton = <ReactMUI.FlatButton label={messages['html_uploader.11']} onClick={this.start} secondary={true}/>
+                startButton = <ReactMUI.FlatButton style={{marginRight: 10}} label={messages['html_uploader.11']} onClick={this.start} secondary={true}/>
             }
-            return (
-                <div style={{position:'relative'}}>
-                    <div className="react-mui-context uploader-action-bar">
-                        <ReactMUI.FlatButton style={{float: 'right'}} label="Options"  onClick={this.toggleOptions}/>
-                        <ReactMUI.RaisedButton secondary={true} label={messages['html_uploader.4']} onClick={this.openFilePicker}/>
-                        {folderButton}
-                        {startButton}
-                        <ReactMUI.FlatButton label={messages['html_uploader.12']} onClick={this.clear}/>
-                    </div>
+            return connectDropTarget(
+                <div style={{position:'relative', padding: '10px'}}>
+                    <MaterialUI.Toolbar style={{backgroundColor: '#fff'}}>
+                        <div style={{display:'flex', justifyContent: 'space-between', padding: '0px 24px', width: '100%', height: '100%'}}>
+                            <div style={{display:'flex', alignItems: 'center', marginLeft: '-48px'}}>
+                                <MaterialUI.RaisedButton secondary={true} style={{marginRight: 10}} label={messages['html_uploader.4']} onClick={this.openFilePicker}/>
+                                {folderButton}
+                                {startButton}
+                                <MaterialUI.FlatButton label={messages['html_uploader.12']} style={{marginRight: 10}} onClick={this.clear}/>
+                            </div>
+                            <div style={{display:'flex', alignItems: 'center', marginRight: '-48px'}}>
+                                <MaterialUI.FlatButton style={{float: 'right'}} label={messages['html_uploader.22']} onClick={this.toggleOptions}/>
+                            </div>
+                        </div>
+                    </MaterialUI.Toolbar>
                     <PydioForm.FileDropZone
+                        className="transparent-dropzone"
                         ref="dropzone"
                         multiple={true}
                         enableFolders={true}
                         supportClick={false}
+                        ignoreNativeDrop={true}
                         onDrop={this.onDrop}
                         onFolderPicked={this.onFolderPicked}
-                        style={{width:'100%'}}
+                        style={{width:'100%', height: 300}}
                     >
-                        <TransfersList/>
+                        <TransfersList onDismiss={this.props.onDismiss}/>
                     </PydioForm.FileDropZone>
-                    {options}
+                    {optionsEl}
                 </div>
             );
 
@@ -96,7 +109,9 @@
 
     });
 
-    var TransferFile = React.createClass({
+    DropUploader = Pydio.requireLib('hoc').dropProvider(DropUploader);
+
+    const TransferFile = React.createClass({
 
         propTypes: {
             item: React.PropTypes.object.isRequired,
@@ -124,8 +139,8 @@
         },
 
         render: function(){
-            let style;
-            var messageIds = {
+            let style, relativeMessage;
+            const messageIds = {
                 "new" : 433,
                 "loading":434,
                 "loaded":435,
@@ -145,7 +160,7 @@
                 statusMessage = global.pydio.MessageHash[messageIds[statusMessage]];
             }
             if(this.props.item.getRelativePath()){
-                var relativeMessage = <span className="path">{this.props.item.getRelativePath()}</span>;
+                relativeMessage = <span className="path">{this.props.item.getRelativePath()}</span>;
             }
             if(this.state && this.state.progress){
                 style = {width: this.state.progress + '%'};
@@ -162,7 +177,7 @@
         }
     });
 
-    var TransferFolder = React.createClass({
+    const TransferFolder = React.createClass({
 
         propTypes: {
             item: React.PropTypes.object.isRequired
@@ -181,7 +196,11 @@
         }
     });
 
-    var TransfersList = React.createClass({
+    const TransfersList = React.createClass({
+
+        propTypes: {
+            onDismiss: React.PropTypes.func
+        },
 
         componentDidMount: function(){
             let store = UploaderModel.Store.getInstance();
@@ -191,8 +210,10 @@
             }.bind(this);
             store.observe("update", this._storeObserver);
             store.observe("auto_close", function(){
-                pydio.UI.modal.dismiss();
-            });
+                if(this.props.onDismiss){
+                    this.props.onDismiss();
+                }
+            }.bind(this));
             this.setState({items: store.getItems()});
         },
 
@@ -233,26 +254,26 @@
                 this.renderSection(items, this.state.items.processed, global.pydio.MessageHash['html_uploader.16'], 'section-processed');
             }
             return (
-                <div id="upload_files_list" className={UploaderModel.Configs.getInstance().getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false) ? 'show-processed' : ''}>
+                <div id="upload_files_list" style={{height: '100%'}} className={UploaderModel.Configs.getInstance().getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false) ? 'show-processed' : ''}>
                     {items}
                 </div>
             )
         }
     });
 
-    var UploadOptionsPane = React.createClass({
+    const UploadOptionsPane = React.createClass({
 
         propTypes: {
+            open: React.PropTypes.boolean,
+            anchorEl: React.PropTypes.string,
             onDismiss: React.PropTypes.func.isRequired
         },
 
         getInitialState: function(){
-
             let configs = UploaderModel.Configs.getInstance();
             return {
                 configs: configs
             };
-
         },
 
         updateField: function(fName, event){
@@ -278,7 +299,7 @@
             this.state.configs.updateOption('upload_existing', newValue);
             this.setState({random: Math.random()});
         },
-        
+
         render: function(){
 
             let maxUploadMessage
@@ -293,28 +314,38 @@
             let overwriteType = this.state.configs.getOption('DEFAULT_EXISTING', 'upload_existing');
 
             return (
-                <div className="upload-options-pane react-mui-context">
-                    <span className="close-options mdi mdi-close" onClick={this.props.onDismiss}></span>
-                    {maxUploadMessage}
-                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash[337]} labelPosition="right" toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')}/></div>
-                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash[338]} labelPosition="right"  toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')}/></div>
-                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash['html_uploader.17']} labelPosition="right"  toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')}/></div>
-                    <div className="option-row">
-                        <div style={{marginBottom: 10}}>{global.pydio.MessageHash['html_uploader.18']}</div>
-                        <ReactMUI.RadioButtonGroup ref="group" name="shipSpeed" defaultSelected={overwriteType} onChange={this.radioChange}>
-                            <ReactMUI.RadioButton value="alert" label={global.pydio.MessageHash['html_uploader.19']}/>
-                            <ReactMUI.RadioButton value="rename" label={global.pydio.MessageHash['html_uploader.20']}/>
-                            <ReactMUI.RadioButton value="overwrite" label={global.pydio.MessageHash['html_uploader.21']}/>
-                        </ReactMUI.RadioButtonGroup>
-                    </div>
-                </div>
+                <MaterialUI.Popover
+                  open={this.props.open}
+                  anchorEl={this.props.anchorEl}
+                  anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                  targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                  onRequestClose={this.props.onDismiss}
+                >
+                    <MaterialUI.List style={{width: 260}}>
+                        <MaterialUI.ListItem primaryText={global.pydio.MessageHash[337]} rightToggle={<MaterialUI.Toggle toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')} />} />
+                        <MaterialUI.ListItem primaryText={global.pydio.MessageHash[338]} rightToggle={<MaterialUI.Toggle toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')} />} />
+                        <MaterialUI.ListItem primaryText={global.pydio.MessageHash['html_uploader.17']} rightToggle={<MaterialUI.Toggle toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')} />} />
+                        <MaterialUI.Divider />
+                        <MaterialUI.Subheader>{global.pydio.MessageHash['html_uploader.18']}</MaterialUI.Subheader>
+                        <MaterialUI.ListItem disabled={true} style={{paddingTop: 0}}>
+                            <MaterialUI.RadioButtonGroup ref="group" name="shipSpeed" defaultSelected={overwriteType} onChange={this.radioChange}>
+                                <MaterialUI.RadioButton value="alert" label={global.pydio.MessageHash['html_uploader.19']} style={{paddingBottom: 8}} />
+                                <MaterialUI.RadioButton value="rename" label={global.pydio.MessageHash['html_uploader.20']} style={{paddingBottom: 8}}/>
+                                <MaterialUI.RadioButton value="overwrite" label={global.pydio.MessageHash['html_uploader.21']}/>
+                            </MaterialUI.RadioButtonGroup>
+                        </MaterialUI.ListItem>
+                    </MaterialUI.List>
+                </MaterialUI.Popover>
             );
         }
 
     });
 
-    var ns = global.UploaderView || {};
-    ns.DropUploader = DropUploader;
-    global.UploaderView = ns;
+    global.UploaderView = {
+        DropUploader,
+        TransferFile,
+        TransfersList,
+        TransferFolder
+    };
 
 })(window);

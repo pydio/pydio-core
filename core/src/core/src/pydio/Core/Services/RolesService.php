@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -109,10 +109,47 @@ class RolesService
     }
 
     /**
+     * @param $userId
+     * @return AJXP_Role[]
+     */
+    public static function getRolesOwnedBy($userId){
+        return ConfService::getConfStorageImpl()->listRolesOwnedBy($userId);
+    }
+
+    /**
+     * @param $roleId
+     * @param $userId
+     * @return AJXP_Role
+     */
+    public static function getOrCreateOwnedRole($roleId, $userId){
+        $crtRoles = ConfService::getConfStorageImpl()->listRolesOwnedBy($userId);
+        if(isSet($crtRoles[$roleId])) {
+            return $crtRoles[$roleId];
+        }
+        $r = new AJXP_Role($roleId);
+        $r->setOwnerId($userId);
+        ConfService::getConfStorageImpl()->updateRole($r);
+        return $r;
+    }
+
+    /**
+     * @param $roleId
+     * @param $userId
+     * @return AJXP_Role
+     */
+    public static function getOwnedRole($roleId, $userId){
+        $crtRoles = ConfService::getConfStorageImpl()->listRolesOwnedBy($userId);
+        if(isSet($crtRoles[$roleId])) {
+            return $crtRoles[$roleId];
+        }
+        return null;
+    }
+
+    /**
      * Get Role by Id
      *
      * @param string $roleId
-     * @return AJXP_Role
+     * @return AJXP_Role|false
      */
     public static function getRole($roleId)
     {
@@ -162,10 +199,18 @@ class RolesService
      * Delete a role by its id
      * @static
      * @param string $roleId
+     * @param string $ownerId
      * @return void
+     * @throws PydioException
      */
-    public static function deleteRole($roleId)
+    public static function deleteRole($roleId, $ownerId = null)
     {
+        if(!empty($ownerId)){
+            $ownerRoles = ConfService::getConfStorageImpl()->listRolesOwnedBy($ownerId);
+            if(!isSet($ownerRoles[$roleId])){
+                throw new PydioException("Cannot delete this role");
+            }
+        }
         ConfService::getConfStorageImpl()->deleteRole($roleId);
         CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:role:".$roleId);
         ConfService::getInstance()->invalidateLoadedRepositories();
@@ -237,7 +282,7 @@ class RolesService
      * @param boolean $excludeReserved,
      * @return AJXP_Role[]
      */
-    public static function getRolesList($roleIds = array(), $excludeReserved = false)
+    public static function getRolesList($roleIds = array(), $excludeReserved = false, $includeOwnedRoles = false)
     {
         if (self::$useCache && !count($roleIds) && $excludeReserved == true && self::$rolesCache != null) {
             return self::$rolesCache;
@@ -263,7 +308,7 @@ class RolesService
         }
 
         $confDriver = ConfService::getConfStorageImpl();
-        $roles = $confDriver->listRoles($roleIds, $excludeReserved);
+        $roles = $confDriver->listRoles($roleIds, $excludeReserved, $includeOwnedRoles);
         $repoList = null;
         foreach ($roles as $roleId => $roleObject) {
             if ($roleObject instanceof AjxpRole) {
@@ -336,20 +381,35 @@ class RolesService
         }
         RolesService::updateRole($rootRole);
 
+        $miniRole = RolesService::getRole("EXTERNAL_USERS");
+        if ($miniRole === false) {
+            $rootRole = new AJXP_Role("EXTERNAL_USERS");
+            $rootRole->setLabel("External users");
+            $actions = array(
+                "action.share" => ["open_user_shares"],
+                "action.user" => ["open_address_book"]
+            );
+            $rootRole->setAutoApplies(array("shared"));
+            foreach ($actions as $pluginId => $acts) {
+                foreach ($acts as $act) {
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_ALL, false);
+                }
+            }
+            RolesService::updateRole($rootRole);
+        }
         $miniRole = RolesService::getRole("MINISITE");
         if ($miniRole === false) {
             $rootRole = new AJXP_Role("MINISITE");
             $rootRole->setLabel("Minisite Users");
             $actions = array(
-                "access.fs" => array("ajxp_link", "chmod", "purge"),
-                "meta.watch" => array("toggle_watch"),
-                "conf.serial" => array("get_bookmarks"),
-                "conf.sql" => array("get_bookmarks"),
-                "index.lucene" => array("index"),
-                "action.share" => array("share", "share_react", "share-edit-shared", "share-folder-workspace", "share-file-minisite", "share-selection-minisite", "share-folder-minisite-public"),
-                "gui.ajax" => array("bookmark"),
-                "auth.serial" => array("pass_change"),
-                "auth.sql" => array("pass_change"),
+                "access.fs" => ["ajxp_link", "chmod", "purge"],
+                "meta.watch" => ["toggle_watch"],
+                "conf.serial" => ["get_bookmarks"],
+                "conf.sql" => ["get_bookmarks"],
+                "action.share" => ["share", "share_react", "share-edit-shared", "share-folder-workspace", "share-file-minisite", "share-selection-minisite", "share-folder-minisite-public", "open_user_shares"],
+                "gui.ajax" => ["bookmark"],
+                "auth.sql" => ["pass_change"],
+                "action.user" => ["open_address_book"]
             );
             foreach ($actions as $pluginId => $acts) {
                 foreach ($acts as $act) {

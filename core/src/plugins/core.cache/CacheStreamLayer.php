@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -65,7 +65,11 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
      */
     public function dir_opendir($path, $options) {
 
-        $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "list");
+        $node = new AJXP_Node($path);
+        if($node->getRepositoryId() === 'inbox'){
+            return parent::dir_opendir($path, $options);
+        }
+        $options = AbstractCacheDriver::getOptionsForNode($node, "list");
 
         if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $options["id"])) {
             $this->currentListingRead = $this->currentListingOrig = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $options["id"]);

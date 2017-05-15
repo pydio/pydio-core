@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -759,7 +759,7 @@ class RepositoriesManager extends AbstractManager
     public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         $fullBasePath       = "/" . $rootPath . "/" . $relativePath;
-        $REPOS_PER_PAGE     = 50;
+        $REPOS_PER_PAGE     = 10000;
         $paginationHash     = $paginationHash === null ? 1 : $paginationHash;
         $offset             = ($paginationHash - 1) * $REPOS_PER_PAGE;
         $count              = null;

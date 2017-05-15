@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -20,6 +20,9 @@
  */
 
 namespace Pydio\OCS\Model;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Share\Model\ShareLink;
 use Pydio\Share\View\PublicAccessManager;
 
@@ -74,8 +77,21 @@ class TargettedLink extends ShareLink
      * @param string $remoteServer
      * @param string $remoteUser
      * @param $documentName
+     * @throws PydioException
      */
     public function prepareInvitation($remoteServer, $remoteUser, $documentName){
+
+        $scheme = parse_url($remoteServer, PHP_URL_SCHEME);
+        if($scheme === 'trusted'){
+            $trustedServerId = parse_url($remoteServer, PHP_URL_HOST);
+            $configs = ConfService::getGlobalConf('TRUSTED_SERVERS', 'ocs');
+            if(isSet($configs) && isSet($configs[$trustedServerId])){
+                $remoteServer = $configs[$trustedServerId]['url'];
+            }else{
+                throw new PydioException('Cannot find trusted server with id ' . $trustedServerId);
+            }
+        }
+
         $this->pendingInvitation = array("host" => $remoteServer, "user" => $remoteUser, "documentName" => $documentName);
     }
 

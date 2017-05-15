@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2012 Charles du Jeu <contact (at) cdujeu.me>
+* Copyright 2007-2017 Charles du Jeu <contact (at) cdujeu.me>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -31,5 +31,7 @@ $mess=array(
 "10" => "Atividade do Diretório",
 "11" => "Atividade do Arquivo",
 "12" => "Dependendo do seu navegador, será pedida uma permissão específica. Para desabilitar, acesse as configurações de seu navegador. Se você já habilitou este recurso, provavelmente nada irá acontecer.",
-"13" => "Seu navegador parece não suportar Notificações de Desktop ainda."
+"13" => "Seu navegador parece não suportar Notificações de Desktop ainda.",
+"14" => "No alerts",
+"15" => "Notifications about files that you monitor will appear here",
 );

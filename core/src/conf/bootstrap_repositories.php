@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -106,18 +106,6 @@ $REPOSITORIES[1] = array(
 );
 
 // DO NOT REMOVE THIS!
-// USER DASHBOARD
-$REPOSITORIES["ajxp_user"] = array(
-    "DISPLAY"		    =>	"My Dashboard",
-    "AJXP_SLUG"		    =>  "dashboard",
-    "DISPLAY_ID"		=>	"user_dash.title",
-    "DESCRIPTION_ID"	=>	"user_dash.desc",
-    "DRIVER"		    =>	"ajxp_user",
-    "DRIVER_OPTIONS"    => array(
-        "DEFAULT_RIGHTS" => "rw"
-    )
-);
-
 $REPOSITORIES["ajxp_home"] = array(
     "DISPLAY"		    =>	"Welcome",
     "AJXP_SLUG"		    =>  "welcome",
@@ -136,7 +124,7 @@ $REPOSITORIES["inbox"] = array(
     "AJXP_SLUG"		    =>  "inbox",
     "DRIVER"		    =>	"inbox",
     "DRIVER_OPTIONS"    => array(
-        "DEFAULT_RIGHTS" => "rw",
+        "DEFAULT_RIGHTS" => "r",
         "META_SOURCES"   => array(
             "metastore.serial"=> array(
                 "METADATA_FILE"	=> ".ajxp_meta",

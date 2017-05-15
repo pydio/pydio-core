@@ -1,8 +1,8 @@
 {
   "name": "action.demo_counter",
-  "version": "6.5.5",
+  "version": "8.0.0",
   "description": "",
-  "source_path":"js",
+  "source_path":"react",
   "main": "index.js",
   "author": "Abstrium SAS",
   "license": "AGPL",

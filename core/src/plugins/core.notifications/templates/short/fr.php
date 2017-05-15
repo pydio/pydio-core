@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -39,4 +39,6 @@ $mess=array(
 "folder.rename" => "AJXP_SOURCE_LABEL a été renommé en AJXP_NODE_LABEL",
 "file.share" => "AJXP_USER a partagé le fichier AJXP_NODE_LABEL avec vous",
 "folder.share" => "AJXP_USER a partagé le répertoire AJXP_NODE_LABEL avec vous",
+"share.file" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
+"share.folder" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",
 );

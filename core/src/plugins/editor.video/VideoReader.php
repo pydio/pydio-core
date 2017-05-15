@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -46,8 +46,13 @@ class VideoReader extends Plugin
      * @param \Pydio\Core\Model\ContextInterface $contextInterface
      * @throws FileNotFoundException
      */
-    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+
+        $contextInterface   = $requestInterface->getAttribute("ctx");
+        $action             = $requestInterface->getAttribute("action");
+        $httpVars           = $requestInterface->getParsedBody();
+
         $selection = UserSelection::fromContext($contextInterface, $httpVars);
         $node = $selection->getUniqueNode();
 
@@ -133,8 +138,8 @@ class VideoReader extends Plugin
             }
             Controller::applyHook("node.read", array($node));
         } else if ($action == "get_sess_id") {
-            HTMLWriter::charsetHeader("text/plain");
-            print(session_id());
+            $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
+            $responseInterface->getBody()->write(session_id());
         }
     }
 

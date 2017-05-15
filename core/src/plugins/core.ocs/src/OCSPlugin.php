@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -58,12 +58,42 @@ class OCSPlugin extends Plugin {
     }
 
     /**
+     * @param array $configData
+     */
+    public function loadConfigs($configData){
+        parent::loadConfigs($configData);
+        // Parse Trusted Servers replication group
+        $baseId = 'TRUSTED_SERVER_ID';
+        $base   = 'TRUSTED_SERVER_';
+        $index = 0;
+        $trustedServers = [];
+        $exposedList = [];
+        while(isSet($this->pluginConf[$baseId]) && !empty($this->pluginConf[$baseId])){
+            $suffix = $index ? '_'.$index : '';
+            $serverId = $this->pluginConf[$baseId];
+            $serverLabel = $this->pluginConf[$base . 'LABEL' . $suffix];
+            $exposedList[$serverId] = $serverLabel;
+            $trustedServers[$serverId] = [
+                'url' => $this->pluginConf[$base . 'URL' . $suffix],
+                'label' => $serverLabel,
+                'user' => $this->pluginConf[$base . 'USER' . $suffix],
+                'pass' => $this->pluginConf[$base . 'PASS' . $suffix]
+            ];
+            $index++;
+            $baseId = $base .'ID'. ($index ? '_'.$index : '');
+        }
+        $this->pluginConf['TRUSTED_SERVERS'] = $trustedServers;
+        $this->exposeConfigInManifest('TRUSTED_SERVERS', json_encode($exposedList));
+    }
+
+    /**
      * @return ActionsController
      */
     protected function getController(){
         if($this->controller == null){
             require_once("ActionsController.php");
-            $this->controller = new ActionsController();
+            $configs = $this->getConfigs();
+            $this->controller = new ActionsController($configs);
         }
         return $this->controller;
     }

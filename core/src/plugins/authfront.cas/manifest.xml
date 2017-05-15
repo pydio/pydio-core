@@ -3,7 +3,7 @@
     <class_definition filename="plugins/authfront.cas/CasAuthFrontend.php" classname="Pydio\Auth\Frontend\CasAuthFrontend"/>
     <client_settings>
         <resources>
-            <js className="CAS_LoginForm" file="plugins/authfront.cas/class.CAS_LoginForm.js" autoload="true"/>
+            <js className="CASAuthFrontend" file="plugins/authfront.cas/res/build/CASAuthFrontend.js"/>
             <i18n namespace="authfront.cas" path="plugins/authfront.cas/i18n"/>
         </resources>
     </client_settings>
@@ -56,36 +56,29 @@
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*"/>
         <actions>
             <action name="logout" expireDefault="true">
-                <gui text="164" title="169" src="decrypted.png" accessKey="" iconClass="icon-signout" hasAccessKey="false" forbidOverride="true">
-                    <context selection="false" dir="" recycle="false" contextMenu="false" infoPanel="false" actionBarGroup="user" ajxpWidgets="UserWidget::logging_string"/>
+                <gui text="164" title="169" accessKey="" iconClass="mdi mdi-logout" hasAccessKey="false" forbidOverride="true">
+                    <context selection="false" dir="" recycle="false" contextMenu="false" infoPanel="false" actionBarGroup="zlogin,minisite"/>
                 </gui>
                 <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly="" forbidOverride="true"/>
                 <processing forbidOverride="true">
-                    <clientCallback prepareModal="false"><![CDATA[
-                  clearRememberData();
-                  var connexion = new Connexion();
-                  connexion.addParameter('get_action', 'logout');
-                  connexion.onComplete = function(transport)
-                  {
-                    var child = transport.responseXML.documentElement.childNodes;
-                      try
-                        {
-                          if(child[0].nodeValue != "#"){
-                            document.location.href = child[0].nodeValue;
-                            }
-                            else{
-                                location.reload();
-                             }
-                        }
-                        catch(e){}
-                  };
-                  connexion.sendAsync();
+                    <clientCallback><![CDATA[
+                  PydioApi.clearRememberData();
+                  PydioApi.getClient().request({get_action:'logout'}, function(transport){
+                        var child = transport.responseXML.documentElement.childNodes;
+                        try {
+                            if(child[0].nodeValue != "#"){ document.location.href = (child[0].nodeValue == null)? '':child[0].nodeValue; }
+                            else{ document.location.reload(); }
+                         } catch(e){}
+                        });
                    ]]></clientCallback>
-
                     <serverCallback methodName="logOutCAS"/>
                 </processing>
             </action>
         </actions>
-
+        <client_configs>
+            <component_config component="AuthfrontCoreActions.LoginPasswordDialog">
+                <modifier module="CASAuthFrontend.LoginDialogModifier"/>
+            </component_config>
+        </client_configs>
     </registry_contributions>
 </ajxp_plugin>

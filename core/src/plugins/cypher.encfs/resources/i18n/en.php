@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,10 +19,14 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1" => "Cypher Folder",
-"2" => "Encrypt folder data",
-"3" => "Uncypher folder",
-"4" => "Decrypt folder data",
-"5" => "Cypher folder",
-"6" => "Encrypt folder data",
+    "1" => "Cypher Folder",
+    "2" => "Encrypt folder data",
+    "3" => "Uncypher folder",
+    "4" => "Decrypt folder data",
+    "5" => "Cypher folder",
+    "6" => "Encrypt folder data",
+    "7" => "Enter the encryption key you have chosen when first encrypting this folder.",
+    "8" => "Encryption Key",
+    "9" => "Confirm Encryption Key",
+    "10" => "Choose an encryption key to make your data inaccessible by anyone but you. Be aware that if you loose the key, your data will be lost forever!",
 );

@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ $mess=array(
 "3b" => "Retour à la ligne automatique",
 "4" => "Numéro ligne",
 "5" => "Numéros de ligne",
-"6" => "Afficher les numéros de ligne",
+"6" => "Aller à la ligne",
 "7" => "Annuler",
 "8" => "Répéter",
 "9" => "Recherche de texte",

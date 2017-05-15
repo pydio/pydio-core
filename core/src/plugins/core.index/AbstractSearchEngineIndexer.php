@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ abstract class AbstractSearchEngineIndexer extends AbstractMetaSource
         if ($this->getContextualOption($ctx, "HIDE_MYSHARES_SECTION") !== true) return;
         if ($contribNode->nodeName != "client_configs") return;
         $actionXpath = new DOMXPath($contribNode->ownerDocument);
-        $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);
+        $nodeList = $actionXpath->query('component_config[@component="AjxpPane::navigation_scroller"]', $contribNode);
         if (!$nodeList->length) return;
         $contribNode->removeChild($nodeList->item(0));
     }

@@ -4,6 +4,7 @@
     <client_settings icon="plugins/access.fs/icon.png" description_template="{REGION}{STORAGE_URL}/{CONTAINER}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="s3_access" path="plugins/access.s3/i18n"/>
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
     </client_settings>
 

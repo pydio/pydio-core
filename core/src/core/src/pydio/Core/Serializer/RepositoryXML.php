@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -120,13 +120,16 @@ class RepositoryXML
         $currentUserIsOwner = false;
         $ownerLabel = null;
         if ($repoObject->hasOwner()) {
-            $uId = $repoObject->getOwner();
-            if($loggedUser != null && $loggedUser->getId() == $uId){
-                $currentUserIsOwner = true;
+            if(strpos($repoId, 'ocs_remote_share_') === 0){
+                $ownerLabel = $uId = $repoObject->getOwner();
+            }else{
+                $uId = $repoObject->getOwner();
+                if($loggedUser != null && $loggedUser->getId() == $uId){
+                    $currentUserIsOwner = true;
+                }
+                $ownerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
             }
-            $label = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
-            $ownerLabel = $label;
-            $isSharedString =  'owner="'. StringHelper::xmlEntities($label) .'"';
+            $isSharedString =  'owner="'. StringHelper::xmlEntities($ownerLabel) .'"';
         }
         if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
             $streamString .= " userScope=\"true\"";

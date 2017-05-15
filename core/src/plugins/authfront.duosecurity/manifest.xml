@@ -5,8 +5,9 @@
 	<class_definition filename="plugins/authfront.duosecurity/DuoSecurityFrontend.php" classname="Pydio\Auth\Frontend\DuoSecurityFrontend"/>
     <client_settings>
         <resources>
-            <js className="DuoSecurity" file="plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js"/>
+            <js className="Duo" file="plugins/authfront.duosecurity/vendor/duosecurity/duo_php/js/Duo-Web-v2.min.js"/>
             <i18n namespace="duosecurity" path="plugins/authfront.duosecurity/i18n"/>
+            <js className="DuoSecurityActions" file="plugins/authfront.duosecurity/res/build/DuoSecurityActions.js" depends="Duo"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -30,51 +31,13 @@
     <registry_contributions>
         <actions>
             <action name="duo_show_iframe">
-                <gui text="duosecurity.1" title="duosecurity.2" src="encrypted.png" iconClass="icon-signin"
-                     accessKey="" hasAccessKey="false">
+                <gui text="duosecurity.1" title="duosecurity.2" iconClass="icon-signin" accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
-                             actionBar="false" contextMenu="false" infoPanel="false"
-                             actionBarGroup="user">
+                             actionBar="false" contextMenu="false" infoPanel="false">
                     </context>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="duosecurity_box" dialogOkButtonOnly="false" dialogSkipButtons="true">
-                        <dialogOnOpen><![CDATA[
-                            new ResourcesManager().loadJSResource('plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js', 'DuoSecurity');
-                            modal.getForm().down("#duosecurity_box").insert('<iframe id="duo_iframe" width="420" height="330" frameborder="0"></iframe>');
-                            modal.getForm().insert('<form method="POST" id="duo_form"></form>');
-                            modal.refreshDialogPosition();
-                            new PeriodicalExecuter(function(pe){
-                                var sigResponse = modal.getForm().down('input[name="sig_response"]');
-                                if(! sigResponse ) return;
-                                pe.stop();
-                                var conn = new Connexion();
-                                conn.setParameters({
-                                    sig_response: sigResponse.getValue(),
-                                    get_action  : 'duo_post_verification_code'
-                                });
-                                conn.onComplete = function(){
-                                    window.setTimeout(function(){
-	                                    ajaxplorer.loadXmlRegistry();
-                                    }, 400);
-                                    hideLightBox();
-                                };
-                                conn.sendAsync();
-                            }, 1);
-                            Duo.init({
-                                host:ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_HOST'),
-                                sig_request:ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_LAST_SIGNATURE'),
-                                post_action:''
-                            });
-                            Duo.ready();
-
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                                ]]></dialogOnComplete>
-                    </clientCallback>
-                    <clientForm id="duosecurity_box"><![CDATA[
-                         <div id="duosecurity_box" box_width="420" box_padding="0"></div>
-					]]></clientForm>
+                    <clientCallback module="DuoSecurityActions.Callbacks.duoPrompt"/>
                 </processing>
             </action>
             <action name="duo_post_verification_code">

@@ -23,8 +23,97 @@ div.form-react_share_form {
 }
 }
 
-div#react_share_form {
-  font-family: Roboto, sans-serif;
+
+div.user-badge.share-dialog {
+  border-bottom: 1px solid #e2e2e2;
+  clear: both;
+  font-size: 16px;
+  margin-left: 50px;
+  margin-right: 11px;
+  padding-top: 1px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  line-height:20px;
+  .user-badge-label {
+    flex: 5;
+    padding: 9px 0;
+    line-height: 25px;
+  }
+  &:last-of-type {
+    border-bottom: 0;
+  }
+  span.icon-ellipsis-vertical.mui-font-icon {
+    color: #6F6F6F;
+    font-size: 18px;
+  }
+  span.avatar {
+    background-color: @color0;
+    border-radius: 30px;
+    color: white;
+    display: inline-block;
+    font-size: 17px;
+    height: @height1;
+    margin: 5px 14px 7px -44px;
+    padding: 6px;
+    text-align: center;
+    width: @width2;
+  }
+  &.user-type-group{
+    span.avatar{
+      background-color: @color1;
+    }
+  }
+  &.user-type-tmp_user,
+  &.user-type-remote_user{
+    span.avatar{
+      background-color: @color3;
+    }
+  }
+  img {
+    background-color: @color0;
+    border-radius: 30px;
+    color: white;
+    display: inline-block;
+    font-size: 17px;
+    height: @height1;
+    margin: 5px 14px 7px -44px;
+    padding: 6px;
+    text-align: center;
+    width: @width2;
+  }
+  div.user-badge-menu-box {
+    font-size: 13px;
+    position: relative;
+    div.mui-menu.mui-visible {
+      box-shadow: 0 0 5px rgba(0,0,0,0.43);
+      position: absolute;
+      right: 0;
+      top:0;
+      width: 200px;
+      z-index: 120;
+    }
+    div.mui-menu {
+      span.icon-check {
+        float: right;
+        font-size: 16px;
+        margin-top: 15px;
+      }
+    }
+  }
+  span.user-badge-rights-container {
+    float: right;
+    padding: 11px;
+    color: gray;
+    font-size: 11px;
+    line-height: 25px;
+    input[name="write"] {
+      margin-left: 28px;
+    }
+  }
+}
+
+div#react_share_form, div.react_share_form {
   font-size:13px;
   label.mui-switch-label {
     white-space: nowrap;
@@ -40,14 +129,6 @@ div#react_share_form {
       line-height: 27px;
       padding:20px 16px 14px;
       word-break:break-all;
-    }
-  }
-  .mui-tabs-container {
-    .mui-tab-item-container {
-      background-color: @color0 !important;
-    }
-    .mui-tab-template {
-      min-height: 390px;
     }
   }
   .shared-users-rights-header {
@@ -100,8 +181,9 @@ div#react_share_form {
     padding-right: 15px;
     a{
       color:#c1c1c1;
-      text-decoration: underline;
+//      text-decoration: underline;
       font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
       display: inline-block;
       margin-left: 10px;
@@ -141,12 +223,7 @@ div#react_share_form {
     }
   }
   .public-link-container{
-    padding: 7px 13px 11px;
-    background-color: #F1F1F1;
-    border-radius: 8px;
-    margin: 16px 0 6px;
     .public-link{
-      width: 337px;
       font-size: 18px;
       input{
         text-align: center;
@@ -173,33 +250,20 @@ div#react_share_form {
         width: 100px;
       }
     }
-    .custom-link-button.icon-edit-sign,
     .copy-link-button
     {
-      color: #ddd;
       font-size: 24px;
       cursor: pointer;
       display: block;
-      padding-left: 7px;
-      float: right;
-      margin-top: 16px;
-    }
-    .custom-link-button.icon-edit-sign:hover,
-    .copy-link-button:hover
-    {
-      color: @color1;
-    }
-    .copy-link-button{
-      font-size: 13px !important;
-      margin-top: 15px;
-      background-color: #ddd;
-      color: #F1F1F1;
-      padding: 6px;
-      border-radius: 4px 4px 4px 0;
-    }
-    .copy-link-button:hover{
-      background-color: @color1;
-      color: #F1F1F1;
+      padding: 4px 7px;
+      font-size: 16px !important;
+      position: absolute;
+      top: 10px;
+      right:0;
+      background-color: white;
+      &:hover{
+        color: @color1;
+      }
     }
     .section-legend{
       margin-top: 10px;
@@ -242,15 +306,17 @@ div#react_share_form {
     .ajxp_icon_span{
       float: left;
       font-size: 20px;
-      color: rgba(0, 0, 0, 0.23);
-      margin-top: 37px;
+      color: rgba(0, 0, 0, 0.53);
       margin-right: 9px;
       margin-left: 3px;
-      &.icon-calendar{
-        font-size: 18px;
+      &.mdi-file-lock{
+        margin-top: 40px;
+      }
+      &.mdi-calendar-clock{
+        margin-top: 27px;
       }
       &.mdi-download{
-        margin-top: 40px;
+        margin-top: 34px;
       }
     }
     span.dlCounterString {
@@ -273,9 +339,6 @@ div#react_share_form {
   }
   h3{
     font-size: 18px;
-    margin-bottom: 0;
-    margin-top: 4px;
-    color: #999;
   }
   h4{
     padding-top: 10px;
@@ -292,92 +355,6 @@ div#react_share_form {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-      }
-    }
-  }
-  div.user-badge {
-    border-bottom: 1px solid #e2e2e2;
-    clear: both;
-    font-size: 16px;
-    margin-left: 50px;
-    margin-right: 11px;
-    padding-top: 1px;
-    display: flex;
-    flex-direction: row;
-    .user-badge-label {
-      flex: 5;
-      padding: 9px 0;
-      line-height: 25px;
-    }
-    &:last-of-type {
-      border-bottom: 0;
-    }
-    span.icon-ellipsis-vertical.mui-font-icon {
-      color: #6F6F6F;
-      font-size: 18px;
-    }
-    span.avatar {
-      background-color: @color0;
-      border-radius: 30px;
-      color: white;
-      display: inline-block;
-      font-size: 17px;
-      height: @height1;
-      margin: 5px 14px 7px -44px;
-      padding: 6px;
-      text-align: center;
-      width: @width2;
-    }
-    &.user-type-group{
-      span.avatar{
-        background-color: @color1;
-      }
-    }
-    &.user-type-tmp_user,
-    &.user-type-remote_user{
-      span.avatar{
-        background-color: @color3;
-      }
-    }
-    img {
-      background-color: @color0;
-      border-radius: 30px;
-      color: white;
-      display: inline-block;
-      font-size: 17px;
-      height: @height1;
-      margin: 5px 14px 7px -44px;
-      padding: 6px;
-      text-align: center;
-      width: @width2;
-    }
-    div.user-badge-menu-box {
-      font-size: 13px;
-      position: relative;
-      div.mui-menu.mui-visible {
-        box-shadow: 0 0 5px rgba(0,0,0,0.43);
-        position: absolute;
-        right: 0;
-        top:0;
-        width: 200px;
-        z-index: 120;
-      }
-      div.mui-menu {
-        span.icon-check {
-          float: right;
-          font-size: 16px;
-          margin-top: 15px;
-        }
-      }
-    }
-    span.user-badge-rights-container {
-      float: right;
-      padding: 11px;
-      color: gray;
-      font-size: 11px;
-      line-height: 25px;
-      input[name="write"] {
-        margin-left: 28px;
       }
     }
   }

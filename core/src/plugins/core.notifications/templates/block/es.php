@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ $mess=array(
 "folder.move" => "movida desde AJXP_SOURCE_FOLDER",
 "folder.move_to" => "movida a AJXP_TARGET_FOLDER",
 "folder.move_from" => "movida desde AJXP_SOURCE_FOLDER",
-"ajxp_link" => "Haga click aquí para ir directamente a <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
-"file.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
-"folder.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
+"ajxp_link" => "Pulse aquí para ir directamente a <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
+"file.share" => "El usuario AJXP_USER compartió AJXP_NODE_LABEL contigo",
+"folder.share" => "El usuario AJXP_USER compartió AJXP_NODE_LABEL contigo",
 );

@@ -53,14 +53,14 @@
             </action>
         </actions>
         <client_configs>
-            <component_config className="AjxpReactComponent::left_navigator">
+            <component_config component="AjxpReactComponent::left_navigator">
                 <additional_content
                         id="navigation_bookmarks"
                         position="1"
                         type="ListProvider"
                         options='{"title":"147", "titleClassName":"colorcode-bookmark", "fit":"content","silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks", "connexion_discrete":true, "containerDroppableAction":"bookmark", "emptyChildrenMessage":515}'/>
             </component_config>
-            <component_config className="AjxpReactComponent::left_navigator">
+            <component_config component="AjxpReactComponent::left_navigator">
                 <additional_content
                         id="navigation_shared"
                         position="2"

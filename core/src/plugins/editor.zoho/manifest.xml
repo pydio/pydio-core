@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.zoho" order="5" enabled="false" openable="true" text="zoho_editor.1" iconClass="icon-edit" title="zoho_editor.2" canWrite="true" description="CONF_MESSAGE[Zoho editor]" icon="zoho_img/zoho.png" label="CONF_MESSAGE[Office Docs]" className="ZohoEditor" mimes="xls,xlsx,ods,sxc,csv,tsv,ppt,pptx,pps,odp,sxi,doc,docx,rtf,odt,sxw" formId="zoho_box" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.zoho" order="5" enabled="false" openable="true" text="zoho_editor.1" iconClass="mdi mdi-file-document" title="zoho_editor.2" canWrite="true"
+        description="CONF_MESSAGE[Zoho editor]" label="CONF_MESSAGE[Office Docs]" actions="PydioZoho.Actions" className="PydioZoho" mimes="xls,xlsx,ods,sxc,csv,tsv,ppt,pptx,pps,odp,sxi,doc,docx,rtf,odt,sxw"
+        formId="zoho_box" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.zoho/ZohoEditor.php" classname="Pydio\Editor\Office\ZohoEditor"/>
     <server_settings>
         <global_param name="ZOHO_LANGUAGE" type="string" description="CONF_MESSAGE[You can change ZOHO menu language (de, en, fr, it, pt, ru, ...)]" label="CONF_MESSAGE[Language]" mandatory="true" default="en"/>
@@ -10,7 +12,7 @@
     </server_settings>
 	<client_settings>
         <resources>
-            <js file="plugins/editor.zoho/class.ZohoEditor.js" className="ZohoEditor"/>
+            <js file="plugins/editor.zoho/res/build/PydioZoho.js" className="PydioZoho"/>
             <i18n path="plugins/editor.zoho/i18n" namespace="zoho_editor"/>
             <img_library path="plugins/editor.zoho/images" alias="zoho_img"/>
         </resources>
@@ -58,6 +60,6 @@
 	</registry_contributions>
 	<dependencies>
 		<!-- Image proxy must be implemented -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user"/>
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>
 </editor>

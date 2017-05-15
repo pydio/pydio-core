@@ -44,7 +44,7 @@
         modal.getForm().down('#flashframe').src = src;
 		]]></dialogOnOpen>
 		<activeCondition><![CDATA[
-            var otherUploadersCount = XPathSelectNodes(ajaxplorer.getXmlRegistry(), 'plugins/uploader[@id!="uploader.flex"]').length;
+            var otherUploadersCount = XMLUtils.XPathSelectNodes(ajaxplorer.getXmlRegistry(), 'plugins/uploader[@id!="uploader.flex"]').length;
             if(otherUploadersCount == 0) return true;
 			var xhrUpload = (typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) );
 			return (getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && ! xhrUpload );

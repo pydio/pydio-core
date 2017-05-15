@@ -4,4 +4,6 @@ $mess = array(
 "2" => "Achtung, Zeitstempel kann nicht zum Token hinzugefügt werden",
 "3" => "Für diese Datei wurde bereits ein Zeitstempel-Token erstellt ",
 "4" => "Warnung: Das System ist falsch konfiguriert. Bitte wenden Sie sich an Ihren Administrator.",
+"5" => "Soll diese Datei wirklich mit Universign signiert werden?",
+"6" => "Timestamp erstellen"
 );

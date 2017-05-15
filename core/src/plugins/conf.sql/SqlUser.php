@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -174,32 +174,24 @@ class SqlUser extends AbstractUser
 
         // Try/Catch DibiException
         try {
-            // Update an existing preference
-            if (array_key_exists($prefName, $this->prefs)) {
 
-                // Delete an existing preferences row, because the value has been unset.
-                if ('' == $prefValue) {
+            if(empty($prefValue)){
 
-                    dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
+                dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
+                unset($this->prefs[$prefName]); // Update the internal array only if successful.
 
-                    $this->log('DELETE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
-                    unset($this->prefs[$prefName]); // Update the internal array only if successful.
+            }else{
 
-                // Update an existing rights row, because only some of the rights have changed.
-                } else {
+                try{
+
+                    dibi::query('INSERT INTO [ajxp_user_prefs] ([login],[name],[val]) VALUES (%s, %s, %bin)', $this->getId(),$prefName,$prefValue);
+
+                }catch(DibiException $dibiException){
 
                     dibi::query('UPDATE [ajxp_user_prefs] SET [val] = %bin WHERE [login] = %s AND [name] = %s', $prefValue, $this->getId(), $prefName);
 
-                    $this->log('UPDATE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
-                    $this->prefs[$prefName] = $prefValue;
                 }
 
-            // The repository supplied does not exist, so insert the right.
-            } else {
-
-                dibi::query('INSERT INTO [ajxp_user_prefs] ([login],[name],[val]) VALUES (%s, %s, %bin)', $this->getId(),$prefName,$prefValue);
-
-                $this->log('INSERT PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
                 $this->prefs[$prefName] = $prefValue;
             }
 
@@ -411,7 +403,7 @@ class SqlUser extends AbstractUser
 
         // NOW LOAD THEM
         if (count($rolesToLoad)) {
-            $allRoles = RolesService::getRolesList($rolesToLoad);
+            $allRoles = RolesService::getRolesList($rolesToLoad, false, true);
             foreach ($rolesToLoad as $roleId) {
                 if (!isSet($allRoles[$roleId]) && strpos($roleId, "AJXP_GRP_/") === 0){
                     $allRoles[$roleId] = RolesService::getOrCreateRole($roleId);

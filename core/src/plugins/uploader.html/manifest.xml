@@ -10,8 +10,8 @@
         <resources>
             <js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
             <js file="plugins/uploader.html/js/build/UploaderView.js" className="UploaderView" depends="React,PydioForm,UploaderModel"/>
-            <js file="plugins/uploader.html/js/build/UploaderModel.js" className="UploaderModel" depends="PydioTasks"/>
-            <js file="plugins/uploader.html/js/build/UploaderGlobalListener.js" className="UploaderGlobalListener"/>
+            <js file="plugins/uploader.html/js/build/UploaderModel.js" className="UploaderModel" depends="React,PydioTasks"/>
+            <js file="plugins/uploader.html/js/build/UploaderGlobalListener.js" className="UploaderGlobalListener" depends="React,PydioTasks,UploaderModel"/>
             <i18n path="plugins/uploader.html/i18n" namespace="html_uploader"/>
         </resources>
     </client_settings>
@@ -44,29 +44,10 @@
         <pluginClass pluginName="gui.ajax"/>
     </dependencies>
 	<processing>
-        <clientForm id="upload_main_container" theme="orbit"><![CDATA[
-			<div id="upload_main_container" box_width="60%" box_padding="0" style="padding:10px;"><div>
-		]]></clientForm>
-		<dialogOnOpen><![CDATA[
-			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
-                pydio.getController().react_selector = new AjxpReactComponent(oForm.down("#upload_main_container"), {
-                    componentNamespace:"UploaderView",
-                    componentName:"DropUploader",
-                    dependencies:["UploaderModel","PydioForm"]
-                });
-			}else{
-				pydio.getController().multi_selector = new MultiUploader(oForm);
-			}
-		]]></dialogOnOpen>
-        <dialogOnComplete><![CDATA[
-            if(pydio.getController().react_selector){
-                pydio.getController().react_selector.destroy();
-                pydio.getController().react_selector = null;
-            }
-        ]]></dialogOnComplete>
+        <clientForm module="UploaderView.DropUploader"/>
 		<extensionOnInit><![CDATA[
             var pydioUserWriteable = pydio && pydio.user && pydio.user.write;
-            var dragSupported = 'draggable' in new Element('span');
+            var dragSupported = 'draggable' in document.createElement('span');
             var fileUploadSupported = typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined" && (window.FileReader || window.FormData);
             if(fileUploadSupported && dragSupported && pydioUserWriteable){
                 try{

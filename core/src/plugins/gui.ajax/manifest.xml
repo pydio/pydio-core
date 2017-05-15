@@ -3,29 +3,70 @@
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
-            <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"
-                fallbackCondition="!window.addEventListener" fallbackFile="plugins/gui.ajax/res/js/vendor/nodejs/bundle.legacy.min.js"/>
-            <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
-            <js className="ReactPydio" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactPydioComponents.js"/>
-            <js className="UsersCompleter" file="plugins/gui.ajax/res/js/ui/reactjs/build/UsersCompleter.js" depends="React"/>
-            <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,ReactPydio"/>
-            <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
+            <js
+                className="React"
+                file="plugins/gui.ajax/res/build/bundle.prod.min.js"
+            />
+            <js
+                className="PydioCoreActions"
+                file="plugins/gui.ajax/res/build/PydioCoreActions.min.js"
+                fallbackFile="plugins/gui.ajax/res/build/PydioCoreActions.js"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                depends="React"
+                expose="actions/core"
+            />
+            <js
+                className="PydioForm"
+                file="plugins/gui.ajax/res/build/PydioForm.js"
+                expose="form"
+            />
+            <js
+                className="PydioReactUI"
+                file="plugins/gui.ajax/res/build/PydioReactUI.min.js"
+                fallbackFile="plugins/gui.ajax/res/build/PydioReactUI.js"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                depends="React,PydioHOCs"
+                expose="boot"
+            />
+            <js
+                className="PydioComponents"
+                file="plugins/gui.ajax/res/build/PydioComponents.min.js"
+                depends="React"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                fallbackFile="plugins/gui.ajax/res/build/PydioComponents.js"
+                expose="components"
+            />
+            <js
+                className="PydioHOCs"
+                file="plugins/gui.ajax/res/build/PydioHOCs.min.js"
+                depends="React"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                fallbackFile="plugins/gui.ajax/res/build/PydioHOCs.js"
+                expose="hoc"
+            />
+            <js
+                className="PydioWorkspaces"
+                file="plugins/gui.ajax/res/build/PydioWorkspaces.min.js"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                fallbackFile="plugins/gui.ajax/res/build/PydioWorkspaces.js"
+                depends="React,PydioComponents,PydioHOCs,PydioTasks"
+                expose="workspaces"
+            />
         </resources>
     </client_settings>
 	<server_settings>
-        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="orbit|Orbit" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
-        <global_param name="JS_RESOURCES_BEFORE" group="CONF_MESSAGE[Main Options]" type="string" label="CONF_MESSAGE[Additional JS frameworks]" description="CONF_MESSAGE[Additional JS frameworks description]" mandatory="false" default="plugins/gui.ajax/res/js/jquery_backbone-min.js"/>
+        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="material|Material" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="material"/>
         <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
         <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Login Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
         <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Login Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"
                     editable="true"
                     uploadAction="store_binary_temp"
                     loadAction="get_global_binary_param"
-                    defaultImage="AJXP_THEME_FOLDER/images/LoginBoxLogo.png"
+                    defaultImage="AJXP_IMAGES_FOLDER/LoginBoxLogo.png"
                     mandatory="false"
                     expose="true"
                 />
-        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="AJXP_THEME_FOLDER/images/LoginBoxLogo.png" mandatory="false" expose="true"/>
+        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="AJXP_IMAGES_FOLDER/LoginBoxLogo.png" mandatory="false" expose="true"/>
         <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
         <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
         <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
@@ -33,7 +74,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/PydioLogo250.png"
+                      defaultImage="AJXP_IMAGES_FOLDER/PydioLogo250.png"
                       expose="true"
                 />
         <global_param name="CUSTOM_TOP_TITLE" group="CONF_MESSAGE[Top Toolbar]" type="string" label="CONF_MESSAGE[Title]" description="CONF_MESSAGE[Append a title to the image logo]" mandatory="false" default="" expose="true"/>
@@ -41,7 +82,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/white_logo.png"
+                      defaultImage="AJXP_IMAGES_FOLDER/white_logo.png"
                       expose="true"
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
@@ -58,7 +99,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/01.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/01.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -70,7 +111,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -82,7 +123,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -94,7 +135,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/04.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/04.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_4" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -106,7 +147,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_5" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -118,7 +159,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/06.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/06.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_6" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -130,7 +171,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03-mobile.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/03-mobile.jpg"
                       expose="true"
                 />
 
@@ -143,7 +184,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Minisite]" type="select"
@@ -154,7 +195,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Minisite]" type="select"
@@ -164,7 +205,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Minisite]" type="select"
@@ -176,7 +217,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/PydioLogo250.png"
+                      defaultImage="AJXP_IMAGES_FOLDER/PydioLogo250.png"
                       expose="true"
                 />
 
@@ -201,34 +242,24 @@
         </hooks>
 		<external_file filename="plugins/gui.ajax/ajxpclient_actions.xml" include="actions/*" exclude=""/>
 		<client_configs uuidAttr="name">
-            <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
-                <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
-                    <div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
-                        <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
-						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["admin"],"submenuOffsetTop":2}'></div>
-                    </div>
-                    <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
-                </div>
-			]]></template>
-            <template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
-				<div id="toolbars">
-					<div>
-						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
-						<div id="locationbar_cont" class="css_gradient">
-							<div style="height: 100%;" class="separator"></div>
-							<div style="padding-top : 5px;">
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
-							</div>
-						</div>
-					</div>
-				</div>
+            <template name="main_material" element="ajxp_desktop" position="top" theme="material" namespace="PydioReactUI" component="TemplateBuilder" props='{"imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_", "containerId":"orbit_content"}'/>
+            <template name="material_modal" element="body" position="bottom" theme="material" namespace="PydioReactUI" component="Modal" props='{"containerId":"pydio_modal"}'/>
+            <template name="compat_modal" element="body" position="bottom" theme="compat" namespace="PydioReactUI" component="CompatModal" props='{"containerId":"pydio_modal"}'/>
+            <template name="material_snack" element="body" position="bottom" namespace="PydioReactUI" component="MessageBar" props='{"containerId":"pydio_message_bar"}'/>
+            <template name="material_router" element="ajxp_desktop" position="bottom" namespace="PydioReactUI" component="Router" props='{"containerId":"pydio_router"}'/>
+            <template name="network_loader" element="body" position="bottom" namespace="PydioReactUI" component="NetworkLoader" props='{}'/>
+            <template name="hidden_download" element="body" position="bottom" namespace="PydioReactUI" component="HiddenDownloadForm" props='{}'/>
+            <template name="widget_orbit" element="ajxp_widget" position="top"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>
 			]]></template>
-			<component_config className="FilesList">
+			<component_config component="FilesList">
 				<property name="thumbSize" value="128"/>
 			</component_config>
 		</client_configs>
 	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="core.conf"/>
+    </dependencies>
 </guidriver>

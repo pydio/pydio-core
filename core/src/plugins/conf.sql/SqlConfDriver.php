@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -666,7 +666,10 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             return $res->fetchSingle();
         }else{
             $res =  dibi::query("SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
-            return $res->fetchAll();
+            $data = $res->fetchAll();
+            return array_map(function($entry){
+                return $entry->login;
+            }, $data);
         }
     }
 
@@ -736,11 +739,15 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     /**
      * @param array $roleIds
      * @param bool $excludeReserved
+     * @param bool $includeOwnedRoles
      * @return array
      */
-    public function listRoles($roleIds = array(), $excludeReserved = false)
+    public function listRoles($roleIds = array(), $excludeReserved = false, $includeOwnedRoles = false)
     {
-        $wClauses = array();
+        $wClauses = [];
+        if(!$includeOwnedRoles){
+            $wClauses[] = '[owner_user_id] IS NULL';
+        }
         if (count($roleIds)) {
             // We use (%s) instead of %in to pass everyting as string ('1' instead of 1)
             $wClauses[] = array('[role_id] IN (%s)', $roleIds);
@@ -773,37 +780,35 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
     /**
-     * @param AJXP_Role[] $roles
-     * @return void
-     * @throws PydioException
+     * Get Roles owned by a given user ( = teams )
+     * @param $ownerId
+     * @return AJXP_Role[]
      */
-    public function saveRoles($roles)
-    {
-        dibi::query("DELETE FROM [ajxp_roles]");
-        foreach ($roles as $roleId => $roleObject) {
-            switch ($this->sqlDriver["driver"]) {
-                case "sqlite":
-                case "sqlite3":
-                case "postgre":
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[last_updated]) VALUES (%s, %bin, %s, %i)",
-                        $roleId,
-                        serialize($roleObject),
-                        serialize($roleObject->listAcls()),
-                        time()
-                    );
-                    break;
-                case "mysqli":
-                case "mysql":
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i)",
-                        $roleId,
-                        serialize($roleObject),
-                        time()
-                    );
-                    break;
-                default:
-                    throw new PydioException("ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__");
+    public function listRolesOwnedBy($ownerId){
+
+        $wClauses = [
+            ['[owner_user_id] = %s', $ownerId]
+        ];
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::nativeQuery("SET bytea_output=escape");
+        }
+        $res = dibi::query('SELECT * FROM [ajxp_roles] %if', count($wClauses), 'WHERE %and', $wClauses);
+        $all = $res->fetchAll();
+
+        $roles = [];
+
+        foreach ($all as $role_row) {
+            $id = $role_row['role_id'];
+            $serialized = $role_row['serial_role'];
+            $object = unserialize($serialized);
+            if ($object instanceof AJXP_Role) {
+                $roles[$id] = $object;
+                $object->setLastUpdated($role_row["last_updated"]);
+                $object->setOwnerId($ownerId);
             }
         }
+
+        return $roles;
     }
 
     /**
@@ -822,15 +827,30 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $row = dibi::query("SELECT [role_id] FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
                 $res = $row->fetchSingle();
                 if($res != null){
-                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%bin,[searchable_repositories]=%s,[last_updated]=%i WHERE [role_id]=%s", serialize($role), serialize($role->listAcls()), time(), $role->getId());
+                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%bin,[searchable_repositories]=%s,[owner_user_id]=%s,[last_updated]=%i WHERE [role_id]=%s",
+                        serialize($role),
+                        serialize($role->listAcls()),
+                        ($role->hasOwner() ? $role->getOwner() : null),
+                        time(),
+                        $role->getId()
+                    );
                 }
                 else{
-                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[last_updated]) VALUES (%s, %bin,%s,%i)", $role->getId(), serialize($role), serialize($role->listAcls()), time());
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories],[owner_user_id],[last_updated]) VALUES (%s, %bin,%s,%s,%i)",
+                        $role->getId(),
+                        serialize($role),
+                        serialize($role->listAcls()),
+                        ($role->hasOwner() ? $role->getOwner() : null),
+                        time());
                 }
                 break;
             case "mysqli":
             case "mysql":
-                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role]), [last_updated]=VALUES([last_updated])", $role->getId(), serialize($role), time());
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[owner_user_id],[last_updated]) VALUES (%s, %s, %s, %i) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role]), [last_updated]=VALUES([last_updated])",
+                    $role->getId(),
+                    serialize($role),
+                    ($role->hasOwner() ? $role->getOwner() : null),
+                    time());
                 break;
             default:
                 throw new PydioException("ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__");
@@ -989,6 +1009,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_teams] WHERE [owner_id] = %s', $userId);
+            dibi::query('DELETE FROM [ajxp_roles] WHERE [owner_user_id] = %s', $userId);
             dibi::commit();
             foreach ($children as $childId) {
                 $this->deleteUser($childId, $deletedSubUsers);
@@ -1069,9 +1090,9 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     /**
      * @param $storeId
      * @param null $cursor
-     * @param string $dataIdLike
+     * @param string|array $dataIdLike
      * @param string $dataType
-     * @param string $serialDataLike
+     * @param string|array $serialDataLike
      * @param string $relatedObjectId
      * @return array
      */
@@ -1079,12 +1100,18 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $wheres = array();
         $wheres[] = array('[store_id]=%s', $storeId);
         if(!empty($dataIdLike)){
-            $wheres[] = array('[object_id] LIKE %s', $dataIdLike);
+            if(is_string($dataIdLike)) $dataIdLike = [$dataIdLike];
+            foreach($dataIdLike as $like){
+                $wheres[] = array('[object_id] LIKE %s', $like);
+            }
         }
         if(!empty($serialDataLike)){
-            $wheres[] = array('[serialized_data] LIKE %s', $serialDataLike);
+            if(is_string($serialDataLike)) $serialDataLike = [$serialDataLike];
+            foreach($serialDataLike as $like){
+                $wheres[] = array('[serialized_data] LIKE %s', $like);
+            }
         }
-        if($relatedObjectId != ""){
+        if($relatedObjectId !== ''){ // Do not use empty() here, or "0" can be seen as empty
             $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
         }
         if($cursor != null){
@@ -1107,6 +1134,48 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $data = $value["binary_data"];
             }
             $result[$value['object_id']] = $data;
+        }
+        return $result;
+    }
+
+    /**
+     * @param $storeId
+     * @param string $dataIdLike
+     * @param string $dataType
+     * @param string $serialDataLike
+     * @param string $relatedObjectId
+     * @param bool   $groupByRelated
+     * @return array
+     */
+    public function simpleStoreCount($storeId, $dataIdLike="", $dataType="serial", $serialDataLike="", $relatedObjectId="", $groupByRelated = false){
+        $wheres = array();
+        $wheres[] = array('[store_id]=%s', $storeId);
+        if(!empty($dataIdLike)){
+            if(is_string($dataIdLike)) $dataIdLike = [$dataIdLike];
+            foreach($dataIdLike as $like){
+                $wheres[] = array('[object_id] LIKE %s', $like);
+            }
+        }
+        if(!empty($serialDataLike)){
+            if(is_string($serialDataLike)) $serialDataLike = [$serialDataLike];
+            foreach($serialDataLike as $like){
+                $wheres[] = array('[serialized_data] LIKE %s', $like);
+            }
+        }
+        if($relatedObjectId != ""){
+            $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
+        }
+        if($groupByRelated){
+            $gBy = " GROUP BY ([related_object_id]) ORDER BY COUNT([object_id]) DESC";
+            $children_results = dibi::query("SELECT COUNT([object_id]) as related_count,[related_object_id] FROM [ajxp_simple_store] WHERE %and".$gBy, $wheres);
+            $values = $children_results->fetchAll();
+            $result = array();
+            foreach($values as $value){
+                $result[$value['related_object_id']] = $value['related_count'];
+            }
+        }else{
+            $children_results = dibi::query("SELECT COUNT([object_id]) as related_count FROM [ajxp_simple_store] WHERE %and", $wheres);
+            $result = $children_results->fetchSingle();
         }
         return $result;
     }
@@ -1264,7 +1333,6 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      */
     public function listUserTeams(UserInterface $parentUser)
     {
-        dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT [login] FROM [ajxp_users])");
         $res = dibi::query("SELECT * FROM [ajxp_user_teams] WHERE [owner_id] = %s ORDER BY [team_id]", $parentUser->getId());
         $data = $res->fetchAll();
         $all = array();

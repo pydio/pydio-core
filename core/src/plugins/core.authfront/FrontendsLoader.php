@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ class FrontendsLoader extends Plugin {
              * @var AbstractAuthFrontend $frontendPlugin
              */
             foreach($frontends as $frontendPlugin){
-                if(!$frontendPlugin->isEnabled()) continue;
+                if(!$frontendPlugin->isEnabled($ctx)) continue;
                 if(!method_exists($frontendPlugin, "tryToLogUser")){
                     Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
                     continue;
@@ -91,7 +91,7 @@ class FrontendsLoader extends Plugin {
         $fronts = PluginsService::getInstance($ctx)->getPluginsByType("authfront");
         usort($fronts, array($this, "frontendsSort"));
         foreach($fronts as $front){
-            if($front->isEnabled()){
+            if($front->isEnabled($ctx)){
                 $configs = $front->getConfigs();
                 $protocol = $configs["PROTOCOL_TYPE"];
                 if($protocol == "session_only" && !$useSessions) continue;

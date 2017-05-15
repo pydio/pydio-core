@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Core\Utils\XMLHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -106,7 +107,7 @@ class UserXML
             $buffer.="</user>";
         } else if ($loggedUser !== null) {
             $lock = $loggedUser->getLock();
-            $buffer.="<user id=\"".$loggedUser->getId()."\">";
+            $buffer.="<user id=\"".StringHelper::xmlEntities($loggedUser->getId())."\">";
             $buffer.="<active_repo id=\"".$currentRepoId."\" write=\"".($loggedUser->canWrite($currentRepoId)?"1":"0")."\" read=\"".($loggedUser->canRead($currentRepoId)?"1":"0")."\"/>";
             $buffer.= $this->writeRepositoriesData($ctx);
             $buffer.="<preferences>";
@@ -124,9 +125,9 @@ class UserXML
                     $atts .=  "pluginId='".$prefData["pluginId"]."' ";
                 }
                 if ($prefData["type"] == "string") {
-                    $buffer.="<pref name=\"$prefName\" value=\"".$prefData["value"]."\" $atts/>";
+                    $buffer.="<pref name=\"".StringHelper::xmlEntities($prefName)."\" value=\"". StringHelper::xmlEntities($prefData["value"])."\" $atts/>";
                 } else if ($prefData["type"] == "json") {
-                    $buffer.="<pref name=\"$prefName\" $atts><![CDATA[".$prefData["value"]."]]></pref>";
+                    $buffer.="<pref name=\"".StringHelper::xmlEntities($prefName)."\" $atts><![CDATA[".$prefData["value"]."]]></pref>";
                 }
             }
             $buffer.="</preferences>";

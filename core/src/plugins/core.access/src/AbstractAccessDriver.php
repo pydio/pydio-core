@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -122,7 +122,9 @@ abstract class AbstractAccessDriver extends Plugin
      * @param Repository $repository
      * @return array
      */
-    public function makePublicletOptions($filePath, $password, $expires, $downloadlimit, $repository) {}
+    public function makePublicletOptions($filePath, $password, $expires, $downloadlimit, $repository) {
+        return [];
+    }
 
     /**
      * Populate shared repository options
@@ -130,7 +132,9 @@ abstract class AbstractAccessDriver extends Plugin
      * @param array $httpVars
      * @return array
      */
-    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars){}
+    public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars){
+        return $httpVars;
+    }
 
     /**
      * @param $node AJXP_Node
@@ -210,7 +214,9 @@ abstract class AbstractAccessDriver extends Plugin
                 $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
                 $srcRepoData, $destRepoData, $taskId);
 
-            $origNodesDiffs->remove($file);
+            if(isSet($httpVars["moving_files"])){
+                $origNodesDiffs->remove($file);
+            }
             $destNodesDiffs->add($destNode->createChildNode($destFile));
         }
 
@@ -225,7 +231,7 @@ abstract class AbstractAccessDriver extends Plugin
 
         // Catching potential errors
         if (!empty($errorMessages)) {
-            throw new Exception(join("\n", $errorMessages));
+            throw new PydioException(join("\n", $errorMessages));
         }
 
         // Sending messages to listeners (WS)

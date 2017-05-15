@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@ $mess=array(
 "Port" => "Port",
 "Ftp Host port" => "FTP-Server Port",
 "Path" => "Pfad",
-"Real path to the root folder on the server" => "Realer Pfad zum Root-Verzeichnis auf dem Server",
+"Real path to the root folder on the server" => "Absoluter Pfad zu einem Ordner auf dem Server",
 "Secure" => "Sichere Verbindung",
 "Whether to use ftp or ftps protocol" => "FTP- oder FTPS-Protokoll verwenden",
 "Active" => "Aktiv",
@@ -35,8 +35,8 @@ $mess=array(
 "FTP Server Tweaks" => "FTP-Server-Einstellungen",
 "Fix Permissions" => "Rechte korrigieren",
 "How to handle remote permissions to be used by PHP as local permissions. See manual." => "Wie die Serverrechte durch PHP als lokale Rechte verwendet werden. Siehe Anleitung.",
-"Temporary Folder" => "Temporäres Verzeichnis",
-"Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." => "Temporäres Verzeichnis auf dem lokalen Server, das für Dateiuploads genutzt wird. Zurzeit muss es im Pydio-Verzeichnis auf dem lokalen Server erstellt und für Apache beschreibbar eingerichtet werden",
+"Temporary Folder" => "Temporärer Ordner",
+"Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." => "Temporärer Ordner für hochgeladene Dateien. Dieses muss sich im Pydio-Ordner befinden. Zudem benötigt die Webanwendung Schreibzugriff auf den Ordner.",
 "Dynamic FTP" => "Dynamische FTP-Verbindung",
 "Pass Ftp data through Auth driver" => "Austausch von FTP-Daten durch Authentifizierungs-Treiber erlauben",
 "In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "Mit einem korrekt konfigurierten Auth.ftp-Treiber, kann Pydio als einfacher netFTP Client genutzt werden.",

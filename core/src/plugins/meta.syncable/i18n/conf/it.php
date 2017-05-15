@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -24,4 +24,8 @@ $mess=array(
 "SQL Tables" => "Tabelle SQL",
 "Install SQL Tables" => "Installa Tabelle SQL",
 "Workspace is syncable" => "Il Workspace è sincronizzabile",
+"Observe storage changes" => "Observe storage changes [Experimental]",
+"Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio." => "Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio.",
+"Observe storage changes every..." => "Observe storage changes every...",
+"If previous option is set to Yes, this will trigger a storage indexation every X minutes. This can be heavy in memory, so it can be a good practice to use something between 5 and 60 minutes." => "If previous option is set to Yes, this will trigger a storage indexation every X minutes. This can be heavy in memory, so it can be a good practice to use something between 5 and 60 minutes.",
 );

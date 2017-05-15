@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -135,7 +135,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
             case PHPCAS_MODE_CLIENT:
                 if ($this->checkConfigurationForClientMode()) {
 
-                    Logger::info(__FUNCTION__, "Start phpCAS mode Client: ", "sucessfully");
+                    Logger::debug(__FUNCTION__, "Start phpCAS mode Client: ", "sucessfully");
 
                     phpCAS::client(CAS_VERSION_2_0, $this->cas_server, $this->cas_port, $this->cas_uri, false);
 
@@ -217,9 +217,9 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
                     if (!empty($res)) {
                         $_SESSION['PROXYTICKET'] = $res;
-                        Logger::info(__FUNCTION__, "Get Proxy ticket successfully ", "");
+                        Logger::debug(__FUNCTION__, "Get Proxy ticket successfully ", "");
                     } else {
-                        Logger::info(__FUNCTION__, "Could not get Proxy ticket. ", "");
+                        Logger::debug(__FUNCTION__, "Could not get Proxy ticket. ", "");
                     }
                     break;
                 } else {
@@ -413,7 +413,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                         $db_password = $dbconfig->sqlDriver["password"];
                         $db_database = "mysql:" . "dbname=" . $dbconfig->sqlDriver["database"] . ";host=" . $dbconfig->sqlDriver["host"];
                         $db_table = "ajxp_cas_pgt";
-                        Logger::info(__CLASS__, __FUNCTION__, $db_database);
+                        Logger::debug(__CLASS__, __FUNCTION__, $db_database);
                         phpCAS::setPGTStorageDb($db_database, $db_username, $db_password, $db_table, "");
                     }
                 }

@@ -16,100 +16,6 @@
 	<registry_contributions>
 		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*,client_configs/*" exclude=""/>
         <actions>
-            <action name="user_team_create">
-                <gui src="delete.png" iconClass="icon-plus" text="user_dash.57" title="user_dash.57">
-                    <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="team_address_book"/>
-                </gui>
-                <processing>
-                    <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
-                        <dialogOnOpen><![CDATA[
-                            var oForm = modal.getForm();
-                            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
-                                TeamEditor.prototype.getInstance().open(oForm);
-                            });
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                            TeamEditor.prototype.getInstance().complete(oForm);
-                        ]]></dialogOnComplete>
-                        <dialogOnCancel><![CDATA[
-                            TeamEditor.prototype.getInstance().close(oForm);
-                        ]]></dialogOnCancel>
-                    </clientCallback>
-                    <serverCallback methodName="userTeamsActions"/>
-                </processing>
-            </action>
-            <action name="user_team_add_user">
-                <processing>
-                    <serverCallback methodName="userTeamsActions"/>
-                </processing>
-            </action>
-            <action name="user_team_edit_users">
-                <gui src="delete.png" iconClass="icon-edit" text="user_dash.54" title="user_dash.55">
-                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="team_address_book"/>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
-                </gui>
-                <processing>
-                    <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
-                        <dialogOnOpen><![CDATA[
-                            var contextHolder = window.actionManager.getDataModel();
-                            var oForm = modal.getForm();
-                            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
-                                TeamEditor.prototype.getInstance().open(oForm, contextHolder);
-                            });
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                            TeamEditor.prototype.getInstance().complete(oForm);
-                        ]]></dialogOnComplete>
-                        <dialogOnCancel><![CDATA[
-                            TeamEditor.prototype.getInstance().close(oForm);
-                        ]]></dialogOnCancel>
-                    </clientCallback>
-                    <clientForm id="team_edit_form"><![CDATA[
-                         <div id="team_edit_form" box_width="420">
-                            <div class="dialogContentMainTitle" ajxp_message_id="user_dash.59">AJXP_MESSAGE[user_dash.59]</div>
-                            <input type="text" style="width:367px;margin-bottom:30px;" id="team_edit_label"/>
-
-                            <div class="dialogContentMainTitle" ajxp_message_id="user_dash.60">AJXP_MESSAGE[user_dash.60]</div>
-                            <div class="dialogLegend" ajxp_message_id="user_dash.56">AJXP_MESSAGE[user_dash.56]</div>
-                            <div style="position: relative;">
-                                <div id="team_loader" style="position: absolute;top: 2px;right: 3px;font-size: 17px;display: none;"><span class="icon-spinner"></span></div>
-                                <input type="text" style="width:367px;" id="team_edit_input"/>
-                                <div type="text" class="editable_users_list" id="team_edit_entries"></div>
-                                <div id="team_edit_container"></div>
-                            </div>
-                         </div>
-                    ]]></clientForm>
-                    <serverCallback methodName="userTeamsActions"/>
-                </processing>
-            </action>
-            <action name="user_team_delete">
-                <gui src="delete.png" iconClass="icon-trash" text="7" title="7">
-                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="team_address_book"/>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                    if(window.confirm(MessageHash["user_dash.52"])){
-                        var sel = window.actionManager.getDataModel().getUniqueNode();
-                        var conn = new Connexion();
-                        conn.setParameters($H({
-                            get_action: "user_team_delete",
-                            team_id: getBaseName(sel.getPath())
-                        }));
-                        conn.onComplete = function(){
-                            $("team_panel").ajxpPaneObject.reloadDataModel();
-                        };
-                        conn.sendAsync();
-                    }
-                    ]]></clientCallback>
-                    <serverCallback methodName="userTeamsActions"/>
-                </processing>
-            </action>
-            <action name="user_team_delete_user">
-                <processing>
-                    <serverCallback methodName="userTeamsActions"/>
-                </processing>
-            </action>
             <action name="ajxp_table_exists">
                 <rightsContext adminOnly="true" noUser="false" read="true" userLogged="only" write="true"/>
                 <processing>
@@ -118,7 +24,7 @@
             </action>
         </actions>
         <client_configs>
-            <component_config className="AjxpTabulator::userdashboard_main_tab">
+            <component_config component="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="team_pane"
                                 tabInfo='{"id":"teams","position":2,"iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
