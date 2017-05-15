@@ -136,6 +136,8 @@ class ConfService
 
     public static function detectVersionMismatch(){
         if(AJXP_VERSION_DB === '##DB_VERSION##') return false;
+        $p = PluginsService::getInstance(Context::emptyContext())->getPluginById("core.conf");
+        if($p === false) return false;
         $confDriver = self::getConfStorageImpl();
         if ($confDriver instanceof \Pydio\Conf\Sql\SqlConfDriver) {
             $conf = OptionsHelper::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
