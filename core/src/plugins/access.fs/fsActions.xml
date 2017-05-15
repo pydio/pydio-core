@@ -15,7 +15,7 @@
 			</rightsContext>
 			<processing>
                 <clientCallback module="FSActions.Callbacks.ls"/>
-				<serverCallback methodName="switchAction" restParams="/dir+" preferredHttp="GET" sdkMethodName="listNodes" checkParams="true" developerComment="Standard listing action
+				<serverCallback methodName="switchAction" restParams="/dir+" preferredHttp="GET" sdkMethodName="listNodes" checkParams="false" developerComment="Standard listing action
 				    to retrieve the list of children for a given directory. For the main parameters, use {nodes} parameter, the {dir}+{file} are kept for backward compatibility.">
                     <input_param description="Directory to browse, from the repository root" name="dir" type="string" mandatory="false"/>
                     <input_param description="One file to check" name="file" type="string" mandatory="false"/>
