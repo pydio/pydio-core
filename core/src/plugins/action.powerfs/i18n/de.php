@@ -24,5 +24,5 @@ $mess = array(
     "2" => "Aktuellen Ordner neu laden",
     "3" => "Der Download des Archivs sollte automatisch starten",
     "4" => "Archiv wird erstellt - %s%",
-    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
+    "5" => "Archiv zum Herunterladen konnte nicht gefunden werden! Ist das Zip-Programm auf dem Server installiert?",
 );

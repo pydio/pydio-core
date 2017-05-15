@@ -21,9 +21,9 @@
 
 $mess = array(
     "1" => "Inhalt in­de­xie­ren",
-    "2" => "Verzeichnisinhalt in­de­xie­ren",
+    "2" => "Ordnerinhalt in­de­xie­ren",
     "3" => "In­de­xie­rung wird im Hintergrund ausführt",
-    "4" => "Der Index scheint gesperrt zu sein, ein In­de­xie­rungsprozess könnte bereits laufen. Falls nicht, bitte die .ajxp_lock-Datei im Verzeichnis cache/indexes löschen.",
+    "4" => "Der Index scheint gesperrt zu sein, ein In­de­xie­rungsprozess könnte bereits laufen. Falls nicht, bitte die .ajxp_lock-Datei im Ordner cache/indexes löschen.",
     "5" => "Indexierung abgeschlossen",
     "6" => "Warnung, die Indexierung der Arbeitsumgebung wird gerade ausgeführt. Bitte versuchen Sie es später noch einmal.",
     "7" => "Die Arbeitsumgebung wird zum ersten Mal indexiert. Bitte versuchen Sie es später noch einmal.",
@@ -31,5 +31,6 @@ $mess = array(
     "9" => "Für die Arbeitsumgebung existiert kein Index. Bitte starten Sie zuerst die Indexierung.",
     "10" => "In­de­xie­rung des Unterordners wird im Hintergrund ausführt",
     "11" => "Die Indexierung der Arbeitsumgebung wird gerade ausgeführt. Bitte versuchen Sie es in drei Minuten noch einmal.",
-    "12" => "Für die Arbeitsumgebung existiert kein Index. Bitte starten Sie zuerst die Indexierung."
+    "12" => "Für die Arbeitsumgebung existiert kein Index. Bitte starten Sie zuerst die Indexierung.",
+    "13" => "Inhalt",
 );

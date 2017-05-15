@@ -2,7 +2,7 @@
 
 $mess = array(
 "1" => "SVN-Protokoll",
-"11" => "SVN-Protokoll des aktuellen Verzeichnisses",
+"11" => "SVN-Protokoll des aktuellen Ordners",
 "2" => "SVN-Protokoll",
 "21" => "SVN-Protokoll des ausgewählten Elements",
 "3" => "Zu Version wechseln",

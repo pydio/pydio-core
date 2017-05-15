@@ -41,4 +41,5 @@ $mess = [
     "19" => "Stop upload and alert me",
     "20" => "Rename file automatically",
     "21" => "Overwrite existing file silently",
+    "22" => "Options",
 ];

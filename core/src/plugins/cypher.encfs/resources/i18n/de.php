@@ -25,8 +25,8 @@ $mess=array(
 "4" => "Ordnerinhalt entschlüsseln",
 "5" => "Chiffre Ordner",
 "6" => "Ordnerinhalt verschlüsseln",
-    "7" => "Enter the encryption key you have chosen when first encrypting this folder.",
-    "8" => "Encryption Key",
-    "9" => "Confirm Encryption Key",
-    "10" => "Choose an encryption key to make your data inaccessible by anyone but you. Be aware that if you loose the key, your data will be lost forever!",
+    "7" => "Geben Sie den Schlüssel ein, den Sie beim verschlüsseln dieses Ordners angegeben haben.",
+    "8" => "Schlüssel",
+    "9" => "Schlüssel bestätigen",
+    "10" => "Legen Sie einen Schlüssel fest, damit kein Anderer auf die Dateien zugreifen kann. Achtung: Wenn Sie diesen verlieren können Sie nicht mehr auf die Dateien zugreifen!",
 );

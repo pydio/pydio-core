@@ -56,7 +56,7 @@
     </authdriver_commons>
     <dibidriver_consumer>
         <server_settings uuidAttr="name">
-            <global_param group_switch_name="dibi" group_switch_label="Core Connexion" group_switch_value="core" name="core_driver" default="core" label="Core Connexion" description="MIXIN_MESSAGE[Driver type (do not touch)]" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="MIXIN_MESSAGE[Core Connexion]" group_switch_value="core" name="core_driver" default="core" label="Core Connexion" description="MIXIN_MESSAGE[Driver type (do not touch)]" type="hidden" mandatory="true"/>
         </server_settings>
     </dibidriver_consumer>
     <dibidriver_provider>
