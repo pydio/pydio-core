@@ -3,7 +3,7 @@ $mess = array(
 "1" => "HTTP-Server",
 "2" => "Datei von einem entfernten HTTP-Server laden",
 "3" => "o",
-"4" => "Bitte mindestens eine URL eingeben. Die Datei wird im Hintergrund in den aktuellen Ordner geladen. (w&auml;hrenddessen kann gearbeitet werden)",
+"4" => "Bitte mindestens eine URL eingeben. Die Datei wird im Hintergrund in den aktuellen Ordner geladen. (währenddessen kann gearbeitet werden)",
 "5" => "URL",
 // The two strings below belong together.
 // After the first one the file name will be displayed followed by the second string
@@ -23,5 +23,5 @@ $mess = array(
 "15" => "Oder mit diesem Code manuell einen Link erstellen: ",
 "16" => "Ziehen Sie mich in Ihre Lesezeichenleiste!",
 "17" => "Datei herunterladen",
-"18" => "Unvollst&auml;ndige Datei",
+"18" => "Unvollständige Datei",
 );

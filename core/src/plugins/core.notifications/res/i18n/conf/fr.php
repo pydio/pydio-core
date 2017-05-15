@@ -28,6 +28,6 @@ $mess=array(
 "Instance Params" => "Paramêtre d'instance",
 "Feed Instance" => "Feed Instance",
 "Choose the plugin" => "Choisir un plugin",
-"Display Workspaces Activity" => "Display Workspaces Activity",
-"Display workspaces activity to the users in the right-hand information panel" => "Display workspaces activity to the users in the right-hand information panel",
+"Display Workspaces Activity" => "Afficher l'activité des workspaces",
+"Display workspaces activity to the users in the right-hand information panel" => "Affiche un widget avec un flux d'activité dans le panneau d'information.",
 );
