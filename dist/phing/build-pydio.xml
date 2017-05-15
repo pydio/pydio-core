@@ -362,7 +362,11 @@
         <zip
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
-                ><fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+                >
+            <fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false">
+                <include name="pydio-core-upgrade-${previous_version}-${build.version}/**"/>
+            </fileset>
+        </zip>
     </target>
 
     <target name="add_update_script" description="Additional upgrade scripts, requires extension and target_name properties">
