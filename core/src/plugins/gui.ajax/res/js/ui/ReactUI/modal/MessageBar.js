@@ -158,7 +158,7 @@ class MessageBar extends React.Component{
         }
         message = (
             <span>
-                {errorStatus && <span><span className="mdi mdi-alert"/>&nbsp;</span>}
+                {errorStatus && <span style={{float:'left', marginRight:6}} className="mdi mdi-alert"/>}
                 {mainStack.map((m)=>{return <div>{m}</div>})}
                 {errorStack.length > 0 &&
                     <ErrorStack fullMessage={message} errorStack={errorStack} pydio={this.props.pydio}/>
