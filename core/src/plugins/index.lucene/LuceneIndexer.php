@@ -72,6 +72,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
      */
     public function initMeta(ContextInterface $contextInterface, AbstractAccessDriver $accessDriver)
     {
+        $messages = LocaleService::getMessages();
         parent::initMeta($contextInterface, $accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
@@ -79,7 +80,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
                 $data = ["indexed_meta_fields" => $metaFields,
-                              "additionnal_meta_columns" => ["ajxp_document_content" => "Content"]
+                              "additionnal_meta_columns" => ["ajxp_document_content" => $messages["index.lucene.13"]]
                 ];
                 $el->setAttribute("indexed_meta_fields", json_encode($data));
             } else {

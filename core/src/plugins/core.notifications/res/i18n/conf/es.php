@@ -29,4 +29,6 @@ $mess=array(
 "Instance Params" => "Parámetros de la instancia",
 "Feed Instance" => "Instancia de feed",
 "Choose the plugin" => "Seleccione el plugin",
+"Display Workspaces Activity" => "Display Workspaces Activity",
+"Display workspaces activity to the users in the right-hand information panel" => "Display workspaces activity to the users in the right-hand information panel",
 );

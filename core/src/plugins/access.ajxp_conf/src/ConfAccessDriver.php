@@ -279,9 +279,9 @@ class ConfAccessDriver extends AbstractAccessDriver
         $user = $ctx->getUser();
         if ($user != null && $user->getGroupPath() != "/") {
             // Group Admin
-            unset($rootNodes["config"]);
+            unset($rootNodes["parameters"]);
+            unset($rootNodes["plugins"]);
             unset($rootNodes["admin"]);
-            unset($rootNodes["developer"]);
             $rootNodes["__metadata__"] = [
                 "icon_class" => "mdi mdi-view-dashboard",
                 "component"  => "AdminComponents.GroupAdminDashboard",

@@ -84,7 +84,7 @@
                                 <MaterialUI.FlatButton label={messages['html_uploader.12']} style={{marginRight: 10}} onClick={this.clear}/>
                             </div>
                             <div style={{display:'flex', alignItems: 'center', marginRight: '-48px'}}>
-                                <MaterialUI.FlatButton style={{float: 'right'}} label="Options" onClick={this.toggleOptions}/>
+                                <MaterialUI.FlatButton style={{float: 'right'}} label={messages['html_uploader.22']} onClick={this.toggleOptions}/>
                             </div>
                         </div>
                     </MaterialUI.Toolbar>

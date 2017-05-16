@@ -107,11 +107,11 @@ let Dashboard = React.createClass({
 
         // ADMIN GUIDE BUTTONS
         const guidesButtons = [
-            {icon:'clock-start', id:'start', link:'https://pydio.com/en/docs/v7/getting-started'},
-            {icon:'network', id:'ws', link:'https://pydio.com/en/docs/v7/workspaces'},
-            {icon:'account-multiple', id:'users', link:'https://pydio.com/en/docs/v7/users-managements'},
-            {icon:'settings', id:'parameters', link:'https://pydio.com/en/docs/v7/global-parameters'},
-            {icon:'professional-hexagon', id:'advanced', link:'https://pydio.com/en/docs/v7/enriching-your-users-experience'}
+            {icon:'clock-start', id:'start', link:'https://pydio.com/en/docs/v8/getting-started'},
+            {icon:'network', id:'ws', link:'https://pydio.com/en/docs/v8/setup-workspaces-and-users'},
+            {icon:'account-multiple', id:'users', link:'https://pydio.com/en/docs/v8/groups-admin-and-delegation'},
+            {icon:'settings', id:'parameters', link:'https://pydio.com/en/docs/v8/pydio-advanced-configuration'},
+            {icon:'professional-hexagon', id:'advanced', link:'https://pydio.com/en/docs/v8/pydio-advanced-configuration'}
         ];
 
         // DOCS LIST

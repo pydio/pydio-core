@@ -336,7 +336,7 @@ let Dashboard = React.createClass({
                             searchResultData={this.state.searchResultData}
                             elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES}
                             hideToolbar={false}
-                            computeActionsForNode={true}
+                            multipleActions={[this.props.pydio.Controller.getActionByName('delete')]}
                         />
                     </ReactMUI.Paper>
                 </div>

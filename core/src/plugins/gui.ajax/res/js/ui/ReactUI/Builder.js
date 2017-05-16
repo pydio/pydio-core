@@ -32,6 +32,8 @@ export default class Builder{
         this._pydio = pydio;
         this.guiLoaded = false;
         this._componentsRegistry = new Map();
+        this._pydio.observe('repository_list_refreshed', this.pageTitleObserver.bind(this));
+        this._pydio.getContextHolder().observe('context_loaded', this.pageTitleObserver.bind(this));
     }
 
     insertChildFromString(parent, html){
@@ -40,6 +42,11 @@ export default class Builder{
         for(let i = 0; i < element.childNodes.length; i++){
             parent.appendChild(element.childNodes[i].cloneNode(true));
         }
+    }
+
+    pageTitleObserver(){
+        const ctxNode = this._pydio.getContextNode();
+        document.title = this._pydio.Parameters.get('customWording').title + ' - ' + ctxNode.getLabel();
     }
 
     initTemplates(){

@@ -333,6 +333,11 @@ class Pydio extends Observable{
                 return;
             }
         }
+        if(this._repositoryCurrentlySwitching && this.user){
+            this.user.setPreference("pending_folder", gotoNode.getPath());
+            this._initLoadRep = gotoNode.getPath();
+            return;
+        }
         const current = this._contextHolder.getContextNode();
         if(current && current.getPath() == path){
             return;
@@ -371,6 +376,7 @@ class Pydio extends Observable{
      */
     triggerRepositoryChange(repositoryId, callback){
         this.fire("trigger_repository_switch");
+        this._repositoryCurrentlySwitching = true;
         const onComplete = (transport) => {
             if(transport.responseXML){
                 this.ApiClient.parseXmlMessage(transport.responseXML);
@@ -378,7 +384,8 @@ class Pydio extends Observable{
             this.loadXmlRegistry(false,  null, null, repositoryId);
             this.repositoryId = null;
 
-            if (typeof callback == "function") callback()
+            if (typeof callback == "function") callback();
+            this._repositoryCurrentlySwitching = false;
         };
 
         const root = this._contextHolder.getRootNode();

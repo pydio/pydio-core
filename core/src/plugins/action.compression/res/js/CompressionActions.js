@@ -140,7 +140,6 @@
 
 
         static extract(){
-            console.log("Toto1?");
             var userSelection = pydio.getUserSelection();
             if (!userSelection.isEmpty()) {
                 PydioApi.getClient().postSelectionWithAction('extraction', function(transport){

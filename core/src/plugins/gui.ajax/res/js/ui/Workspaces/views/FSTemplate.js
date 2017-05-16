@@ -163,6 +163,7 @@ let FSTemplate = React.createClass({
         }
 
         const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
+        const inboxWorkspace = this.props.pydio.user && this.props.pydio.user.activeRepository === 'inbox';
 
         // Making sure we only pass the style to the parent element
         const {style, ...props} = this.props
@@ -177,21 +178,23 @@ let FSTemplate = React.createClass({
                             <span className="drawer-button"><MaterialUI.IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <Breadcrumb {...props} startWithSeparator={false}/>
                             <span style={{flex:1}}/>
-                            <SearchForm {...props}/>
+                            {!inboxWorkspace && <SearchForm {...props}/>}
                         </div>
                         <div id="main_toolbar">
-                            <PydioComponents.ButtonMenu
-                                {...props}
-                                buttonStyle={styles.raisedButtonStyle}
-                                buttonLabelStyle={styles.raisedButtonLabelStyle}
-                                id="create-button-menu"
-                                toolbars={["upload", "create"]}
-                                buttonTitle="New"
-                                raised={true}
-                                secondary={true}
-                                controller={props.pydio.Controller}
-                                openOnEvent={'tutorial-open-create-menu'}
-                            />
+                            {!inboxWorkspace &&
+                                <PydioComponents.ButtonMenu
+                                    {...props}
+                                    buttonStyle={styles.raisedButtonStyle}
+                                    buttonLabelStyle={styles.raisedButtonLabelStyle}
+                                    id="create-button-menu"
+                                    toolbars={["upload", "create"]}
+                                    buttonTitle={this.props.pydio.MessageHash['198']}
+                                    raised={true}
+                                    secondary={true}
+                                    controller={props.pydio.Controller}
+                                    openOnEvent={'tutorial-open-create-menu'}
+                                />
+                            }
                             {!mobile &&
                                 <PydioComponents.Toolbar
                                     {...props}

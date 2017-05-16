@@ -68,7 +68,20 @@ if(!function_exists('crawlPermissions')){
 
 }
 
+if(!function_exists('disablePlugin')){
+
+    function disablePlugin($pluginId){
+
+        if(file_exists(AJXP_INSTALL_PATH."/plugins/".$pluginId."/manifest.xml")){
+            rename(AJXP_INSTALL_PATH."/plugins/".$pluginId."/manifest.xml", AJXP_INSTALL_PATH."/plugins/".$pluginId."/manifest.xml.disabled");
+        }
+
+    }
+
+}
+
 crawlPermissions(null, AJXP_INSTALL_PATH."/*.php");
 crawlPermissions(AJXP_INSTALL_PATH."/core");
 crawlPermissions(AJXP_INSTALL_PATH."/plugins");
+disablePlugin("access.sftp_psl");
 blockAllXHRInPage();

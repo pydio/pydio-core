@@ -545,7 +545,7 @@ class ShareCenter extends Plugin
             if($share->isExpired()){
                 throw new \Exception('Link is expired');
             }
-            if($share->hasDownloadLimit()){
+            if($share->hasDownloadLimit() || $share->hasTargetUsers()){
                 $share->incrementDownloadCount($requestInterface->getAttribute('ctx'));
                 $share->save();
             }

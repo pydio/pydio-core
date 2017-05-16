@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -16,15 +16,13 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <https://pydio.com>.
+* The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"timestamp" => "Universign",
-"Allow timestamp files with Universign." => "Dokumente mit Universign digital signieren und mit einem Zeitstempel versehen.",
-"URL" => "URL zum Universign API Webservice",
-"Timestamp provider API URL" => "Universign-API URL",
-"User Mail" => "E-Mail-Adresse",
-"Password" => "Passwort",
-"User account" => "Die bei Universign registrierte E-Mail-Adresse",
-"User Password" => "Das Passwort zum Universign-Benutzer",
+    "Collabora Online" => "Collabora-Online",
+    "Collabora Online Editor for office documents" => "Collabora-Online-Editor für Office-Dokumente",
+    "URL to the Libre Office Editor Iframe" => "URL zum Libre-Office Editor-Iframe",
+    "Websocket Uses TLS" => "Websocket mit TLS",
+    "Web Socket Connector Host" => "Websocket Host",
+    "Web Socket Connector Port" => "Websocket Port",
 );

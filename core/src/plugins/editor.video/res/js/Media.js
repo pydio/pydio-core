@@ -272,8 +272,8 @@ class Media extends React.Component {
 
         // We have a reference to the parent so that if the video tag has disappeared, no errors is thrown when unmounting
         return (
-            <div ref="videoPlayerMountPoint" style={{padding: 0, margin: 0}}>
-                <video ref="videoPlayer" className={videoPlayerClasses}>
+            <div ref="videoPlayerMountPoint" style={{padding: 0, margin: 0, height:'100%'}}>
+                <video ref="videoPlayer" className={videoPlayerClasses} style={{height:'100%'}}>
                 {this.props.children || this.renderDefaultWarning()}
                 </video>
             </div>

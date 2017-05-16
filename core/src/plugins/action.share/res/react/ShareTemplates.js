@@ -10,7 +10,7 @@ const { ContextMenu, ButtonMenu, Toolbar, ListPaginator, ClipboardTextField } = 
 const { BackgroundImage } = Pydio.requireLib('boot');
 const { EditorActions, dropProvider } = Pydio.requireLib('hoc');
 
-const withUniqueNode = (Component) => {
+const withUniqueNode = (attachListener) => (Component) => {
     return class WithUniqueNode extends React.PureComponent {
 
         componentDidMount() {
@@ -32,6 +32,13 @@ const withUniqueNode = (Component) => {
                 if (!this.state || !this.state.node) {
                     this.setState({node: dm.getSelectedNodes()[0]});
                 }
+            }
+            if(attachListener){
+                dm.observe("selection_changed", function(){
+                    let selection = dm.getSelectedNodes();
+                    if(selection.length) this.setState({node: selection[0]});
+                    else this.setState({node: null});
+                }.bind(this));
             }
         }
 
@@ -295,7 +302,7 @@ let StandardLayout = React.createClass({
                         <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
                             {!uniqueNode &&
                                 <span style={{marginTop:7}}>
-                                    <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} secondary={true} controller={this.props.pydio.Controller}/>
+                                    <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle={this.props.pydio.MessageHash['198']} raised={true} secondary={true} controller={this.props.pydio.Controller}/>
                                 </span>
                             }
                             <Toolbar {...this.props} id="main-toolbar" toolbars={uniqueNode ? ["minisite_toolbar"] : ["info_panel"]} groupOtherList={uniqueNode ? [] : ["change_main", "more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
@@ -454,56 +461,133 @@ const DropZoneMinisite = React.createClass({
 
 });
 
-const FilmStripMinisite = React.createClass({
+class FilmStripMinisite extends React.Component{
 
-    mixins: [UniqueNodeTemplateMixin],
+    componentDidMount(){
+        pydio.UI.registerEditorOpener(this);
+    }
 
-    componentDidMount: function(){
-        this.detectFirstNode(true);
-    },
+    componentWillUnmount() {
+        pydio.UI.unregisterEditorOpener(this);
+    }
 
-    render: function(){
+    componentWillReceiveProps(nextProps) {
+
+        const {pydio, node, dispatch} = nextProps
+
+        if(this.props.node){
+            dispatch(EditorActions.tabDelete(this.props.node.getLabel()));
+        }
+
+        if (!node || !node.isLeaf()) return
+
+        const selectedMime = PathUtils.getAjxpMimeType(node);
+        const editors = pydio.Registry.findEditorsForMime(selectedMime, false);
+        if (editors.length && editors[0].openable) {
+
+            const editorData = editors[0]
+
+            pydio.Registry.loadEditorResources(
+                editorData.resourcesManager,
+                () => {
+                    let EditorClass = null
+
+                    if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+                        this.setState({
+                            error: "Cannot find editor component (" + editorData.editorClass + ")!"
+                        })
+                        return
+                    }
+
+                    let tabId = dispatch(EditorActions.tabCreate({
+                        id: node.getLabel(),
+                        title: node.getLabel(),
+                        url: node.getPath(),
+                        icon: PydioWorkspaces.FilePreview,
+                        Editor: EditorClass.Editor,
+                        Controls: EditorClass.Controls,
+                        pydio,
+                        node,
+                        editorData,
+                        registry: pydio.Registry
+                    })).id
+
+                    dispatch(EditorActions.editorSetActiveTab(tabId))
+                }
+            )
+        }
+    }
+
+    openEditorForNode(node, editorData) {
+        const {dispatch} = this.props
+        if(!node.isLeaf()) return;
+        pydio.Registry.loadEditorResources(
+            editorData.resourcesManager,
+            () => {
+                let EditorClass = null
+
+                if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+                    this.setState({
+                        error: "Cannot find editor component (" + editorData.editorClass + ")!"
+                    })
+                    return
+                }
+
+                dispatch(EditorActions.tabModify({
+                    id: node.getLabel(),
+                    title: node.getLabel(),
+                    url: node.getPath(),
+                    icon: PydioWorkspaces.FilePreview,
+                    Editor: EditorClass.Editor,
+                    Controls: EditorClass.Controls,
+                    pydio,
+                    node,
+                    editorData,
+                    registry: pydio.Registry
+                }))
+            }
+        )
+    }
 
 
-        let node = this.state && this.state.node ?  this.state.node : null;
+    render(){
+
+
+        let node = this.props && this.props.node ?  this.props.node : null;
 
         let editor;
-        if(node){
+        if(node && node.isLeaf()) {
             editor = (
-                <InlineEditor
-                    pydio={this.props.pydio}
-                    node={node}
-                />
-            );
-        }else{
-            editor = (
-                <PydioReactUI.Loader />
+                <Editor displayToolbar={false} style={{display: "flex", flex: 1}}/>
             );
         }
 
-
         return (
             <StandardLayout {...this.props} skipDisplayToolbar={true}>
-                <div className="vertical_layout" style={{flex:1, backgroundColor:'#424242'}}>
+                <div className="vertical_layout" style={{flex:1, backgroundColor:'#424242', position:'relative'}}>
                     {editor}
                 </div>
-                <MaterialUI.Paper zDepth={2} className="vertical_layout" style={{height: 160, backgroundColor:this.props.muiTheme.appBar.color}}>
+                <MaterialUI.Paper zDepth={2} className="vertical_layout" style={{height: 160, backgroundColor:this.props.muiTheme.appBar.color, zIndex:1}}>
                     <MainFilesList ref="list" {...this.props} horizontalRibbon={true} displayMode={"grid-160"}/>
                 </MaterialUI.Paper>
             </StandardLayout>
         );
     }
 
-});
+};
 
 window.ShareTemplates = {
     FolderMinisite      : muiThemeable()(FolderMinisite),
     FileMinisite        : compose(
-        withUniqueNode,
+        withUniqueNode(false),
         muiThemeable(),
         connect()
     )(FileMinisite),
     DLTemplate          : muiThemeable()(DLTemplate),
     DropZoneMinisite    : muiThemeable()(DropZoneMinisite),
-    FilmStripMinisite   : muiThemeable()(FilmStripMinisite)
+    FilmStripMinisite   : compose(
+        withUniqueNode(true),
+        muiThemeable(),
+        connect()
+    )(FilmStripMinisite)
 };

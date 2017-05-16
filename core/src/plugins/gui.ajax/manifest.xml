@@ -259,4 +259,7 @@
 			</component_config>
 		</client_configs>
 	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="core.conf"/>
+    </dependencies>
 </guidriver>

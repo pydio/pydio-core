@@ -22,9 +22,9 @@ $mess=array(
 "Demo (no write actions)" => "Demo (ohne Schreibrechte)",
 "This is a standard access to the filesystem but with all write actions disabled server-side." => "Dies ist ein Standardzugriff auf das Dateisystem, aber alle Schreibvorgänge sind serverseitig blockiert.",
 "Path" => "Pfad",
-"Real path to the root folder on the server" => "Absoluter Pfad zum Haupt-Verzeichnis des Servers",
-"Create" => "Erstellen",
-"Create folder if it does not exists" => "Nicht existierendes Verzeichnis erstellen",
-"Recycle Bin Folder" => "Papierkorb-Verzeichnis",
+"Real path to the root folder on the server" => "Absoluter Pfad zu einem Ordner auf dem Server",
+"Create" => "Ordner erstellen",
+"Create folder if it does not exists" => "Nicht vorhandene Ordner erstellen",
+"Recycle Bin Folder" => "Papierkorb-Ordner",
 "Leave empty if you do not want to use a recycle bin." => "Leerlassen um kein Papierkorb zu verwenden.",
 );

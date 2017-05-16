@@ -23,13 +23,15 @@
 class CustomIframe extends React.Component {
 
     onUnload(e) {
-        let href = this.myIframe.contentDocument.location.href;
+        try{
+            let href = this.myIframe.contentDocument.location.href;
 
-        if(href && href.indexOf('image=') > -1){
-            this.save(href);
-        }else if(href && (href.indexOf('close_pixlr')>-1 || href.indexOf('error_pixlr')>-1)){
-            // TODO: Close the editor
-        }
+            if(href && href.indexOf('image=') > -1){
+                this.save(href);
+            }else if(href && (href.indexOf('close_pixlr')>-1 || href.indexOf('error_pixlr')>-1)){
+                // TODO: Close the editor
+            }
+        }catch(e){}
     }
 
     save(pixlrUrl) {
@@ -46,11 +48,15 @@ class CustomIframe extends React.Component {
     }
 
     componentDidMount() {
-        this.myIframe.contentWindow.addEventListener("onbeforeunload", this.onUnload)
+        try{
+            this.myIframe.contentWindow.addEventListener("onbeforeunload", this.onUnload)
+        }catch(e){}
     }
 
     componentWillUnmount() {
-        this.myIframe.contentWindow.removeEventListener("onbeforeunload", this.onUnload)
+        try{
+            this.myIframe.contentWindow.removeEventListener("onbeforeunload", this.onUnload)
+        }catch(e){}
     }
 
     render() {
