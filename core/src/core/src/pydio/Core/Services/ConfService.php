@@ -247,6 +247,7 @@ class ConfService
         if(isSet(self::$tmpConfStorageImpl)) return self::$tmpConfStorageImpl;
         /** @var CoreInstanceProvider $p */
         $p = PluginsService::getInstance(Context::emptyContext())->getPluginById("core.conf");
+        if($p === false) return false;
         return $p->getImplementation();
     }
 
