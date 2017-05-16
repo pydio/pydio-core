@@ -32,7 +32,7 @@ $mess=array(
 "46"=> "Adressbuch",
 "47"=> "Von Ihnen erstellte Benutzer",
 "48"=> "Meine Benutzer",
-"49"=> "Externe Benutzer, die Sie erstellt haben",
+"49"=> "Freigaben-Benutzer, die Sie erstellt haben",
 "50"=> "Meine Teams",
 "51"=> "Um Inhalte schnell an einen bestimmten Personenkreis freizugeben.",
 "52"=> "Möchten Sie dieses Team wirklich löschen? Es werden dabei keine Benutzer gelöscht.",
@@ -150,4 +150,8 @@ $mess=array(
     "89" => "Zum Hochladen ausgeählte Datei",
     "90" => "Ziel-Arbeitsumgebung auswählen",
     "91" => "Dateien mit dem Sync-Client offline synchronisieren",
+    "92" => "Programme herunterladen",
+    "93" => "Dateien hochladen",
+    "94" => "Video-Tutorial",
+    "95" => "Meine Arbeitsumgebungen",
 );

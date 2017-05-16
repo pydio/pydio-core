@@ -152,4 +152,8 @@ $mess=array(
     "89" => "Fichier sélectionné",
     "90" => "Choisir un workspace de destination",
     "91" => "Vos fichiers hors-ligne avec l'application de synchro",
+    "92" => "Applications Download",
+    "93" => "Quick Upload",
+    "94" => "Video Tutorial",
+    "95" => "My Workspaces",
 );

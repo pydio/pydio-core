@@ -150,4 +150,8 @@ $mess=array(
     "89" => "Selected file for upload",
     "90" => "Select target workspace",
     "91" => "Keep your files offline with our Desktop Sync Client",
+    "92" => "Applications Download",
+    "93" => "Quick Upload",
+    "94" => "Video Tutorial",
+    "95" => "My Workspaces",
 );

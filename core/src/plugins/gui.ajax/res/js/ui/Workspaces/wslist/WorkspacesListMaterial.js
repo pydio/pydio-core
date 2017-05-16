@@ -22,6 +22,7 @@ const React = require('react')
 const {List, Subheader, Divider} = require('material-ui')
 
 import WorkspaceEntryMaterial from './WorkspaceEntryMaterial'
+import Pydio from 'pydio'
 
 class WorkspacesListMaterial extends React.Component{
 
@@ -55,25 +56,27 @@ class WorkspacesListMaterial extends React.Component{
                 entries.push(entry);
             }
         }.bind(this));
+        
+        const messages = pydio.MessageHash;
 
         let allEntries;
         if(sharedEntries.length){
-            sharedEntries.unshift(<Subheader>Folders shared with me</Subheader>);
+            sharedEntries.unshift(<Subheader>{messages[626]}</Subheader>);
         }
         if(inboxEntry){
             if(sharedEntries.length){
                 sharedEntries.unshift(<Divider/>);
             }
             sharedEntries.unshift(inboxEntry);
-            sharedEntries.unshift(<Subheader>Files Shared with me</Subheader>);
+            sharedEntries.unshift(<Subheader>{messages[625]}</Subheader>);
         }
         if(remoteShares.length){
-            remoteShares.unshift(<Subheader>Shares from remote servers</Subheader>)
+            remoteShares.unshift(<Subheader>{messages[627]}</Subheader>)
             remoteShares.unshift(<Divider/>)
             sharedEntries = sharedEntries.concat(remoteShares);
         }
         if(filterByType === 'entries'){
-            entries.unshift(<Subheader>My Workspaces</Subheader>);
+            entries.unshift(<Subheader>{messages[468]}</Subheader>);
         }
         if(filterByType){
             allEntries = filterByType === 'shared' ? sharedEntries : entries

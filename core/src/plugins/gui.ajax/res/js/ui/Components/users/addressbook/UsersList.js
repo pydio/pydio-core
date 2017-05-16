@@ -145,7 +145,7 @@ class UsersList extends React.Component{
             let emptyStateProps = {
                 style               : {backgroundColor: 'rgb(250, 250, 250)'},
                 iconClassName       : 'mdi mdi-account-off',
-                primaryTextId       : this.props.emptyStatePrimaryText || 'No records yet',
+                primaryTextId       : this.props.emptyStatePrimaryText || getMessage(629),
                 secondaryTextId     : mode === 'book' ? ( this.props.emptyStateSecondaryText || null ) : null
             };
             if(mode === 'book' && item.actions && item.actions.create){

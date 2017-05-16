@@ -74,7 +74,7 @@ class PasswordPopover extends React.Component{
                         />
                         <Divider/>
                         <div style={{textAlign:'right', padding: '8px 0'}}>
-                            <FlatButton label="Cancel" onTouchTap={this.passClosePopover.bind(this)}/>
+                            <FlatButton label={this.props.pydio.MessageHash[49]} onTouchTap={this.passClosePopover.bind(this)}/>
                             <FlatButton disabled={!passValid} label="Ok" onTouchTap={this.passSubmit.bind(this)}/>
                         </div>
                     </div>

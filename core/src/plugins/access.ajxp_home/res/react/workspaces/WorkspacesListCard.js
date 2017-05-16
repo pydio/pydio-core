@@ -69,5 +69,5 @@ let WorkspacesListCard = React.createClass({
     }
 });
 
-WorkspacesListCard = asGridItem(WorkspacesListCard,'My Workspaces',{gridWidth:2,gridHeight:60},[]);
+WorkspacesListCard = asGridItem(WorkspacesListCard,global.pydio.MessageHash['user_home.95'],{gridWidth:2,gridHeight:60},[]);
 export {WorkspacesListCard as default}
