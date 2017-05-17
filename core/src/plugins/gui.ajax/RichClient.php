@@ -509,7 +509,7 @@ class RichClient extends Plugin
         define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
         define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
         $imagesFolder = AJXP_THEME_FOLDER."/images";
-        if(file_exists(AJXP_INSTALL_PATH . "." . $imagesFolder)){
+        if(file_exists(AJXP_INSTALL_PATH . "/" . $imagesFolder)){
             define("AJXP_IMAGES_FOLDER", $imagesFolder);
         }else{
             define("AJXP_IMAGES_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/common/images");
