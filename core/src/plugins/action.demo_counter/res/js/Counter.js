@@ -59,7 +59,7 @@ export default class Counter extends React.Component {
     }
 
     componentDidMount(){
-        this._ticker = setInterval(() => this.tick, 1);
+        this._ticker = setInterval(() => this.tick(), 1);
     }
 
     componentWillUnmount(){
