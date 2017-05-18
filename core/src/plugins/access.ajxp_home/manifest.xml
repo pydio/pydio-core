@@ -14,9 +14,9 @@
         <global_param name="URL_APP_ANDROID" type="string" expose="true"
                       label="CONF_MESSAGE[Android App URL]" description="CONF_MESSAGE[URL of the Android application]" default="https://play.google.com/store/apps/details?id=com.pydio.android.pydioPro"/>
         <global_param name="URL_APP_SYNC_WIN" type="string" expose="true"
-                      label="CONF_MESSAGE[Windows PydioSync URL]" description="CONF_MESSAGE[URL of the windows sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
+                      label="CONF_MESSAGE[Windows PydioSync URL]" description="CONF_MESSAGE[URL of the windows sync application]" default="https://pydio.com/en/get-pydio/downloads/pydiosync-desktop-app/"/>
         <global_param name="URL_APP_SYNC_MAC" type="string" expose="true"
-                      label="CONF_MESSAGE[Mac PydioSync URL]" description="CONF_MESSAGE[URL of the mac sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
+                      label="CONF_MESSAGE[Mac PydioSync URL]" description="CONF_MESSAGE[URL of the mac sync application]" default="https://pydio.com/en/get-pydio/downloads/pydiosync-desktop-app/"/>
     </server_settings>
 	<registry_contributions>
 		<client_configs>
