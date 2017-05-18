@@ -136,6 +136,7 @@ let AltDashboard = React.createClass({
         }
 
         const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
+        const wTourEnabled = this.props.pydio.getPluginConfigs('gui.ajax').get('ENABLE_WELCOME_TOUR');
 
         let mainClasses = ['vertical_layout', 'vertical_fit', 'react-fs-template', 'user-dashboard-template'];
         if(this.state.drawerOpen){
@@ -145,7 +146,7 @@ let AltDashboard = React.createClass({
         return (
 
             <div className={mainClasses.join(' ')} onTouchTap={this.closeDrawer}>
-                {!guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
+                {wTourEnabled && !guiPrefs['WelcomeComponent.Pydio8.TourGuide.Welcome'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
                 <LeftPanel
                     className="left-panel"
                     pydio={pydio}

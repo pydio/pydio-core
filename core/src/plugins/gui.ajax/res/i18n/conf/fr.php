@@ -107,4 +107,6 @@ $mess=array(
 "Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option." => "Afficher la palette sur l'interface permettant de modifier les couleurs et les logos. Recharger complètement la fenêtre après changement de cette option.",
 "Use configured branding" => "Utiliser le branding configuré",
 "Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option." => "Utiliser les logos et couleurs définis et sauvés lors de l'utilisation de l'outil de branding. Recharger complètement la fenêtre après changement de cette option.",
+"Enable Welcome Tour" => "Activer le guide de bienvenue",
+"Enable the small tour triggered at first visit" => "Présenter un petit tour de l'interface à l'utilisateur à la première connexion.",
 );

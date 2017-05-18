@@ -56,6 +56,7 @@
     </client_settings>
 	<server_settings>
         <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="material|Material" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="material"/>
+        <global_param name="ENABLE_WELCOME_TOUR" group="CONF_MESSAGE[Main Options]" type="boolean" expose="true" label="CONF_MESSAGE[Enable Welcome Tour]" description="CONF_MESSAGE[Enable the small tour triggered at first visit]" default="true"/>
         <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
         <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Login Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
         <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Login Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"

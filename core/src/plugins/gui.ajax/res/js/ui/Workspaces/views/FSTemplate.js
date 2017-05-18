@@ -163,6 +163,7 @@ let FSTemplate = React.createClass({
         }
 
         const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
+        const wTourEnabled = this.props.pydio.getPluginConfigs('gui.ajax').get('ENABLE_WELCOME_TOUR');
         const inboxWorkspace = this.props.pydio.user && this.props.pydio.user.activeRepository === 'inbox';
 
         // Making sure we only pass the style to the parent element
@@ -170,7 +171,7 @@ let FSTemplate = React.createClass({
 
         return ( connectDropTarget(
             <div style={style} className={classes.join(' ')} onTouchTap={this.closeDrawer} onContextMenu={this.props.onContextMenu}>
-                {!guiPrefs['WelcomeComponent.Pydio8.TourGuide.FSTemplate'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
+                {wTourEnabled && !guiPrefs['WelcomeComponent.Pydio8.TourGuide.FSTemplate'] && <WelcomeTour ref="welcome" pydio={this.props.pydio}/>}
                 <LeftPanel className="left-panel" pydio={props.pydio}/>
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
