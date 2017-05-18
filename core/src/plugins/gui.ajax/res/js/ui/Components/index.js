@@ -40,7 +40,7 @@ import Store from './dynamic-grid/Store'
 import GridItemMixin from './dynamic-grid/GridItemMixin'
 import asGridItem from './dynamic-grid/asGridItem'
 
-import {DNDActionParameter} from './util/DND'
+import {Types, collect, collectDrop, nodeDragSource, nodeDropTarget, DNDActionParameter} from './util/DND'
 
 import UserAvatar from './users/avatar/UserAvatar'
 import UsersCompleter from './users/UsersCompleter'
@@ -81,6 +81,9 @@ const PydioComponents = {
     asGridItem              : asGridItem,
     DynamicGridStore        : Store,
 
+    DND                     : {
+        Types, collect, collectDrop, nodeDragSource, nodeDropTarget, DNDActionParameter
+    },
     DNDActionParameter      : DNDActionParameter,
 
     UserAvatar              : UserAvatar,
