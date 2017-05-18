@@ -71,6 +71,11 @@ class Editor extends React.Component {
     }
 
     enterFullScreen() {
+        if(this.props.onFullBrowserScreen){
+            this.props.onFullBrowserScreen();
+            return;
+        }
+
         if (this.container.requestFullscreen) {
             this.container.requestFullscreen();
         } else if (this.container.mozRequestFullScreen) {
