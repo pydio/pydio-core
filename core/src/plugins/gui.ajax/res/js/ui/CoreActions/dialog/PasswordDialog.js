@@ -23,13 +23,12 @@ const React = require('react')
 const PydioApi = require('pydio/http/api')
 const BootUI = require('pydio/http/resources-manager').requireLib('boot');
 const {ActionDialogMixin, SubmitButtonProviderMixin, CancelButtonProviderMixin, AsyncComponent} = BootUI;
+import {FlatButton} from 'material-ui'
 
 const PasswordDialog = React.createClass({
 
     mixins:[
-        ActionDialogMixin,
-        CancelButtonProviderMixin,
-        SubmitButtonProviderMixin
+        ActionDialogMixin
     ],
     getInitialState: function(){
         return {passValid: false};
@@ -37,20 +36,32 @@ const PasswordDialog = React.createClass({
     getDefaultProps: function(){
         return {
             dialogTitle: pydio.MessageHash[194],
-            dialogIsModal: true
+            dialogIsModal: true,
+            dialogSize: 'sm'
         };
     },
+    getButtons: function(updater = null){
+        if(updater) this._updater = updater;
+        let buttons = [];
+        if(!this.props.locked){
+            buttons.push(<FlatButton label={this.props.pydio.MessageHash[49]} onTouchTap={() => this.dismiss()}/>);
+        }
+        buttons.push(<FlatButton label={this.props.pydio.MessageHash[48]} onTouchTap={this.submit.bind(this)} disabled={!this.state.passValid}/>);
+        return buttons;
+    },
+
     submit(){
         if(!this.state.passValid){
             return false;
         }
-        this.refs.passwordForm.getComponent().post(function(value){
+        this.refs.passwordForm.instance.post(function(value){
             if(value) this.dismiss();
         }.bind(this));
     },
-
     passValidStatusChange: function(status){
-        this.setState({passValid: status});
+        this.setState({passValid: status}, ()=>{
+            this._updater(this.getButtons());
+        });
     },
 
     render: function(){
