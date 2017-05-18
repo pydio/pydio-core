@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS ajxp_users (
+  login text NOT NULL,
+  "password" text NOT NULL,
+  groupPath text NOT NULL
+);

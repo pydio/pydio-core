@@ -1,0 +1,167 @@
+<html>
+	<head>
+		<title>Pydio sql_otp Authentication Plugin</title>
+	</head>
+	<body>
+		<h1>
+			Authentication plugin for Ajaxplorer</h1>
+		<p>
+			Based on the auth.sql + the google authenticator reference implementation + yubikey demo php implementation. With this plugin you can authenticate users 4 different ways:</p>
+		<ul>
+			<li>
+				Password authentication: it works as the auth.sql</li>
+			<li>
+				Password + Google Authenticator: to the password field write the password first, then the six digits from Google Authenticator</li>
+			<li>
+				Password + YubiKey: to the password filed write your password then press yubikey</li>
+			<li>
+				Password + (YubiKey OR Google Authenticator): if both method enabled for a user, the plugin can recognize whether YubiKey or Google Authenticator is used. (it is simple, Google Authenticator uses numbers, YubiKey uses letters)</li>
+		</ul>
+		<p>
+			The authentication method can be set up per users, so it is possible that someone authenticate with password, other user authenticate with YubiKey, and someone else authenticate with both YubiKey and Google Authenticator.<br />
+			&nbsp;</p>
+
+		<h2>
+			Installation</h2>
+		<p>
+			You need to install php-yubico from <a href="http://code.google.com/p/php-yubico/">http://code.google.com/p/php-yubico/</a><br />
+			&nbsp;</p>
+		<pre>
+		wget http://php-yubico.googlecode.com/files/Auth_Yubico-2.4.tgz
+pear install Auth_Yubico-2.4.tgz
+</pre>
+		<p>
+			<br />
+			Do not forget to install or enable php-curl for Auth_Yubico.</p>
+		<ul>
+			<li>
+				Copy the auth.sql_otp modul to the plugin directory</li>
+			<li>
+				Clear the cache</li>
+		</ul>
+		<h2>
+			Configuration</h2>
+		<ul>
+			<li>
+				Backup your current AjaXplorer instance just for sure</li>
+			<li>
+				Enable the Serial One-Time-Password (auth.sql_otp) modul in <em>Global configurations &gt;&gt; Core Plugins &gt;&gt; Auth</em></li>
+			<li>
+				In the <em>Global configurations &gt;&gt; Core Configs &gt;&gt; Authentication &gt;&gt; Main instance section</em>
+				<ul>
+					<li>
+						<p>
+							Instance Type: <strong>SQL One-time-password</strong></p>
+					</li>
+					<li>
+						<p>
+							Connexion: <strong>Core Connection (or other if users are stored somewhere else)</strong></p>
+					</li>
+					<li>
+						<p>
+							Yubico Secret Key: your Yubico Secret Key generated at <a href="http://api.yubico.com/get-api-key/">http://api.yubico.com/get-api-key/</a> or blank when you don&#39;t plan to use YubiKey</p>
+					</li>
+					<li>
+						<p>
+							Yubico Client Id: your Yubico Client Id generated at <a href="http://api.yubico.com/get-api-key/">http://api.yubico.com/get-api-key/</a> or blank when you don&#39;t plan to use YubiKey</p>
+					</li>
+					<li>
+						<p>
+							Google Authenticator, Google Authenticator Last, YubiKey 1, YubiKey 2: leave them blank.</p>
+					</li>
+					<li>
+						<p>
+							Transmit Clear Pass: <strong>Yes</strong></p>
+					</li>
+				</ul>
+			</li>
+			<li>
+				<p>
+					Try it: logout and login again with your password</p>
+			</li>
+		</ul>
+		<p>
+			&nbsp;</p>
+		<h3>
+			Google authenticator</h3>
+		<p>
+			Add the &quot;Google Authenticator&quot; and &quot;Google Authenticator Last&quot; fields to users. You can do it one by one, or you can add a group of users by adding it to a role. Adding it to all users use the Root Role:</p>
+		<p>
+			<em>Workspaces &amp; Users &gt;&gt; Roles &gt;&gt; Root Role &gt;&gt; Parameters tab</em></p>
+		<ul>
+			<li>
+				Plugin Identifier: <strong>auth.sql_otp</strong></li>
+			<li>
+				Parameter name: <strong>google (Google Authenticator)</strong></li>
+			<li>
+				Repository Scope: <strong>All Workspaces</strong></li>
+			<li>
+				Add parameter</li>
+		</ul>
+		<ul>
+			<li>
+				Plugin Identifier: <strong>auth.sql_otp</strong></li>
+			<li>
+				Parameter name: <strong>google_last (Google Authenticator Last)</strong></li>
+			<li>
+				Repository Scope: <strong>All Workspaces</strong></li>
+			<li>
+				Add parameter</li>
+		</ul>
+		<p>
+			Leave both parameter blank in All Workspaces tab.</p>
+		<p>
+			Hint: Adding this parameters to all users does not means all users have to use GA. Leave this parameters blank in per user configuration and user can log in with his/her password or password + yubikey if the yubikey if it is enabled.</p>
+		<p>
+			&nbsp;</p>
+		<h3>
+			YubiKey</h3>
+		<p>
+			Add the &quot;YubiKey 1&quot; and &quot;YubiKey 2&quot; fields to users. You can do it one by one, or you can add a group of users by adding it to a role. Adding it to all users use the Root Role:</p>
+		<p>
+			<em>Workspaces &amp; Users &gt;&gt; Roles &gt;&gt; Root Role &gt;&gt; Parameters tab</em></p>
+		<ul>
+			<li>
+				Plugin Identifier: <strong>auth.sql_otp</strong></li>
+			<li>
+				Parameter name: <strong>yubikey1 (YubiKey 1)</strong></li>
+			<li>
+				Repository Scope: <strong>All Workspaces</strong></li>
+			<li>
+				Add parameter</li>
+		</ul>
+		<ul>
+			<li>
+				Plugin Identifier: <strong>auth.sql_otp</strong></li>
+			<li>
+				Parameter name: <strong>yubikey2 (YubiKey 2)</strong></li>
+			<li>
+				Repository Scope: <strong>All Workspaces</strong></li>
+			<li>
+				Add parameter</li>
+		</ul>
+		<p>
+			Leave both parameter blank in All Workspaces tab.</p>
+		<p>
+			Hint: Adding this parameters to all users does not means all users have to use yubikey. Leave this parameters blank in per user configuration and user can log in with his/her password or password + GA if the GA enabled.</p>
+		<p>
+			&nbsp;</p>
+		<h2>
+			Per user configuration</h2>
+		<p>
+			You can set up per user configuration at <em>Workspaces &amp; Users &gt;&gt; Users &amp; Groups &gt;&gt; &lt;user&gt; &gt;&gt; Parameters tab &gt;&gt; All Workspaces tab</em></p>
+		<h3>
+			Google Authenticator</h3>
+		<p>
+			Fill the Google Authenticator field with the Google Authenticator secret. It is a 16 charater long string, like P47IZDN4ZIXWLCCN</p>
+		<p>
+			<strong>!! DO NOT USE THE SAME SECRET AS YOUR GOOGLE ACCOUNT !!</strong><br />
+			<br />
+			Don&#39;t touch the &quot;Google Authenticator Last&quot; field, it is updating automatically. It is used internally for the defense against replay attack.</p>
+		<h3>
+			YubiKey</h3>
+		<p>
+			Use your in the YubiKey 1 or the YubiKey 2 field. Maximum two YubiKeys can be assigned to one user.</p>
+	</body>
+</html>
+
