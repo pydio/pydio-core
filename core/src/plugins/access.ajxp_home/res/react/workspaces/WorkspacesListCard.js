@@ -69,5 +69,4 @@ let WorkspacesListCard = React.createClass({
     }
 });
 
-WorkspacesListCard = asGridItem(WorkspacesListCard,'My Workspaces',{gridWidth:2,gridHeight:60},[]);
 export {WorkspacesListCard as default}
