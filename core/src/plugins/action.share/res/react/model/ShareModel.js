@@ -228,13 +228,13 @@
             var entries = this.getSharedUsers();
             var index = 0;
             entries.map(function(e){
-                params['user_' + index] = e.ID;
+                params['user_' + index] = (e.TYPE && e.TYPE === 'team' ? '/AJXP_TEAM/' : '') +  e.ID;
                 params['right_read_' + index] = (e.RIGHT.indexOf('r') !== -1) ? 'true' : 'false';
                 params['right_write_' + index] = (e.RIGHT.indexOf('w') !== -1) ? 'true' : 'false';
                 if(e.WATCH){
                     params['right_watch_' + index] = 'true';
                 }
-                params['entry_type_' + index] = e.TYPE == 'group' ? 'group' : 'user';
+                params['entry_type_' + index] = (e.TYPE === 'group' || e.TYPE === 'team') ? 'group' : 'user';
                 index ++;
             });
         }
