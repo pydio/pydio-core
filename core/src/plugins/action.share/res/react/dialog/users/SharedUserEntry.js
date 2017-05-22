@@ -58,7 +58,7 @@ let SharedUserEntry = React.createClass({
                 type={this.props.userEntry.TYPE}
                 menus={menuItems}
             >
-                <span className="user-badge-rights-container">
+                <span className="user-badge-rights-container" style={!menuItems.length ? {marginRight: 48} : {}}>
                     <input type="checkbox" name="read" disabled={this.props.isReadonly()} checked={this.props.userEntry.RIGHT.indexOf('r') !== -1} onChange={this.onUpdateRight}/>
                     <input type="checkbox" name="write" disabled={this.props.isReadonly()} checked={this.props.userEntry.RIGHT.indexOf('w') !== -1} onChange={this.onUpdateRight}/>
                 </span>
