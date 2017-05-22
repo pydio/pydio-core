@@ -145,7 +145,7 @@ class FilePreview extends PureComponent {
         let element;
 
         if (EditorClass) {
-            element = <EditorClass pydio={pydio} {...this.props} preview={true} />
+            element = <EditorClass pydio={pydio} {...this.props} preview={true} mimeFontStyle={mimeFontStyle} />
         } else {
             const svg = node.getSvgSource()
             const isLeaf = node.isLeaf()

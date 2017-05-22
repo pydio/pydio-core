@@ -20,9 +20,9 @@
 
 import {Editor, Panel} from './editor'
 import * as Controls from './controls'
+import Badge from './badge'
 
-
-
+export {Badge}
 export {Editor}
 export {Panel}
 export {Controls}
