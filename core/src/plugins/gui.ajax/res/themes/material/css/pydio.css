@@ -1997,7 +1997,7 @@ div.pydio-tasks-panel {
   overflow-y: auto;
   overflow-x: hidden;
   background-color: white;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.12);
+  /*box-shadow: @reactBoxShadowDepth1;*/
   z-index: 20001;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
@@ -2035,9 +2035,10 @@ div.pydio-tasks-panel div.task .task_actions {
 }
 div.pydio-tasks-panel div.task .task_actions > span {
   display: inline-block;
-  margin-top: 15px;
+  margin-top: 11px;
+  color: #325e74;
   margin-left: 10px;
-  color: #009688;
+  font-size: 20px;
 }
 div.pydio-tasks-panel div.task.task-status-8 {
   /* error status */

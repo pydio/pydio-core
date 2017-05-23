@@ -315,15 +315,13 @@
 
             let actions;
             if(t.getStatus() === Task.STATUS_RUNNING && t.isStoppable()){
-                actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
+                actions = (<span className="mdi mdi-stop" onClick={t.pause.bind(t)}/>);
             }else{
-                actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
+                actions = (<span className="mdi mdi-close" onClick={t.stop.bind(t)}/>);
             }
             if(this.state.showProgress && t.hasProgress() && t.getStatus() !== Task.STATUS_FAILED){
                 actions = (
-                    <div className="radial-progress">
-                        <div className={"pie-wrapper pie-wrapper--solid progress-" + t.getProgress()}></div>
-                    </div>
+                    <MaterialUI.CircularProgress mode="determinate" value={t.getProgress()} size={26} style={{marginTop:8}}/>
                 );
             }
             return <div className="task_actions" onMouseOver={this.showAction} onMouseOut={this.showProgress}>{actions}</div>;
@@ -411,12 +409,12 @@
             if(!tasks.length){
                 className += " invisible";
             }else{
-                heightStyle = {height: this.state.mouseOver ? 'auto' : Math.min(tasks.length * 60, 180)};
+                heightStyle = {height: this.state.mouseOver ? 'auto' : Math.min(tasks.length * 61, 180)};
             }
             return (
-                <div onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut} className={className} style={heightStyle}>
+                <MaterialUI.Paper zDepth={2} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut} className={className} style={heightStyle}>
                     {tasks}
-                </div>
+                </MaterialUI.Paper>
             );
         }
     });

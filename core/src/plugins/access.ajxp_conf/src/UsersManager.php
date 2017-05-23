@@ -126,6 +126,11 @@ class UsersManager extends AbstractManager
                         $newAction = "update_user_profile";
                         $newVars["profile"] = $paramValue;
                         break;
+                    case "userGroupPath":
+                        $newAction = "user_update_group";
+                        $newVars["file"] = basename($path);
+                        $newVars["group_path"] = $paramValue;
+                        break;
                     case "userLock":
                         list($lockType, $lockValue) = explode(":", $paramValue);
                         $newVars["lock_type"] = $lockType;

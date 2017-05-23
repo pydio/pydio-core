@@ -42,4 +42,5 @@ $mess = [
     "20" => "Datei automatisch umbenennen",
     "21" => "Bestehende Datei überschreiben",
     "22" => "Optionen",
+    "23" => "Errors",
 ];

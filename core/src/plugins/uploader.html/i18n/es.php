@@ -41,4 +41,5 @@ $mess = [
     "19" => "Parar subida y notificarme",
     "20" => "Renombar archivo",
     "21" => "Sobreescribir",
+    "23" => "Errors",
 ];

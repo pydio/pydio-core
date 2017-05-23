@@ -251,6 +251,7 @@
             if(this.state && this.state.items){
                 this.renderSection(items, this.state.items.processing, global.pydio.MessageHash['html_uploader.14'], 'section-processing');
                 this.renderSection(items, this.state.items.pending, global.pydio.MessageHash['html_uploader.15'], 'section-pending');
+                this.renderSection(items, this.state.items.errors, global.pydio.MessageHash['html_uploader.23'], 'section-errors');
                 this.renderSection(items, this.state.items.processed, global.pydio.MessageHash['html_uploader.16'], 'section-processed');
             }
             return (
