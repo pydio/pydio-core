@@ -32,6 +32,7 @@ import Modal from './modal/Modal'
 import ConfirmDialog from './modal/ConfirmDialog'
 import PromptDialog from './modal/PromptDialog'
 import ActivityWarningDialog from './modal/ActivityWarningDialog'
+import ServerPromptDialog from './modal/ServerPromptDialog'
 
 import MessageBar from './modal/MessageBar'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
@@ -59,6 +60,7 @@ export {
     Modal,
     ConfirmDialog,
     PromptDialog,
+    ServerPromptDialog,
     ActivityWarningDialog,
 
     Loader,

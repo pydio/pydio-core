@@ -335,8 +335,7 @@ class PydioApi{
                     let jsonData = XMLUtils.XPathSelectSingleNode(childs[i], "data").firstChild.nodeValue;
                     pydio.UI.openPromptDialog(JSON.parse(jsonData));
                 }
-                // Interrupt further process
-                throw new Error();
+                return false;
 
             } else if(child.tagName == "reload_instruction") {
 
