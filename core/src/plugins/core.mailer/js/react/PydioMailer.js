@@ -233,7 +233,7 @@
 
         postEmail : function(repost=false){
             const {users, subject, message} = this.state;
-            if(!repost && this.refs.completer.getPendingSearchText()){
+            if(!repost && this.refs.completer && this.refs.completer.getPendingSearchText && this.refs.completer.getPendingSearchText()){
                 this.refs.completer.onCompleterRequest(this.refs.completer.getPendingSearchText(), -1);
                 setTimeout(() => this.postEmail(true), 500);
                 return;

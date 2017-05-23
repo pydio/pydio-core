@@ -235,7 +235,9 @@ class UserAvatar extends React.Component{
         }else if(this.props.richOnHover){
 
             onMouseOut = () => {
-                this.setState({showPopover: false});
+                if(!this.lockedBySubPopover){
+                    this.setState({showPopover: false});
+                }
             };
             onMouseOut = debounce(onMouseOut, 350);
             onMouseOver = (e) => {
@@ -247,17 +249,26 @@ class UserAvatar extends React.Component{
                 onMouseOut.cancel();
             }
 
+            const lockOnSubPopoverOpen = (status) => {
+                this.lockedBySubPopover = status;
+                onMouseOverInner();
+            };
+
             popover = (
                 <Popover
                     open={this.state.showPopover}
                     anchorEl={this.state.popoverAnchor}
-                    onRequestClose={() => {this.setState({showPopover: false})}}
+                    onRequestClose={(reason) => {
+                        if(reason !== 'clickAway' || !this.lockedBySubPopover){
+                            this.setState({showPopover: false})
+                        }
+                    }}
                     anchorOrigin={{horizontal:"left",vertical:"center"}}
                     targetOrigin={{horizontal:"right",vertical:"center"}}
                     useLayerForClickAway={false}
                 >
                     <Paper zDepth={2} style={{width: 220, height: 320, overflowY: 'auto'}} onMouseOver={onMouseOverInner}  onMouseOut={onMouseOut}>
-                        <UserAvatar {...this.props} richCard={true} richOnHover={false} cardSize={220}/>
+                        <UserAvatar {...this.props} richCard={true} richOnHover={false} cardSize={220} lockOnSubPopoverOpen={lockOnSubPopoverOpen} />
                     </Paper>
                 </Popover>
             );
