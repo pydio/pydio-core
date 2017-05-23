@@ -25,6 +25,7 @@ use dibi;
 use DibiException;
 use Exception;
 use PclZip;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\FileHelper;
@@ -88,7 +89,7 @@ class UpgradeManager
             "checkDownloadFolder" => "Checking download permissions",
             "downloadArchive" => "Downloading upgrade archive",
             "checkArchiveIntegrity" => "Checking archive integrity",
-            "checkTargetFolder" => "Checking folders permissions",
+            "checkTargetFolder" => "Checking files and folders permissions, this may take a while.",
             "extractArchive" => "Extracting Archive",
             "backupMarkedFiles" => "Backuping your modified files",
             "copyCodeFiles" => "Copying core source files",
@@ -234,13 +235,20 @@ class UpgradeManager
     public function checkTargetFolder()
     {
         if (!is_writable(AJXP_INSTALL_PATH)) {
-            throw new Exception("The root install path is not writeable, no file will be overriden!
+            throw new PydioException("The root install path is not writeable, no file will be overriden!
             <br>When performing upgrades, first change the ownership (using chown) of the Pydio root folder
             to your web server account (e.g. www-data or apache) and propagate that ownership change to all
             Pydio sub-folders. <br>Run the upgrade again then, post upgrade, change the ownership back
             to the previous settings for all Pydio folders, <b>except for the data/ folder</b> that must stay
             writeable by the web server.");
         }
+
+        $this->crawlPermissions(null, AJXP_INSTALL_PATH."/*.php");
+        $this->crawlPermissions(AJXP_INSTALL_PATH."/core");
+        $this->crawlPermissions(AJXP_INSTALL_PATH."/plugins");
+
+        return "Crawling folders core, plugins and files /*.php to check that all code files are writeable : OK";
+
         return "OK";
     }
 
@@ -639,6 +647,39 @@ class UpgradeManager
         }
         ConfService::clearAllCaches();
         return $result;
+    }
+
+    /**
+     * Crawl all files permissions to make sure they are writeable.
+     * @param $path
+     * @param null $glob
+     * @throws PydioException
+     */
+    public function crawlPermissions($path, $glob = null){
+
+        @set_time_limit(1000);
+        $error = false;
+        if($glob !== null){
+            $files = glob($glob);
+            foreach($files as $file){
+                if(!is_writeable($file)){
+                    $error = $file;
+                    break;
+                }
+            }
+        }else{
+            $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS);
+            $iterator = new \RecursiveIteratorIterator($directory);
+            foreach ($iterator as $info) {
+                if(!is_writable($info->getPathname())){
+                    $error = $info->getPathname();
+                    break;
+                }
+            }
+        }
+        if($error){
+            throw new PydioException("Crawling folder $path to check all files are writeable : File $info FAIL! Please make sure that the whole tree is currently writeable by the webserver, or upgrade may probably fail at one point.");
+        }
     }
 
     /**
