@@ -71,4 +71,5 @@ $mess=array(
 "44" => "Paramètres avançés de plugins",
 "45" => "Contrôle d'accès",
 "46" => "Actions désactivées",
+"47" => "Rechercher dans les rôles",
 );
