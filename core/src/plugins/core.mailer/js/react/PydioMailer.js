@@ -231,12 +231,17 @@
             }
         },
 
-        postEmail : function(){
-            if(!Object.keys(this.state.users).length){
+        postEmail : function(repost=false){
+            const {users, subject, message} = this.state;
+            if(!repost && this.refs.completer.getPendingSearchText()){
+                this.refs.completer.onCompleterRequest(this.refs.completer.getPendingSearchText(), -1);
+                setTimeout(() => this.postEmail(true), 500);
+                return;
+            }
+            if(!Object.keys(users).length){
                 this.setState({errorMessage:this.getMessage(2)});
                 return;
             }
-            const {users, subject, message} = this.state;
             const {link} = this.props;
             const callback = (res) => {
                 if(res) this.props.onDismiss();
@@ -281,6 +286,7 @@
                     {!this.props.uniqueUserStyle &&
                         <div className="users-block" style={{padding: '0 20px'}}>
                             <PydioComponents.UsersCompleter
+                                ref="completer"
                                 fieldLabel={this.getMessage('8')}
                                 usersOnly={true}
                                 existingOnly={true}
@@ -315,7 +321,7 @@
                     <MaterialUI.Divider/>
                     <div style={{textAlign:'right', padding: '8px 20px'}}>
                         <MaterialUI.FlatButton label={this.getMessage('54', '')} onTouchTap={this.props.onDismiss}/>
-                        <MaterialUI.FlatButton primary={true} label={this.getMessage('77', '')} onTouchTap={this.postEmail}/>
+                        <MaterialUI.FlatButton primary={true} label={this.getMessage('77', '')} onTouchTap={(e)=>this.postEmail()}/>
                     </div>
                 </MaterialUI.Paper>
             );

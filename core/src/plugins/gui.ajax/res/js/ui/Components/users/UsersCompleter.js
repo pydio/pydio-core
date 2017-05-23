@@ -121,6 +121,10 @@ const UsersLoader = React.createClass({
 
     },
 
+    getPendingSearchText: function(){
+        return this.state.searchText || false;
+    },
+
     /**
      * Debounced call for rendering search
      * @param value {string}
