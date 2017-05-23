@@ -54,6 +54,7 @@ let SimpleList = React.createClass({
         tableKeys           : React.PropTypes.object,
         autoRefresh         : React.PropTypes.number,
         reloadAtCursor      : React.PropTypes.bool,
+        clearSelectionOnReload: React.PropTypes.bool,
         heightAutoWithMax   : React.PropTypes.number,
         containerHeight     : React.PropTypes.number,
         observeNodeReload   : React.PropTypes.bool,
@@ -97,7 +98,7 @@ let SimpleList = React.createClass({
     },
 
     getDefaultProps:function(){
-        return {infiniteSliceCount:30}
+        return {infiniteSliceCount:30, clearSelectionOnReload: true}
     },
 
     clickRow: function(gridRow, event){
@@ -409,7 +410,9 @@ let SimpleList = React.createClass({
             this.loadStartingAtCursor();
             return;
         }
-        this.props.dataModel.setSelectedNodes([]);
+        if(this.props.clearSelectionOnReload){
+            this.props.dataModel.setSelectedNodes([]);
+        }
         this._loadingListener();
         this.props.node.observeOnce("loaded", this._loadedListener);
         this.props.node.reload();

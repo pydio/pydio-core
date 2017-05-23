@@ -347,6 +347,7 @@ let Dashboard = React.createClass({
                             node={this.state.currentNode}
                             dataModel={this.state.dataModel}
                             openEditor={this.openRoleEditor}
+                            clearSelectionOnReload={false}
                             entryRenderIcon={this.renderListUserAvatar}
                             entryRenderFirstLine={this.renderListEntryFirstLine}
                             entryRenderSecondLine={this.renderListEntrySecondLine}
