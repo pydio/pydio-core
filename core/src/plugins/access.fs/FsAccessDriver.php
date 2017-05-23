@@ -576,7 +576,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $this->writeUploadSuccess($request, ["PARTIAL_NODE" => $createdNode]);
         } else {
             $this->logDebug("Return success");
-            $createdNode->loadHash();
+            $params = $request->getParsedBody();
+            if(isSet($params['hash']) && $params['hash'] === 'true'){
+                $createdNode->loadHash();
+            }
             if($nodeOverriden){
                 $this->writeUploadSuccess($request, ["UPDATED_NODE" => $createdNode]);
             }else{
