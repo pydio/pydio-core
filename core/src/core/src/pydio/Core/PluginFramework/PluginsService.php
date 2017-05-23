@@ -1033,7 +1033,7 @@ class PluginsService
                 }
 
                 // Retrieving Registry from files cache
-                if (empty($res)) {
+                if (empty($res) || !is_array($res)) {
                     $res = FileHelper::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
                     $this->detectedPlugins=$res;
                     $this->savePluginsRegistryToCache($cacheStorage);
