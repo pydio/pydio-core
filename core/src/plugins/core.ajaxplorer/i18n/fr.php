@@ -724,5 +724,6 @@ $mess=array(
 "622" => "Pile d'erreurs",
 "623" => "Copier",
 "624" => "Copié!",
+"625" => "Lettre",
 /* END SENTENCE */
 );

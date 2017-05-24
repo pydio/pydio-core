@@ -729,6 +729,7 @@ $mess=array(
 "622" => "Fehlerstapel",
 "623" => "Kopieren",
 "624" => "Erfolgreich kopiert!",
+"625" => "Letter",
 /* END SENTENCE */
 /* password strength tester */
 );

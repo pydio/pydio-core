@@ -1294,6 +1294,7 @@ abstract class AbstractConfDriver extends Plugin
                 $groupPath      = isSet($httpVars["group_path"]) ? InputFilter::sanitize($httpVars['group_path'], InputFilter::SANITIZE_DIRNAME) : '';
                 $existingOnly   = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] === "true";
                 $excludeCurrent = isSet($httpVars["exclude_current"]) && ($httpVars["exclude_current"] === "false" || $httpVars["exclude_current"] === false) ? false : true;
+                $range          = isSet($httpVars["range"]) ? $httpVars["range"] : null;
                 if($alphaPages){
                     if($crtValue === '') $crtValue = 'a';
                     $existingOnly = true;
@@ -1309,8 +1310,10 @@ abstract class AbstractConfDriver extends Plugin
                     }
                 }
 
-                $list = new FilteredUsersList($ctx, $excludeCurrent, $alphaPages);
+                $list = new FilteredUsersList($ctx, $excludeCurrent, $range);
                 $items = $list->load($filterValue, !$existingOnly, $crtValue, $groupPath);
+                $list->setResponseHeaders($responseInterface);
+
                 $format = $httpVars["format"];
                 if(!isSet($format)) $format = 'json';
                 switch($format){

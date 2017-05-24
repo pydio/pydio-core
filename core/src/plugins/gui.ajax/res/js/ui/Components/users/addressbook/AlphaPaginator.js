@@ -19,12 +19,15 @@
  */
 
 
-const {Component, PropTypes} = require('react')
-const {muiThemeable} = require('material-ui/styles')
-const {PydioContextConsumer} = require('pydio').requireLib('boot')
+import {Component, PropTypes} from 'react'
+import {muiThemeable} from 'material-ui/styles'
+import Pydio from 'pydio'
+const {PydioContextConsumer} = Pydio.requireLib('boot')
+
+import {SelectField, MenuItem} from 'material-ui';
 
 /**
- * Simple alphabet generator to give a first-letter-based pagination
+ * Alphabet and pages generator to give a first-letter-based pagination
  */
 class AlphaPaginator extends Component{
 
@@ -32,36 +35,39 @@ class AlphaPaginator extends Component{
 
         let letters = 'abcdefghijklmnopqrstuvwxyz0123456789'.split('');
         letters = [-1, ...letters];
-        const {item, paginatorCallback, style, muiTheme, getMessage} = this.props;
+        const {item, paginatorCallback, style, getMessage} = this.props;
+
+        let paginator;
+        if(item.pagination){
+
+            const {start, end, max, interval} = item.pagination;
+
+            const total_pages = Math.ceil(max / interval);
+            const current = Math.ceil(start / interval);
+            let pages = [];
+            for(let i=0; i<total_pages;i++) pages.push(i);
+
+            paginator = (
+                <SelectField floatingLabelText={getMessage(331)} style={{width: 60}} fullWidth={true} value={current} onChange={(e,i,v) => { paginatorCallback((v*interval) + '-' + (v+1)*interval) }}>
+                    {pages.map((p) => {
+                        return <MenuItem value={p} key={p} primaryText={p+1}/>
+                    })}
+                </SelectField>
+            );
+
+        }
 
         const currentPage = (item.currentParams && item.currentParams.alpha_pages && item.currentParams.value) || -1;
 
         return (
-            <div style={{...style, display:'flex', paddingRight: 8}}>
+            <div style={{...style, display:'flex', paddingRight: 8, alignItems:'center'}}>
                 <div style={{flex:1}}>{getMessage(249, '')}</div>
-                <div>
-                {letters.map((l) => {
-
-                    const letterStyle = {
-                        display         :'inline-block',
-                        cursor          :'pointer',
-                        margin          :'0 3px',
-                        fontWeight      : 400,
-                        textDecoration  :(currentPage===l?'underline':'none'),
-                        fontSize        : (currentPage===l?'1.3em':'1em')
-                    };
-
-                    return (
-                        <span
-                            key={l}
-                            style={letterStyle}
-                            onClick={(e) => {paginatorCallback(l)}}
-                            title={l === -1 ? 'Limited number of results': ''}
-                        >{l === -1 ? getMessage(597, '') : l}
-                        </span>
-                    )
-                })}
-                </div>
+                {paginator}
+                <SelectField floatingLabelText={getMessage(625)} style={{width: 60, marginLeft: 20}} fullWidth={true} value={currentPage} onChange={(e,i,v) => { paginatorCallback(v) }}>
+                    {letters.map((l) => {
+                        return <MenuItem value={l} key={l} primaryText={l === -1 ? getMessage(597, '') : l}/>
+                    })}
+                </SelectField>
             </div>
         );
     }
