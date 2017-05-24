@@ -40,8 +40,6 @@
         <global_param name="ALLOW_CROSSUSERS_SHARING" group="CONF_MESSAGE[Users Directory Listing]" type="boolean" label="CONF_MESSAGE[See existing users]" description="CONF_MESSAGE[Allow the users to pick an existing user when sharing a folder]" mandatory="false" default="true" expose="true"/>
         <global_param name="CROSSUSERS_ALLGROUPS" group="CONF_MESSAGE[Users Directory Listing]" type="boolean" label="CONF_MESSAGE[Share with existing users from all groups]" description="CONF_MESSAGE[Allow to search users from other groups through auto completer (can be handy if previous option is set to false) and share workspaces with them]" mandatory="false" default="true"/>
         <global_param name="CROSSUSERS_ALLGROUPS_DISPLAY" group="CONF_MESSAGE[Users Directory Listing]" type="boolean" label="CONF_MESSAGE[List existing from all groups]" description="CONF_MESSAGE[If previous option is set to True, directly display a full list of users from all groups]" mandatory="false" default="true" expose="true"/>
-        <global_param name="CROSSUSERS_ADDRESSBOOK_SEARCH_ONLY" group="CONF_MESSAGE[Users Directory Listing]" type="boolean" label="CONF_MESSAGE[Display search form only in address book]" description="CONF_MESSAGE[If you have a very high number of users, typically more than 10k, switch this on to disable groups/users direct browsing and use only a search form in address book.]" mandatory="false" default="false" expose="true"/>
-
 
         <global_param group="CONF_MESSAGE[Roles / Groups Directory Listing]" name="GROUP_OR_ROLE" type="group_switch:GROUP_OR_ROLE"   label="CONF_MESSAGE[Display roles and/or groups]"
                       description="" mandatory="true" default="group"/>
@@ -51,6 +49,14 @@
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="CONF_MESSAGE[Allow Role Listing]"  group_switch_value="Role"  name="ROLE"  type="hidden" label="" description="" default="role"/>
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="CONF_MESSAGE[Role/Group Listing]"  group_switch_value="RoleGroup"  name="GROUP_AND_ROLE"  type="hidden" label="" description="" default="rolegroup"/>
 
+
+        <global_param group="CONF_MESSAGE[Roles / Groups Directory Listing]" name="ADDRESSBOOK_GROUP_OR_USERS" type="group_switch:ADDRESSBOOK_GROUP_OR_USERS"   label="CONF_MESSAGE[Address Book directory listing]"
+                      description="" mandatory="true" default="both" expose="true"/>
+
+        <global_param group_switch_name="ADDRESSBOOK_GROUP_OR_USERS" group_switch_label="CONF_MESSAGE[Users and Groups/Roles]" group_switch_value="both" name="ABOOK_BOTH" type="hidden" label="" description="" default="both"/>
+        <global_param group_switch_name="ADDRESSBOOK_GROUP_OR_USERS" group_switch_label="CONF_MESSAGE[Groups/Roles only]" group_switch_value="groups" name="ABOOK_GROUPS" type="hidden" label="" description="" default="groups"/>
+        <global_param group_switch_name="ADDRESSBOOK_GROUP_OR_USERS" group_switch_label="CONF_MESSAGE[Users only]"  group_switch_value="users"  name="ABOOK_USERS"  type="hidden" label="" description="" default="users"/>
+        <global_param group_switch_name="ADDRESSBOOK_GROUP_OR_USERS" group_switch_label="CONF_MESSAGE[No listing, search engine only]"  group_switch_value="search"  name="ABOOK_SEARCH"  type="hidden" label="" description="" default="search"/>
 
 
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="List role by" group_switch_value="Role" name="LIST_ROLE_BY" type="group_switch:LIST_ROLE_BY"   label="CONF_MESSAGE[List Roles By]"

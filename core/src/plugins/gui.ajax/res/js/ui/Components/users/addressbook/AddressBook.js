@@ -169,7 +169,11 @@ let AddressBook = React.createClass({
                 });
             }
             if(confConfigs.get('ALLOW_CROSSUSERS_SHARING')){
-                if(confConfigs.get('CROSSUSERS_ADDRESSBOOK_SEARCH_ONLY')){
+                let groupOrUsers = confConfigs.get('ADDRESSBOOK_GROUP_OR_USERS');
+                if(groupOrUsers && groupOrUsers.group_switch_value) groupOrUsers = groupOrUsers.group_switch_value;
+                else groupOrUsers = 'both';
+
+                if(groupOrUsers === 'search'){
                     if(!disableSearch){
                         root.collections.push({
                             id:'search',
@@ -185,8 +189,8 @@ let AddressBook = React.createClass({
                         id:'AJXP_GRP_/',
                         label:getMessage(584),
                         //icon:'mdi mdi-account-box',
-                        childrenLoader:Loaders.loadGroups,
-                        itemsLoader: Loaders.loadGroupUsers,
+                        childrenLoader: (groupOrUsers === 'both' || groupOrUsers === 'groups' ) ? Loaders.loadGroups : null,
+                        itemsLoader:  (groupOrUsers === 'both' || groupOrUsers === 'users' ) ? Loaders.loadGroupUsers : null,
                         _parent:root,
                         _notSelectable:true
                     });

@@ -98,8 +98,8 @@ class Loaders{
         const wrapped = (children) => {
             children.map(function(child){
                 child.icon = 'mdi mdi-account-multiple';
-                child.childrenLoader = Loaders.loadGroups;
-                child.itemsLoader = Loaders.loadGroupUsers;
+                child.childrenLoader = entry.childrenLoader ? Loaders.loadGroups : null;
+                child.itemsLoader = entry.itemsLoader ? Loaders.loadGroupUsers : null;
                 if(entry.currentParams && entry.currentParams.alpha_pages){
                     child.currentParams = {...entry.currentParams};
                 }

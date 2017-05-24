@@ -39,10 +39,10 @@ class UsersList extends React.Component{
 
         const folders = item.collections || [];
         const leafs = item.leafs || [];
-        const foldersSubHeader = folders.length && (leafs.length || showSubheaders) ? [{subheader:'Groups'}] : [];
+        const foldersSubHeader = folders.length && (leafs.length || showSubheaders) ? [{subheader:getMessage('532')}] : [];
         let usersSubHeader = [];
-        if(showSubheaders || paginatorType){
-            usersSubHeader = [{subheader: paginatorType ? <AlphaPaginator {...this.props} style={{lineHeight: '20px',padding: '14px 0'}} /> : 'Users'}];
+        if((showSubheaders || paginatorType) && leafs.length){
+            usersSubHeader = [{subheader: paginatorType ? <AlphaPaginator {...this.props} style={{lineHeight: '20px',padding: '14px 0'}} /> : getMessage('249')}];
         }
         const items = [...foldersSubHeader, ...folders, ...usersSubHeader, ...leafs];
         const total = items.length;
@@ -168,7 +168,7 @@ class UsersList extends React.Component{
                     </List>
                 }
                 {loading && <Loader style={{flex:1}}/>}
-                {emptyState}
+                {!loading && emptyState}
             </div>
         );
     }
