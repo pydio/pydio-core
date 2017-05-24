@@ -72,7 +72,6 @@ class Loaders{
                     max: parseInt(max),
                     interval: parseInt(interval)
                 };
-                console.log(parent);
             }
         });
     }
