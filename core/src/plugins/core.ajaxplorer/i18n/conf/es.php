@@ -176,5 +176,15 @@ $mess=array(
 "Redirect URL" => "Redireccionar URL",
 "API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "API endpoint - Usado para lanzar la ventana que permite a los usuarios autenticarse y aceptar los terminos de uso de la aplicación",
 "API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API endpoint - Usado para regenerar o validar el token en la parte de la autenticación",
-"API setting - Redirect URL for the OAuth Application" => "Configuración de la API - Redirecciona la URL para la Aplicación OAuth"
+"API setting - Redirect URL for the OAuth Application" => "Configuración de la API - Redirecciona la URL para la Aplicación OAuth",
+"Download Folder (Legacy)" => "Download Folder (Legacy)",
+"Absolute path to the public folder where temporary download links will be created. This is used for legacy purpose, newly created links do not use it anymore, but use the Base URI instead." => "Absolute path to the public folder where temporary download links will be created. This is used for legacy purpose, newly created links do not use it anymore, but use the Base URI instead.",
+"If not inferred directly from the current pydio URL plus the public base URI, replace the public access URL here." => "If not inferred directly from the current pydio URL plus the public base URI, replace the public access URL here.",
+"Public Base URI" => "Public Base URI",
+"URI where to serve the public links" => "URI where to serve the public links",
+"Enable for all users" => "Enable for all users",
+"Enable WebDAV for all users by default. If set to false, users will have to manually enable WebDAV via their preferences panel." => "Enable WebDAV for all users by default. If set to false, users will have to manually enable WebDAV via their preferences panel.",
+"Download Delegation" => "Download Delegation",
+"Delegates download operations to an alternative agent, either webserver or pydio agent. Warning, this requires external modules to be installed. When using XSendFile/XaccelRedirect, you have to manually add the folders where files will be downloaded in the module configuration" => "Delegates download operations to an alternative agent, either webserver or pydio agent. Warning, this requires external modules to be installed. When using XSendFile/XaccelRedirect, you have to manually add the folders where files will be downloaded in the module configuration",
+"Core Connexion" => "Core Connexion",
 );

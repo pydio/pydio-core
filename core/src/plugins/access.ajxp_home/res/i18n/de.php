@@ -153,5 +153,4 @@ $mess=array(
     "92" => "Programme herunterladen",
     "93" => "Dateien hochladen",
     "94" => "Video-Tutorial",
-    "95" => "Meine Arbeitsumgebungen",
 );

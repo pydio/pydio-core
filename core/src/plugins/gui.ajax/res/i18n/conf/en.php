@@ -107,4 +107,6 @@ $mess=array(
 "Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option." => "Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option.",
 "Use configured branding" => "Use configured branding",
 "Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option." => "Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option.",
+"Enable Welcome Tour" => "Enable Welcome Tour",
+"Enable the small tour triggered at first visit" => "Enable the small tour triggered at first visit",
 );

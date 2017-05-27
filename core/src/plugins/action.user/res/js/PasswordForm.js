@@ -122,7 +122,7 @@ let PasswordForm = React.createClass({
                 <div style={{width:250}}>
                     <ValidPassword
                         onChange={newChange}
-                        attributes={{name:'pass',label:messages[199]}}
+                        attributes={{name:'pass',label:messages[198]}}
                         value={this.state.newPass}
                         name="newpassword"
                         ref="newpass"

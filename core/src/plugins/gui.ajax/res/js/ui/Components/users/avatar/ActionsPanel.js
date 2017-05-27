@@ -58,6 +58,15 @@ class ActionsPanel extends React.Component{
             });
         });
     }
+
+    componentDidUpdate(prevProps, prevState){
+        if(!this.props.lockOnSubPopoverOpen) return;
+        if( (this.state.showPicker || this.state.showMailer) && !(prevState.showPicker || prevState.showMailer)){
+            this.props.lockOnSubPopoverOpen(true);
+        }else if( !(this.state.showPicker || this.state.showMailer) && (prevState.showPicker || prevState.showMailer) ){
+            this.props.lockOnSubPopoverOpen(false);
+        }
+    }
     
     render(){
 
@@ -110,6 +119,8 @@ class ActionsPanel extends React.Component{
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                     targetOrigin={{horizontal: 'right', vertical: 'top'}}
                     onRequestClose={() => {this.setState({showPicker: false})}}
+                    useLayerForClickAway={false}
+                    style={{zIndex:2200}}
                 >
                     <div style={{width: 256, height: 320}}>
                         <AddressBook
@@ -127,6 +138,8 @@ class ActionsPanel extends React.Component{
                     anchorEl={this.state.mailerAnchor}
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                     targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                    useLayerForClickAway={false}
+                    style={{zIndex:2200}}
                 >
                     <div style={{width: 256, height: 320}}>
                         {this.state.mailerLibLoaded &&
@@ -138,6 +151,7 @@ class ActionsPanel extends React.Component{
                             uniqueUserStyle={true}
                             users={usermails}
                             onDismiss={() => {this.setState({showMailer: false})}}
+                            onFieldFocus={this.props.otherPopoverMouseOver}
                         />}
                     </div>
                 </Popover>

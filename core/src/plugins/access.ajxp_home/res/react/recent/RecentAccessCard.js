@@ -200,5 +200,4 @@ let RecentAccessCard = React.createClass({
 });
 
 RecentAccessCard = muiThemeable()(RecentAccessCard);
-RecentAccessCard = asGridItem(RecentAccessCard,global.pydio.MessageHash['user_home.87'],{gridWidth:5,gridHeight:20},[]);
 export {RecentAccessCard as default}

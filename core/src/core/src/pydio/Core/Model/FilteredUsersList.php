@@ -21,6 +21,7 @@
 namespace Pydio\Core\Model;
 
 
+use Psr\Http\Message\ResponseInterface;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Services\ConfService;
@@ -54,18 +55,23 @@ class FilteredUsersList{
     private $excludeCurrent;
 
     /**
-     * @var bool
+     * @var string
      */
-    private $alphaPages;
+    private $range;
+
+    /**
+     * @var
+     */
+    private $responseRange;
 
     /**
      * FilteredUsersList constructor.
      * @param ContextInterface $ctx
      */
-    public function __construct(ContextInterface $ctx, $excludeCurrent = true, $alphaPages = false){
+    public function __construct(ContextInterface $ctx, $excludeCurrent = true, $range = ''){
         $this->ctx = $ctx;
         $this->excludeCurrent = $excludeCurrent;
-        $this->alphaPages = $alphaPages;
+        $this->range = $range;
     }
 
     /**
@@ -164,12 +170,13 @@ class FilteredUsersList{
     /**
      * @param $groupPath string
      * @param $searchTerm string
+     * @param $offset int
      * @param $searchLimit int
      * @param $filterArray array
      * @param $recursive bool
      * @return UserInterface[]
      */
-    protected function listUsers($groupPath, $searchTerm, $searchLimit, $filterArray, $recursive = false){
+    protected function listUsers($groupPath, $searchTerm, $offset, $searchLimit, $filterArray, $recursive = false){
 
         if(strpos($groupPath, self::TEAM_PREFIX) === 0){
 
@@ -189,7 +196,13 @@ class FilteredUsersList{
 
         } else if($filterArray['users_internal']){
             // only internal or both
-            $users = UsersService::listUsers($groupPath, '^'.$searchTerm, 0, $searchLimit, false, $recursive);
+            if(!$filterArray['users_external']){
+                $count = UsersService::authCountUsers($groupPath, '^'.$searchTerm, 'parent', AJXP_FILTER_EMPTY, false);
+            }else{
+                $count = UsersService::authCountUsers($groupPath, '^'.$searchTerm, null, null, false);
+            }
+            $this->responseRange = ($count > $searchLimit) ? $offset."-".($offset+$searchLimit)."/".$count : null;
+            $users = UsersService::listUsers($groupPath, '^'.$searchTerm, $offset, $searchLimit, false, $recursive);
             if(!$filterArray['users_external']){
                 $users = array_filter($users, function($userObject) {
                     /** @var UserInterface $userObject */
@@ -313,6 +326,16 @@ class FilteredUsersList{
     }
 
     /**
+     * @param ResponseInterface $response
+     */
+    public function setResponseHeaders(ResponseInterface &$response){
+        if(!$this->responseRange) return;
+        $response = $response
+            ->withHeader('Content-Range', $this->responseRange)
+            ->withHeader('Accept-Range', 'user '.$this->getConf('USERS_LIST_COMPLETE_LIMIT'));
+    }
+
+    /**
      * @param int $filterValue
      * @param bool $allowCreation
      * @param string $searchQuery
@@ -335,7 +358,13 @@ class FilteredUsersList{
         $items          = [];
         $mess           = LocaleService::getMessages();
         $allowCreation &= $this->getConf('USER_CREATE_USERS');
-        $searchLimit    = $this->alphaPages ? -1 : $this->getConf('USERS_LIST_COMPLETE_LIMIT');
+        if(empty($this->range)){
+            $offset = 0;
+            $searchLimit = $this->getConf('USERS_LIST_COMPLETE_LIMIT');
+        }else{
+            list($offset, $end) = explode('-', $this->range);
+            $searchLimit = min($end - $offset, $this->getConf('USERS_LIST_COMPLETE_LIMIT'));
+        }
         $baseGroup      = $this->computeBaseGroup($groupPathFilter, $searchQuery);
 
         if(!empty($searchQuery)) {
@@ -348,7 +377,7 @@ class FilteredUsersList{
         $allGroups = [];
         $allUsers = [];
         if( $FILTER['users_internal'] || $FILTER['users_external'] ){
-            $allUsers = $this->listUsers($baseGroup, $searchQuery, $searchLimit, $FILTER, empty($groupPathFilter));
+            $allUsers = $this->listUsers($baseGroup, $searchQuery, $offset, $searchLimit, $FILTER, empty($groupPathFilter));
         }
         if( $FILTER['groups'] ) {
             $allGroups = $this->listGroupsOrRoles($baseGroup);

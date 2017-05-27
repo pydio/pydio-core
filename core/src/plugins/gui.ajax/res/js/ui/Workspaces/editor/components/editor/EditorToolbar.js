@@ -36,7 +36,10 @@ const EditorToolbar = ({title, className, style, onFullScreen, onMinimise, onClo
             iconElementRight={
                 <ToolbarGroup>
                     <IconButton iconClassName="mdi mdi-window-minimize" iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}/>
-                    <IconButton iconClassName="mdi mdi-window-maximize" iconStyle={innerStyle} disabled={typeof onFullScreen !== "function"} touch={true} onTouchTap={onFullScreen}/>
+                    {!pydio.UI.MOBILE_EXTENSIONS &&
+                        <IconButton iconClassName="mdi mdi-window-maximize" iconStyle={innerStyle}
+                                disabled={typeof onFullScreen !== "function"} touch={true} onTouchTap={onFullScreen}/>
+                    }
                 </ToolbarGroup>
             }
         />

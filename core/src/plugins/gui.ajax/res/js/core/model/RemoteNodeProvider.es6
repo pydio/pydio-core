@@ -229,7 +229,7 @@ export default class RemoteNodeProvider{
         if(authNode && pydio && pydio.UI && pydio.UI.openPromptDialog){
             let jsonData = XMLUtils.XPathSelectSingleNode(authNode, "data").firstChild.nodeValue;
             pydio.UI.openPromptDialog(JSON.parse(jsonData));
-            throw new Error();
+            return false;
         }
 
         // CHECK FOR PAGINATION DATA

@@ -39,8 +39,11 @@ class App extends React.Component {
         this.onEditorMinimise = () => this.setState({editorMinimised: !this.props.displayPanel})
 
         this.state = {
-            editorMinimised: false
+            editorMinimised: false,
+            fullBrowserScreen: pydio.UI.MOBILE_EXTENSIONS || false
         }
+
+        this.onFullBrowserScreen = () => this.setState({fullBrowserScreen: !this.state.fullBrowserScreen})
     }
 
     componentWillReceiveProps(nextProps) {
@@ -69,7 +72,7 @@ class App extends React.Component {
     render() {
 
         const {display, displayPanel} = this.props
-        const {editorMinimised} = this.state
+        const {editorMinimised, fullBrowserScreen} = this.state
 
         let editorStyle = {
             display: "none"
@@ -82,10 +85,10 @@ class App extends React.Component {
         if (!editorMinimised) {
             editorStyle = {
                 position: "fixed",
-                top: "1%",
-                left: "1%",
-                right: "15%",
-                bottom: "1%",
+                top: fullBrowserScreen ? 0 : "1%",
+                left: fullBrowserScreen ? 0 : "1%",
+                right: fullBrowserScreen ? 0 : "15%",
+                bottom: fullBrowserScreen ? 0 : "1%",
                 transformOrigin: this.state.transformOrigin
             }
 
@@ -109,7 +112,7 @@ class App extends React.Component {
             <div>
                 { display ? <div style={overlayStyle} /> : null }
                 <AnimationGroup>
-                    { display ? <Editor style={editorStyle} onMinimise={this.onEditorMinimise.bind(this)} /> : null }
+                    { display ? <Editor style={editorStyle} onFullBrowserScreen={this.onFullBrowserScreen.bind(this)} onMinimise={this.onEditorMinimise.bind(this)}  /> : null }
                     { display ? <Menu style={menuStyle} /> : null }
                 </AnimationGroup>
             </div>

@@ -196,6 +196,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
             <processing>
+                <clientCallback module="AdminActions.Callbacks.applyDND"/>
                 <serverCallback methodName="usersAction" developerComment="Move an existing user to an existing group" restParams="/file/group_path+">
                     <input_param description="User identifier" name="file" type="String"/>
                     <input_param description="Target group path, must be /group/path" name="group_path" type="String"/>

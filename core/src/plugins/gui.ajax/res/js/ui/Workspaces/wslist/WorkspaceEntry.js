@@ -21,12 +21,17 @@
 const React = require('react')
 const {muiThemeable} = require('material-ui/styles')
 import Color from 'color'
+import {CircularProgress} from 'material-ui'
+import { DragSource, DropTarget, flow } from 'react-dnd';
 
 const Pydio = require('pydio')
 const PydioApi = require('pydio/http/api')
 const Node = require('pydio/model/node')
-const {FoldersTree} = Pydio.requireLib('components');
+const {FoldersTree, DND} = Pydio.requireLib('components');
 const {withContextMenu} = Pydio.requireLib('hoc');
+
+const { Types, collect, collectDrop, nodeDragSource, nodeDropTarget } = DND;
+
 
 const Confirm = React.createClass({
 
@@ -187,6 +192,8 @@ let WorkspaceEntry =React.createClass({
         if(this.props.workspace.getId() === this.props.pydio.user.activeRepository && this.props.showFoldersTree){
             this.props.pydio.goTo('/');
         }else{
+            this.props.pydio.observeOnce('repository_list_refreshed', () => {this.setState({loading: false})});
+            this.setState({loading: true});
             this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
         }
     },
@@ -215,9 +222,12 @@ let WorkspaceEntry =React.createClass({
     },
 
     render:function(){
-        let current = (this.props.pydio.user.getActiveRepository() == this.props.workspace.getId()),
+
+        const {workspace, pydio, onHoverLink, onOutLink, showFoldersTree} = this.props;
+
+        let current = (pydio.user.getActiveRepository() == workspace.getId()),
             currentClass="workspace-entry",
-            messages = this.props.pydio.MessageHash,
+            messages = pydio.MessageHash,
             onHover, onOut, onClick,
             additionalAction,
             badge, badgeNum, newWorkspace;
@@ -227,74 +237,78 @@ let WorkspaceEntry =React.createClass({
         if (current) {
             currentClass +=" workspace-current";
             if(this.state.openFoldersTree){
-                style = this.getItemStyle(this.props.pydio.getContextHolder().getRootNode());
+                style = this.getItemStyle(pydio.getContextHolder().getRootNode());
             }else{
-                style = this.getItemStyle(this.props.pydio.getContextHolder().getContextNode());
+                style = this.getItemStyle(pydio.getContextHolder().getContextNode());
             }
         }
 
-        currentClass += " workspace-access-" + this.props.workspace.getAccessType();
+        currentClass += " workspace-access-" + workspace.getAccessType();
 
-        if (this.props.onHoverLink) {
+        if (onHoverLink) {
             onHover = function(event){
-                this.props.onHoverLink(event, this.props.workspace)
+                onHoverLink(event, workspace)
             }.bind(this);
         }
 
-        if (this.props.onOutLink) {
+        if (onOutLink) {
             onOut = function(event){
-                this.props.onOutLink(event, this.props.ws)
+                onOutLink(event, workspace)
             }.bind(this);
         }
 
         onClick = this.onClick;
 
         // Icons
-        if (this.props.workspace.getAccessType() == "inbox") {
-            const status = this.props.workspace.getAccessStatus();
+        if (workspace.getAccessType() == "inbox") {
+            const status = workspace.getAccessStatus();
 
             if (!isNaN(status) && status > 0) {
                 badgeNum = <span className="workspace-num-badge">{status}</span>;
             }
 
             badge = <span className="workspace-badge"><span className="access-icon"/></span>;
-        } else if(this.props.workspace.getOwner()){
+        } else if(workspace.getOwner()){
             let overlay = <span className="badge-overlay mdi mdi-share-variant"/>;
-            if(this.props.workspace.getRepositoryType() == "remote"){
+            if(workspace.getRepositoryType() == "remote"){
                 overlay = <span className="badge-overlay icon-cloud"/>;
             }
             badge = <span className="workspace-badge"><span className="mdi mdi-folder"/>{overlay}</span>;
         } else{
-            badge = <span className="workspace-badge"><span>{this.props.workspace.getLettersBadge()}</span></span>;
+            badge = <span className="workspace-badge"><span>{workspace.getLettersBadge()}</span></span>;
         }
 
-        if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()) {
+        if (workspace.getOwner() && !workspace.getAccessStatus() && !workspace.getLastConnection()) {
             newWorkspace = <span className="workspace-new">NEW</span>;
             // Dialog for remote shares
-            if (this.props.workspace.getRepositoryType() == "remote") {
+            if (workspace.getRepositoryType() == "remote") {
                 onClick = this.handleOpenAlert.bind(this, 'new_share');
             }
-        }else if(this.props.workspace.getRepositoryType() == "remote" && !current){
+        }else if(workspace.getRepositoryType() == "remote" && !current){
             // Remote share but already accepted, add delete
             additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleOpenAlert.bind(this, 'reject_accepted')} title={messages['550']}/>;
-        }else if(this.props.workspace.userEditable && !current){
+        }else if(workspace.userEditable && !current){
             additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleRemoveTplBasedWorkspace} title={messages['423']}/>;
         }
 
-        if(this.props.showFoldersTree){
+        if(this.state && this.state.loading){
+            additionalAction = <span className="workspace-additional-action" style={{padding:5}}><CircularProgress size={20} thickness={3}/></span>
+        }
+
+        if(showFoldersTree){
             let fTCName = this.state.openFoldersTree ? "workspace-additional-action mdi mdi-chevron-up" : "workspace-additional-action mdi mdi-chevron-down";
             additionalAction = <span className={fTCName} onClick={this.toggleFoldersPanelOpen}></span>;
         }
 
         let menuNode;
-        if(this.props.workspace.getId() === this.props.pydio.user.activeRepository ){
-            menuNode = this.props.pydio.getContextHolder().getRootNode();
+        if(workspace.getId() === pydio.user.activeRepository ){
+            menuNode = pydio.getContextHolder().getRootNode();
         }else{
             /*
-            menuNode = new Node('/', false, this.props.workspace.getLabel());
+            menuNode = new Node('/', false, workspace.getLabel());
             menuNode.setRoot(true);
             const metaMap = new Map();
-            metaMap.set('repository_id', this.props.workspace.getId());
+            metaMap.set('repository_id', workspace.getId());
             menuNode.setMetadata(metaMap);
             */
         }
@@ -304,27 +318,27 @@ let WorkspaceEntry =React.createClass({
                 node={menuNode}
                 className={currentClass}
                 onClick={onClick}
-                title={this.props.workspace.getDescription()}
+                title={workspace.getDescription()}
                 onMouseOver={onHover}
                 onMouseOut={onOut}
                 style={style}
             >
                 {badge}
                 <span className="workspace-label-container">
-                    <span className="workspace-label">{this.props.workspace.getLabel()}{newWorkspace}{badgeNum}</span>
-                    <span className="workspace-description">{this.props.workspace.getDescription()}</span>
+                    <span className="workspace-label">{workspace.getLabel()}{newWorkspace}{badgeNum}</span>
+                    <span className="workspace-description">{workspace.getDescription()}</span>
                 </span>
                 {additionalAction}
             </ContextMenuWrapper>
         );
 
-        if(this.props.showFoldersTree){
+        if(showFoldersTree){
             return (
                 <div>
                     {wsBlock}
                     <FoldersTree
-                        pydio={this.props.pydio}
-                        dataModel={this.props.pydio.getContextHolder()}
+                        pydio={pydio}
+                        dataModel={pydio.getContextHolder()}
                         className={this.state.openFoldersTree?"open":"closed"}
                         draggable={true}
                         getItemStyle={this.getItemStyle}
@@ -340,11 +354,25 @@ let WorkspaceEntry =React.createClass({
 });
 
 let ContextMenuWrapper = (props) => {
+
+    const {canDrop, isOver, connectDropTarget} = props;
+    let className = props.className || '';
+    if(canDrop && isOver){
+        className += ' droppable-active';
+    }
     return (
-        <div {...props} />
+        <div
+            {...props}
+            className={className}
+            ref={instance => {
+                const node = ReactDOM.findDOMNode(instance)
+                if (typeof connectDropTarget === 'function') connectDropTarget(node)
+            }}
+        />
     )
 }
 ContextMenuWrapper = withContextMenu(ContextMenuWrapper)
-
+ContextMenuWrapper = DropTarget(Types.NODE_PROVIDER, nodeDropTarget, collectDrop)(ContextMenuWrapper);
 WorkspaceEntry = muiThemeable()(WorkspaceEntry);
+
 export {WorkspaceEntry as default}

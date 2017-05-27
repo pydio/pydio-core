@@ -85,9 +85,7 @@
 		</action>
 		<action name="empty_recycle">
 			<gui text="220" title="221" iconClass="mdi mdi-delete-forever" accessKey="empty_recycle_access_key" hasAccessKey="true">
-				<context selection="true" dir="true" recycle="only" actionBar="true"
-                         contextMenu="true" infoPanel="false" actionBarGroup="change_main"/>
-                <selectionContext dir="false" file="false" recycle="true" unique="true"/>
+				<context selection="false" dir="true" recycle="only" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="info_panel,change_main"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>

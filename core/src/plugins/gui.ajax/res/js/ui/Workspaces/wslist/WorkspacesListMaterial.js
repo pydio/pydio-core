@@ -68,7 +68,7 @@ class WorkspacesListMaterial extends React.Component{
                 sharedEntries.unshift(<Divider/>);
             }
             sharedEntries.unshift(inboxEntry);
-            sharedEntries.unshift(<Subheader>{messages[625]}</Subheader>);
+            sharedEntries.unshift(<Subheader>{messages[630]}</Subheader>);
         }
         if(remoteShares.length){
             remoteShares.unshift(<Subheader>{messages[627]}</Subheader>)

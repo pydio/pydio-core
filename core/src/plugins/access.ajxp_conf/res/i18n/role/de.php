@@ -77,5 +77,6 @@ $mess=array(
 "44" => "Fein-Einstellungen für Erweiterungs-Parameter",
 "45" => "Zugriffssteuerungsliste",
 "46" => "Ausgeschaltete Aktionen",
+"47" => "Search Roles",
 );
 

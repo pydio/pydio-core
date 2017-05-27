@@ -724,10 +724,11 @@ $mess=array(
 "622" => "Pile d'erreurs",
 "623" => "Copier",
 "624" => "Copié!",
-"625" => "Folders shared with me",
+"625" => "Lettre",
 "626" => "Files Shared with me",
 "627" => "Shares from remote servers",
 "628" => "Revert",
 "629" => "No records yet",
+"630" => "Folders shared with me",
 /* END SENTENCE */
 );

@@ -11,7 +11,7 @@ div.pydio-tasks-panel{
   overflow-y: auto;
   overflow-x: hidden;
   background-color: white;
-  box-shadow: @reactBoxShadowDepth1;
+  /*box-shadow: @reactBoxShadowDepth1;*/
   z-index: 20001;
   transition: @bezier_transition;
   &.invisible{
@@ -43,9 +43,10 @@ div.pydio-tasks-panel{
       cursor: pointer;
       > span{
         display: inline-block;
-        margin-top: 15px;
+        margin-top: 11px;
+        color: #325e74;
         margin-left: 10px;
-        color: @teal-500;
+        font-size: 20px;
       }
     }
     &.task-status-8{ /* error status */

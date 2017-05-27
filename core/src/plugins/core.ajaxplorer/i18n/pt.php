@@ -722,11 +722,12 @@ $mess=array(
 "622" => "Error Stack",
 "623" => "Copy",
 "624" => "Copied!",
-"625" => "Folders shared with me",
+"625" => "Letter",
 "626" => "Files Shared with me",
 "627" => "Shares from remote servers",
 "628" => "Revert",
 "629" => "No records yet",
+"630" => "Folders shared with me",
 /* END SENTENCE */
 /* password strength tester */
 );

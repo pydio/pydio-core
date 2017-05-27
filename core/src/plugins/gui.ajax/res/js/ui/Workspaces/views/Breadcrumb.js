@@ -71,17 +71,17 @@ let Breadcrumb = React.createClass({
             repoLabel = pydio.user.repositories.get(pydio.user.activeRepository).getLabel();
         }
         let segments = [];
-        let path = this.state.node ? LangUtils.trimLeft(this.state.node.getPath(), '/') : '';
+        const path = this.state.node ? LangUtils.trimLeft(this.state.node.getPath(), '/') : '';
+        const label = this.state.node ? this.state.node.getLabel() : '';
         let rebuilt = '';
-        let i = 0;
         let mainStyle = this.props.rootStyle || {};
         mainStyle = {...styles.main, ...mainStyle};
-        path.split('/').map(function(seg){
+        const parts = path.split('/');
+        parts.forEach(function(seg, i){
             if(!seg) return;
             rebuilt += '/' + seg;
             segments.push(<span key={'bread_sep_' + i} className="separator"> / </span>);
-            segments.push(<span key={'bread_' + i} className="segment" onClick={this.goTo.bind(this, rebuilt)}>{seg}</span>);
-            i++;
+            segments.push(<span key={'bread_' + i} className="segment" onClick={this.goTo.bind(this, rebuilt)}>{i===parts.length-1 ? label : seg}</span>);
         }.bind(this));
         return (
             <Textfit mode="single" perfectFit={false} min={12} max={22} className="react_breadcrumb" style={mainStyle}>

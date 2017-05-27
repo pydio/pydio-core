@@ -71,4 +71,5 @@ $mess=array(
 "44" => "Ajuste Fino de Plugins",
 "45" => "Listas de Control de Acceso",
 "46" => "Deshabilitar Acciones",
+"47" => "Search Roles",
 );

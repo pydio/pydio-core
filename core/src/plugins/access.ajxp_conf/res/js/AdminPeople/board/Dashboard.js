@@ -19,7 +19,7 @@
  */
 
 const React = require('react')
-const {IconButton, Paper, BottomNavigation, BottomNavigationItem, FontIcon, FlatButton} = require('material-ui')
+const {IconButton, Paper, BottomNavigation, BottomNavigationItem, FontIcon, FlatButton, TextField} = require('material-ui')
 import Editor from '../editor/Editor'
 const PydioDataModel = require('pydio/model/data-model')
 const {muiThemeable} = require('material-ui/styles')
@@ -232,6 +232,18 @@ let Dashboard = React.createClass({
         )
     },
 
+    toggleRoleSearch: function(){
+        if(this.state.showRolesSearch){
+            this.setState({showRolesSearch: false, searchRoleString: ''});
+        }else{
+            this.setState({showRolesSearch: true});
+        }
+    },
+
+    filterRoleNodes: function(node){
+        return node.getLabel().toLowerCase().indexOf(this.state.searchRoleString.toLowerCase()) !== -1;
+    },
+
     render: function(){
 
         const fontIconStyle = {
@@ -313,10 +325,17 @@ let Dashboard = React.createClass({
                                 entryRenderIcon={function(node){return null;}}
                                 entryRenderActions={this.renderNodeActions}
                                 elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
+                                filterNodes={this.state.searchRoleString? this.filterRoleNodes.bind(this) : null}
                             />
-                            <div style={{height:48,padding:'8px 16px',backgroundColor:'rgb(247,247,247)',boxShadow:'0px 0px 1px rgba(0, 0, 0, 0.23)'}}>
+                            {this.state.showRolesSearch &&
+                                <div style={{height:48, padding: '0px 16px', backgroundColor: 'rgba(247, 247, 247, 0.4)', borderTop: '1px solid #E0E0E0', borderBottom: '1px solid #EEEEEE'}}>
+                                    <TextField fullWidth={true} underlineShow={false} hintText={this.context.getMessage('47', 'role_editor') + '...'} value={this.state.searchRoleString || ''} onChange={(e,v) => this.setState({searchRoleString:v}) } />
+                                </div>
+                            }
+                            <div style={{height:48,padding:'8px 12px',backgroundColor:'rgb(247,247,247)',boxShadow:'0px 0px 1px rgba(0, 0, 0, 0.23)', display:'flex', alignItems:'center'}}>
                                 <FlatButton secondary={true} label={this.context.getMessage("user.6")} onClick={this.createRoleAction}/>
-                                <FlatButton secondary={true} onClick={this.toggleStateShowRoles} label={this.context.getMessage('93', 'ajxp_conf')}/>
+                                <FlatButton secondary={true} onTouchTap={this.toggleStateShowRoles} label={this.context.getMessage('93', 'ajxp_conf')}/>
+                                <IconButton secondary={true} iconClassName={this.state.showRolesSearch?"mdi mdi-close":"mdi mdi-magnify"} tooltipPosition="top-left" iconStyle={{color:'#757575'}} tooltip={this.context.getMessage('47', 'role_editor')} onTouchTap={this.toggleRoleSearch.bind(this)}/>
                             </div>
                         </div>
                         }
@@ -328,6 +347,7 @@ let Dashboard = React.createClass({
                             node={this.state.currentNode}
                             dataModel={this.state.dataModel}
                             openEditor={this.openRoleEditor}
+                            clearSelectionOnReload={false}
                             entryRenderIcon={this.renderListUserAvatar}
                             entryRenderFirstLine={this.renderListEntryFirstLine}
                             entryRenderSecondLine={this.renderListEntrySecondLine}

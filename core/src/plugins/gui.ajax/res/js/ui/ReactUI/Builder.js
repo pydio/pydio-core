@@ -251,4 +251,17 @@ export default class Builder{
         }
     }
 
+    openPromptDialog(json){
+
+        if(!this._modalOpener){
+            if(console){
+                console.error('Cannot find modalOpener! Received serverPromptDialog with data', json);
+            }
+            return;
+        }
+        this._modalOpener.open('PydioReactUI', 'ServerPromptDialog', json);
+
+    }
+
+
 }

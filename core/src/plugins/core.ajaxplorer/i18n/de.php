@@ -729,11 +729,12 @@ $mess=array(
 "622" => "Fehlerstapel",
 "623" => "Kopieren",
 "624" => "Erfolgreich kopiert!",
-"625" => "Mit mir geteilte Dateien",
+"625" => "Letter",
 "626" => "Mit mir geteilte Ordner",
 "627" => "Remote-Server-Freigaben",
 "628" => "Zurücksetzen",
 "629" => "Noch keine Einträge",
+"630" => "Mit mir geteilte Dateien",
 /* END SENTENCE */
 /* password strength tester */
 );

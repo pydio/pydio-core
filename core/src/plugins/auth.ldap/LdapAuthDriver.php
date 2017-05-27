@@ -479,7 +479,8 @@ class LdapAuthDriver extends AbstractAuthDriver
      */
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
-        $check_cache = $this->getCountFromCache($baseGroup);
+        $cacheKey = $baseGroup . (!empty($regexp) ? "-" . $regexp : "");
+        $check_cache = $this->getCountFromCache($cacheKey);
         if ((is_array($check_cache) && $check_cache["count"] > 0)) {
             return $check_cache["count"];
         }
@@ -491,7 +492,7 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
 
         $res = $this->getUserEntries(StringHelper::regexpToLdap($regexp), true, null);
-        $this->saveCountToCache($res, $baseGroup);
+        $this->saveCountToCache($res, $cacheKey);
         $this->dynamicFilter = null;
         return $res["count"];
     }

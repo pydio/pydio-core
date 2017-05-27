@@ -51,12 +51,28 @@ class Loaders{
         baseParams = {...baseParams, ...params};
         let cb = callback;
         if(parent){
+            if(parent.range){
+                baseParams['range'] = parent.range;
+            }
             cb = (children) => {
                 callback(children.map(function(c){ c._parent = parent; return c; }));
             };
         }
         PydioApi.getClient().request(baseParams, function(transport){
             cb(transport.responseJSON);
+            const cRange = transport.responseObject.headers.get('Content-Range');
+            const aRange = transport.responseObject.headers.get('Accept-Range');
+            if(cRange && aRange && parent){
+                const [type, interval] = aRange.split(' ');
+                const [range, max] = cRange.split('/');
+                const [start, end] = range.split('-');
+                parent.pagination = {
+                    start: parseInt(start),
+                    end: parseInt(end),
+                    max: parseInt(max),
+                    interval: parseInt(interval)
+                };
+            }
         });
     }
 
@@ -82,8 +98,8 @@ class Loaders{
         const wrapped = (children) => {
             children.map(function(child){
                 child.icon = 'mdi mdi-account-multiple';
-                child.childrenLoader = Loaders.loadGroups;
-                child.itemsLoader = Loaders.loadGroupUsers;
+                child.childrenLoader = entry.childrenLoader ? Loaders.loadGroups : null;
+                child.itemsLoader = entry.itemsLoader ? Loaders.loadGroupUsers : null;
                 if(entry.currentParams && entry.currentParams.alpha_pages){
                     child.currentParams = {...entry.currentParams};
                 }

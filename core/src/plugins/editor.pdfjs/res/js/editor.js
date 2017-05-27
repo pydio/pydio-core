@@ -76,7 +76,7 @@ class Viewer extends Component {
         if (!url) return null
 
         return (
-            <iframe {...this.props} style={{width: "100%", height: "100%", border: 0}} src={url} />
+            <iframe {...this.props} style={{flex: 1, width: "100%", height: "100%", border: 0}} src={url} />
         );
     }
 }

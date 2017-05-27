@@ -154,5 +154,4 @@ $mess=array(
     "92" => "Applications Download",
     "93" => "Quick Upload",
     "94" => "Video Tutorial",
-    "95" => "My Workspaces",
 );

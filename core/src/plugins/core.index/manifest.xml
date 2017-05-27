@@ -10,7 +10,7 @@
     <registry_contributions>
         <actions>
             <action name="index">
-                <gui text="core.index.1" title="core.index.2" iconClass="icon-book" accessKey="folder_access_key">
+                <gui text="core.index.1" title="core.index.2" iconClass="mdi mdi-library-books" accessKey="folder_access_key">
                     <context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="other" inZip="false"/>
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true"

@@ -37,6 +37,7 @@ import EmptyStateView from '../views/EmptyStateView'
 const DOMUtils = require('pydio/util/dom')
 const LangUtils = require('pydio/util/lang')
 const PydioDataModel = require('pydio/model/data-model')
+const PeriodicalExecuter = require('pydio/util/periodical-executer')
 
 /**
  * Generic List component, using Infinite for cell virtualization, pagination, various
@@ -53,6 +54,7 @@ let SimpleList = React.createClass({
         tableKeys           : React.PropTypes.object,
         autoRefresh         : React.PropTypes.number,
         reloadAtCursor      : React.PropTypes.bool,
+        clearSelectionOnReload: React.PropTypes.bool,
         heightAutoWithMax   : React.PropTypes.number,
         containerHeight     : React.PropTypes.number,
         observeNodeReload   : React.PropTypes.bool,
@@ -96,7 +98,7 @@ let SimpleList = React.createClass({
     },
 
     getDefaultProps:function(){
-        return {infiniteSliceCount:30}
+        return {infiniteSliceCount:30, clearSelectionOnReload: true}
     },
 
     clickRow: function(gridRow, event){
@@ -330,6 +332,10 @@ let SimpleList = React.createClass({
         if(this.props.node && nextProps.node !== this.props.node) {
             this.observeNodeChildren(this.props.node, true);
         }
+        if(this._manualScrollPe) {
+            this._manualScrollPe.stop();
+            this._manualScrollPe = null;
+        }
     },
 
     observeNodeChildren: function(node, stop = false){
@@ -404,7 +410,9 @@ let SimpleList = React.createClass({
             this.loadStartingAtCursor();
             return;
         }
-        this.props.dataModel.setSelectedNodes([]);
+        if(this.props.clearSelectionOnReload){
+            this.props.dataModel.setSelectedNodes([]);
+        }
         this._loadingListener();
         this.props.node.observeOnce("loaded", this._loadedListener);
         this.props.node.reload();
@@ -623,10 +631,16 @@ let SimpleList = React.createClass({
         this.props.dataModel.observe('selection_changed', function(){
             if(!this.isMounted()) return;
             let selection = new Map();
-            this.props.dataModel.getSelectedNodes().map(function(n){
+            const selectedNodes = this.props.dataModel.getSelectedNodes();
+            selectedNodes.map(function(n){
                 selection.set(n, true);
             });
-            this.setState({selection: selection}, this.rebuildLoadedElements);
+            this.setState({selection: selection}, ()  => {
+                this.rebuildLoadedElements();
+                if(selectedNodes.length === 1){
+                    this.scrollToView(selectedNodes[0]);
+                }
+            });
         }.bind(this));
     },
 
@@ -688,6 +702,49 @@ let SimpleList = React.createClass({
             scrollTimeout: scrollTimeout
         });
 
+    },
+
+    scrollToLast: function(){
+        if(this.indexedElements && this.indexedElements[this.indexedElements.length - 1].node){
+            this.scrollToView(this.indexedElements[this.indexedElements.length - 1].node);
+        }
+    },
+
+    scrollToView:function(node){
+        if(!this.indexedElements || !this.refs.infinite || !this.refs.infinite.scrollable) return;
+        const scrollable = this.refs.infinite.scrollable;
+        const visibleFrame = {
+            top: scrollable.scrollTop + this.props.elementHeight / 2,
+            bottom: scrollable.scrollTop + this.state.containerHeight - this.props.elementHeight / 2
+        };
+        const realMaxScrollTop = this.indexedElements.length * this.props.elementHeight - this.state.containerHeight;
+
+        let position = -1;
+        this.indexedElements.forEach((e, k) => {
+            if(e.node && e.node === node) position = k;
+        });
+        if(position === -1) return;
+        let elementHeight = this.props.elementHeight;
+        let scrollTarget = position * elementHeight;
+
+        if(scrollTarget > visibleFrame.top && scrollTarget < visibleFrame.bottom){
+            // already visible;
+            return;
+        }else if(scrollTarget >= visibleFrame.bottom){
+            scrollTarget -= (this.state.containerHeight - elementHeight * 2);
+        }
+        scrollTarget = Math.min(scrollTarget, realMaxScrollTop);
+        scrollable.scrollTop = scrollTarget;
+        if(this._manualScrollPe) this._manualScrollPe.stop();
+        if(scrollable.scrollHeight < scrollTarget){
+            this._manualScrollPe = new PeriodicalExecuter(() => {
+                scrollable.scrollTop = scrollTarget;
+                if(scrollable.scrollHeight >= scrollTarget){
+                    this._manualScrollPe.stop();
+                    this._manualScrollPe = null;
+                }
+            }, .25);
+        }
     },
 
     buildElementsFromNodeEntries: function(nodeEntries, showSelector){

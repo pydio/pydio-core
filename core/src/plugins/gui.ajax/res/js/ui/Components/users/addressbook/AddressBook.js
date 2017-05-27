@@ -169,7 +169,11 @@ let AddressBook = React.createClass({
                 });
             }
             if(confConfigs.get('ALLOW_CROSSUSERS_SHARING')){
-                if(confConfigs.get('CROSSUSERS_ADDRESSBOOK_SEARCH_ONLY')){
+                let groupOrUsers = confConfigs.get('ADDRESSBOOK_GROUP_OR_USERS');
+                if(groupOrUsers && groupOrUsers.group_switch_value) groupOrUsers = groupOrUsers.group_switch_value;
+                else groupOrUsers = 'both';
+
+                if(groupOrUsers === 'search'){
                     if(!disableSearch){
                         root.collections.push({
                             id:'search',
@@ -185,12 +189,8 @@ let AddressBook = React.createClass({
                         id:'AJXP_GRP_/',
                         label:getMessage(584),
                         //icon:'mdi mdi-account-box',
-                        currentParams:{
-                            alpha_pages:true,
-                            value:'a'
-                        },
-                        childrenLoader:Loaders.loadGroups,
-                        itemsLoader: Loaders.loadGroupUsers,
+                        childrenLoader: (groupOrUsers === 'both' || groupOrUsers === 'groups' ) ? Loaders.loadGroups : null,
+                        itemsLoader:  (groupOrUsers === 'both' || groupOrUsers === 'users' ) ? Loaders.loadGroupUsers : null,
                         _parent:root,
                         _notSelectable:true
                     });
@@ -341,20 +341,23 @@ let AddressBook = React.createClass({
         });
     },
 
-    reloadCurrentAtPage: function(letter){
+    reloadCurrentAtPage: function(letterOrRange){
         this.state.selectedItem.leafLoaded = false;
         this.state.selectedItem.collectionsLoaded = false;
-        if(letter === -1){
+        if(letterOrRange === -1) {
             this.state.selectedItem.currentParams = null;
+        }else if(letterOrRange.indexOf('-') !== -1){
+            this.state.selectedItem.range = letterOrRange;
         }else{
-            this.state.selectedItem.currentParams = {alpha_pages:'true', value:letter};
+            this.state.selectedItem.range = null;
+            this.state.selectedItem.currentParams = {alpha_pages:'true', value:letterOrRange};
         }
         this.onFolderClicked(this.state.selectedItem);
     },
 
     reloadCurrentWithSearch: function(value){
         if(!value){
-            this.reloadCurrentAtPage('a');
+            this.reloadCurrentAtPage(-1);
             return;
         }
         this.state.selectedItem.leafLoaded = false;

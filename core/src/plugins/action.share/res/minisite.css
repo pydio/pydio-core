@@ -17,9 +17,12 @@ html .hash_load_error {
 }
 #ajxp_unique_dl .download-block {
   cursor: pointer;
-  width: auto;
-  max-width: 400px;
-  min-width: 220px;
+  /*
+    width: auto;
+    max-width: 400px;
+    min-width: 220px;
+    */
+  width: 300px;
   margin: 0 auto;
   text-align: center;
   background: rgba(255, 255, 255, 0.91);
