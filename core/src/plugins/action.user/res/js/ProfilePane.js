@@ -88,10 +88,10 @@ let ProfilePane = React.createClass({
         if(updater) this._updater = updater;
         let button, revert;
         if(this.state.dirty){
-            revert = <FlatButton label={"Revert"} onTouchTap={this.revert}/>;
+            revert = <FlatButton label={this.props.pydio.MessageHash[628]} onTouchTap={this.revert}/>;
             button = <FlatButton label={this.props.pydio.MessageHash[53]} secondary={true} onTouchTap={this.saveForm}/>;
         }else{
-            button = <FlatButton label="Close" onTouchTap={this.props.onDismiss}/>;
+            button = <FlatButton label={this.props.pydio.MessageHash[86]} onTouchTap={this.props.onDismiss}/>;
         }
         if(this.props.pydio.Controller.getActionByName('pass_change')){
             return [

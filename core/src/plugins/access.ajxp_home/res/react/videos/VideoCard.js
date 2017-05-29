@@ -131,5 +131,5 @@ let VideoCard = React.createClass({
     }
 });
 
-VideoCard = asGridItem(VideoCard,'Video Tutorial',{gridWidth:2,gridHeight:12},[]);
+VideoCard = asGridItem(VideoCard,global.pydio.MessageHash['user_home.94'],{gridWidth:2,gridHeight:12},[]);
 export {VideoCard as default}

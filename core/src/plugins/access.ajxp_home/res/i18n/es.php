@@ -155,4 +155,7 @@ $mess=array(
     "89" => "Seleccionado archivo para subir",
     "90" => "Seleccionar workspace de destino",
     "91" => "Archivos offline con Desktop Sync Client",
+    "92" => "Applications Download",
+    "93" => "Quick Upload",
+    "94" => "Video Tutorial",
 );

@@ -111,5 +111,5 @@ let DlAppsCard = React.createClass({
     }
 });
 
-DlAppsCard = asGridItem(DlAppsCard,'Applications Download',{gridWidth:2,gridHeight:10},[]);
+DlAppsCard = asGridItem(DlAppsCard,global.pydio.MessageHash['user_home.92'],{gridWidth:2,gridHeight:10},[]);
 export {DlAppsCard as default}

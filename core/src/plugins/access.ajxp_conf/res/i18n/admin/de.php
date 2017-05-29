@@ -106,10 +106,10 @@ $mess=array(
     "home.49" => "Widgets hinzufügen/entfernen",
     "home.50" => "Widget hinzufügen...",
     "home.51" => "Dadurch wird Ihr Layout verloren gehen. Möchten Sie fortfahren?",
-    "home.52" => "Widget erstellen",
+    "home.52" => "Widget hinzufügen",
     "home.53" => "Dashboard konfigurieren",
     "home.54" => "Bestehende Widgets können durch einen Klick auf ENTFERNEN ausgeblendet werden. ",
-    "home.55" => "Wählen Sie unterhalb einen Typ aus, um ein neues Widget zu erstellen.",
+    "home.55" => "Wählen Sie unterhalb einen Typ aus, um ein neues Widget hinzuzufügen.",
     "home.56" => "Layout zurücksetzen",
 
     // Default Widgets
