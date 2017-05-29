@@ -1743,7 +1743,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $currentMeta = $ajxpNode->getNodeInfoMeta();
         if(!empty($currentMeta["ajxp_modiftime"])){
             $dateModif = $currentMeta["ajxp_modiftime"];
-            $localMeta["ajxp_description"] = $localMeta["ajxp_relativetime"] = $messages[4]." ". StatHelper::relativeDate($dateModif, $messages);
+            $localMeta["ajxp_relativetime"] = StatHelper::relativeDate($dateModif, $messages);
+            $localMeta["ajxp_description"] = $messages[4]." ". $localMeta["ajxp_relativetime"];
         }
 
         // Recompute human readable size
