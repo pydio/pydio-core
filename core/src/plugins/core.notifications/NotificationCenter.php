@@ -140,6 +140,8 @@ class NotificationCenter extends Plugin
             ));
             if($notification->getNode()->getRepository() != null && $notification->getNode()->getRepository()->hasParent()){
                 $parentRepoId = $notification->getNode()->getRepository()->getParentId();
+                $parentRepo = RepositoryService::getRepositoryById($parentRepoId);
+                if($parentRepo === null || $parentRepo->isTemplate()) return;
                 Controller::applyHook("msg.instant",array(
                     $notification->getNode()->getContext()->withRepositoryId($parentRepoId),
                     "<reload_user_feed/>",

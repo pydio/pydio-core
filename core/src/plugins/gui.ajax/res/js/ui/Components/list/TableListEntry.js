@@ -20,7 +20,7 @@
 
 
 import ListEntryNodeListenerMixin from './ListEntryNodeListenerMixin'
-import {ListEntry} from './ListEntry'
+import {DragDropListEntry, ListEntry} from './ListEntry'
 import InlineEditor from './InlineEditor'
 
 
@@ -47,19 +47,22 @@ export default React.createClass({
 
         let cells = [];
         let firstKey = true;
+        const meta = this.props.node.getMetadata();
         for(var key in this.props.tableKeys){
             if(!this.props.tableKeys.hasOwnProperty(key)) continue;
 
             let data = this.props.tableKeys[key];
             let style = data['width']?{width:data['width']}:null;
             let value, rawValue;
-            if(data.renderCell){
+            if(data.renderCell) {
                 data['name'] = key;
                 value = data.renderCell(this.props.node, data);
+            }else if(key === 'ajxp_modiftime' && meta.get('ajxp_relativetime')){
+                value = meta.get('ajxp_relativetime');
             }else{
-                value = this.props.node.getMetadata().get(key);
+                value = meta.get(key);
             }
-            rawValue = this.props.node.getMetadata().get(key);
+            rawValue = meta.get(key);
             let inlineEditor;
             if(this.state && this.state.inlineEdition && firstKey){
                 inlineEditor = <InlineEditor
@@ -76,7 +79,7 @@ export default React.createClass({
         }
 
         return (
-            <ListEntry
+            <DragDropListEntry
                 {...this.props}
                 iconCell={null}
                 firstLine={cells}

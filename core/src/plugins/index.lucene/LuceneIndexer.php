@@ -257,7 +257,8 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     if(isSet($meta["ajxp_modiftime"])){
-                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ". StatHelper::relativeDate($meta["ajxp_modiftime"], $messages);
+                        $meta["ajxp_relativetime"] = StatHelper::relativeDate($meta["ajxp_modiftime"], $messages);
+                        $meta["ajxp_description"] = $messages[4]." ". $meta["ajxp_relativetime"];
                     }
                     $tmpNode = new AJXP_Node($hit->node_url, $meta);
                     if(!$tmpNode->hasUser()){

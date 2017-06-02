@@ -28,7 +28,6 @@ import Color from 'color';
 /**
  * Material List Entry
  */
-//mixins:[ContextMenuNodeProviderMixin],
 class ListEntry extends React.Component {
 
     onClick(event) {

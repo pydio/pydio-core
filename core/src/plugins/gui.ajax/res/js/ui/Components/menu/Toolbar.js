@@ -186,6 +186,9 @@ import IconButtonPopover from './IconButtonPopover'
             });
             let cName = this.props.className ? this.props.className : '';
             cName += ' ' + 'toolbar';
+            if(!actions.length){
+                cName += ' empty-toolbar';
+            }
             return <div className={cName} style={this.props.toolbarStyle} id={this.props.id}>{actions}</div>
         }
 

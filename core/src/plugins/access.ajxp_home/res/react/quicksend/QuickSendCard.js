@@ -110,5 +110,5 @@ let QuickSendCard = React.createClass({
 
 });
 
-QuickSendCard = asGridItem(QuickSendCard,'Quick Upload',{gridWidth:2,gridHeight:10},[]);
+QuickSendCard = asGridItem(QuickSendCard,global.pydio.MessageHash['user_home.93'],{gridWidth:2,gridHeight:10},[]);
 export {QuickSendCard as default}
