@@ -259,6 +259,25 @@ class S3AccessWrapper extends FsAccessWrapper
         return $this->dH !== false;
     }
 
+    public function mkdir($path, $mode, $options){
+        $url        = UrlUtils::mbParseUrl($path);
+        $node       = new AJXP_Node($path);
+        $repoId     = $node->getRepositoryId();
+        $repoObject = $node->getRepository();
+        if (!isSet($repoObject)) {
+            $e = new \Exception("Cannot find repository with id " . $repoId);
+            self::$lastException = $e;
+            throw $e;
+        }
+        $folderEmptyFile       = $repoObject->getContextOption($node->getContext(), "S3_FOLDER_EMPTY_FILE");
+        if(!empty($folderEmptyFile)){
+            $s3path = $this->initPath($path, "file") . "/" . $folderEmptyFile;
+            file_put_contents($s3path, " ");
+            return true;
+        }else{
+            return mkdir($this->initPath($path, "file"), $mode);
+        }
+    }
 
     /**
      * DUPLICATE STATIC FUNCTIONS TO BE SURE

@@ -17,6 +17,7 @@
 		<param name="API_VERSION" group="CONF_MESSAGE[API]" type="string" label="CONF_MESSAGE[API Version]" description="CONF_MESSAGE[The API Version of AS3 is a date (like 2006-03-01). If not sure, put latest ]" mandatory="true" default="latest"/>
         <param name="PROXY" group="CONF_MESSAGE[Custom Storage]" type="string" label="CONF_MESSAGE[Proxy]" description="CONF_MESSAGE[If you are using a proxy, for example:  127.0.0.1:80 or username:password@127.0.0.1:8080]" mandatory="false"/>
         <param name="STORAGE_URL" group="CONF_MESSAGE[Custom Storage]" type="string" label="CONF_MESSAGE[Storage URL]" description="CONF_MESSAGE[Replace default AWS access points (built from region). Set a full URL, including protocol]" mandatory="false"/>
+        <param name="S3_FOLDER_EMPTY_FILE" group="CONF_MESSAGE[Custom Storage]" type="string" label="CONF_MESSAGE[Empty folders file]" description="CONF_MESSAGE[Create a hidden file when creating folder]" default="" mandatory="false"/>
         <param name="IS_VIPR" group="CONF_MESSAGE[Custom Storage]" type="boolean" label="CONF_MESSAGE[Is ViPR]" description="CONF_MESSAGE[If the backend storage is an EMC ViPR storage]" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
