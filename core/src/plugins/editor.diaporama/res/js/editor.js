@@ -81,9 +81,18 @@ class Editor extends PureComponent {
     }
 
     render() {
-        const {node, src, editorData} = this.props;
+        const {node, src, orientation, editorData} = this.props;
 
         if (!node) return null
+
+        let imageClassName = ['diaporama-image-main-block']
+
+        if (orientation) {
+            imageClassName = [
+                ...imageClassName,
+                'ort-rotate-' + orientation
+            ];
+        }
 
         return (
             <ContainerSizeProvider>
@@ -98,7 +107,7 @@ class Editor extends PureComponent {
                         height={imgHeight}
                         containerWidth={containerWidth}
                         containerHeight={containerHeight}
-                        imgClassName="diaporama-image-main-block"
+                        imgClassName={imageClassName.join(" ")}
                         style={{backgroundColor:'#424242'}}
                         imgStyle={{boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px'}}
                     />
@@ -123,10 +132,25 @@ const getSelection = (node) => new Promise((resolve, reject) => {
     })
 })
 
+const mapStateToProps = (state, props) => {
+    const {tabs} = state
+    const tab = tabs.filter(({editorData, node}) => (!editorData || editorData.id === props.editorData.id) && node.getPath() === props.node.getPath())[0] || {}
+
+    if (!tab) return props
+
+    const {node, resolution} = tab
+
+    return {
+        orientation: resolution === 'hi' ? node.getMetadata().get("image_exif_orientation") : null,
+        ...props
+    }
+}
+
 export default compose(
     withSelection(getSelection, getSelectionFilter),
     withResolution(sizes,
         (node) => `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
         (node, dimension) => `${baseURL}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
-    )
+    ),
+    connect(mapStateToProps)
 )(Editor)
