@@ -23,12 +23,11 @@
 import React, {PureComponent} from 'react'
 import { ImageContainer } from './components'
 
-const baseURL = pydio.Parameters.get('ajxpServerAccess');
 
 const Preview = ({node, ...remainingProps}) => (
     <ImageContainer
         {...remainingProps}
-        src={`${baseURL}&get_action=imagick_data_proxy&file=${node.getPath()}`}
+        src={`${pydio.Parameters.get('ajxpServerAccess')}&get_action=imagick_data_proxy&file=${node.getPath()}`}
         imgStyle={{
             width: "100%",
             height: "100%",

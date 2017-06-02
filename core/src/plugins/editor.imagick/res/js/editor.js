@@ -25,7 +25,6 @@ import { compose } from 'redux'
 import { ImageContainer } from './components'
 import PydioApi from 'pydio/http/api'
 
-const baseURL = pydio.Parameters.get('ajxpServerAccess')
 const conf = pydio.getPluginConfigs('editor.diaporama')
 const sizes = conf && conf.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700, 1000, 1300]
 
@@ -146,7 +145,8 @@ const getSelection = (node) => {
     })
 }
 
-const getThumbnailURL = (baseURL, node) => {
+const getThumbnailURL = (node) => {
+    const baseURL = pydio.Parameters.get('ajxpServerAccess')
     const path = encodeURIComponent(node.getPath())
     const file = encodeURIComponent(node.getMetadata().get('thumb_file_id'))
 
@@ -156,7 +156,7 @@ const getThumbnailURL = (baseURL, node) => {
 export default compose(
     withSelection(getSelection),
     withResolution(sizes,
-        (node) => getThumbnailURL(baseURL, node),
-        (node) => getThumbnailURL(baseURL, node)
+        (node) => getThumbnailURL(node),
+        (node) => getThumbnailURL(node)
     )
 )(Editor)

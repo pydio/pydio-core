@@ -25,7 +25,6 @@ import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { ImageContainer } from './components'
 
-const baseURL = pydio.Parameters.get('ajxpServerAccess')
 const conf = pydio.getPluginConfigs('editor.diaporama')
 const sizes = conf && conf.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700, 1000, 1300]
 
@@ -149,8 +148,8 @@ const mapStateToProps = (state, props) => {
 export default compose(
     withSelection(getSelection, getSelectionFilter),
     withResolution(sizes,
-        (node) => `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
-        (node, dimension) => `${baseURL}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
+        (node) => `${pydio.Parameters.get('ajxpServerAccess')}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
+        (node, dimension) => `${pydio.Parameters.get('ajxpServerAccess')}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
     ),
     connect(mapStateToProps)
 )(Editor)
