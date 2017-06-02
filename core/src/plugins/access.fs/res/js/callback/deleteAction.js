@@ -50,8 +50,9 @@ export default function (pydio) {
             message:message,
             dialogTitleId: 7,
             validCallback:function(){
-                PydioApi.getClient().postSelectionWithAction('delete', () => {
+                PydioApi.getClient().postSelectionWithAction('delete', (transp) => {
                     pydio.getContextHolder().setSelectedNodes([]);
+                    PydioApi.getClient().parseXmlMessage(transp.responseXML);
                 });
             }
         });

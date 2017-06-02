@@ -23,8 +23,6 @@
 import React, {Component} from 'react'
 import { ImageContainer } from './components'
 
-const baseURL = pydio.Parameters.get('ajxpServerAccess');
-
 const Preview = ({node, ...remainingProps}) => {
     const repositoryId = node.getMetadata().get("repository_id")
 
@@ -38,7 +36,7 @@ const Preview = ({node, ...remainingProps}) => {
     return (
         <ImageContainer
             {...remainingProps}
-            src={`${baseURL}${repoString}${mtimeString}&action=preview_data_proxy&get_thumb=true&file=${encodeURIComponent(node.getPath())}`}
+            src={`${pydio.Parameters.get('ajxpServerAccess')}${repoString}${mtimeString}&action=preview_data_proxy&get_thumb=true&file=${encodeURIComponent(node.getPath())}`}
             imgStyle={{
                 width: "100%",
                 height: "100%",

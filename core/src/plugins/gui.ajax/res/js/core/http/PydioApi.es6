@@ -24,17 +24,11 @@ import XMLUtils from '../util/XMLUtils'
 class PydioApi{
 
     constructor(){
-        this._secureToken = '';
     }
 
     setPydioObject(pydioObject){
         this._pydioObject = pydioObject;
         this._baseUrl = pydioObject.Parameters.get('serverAccessPath');
-        this._secureToken = pydioObject.Parameters.get('SECURE_TOKEN');
-    }
-
-    setSecureToken(token){
-        this._secureToken = token;
     }
 
     request(parameters, onComplete=null, onError=null, settings={}){
@@ -126,7 +120,7 @@ class PydioApi{
             document.location.href=downloadUrl;
         }else{
 
-            let parameters = {...additionalParameters, secure_token:this._secureToken, get_action: dlActionName};
+            let parameters = {...additionalParameters, secure_token:this._pydioObject.Parameters.get("SECURE_TOKEN"), get_action: dlActionName};
             const minisite_session = PydioApi.detectMinisiteSession(ajxpServerAccess);
             if(minisite_session){
                 parameters['minisite_session'] = minisite_session;
@@ -244,7 +238,7 @@ class PydioApi{
         const cB = function(transport){
             if(transport.responseJSON && transport.responseJSON.SECURE_TOKEN){
                 this._pydioObject.Parameters.set('SECURE_TOKEN', transport.responseJSON.SECURE_TOKEN);
-                this.setSecureToken(transport.responseJSON.SECURE_TOKEN);
+                Connexion.updateServerAccess(this._pydioObject.Parameters)
             }
             if(completeCallback) {
                 completeCallback(transport);
