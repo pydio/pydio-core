@@ -26,15 +26,6 @@ import { EditorActions, getRatio, getDisplayName, getBoundingRect } from '../uti
 
 const withResize = (Component) => {
     class WithResize extends React.Component {
-        constructor(props) {
-            super(props)
-
-            const {node, tab, dispatch} = this.props
-            const {id} = tab
-
-            if (!id) dispatch(EditorActions.tabCreate({id: node.getLabel(), node}))
-        }
-
         static get displayName() {
             return `WithResize(${getDisplayName(Component)})`
         }
@@ -63,11 +54,10 @@ const withResize = (Component) => {
         }
 
         componentWillReceiveProps(nextProps) {
-            const {tab, containerWidth, width, containerHeight, height} = nextProps
-            const {size = "contain"} = tab
+            const {size, containerWidth, width, containerHeight, height} = nextProps
 
             if (
-                size !== this.props.tab.size ||
+                size !== this.props.size ||
                 width !== this.props.width ||
                 height !== this.props.height ||
                 containerWidth !== this.props.containerWidth ||
@@ -79,11 +69,9 @@ const withResize = (Component) => {
         }
 
         loadSize(props) {
-            const {tab, dispatch, containerWidth, width, containerHeight, height} = props
-            const {id, scale, size = "contain"} = tab
+            const {scale, size = "contain", dispatch, containerWidth, width, containerHeight, height} = props
 
             const state = {
-                id,
                 size,
                 scale: getRatio[size]({
                     scale,
@@ -92,13 +80,11 @@ const withResize = (Component) => {
                 })
             }
 
-            dispatch(EditorActions.tabModify(state))
+            dispatch(EditorActions.editorModify(state))
         }
 
         render() {
-            //const {scale} = this.state || {}
-            const {tab, dispatch, ...remainingProps} = this.props
-            const {scale} = tab
+            const {scale, dispatch, ...remainingProps} = this.props
 
             return (
                 <Component

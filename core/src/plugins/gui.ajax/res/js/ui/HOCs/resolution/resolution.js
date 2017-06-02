@@ -27,15 +27,6 @@ import { mapStateToProps } from './utils';
 const withResolution = (sizes, highResolution, lowResolution) => {
     return (Component) => {
         class WithResolution extends React.Component {
-            constructor(props) {
-                super(props)
-
-                const {node, tab, dispatch} = this.props
-                const {id} = tab
-
-                if (!id) dispatch(EditorActions.tabCreate({id: node.getLabel(), node}))
-            }
-
             static get displayName() {
                 return `WithResolution(${getDisplayName(Component)})`
             }
@@ -47,20 +38,19 @@ const withResolution = (sizes, highResolution, lowResolution) => {
             }
 
             componentDidMount() {
-                const {tab, dispatch} = this.props
-                const {id, resolution = "lo"} = tab
+                const {resolution = "lo", dispatch} = this.props
 
-                dispatch(EditorActions.tabModify({id, resolution}))
+                dispatch(EditorActions.editorModify({resolution}))
             }
 
             onHi() {
-                const {node} = this.props
+                const {tab} = this.props
 
-                return highResolution(node)
+                return highResolution(tab.node)
             }
 
             onLo() {
-                const {node} = this.props
+                const {tab} = this.props
                 const viewportRef = (DOMUtils.getViewportHeight() + DOMUtils.getViewportWidth()) / 2;
 
                 const thumbLimit = sizes.reduce((current, size) => {
@@ -68,15 +58,14 @@ const withResolution = (sizes, highResolution, lowResolution) => {
                 }, 0);
 
                 if (thumbLimit > 0) {
-                    return lowResolution(node, thumbLimit)
+                    return lowResolution(tab.node, thumbLimit)
                 }
 
-                return highResolution(node)
+                return highResolution(tab.node)
             }
 
             render() {
-                const {tab, dispatch, ...remainingProps} = this.props
-                const {resolution = "lo"} = tab
+                const {resolution = "lo", dispatch, ...remainingProps} = this.props
 
                 return (
                     <ResolutionURLProvider

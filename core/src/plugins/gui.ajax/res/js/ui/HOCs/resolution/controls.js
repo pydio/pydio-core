@@ -23,6 +23,6 @@ import { connect } from 'react-redux';
 import { mapStateToProps } from './utils';
 import { handler } from '../utils';
 
-const _ToggleResolution = (props) => <IconButton onClick={() => handler("onToggleResolution", props)} iconClassName={`mdi mdi-crop-${props.tab.resolution === "hi" ? "square" : "free"}`} />
+const _ToggleResolution = (props) => <IconButton onClick={() => handler("onToggleResolution", props)} iconClassName={`mdi mdi-crop-${props.resolution === "hi" ? "square" : "free"}`} />
 
 export const ToggleResolution = connect(mapStateToProps)(_ToggleResolution);

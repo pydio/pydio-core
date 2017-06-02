@@ -149,8 +149,8 @@ const mapStateToProps = (state, props) => {
 export default compose(
     withSelection(getSelection, getSelectionFilter),
     withResolution(sizes,
-        (node) => `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
-        (node, dimension) => `${baseURL}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
+        (node) => node ? `${baseURL}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}` : "",
+        (node, dimension) => node ? `${baseURL}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}` : ""
     ),
     connect(mapStateToProps)
 )(Editor)

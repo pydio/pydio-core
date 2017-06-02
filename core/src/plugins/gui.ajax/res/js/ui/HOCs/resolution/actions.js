@@ -18,4 +18,6 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-//const onToggleResolution = () => tabModify({id, resolution: resolution === "hi" ? "lo" : "hi"})
+import { EditorActions } from '../utils';
+
+export const onToggleResolution = ({dispatch, resolution}) => dispatch(EditorActions.editorModify({resolution: resolution === "hi" ? "lo" : "hi"}))
