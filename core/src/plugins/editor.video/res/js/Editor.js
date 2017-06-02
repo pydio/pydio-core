@@ -29,10 +29,13 @@ class Viewer extends React.Component {
     static get styles() {
         return {
             container: {
+                maxWidth: "100%",
                 minHeight: 120,
-                flex: 1,
                 padding: 0,
-                width: "100%"
+                width: "100%",
+                flex: 1,
+                display: 'flex',
+                alignItems: 'stretch'
             }
         }
     }

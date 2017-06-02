@@ -22,7 +22,21 @@
 
 import Media from './Media';
 
-class Editor extends React.Component {
+class Player extends React.Component {
+
+    static get styles() {
+        return {
+            container: {
+                position: "relative",
+                display: "flex",
+                flex: 1,
+                padding: 0,
+                margin: 0,
+                overflow:'hidden',
+                backgroundColor:'#424242'
+            }
+        }
+    }
 
     onReady() {
         typeof this.props.onReady ==='function' && this.props.onReady()
@@ -36,21 +50,21 @@ class Editor extends React.Component {
             flash: {
                 swf: "plugins/editor.video/res/build/video-js.swf"
             },
-            techOrder: ['flash', 'html5'] // TODO - switch the order when the file is MP4 ??
+            techOrder: ["html5", "flash", "other supported tech"]
         }
 
         return (
-            <div style={{position: "relative", padding: 0, margin: 0, overflow:'hidden', height:'100%', backgroundColor:'#424242'}}>
+            <div style={Player.styles.container}>
                 <Media options={options} src={this.props.url} resize={true} onReady={() => this.onReady}></Media>
             </div>
         )
     }
 }
 
-Editor.propTypes = {
+Player.propTypes = {
     url: React.PropTypes.string.isRequired,
 
     onReady: React.PropTypes.func
 }
 
-export default Editor;
+export default Player;
