@@ -9,6 +9,7 @@
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
+        <global_param name="DISABLE_WIDGET_BAR" type="boolean" expose="true" label="CONF_MESSAGE[Disable Widget Bar]" description="CONF_MESSAGE[Hide the right bar with helpers widgets]" default="false"/>
         <global_param name="URL_APP_IOSAPPSTORE" type="string" expose="true"
                       label="CONF_MESSAGE[iOS App URL]" description="CONF_MESSAGE[URL of the iOS application]" default="https://itunes.apple.com/us/app/pydiopro/id1109419882?mt=8"/>
         <global_param name="URL_APP_ANDROID" type="string" expose="true"

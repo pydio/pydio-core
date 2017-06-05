@@ -149,6 +149,7 @@ class WelcomeTour extends Component{
         }
         const {getMessage} = this.props;
         const message = (id) => getMessage('ajax_gui.tour.' + id);
+        const widgetBarEnabled = !!! this.props.pydio.getPluginConfigs('access.ajxp_home').get('DISABLE_WIDGET_BAR');
 
         let tourguideSteps = [
             {
@@ -163,23 +164,23 @@ class WelcomeTour extends Component{
                 selector    : '.home-search-form',
                 position    : 'bottom'
             },
-            {
+        ];
+        if(widgetBarEnabled){
+            tourguideSteps.push({
                 title       : message('widget-cards.title'),
                 text        : <WidgetsCard message={message}/>,
                 selector    : '.dashboard-layout',
                 position    : 'left'
-            },
-        ];
+            });
+        }
 
         if(this.props.pydio.user && this.props.pydio.user.getRepositoriesList().size){
-            tourguideSteps = tourguideSteps.concat([
-                {
+            tourguideSteps.push({
                     title       : message('openworkspace.title'),
                     text        : message('openworkspace'),
                     selector    : '.workspace-entry',
                     position    : 'right'
-                }
-            ])
+            });
         }
 
         const callback = (data) => {

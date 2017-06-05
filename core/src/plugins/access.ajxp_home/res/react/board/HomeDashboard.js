@@ -96,6 +96,10 @@ let AltDashboard = React.createClass({
         const wsListProps = this.props.workspacesListProps || {};
         const appBarColor = new Color(this.props.muiTheme.appBar.color);
 
+        const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
+        const wTourEnabled = this.props.pydio.getPluginConfigs('gui.ajax').get('ENABLE_WELCOME_TOUR');
+        const widgetBarEnabled = !!! this.props.pydio.getPluginConfigs('access.ajxp_home').get('DISABLE_WIDGET_BAR');
+
         const styles = {
             appBarStyle : {
                 zIndex: 1,
@@ -113,7 +117,7 @@ let AltDashboard = React.createClass({
                 zIndex: 10,
                 top: 55,
                 bottom: 0,
-                right: 260,
+                right: widgetBarEnabled ? 260 : 10,
                 left: 260,
                 display:'flex',
                 flexDirection:'column'
@@ -134,9 +138,6 @@ let AltDashboard = React.createClass({
                 fontWeight: 500
             }
         }
-
-        const guiPrefs = this.props.pydio.user ? this.props.pydio.user.getPreference('gui_preferences', true) : [];
-        const wTourEnabled = this.props.pydio.getPluginConfigs('gui.ajax').get('ENABLE_WELCOME_TOUR');
 
         let mainClasses = ['vertical_layout', 'vertical_fit', 'react-fs-template', 'user-dashboard-template'];
         if(this.state.drawerOpen){
@@ -159,7 +160,13 @@ let AltDashboard = React.createClass({
                             <span className="drawer-button"><IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <span style={{flex:1}}></span>
                             <div style={{textAlign:'center', width: 260}}>
-                                <ConfigLogo className="home-top-logo" pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
+                                <ConfigLogo
+                                    className="home-top-logo"
+                                    pydio={this.props.pydio}
+                                    pluginName="gui.ajax"
+                                    pluginParameter="CUSTOM_DASH_LOGO"
+                                    style={widgetBarEnabled?{}:{height:55, float:'right', marginRight: 16}}
+                                />
                             </div>
                         </div>
                     </Paper>
@@ -181,14 +188,16 @@ let AltDashboard = React.createClass({
                             </div>
                         </HomeSearchForm>
 
-                        <PydioComponents.DynamicGrid
-                            storeNamespace="WelcomePanel.Dashboard"
-                            defaultCards={this.getDefaultCards()}
-                            builderNamespaces={["WelcomeComponents"]}
-                            pydio={this.props.pydio}
-                            cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
-                            rglStyle={styles.rglStyle}
-                        />
+                        {widgetBarEnabled &&
+                            <PydioComponents.DynamicGrid
+                                storeNamespace="WelcomePanel.Dashboard"
+                                defaultCards={this.getDefaultCards()}
+                                builderNamespaces={["WelcomeComponents"]}
+                                pydio={this.props.pydio}
+                                cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
+                                rglStyle={styles.rglStyle}
+                            />
+                        }
                     </div>
                 </div>
             </div>

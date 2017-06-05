@@ -228,14 +228,19 @@ class WelcomeTour extends Component{
         const {getMessage} = this.props;
         const message = (id) => getMessage('ajax_gui.tour.' + id);
 
-        const tourguideSteps = [
-            {
+        let tourguideSteps = [];
+
+        if(pydio.user && pydio.user.activeRepository && pydio.user.write){
+            tourguideSteps.push({
                 title:message('create-menu.title'),
                 text : <CreateMenuCard message={message} pydio={this.props.pydio}/>,
                 selector:'#create-button-menu',
                 position:'left',
                 style:{width:220}
-            },
+            });
+        }
+
+        tourguideSteps = tourguideSteps.concat([
             {
                 title:message('display-bar.title'),
                 text : <div><p>{message('display-bar')}</p><IconScheme icons={['view-list', 'view-grid', 'view-carousel', 'sort-ascending', 'sort-descending']}/></div>,
@@ -255,7 +260,7 @@ class WelcomeTour extends Component{
                 position:'right',
                 style:{width: 320}
             }
-        ];
+        ]);
         const callback = (data) => {
             if(data.type === 'step:after' && data.index === tourguideSteps.length - 1 ){
                 this.discard();
