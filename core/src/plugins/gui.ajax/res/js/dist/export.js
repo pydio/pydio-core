@@ -37,4 +37,3 @@ window.ReactQRCode = require('qrcode.react');
 window.Cronstrue = require("cronstrue");
 window.injectTapEventPlugin = require('react-tap-event-plugin');
 window.injectTapEventPlugin();
-
