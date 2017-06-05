@@ -3,7 +3,7 @@
   "version": "8.0.0",
   "description": "",
   "main": "index.js",
-  "source_path": "res/js",
+  "source_path": ".",
   "css_path": "res/themes",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
