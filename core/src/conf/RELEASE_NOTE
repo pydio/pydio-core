@@ -1,5 +1,58 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Bug Fixes for 8.0.0 :
+
+[Most noticeable]
+Fix wrong path separator, triggering error on open_basedir
+Fixing pdfjs editor for Safari
+Fix force password reset
+WS List: Make Root Node droppable - Show a circular progress when loading workspace
+Fix reload in admin - Fix DND in admin.
+Do not send back hash after upload by default, not used by any sdk's yet - Optional "hash" parameter now.
+Fix notification sent to parent when parent is a template - could possibly break the hooks loop, preventing email.
+Add setting to disable widget bar in home page. Adapt welcome tour accordingly.
+
+[Other]
+Fix Film Strip Template
+Fixing the demo counter
+Added new translation keys (user frontend)
+Fixing counter
+Update README.md
+Fix home links for sync apps
+Add setting to disable the Welcome Tour. Fix #1350
+Change full screen : make browser full screen, not desktop full screen. Switch fullscreen by default on mobile.
+Fix team share rights lost on edition - Close #1352
+Editor.pdfjs : change order with imagick, and use Imagick badge if available.
+Add a scrollToView behaviour on list
+Fix Layout when no menu
+Remove some unused widgets
+Improve task display and upload global progress Add a way to change user groupPath with api v2.
+Add a quick "type-and-search" feature for roles list.
+Detect free value not submitted in mailer and auto-submit.
+UserAvatar rich card : lock on sub popover open and fix zIndex
+Put crawlPermissions inside standard upgrader, from specific 8.0.0 upgrade scripts.
+Fix Breadcrumb display when in RecycleBin Fix "Empty" action appearing only if a file is selected. Upgrade "Index" icon.
+Set fixed width to fix #1356
+Additional check if cache is corrupted when loading plugins
+Rewrite missing ServerPrompt dialogs (for OAuth redir and dynamic workspace authentication).
+Add page-based pagination to full directory in address book.
+Forgotten log
+Add setting to choose what to display in the user directory in addressbook
+Fix cache key for users count in auth.ldap
+Fix detail display for date Fix missing Drag'n'drop for detail display (close #1354) Hide info panel blue toolbar if empty
+Wrong secure token on download.
+Fix smb throw error and block access via webdav
+Fixing video resize
+Fixing diaporama orientation
+Fix webdav enable all users options
+Fix baseUrl declaration, it can be changed on logout / login
+S3 : add setting to create hidden file on mkdir (virtual folder)
+Missing message parsing after delete
+Fixing editor tab
+
+
+---- PYDIO 8.0.0
+
 This is major UX release.
 
 [Full UI Rewrite]
@@ -33,33 +86,33 @@ Reaffirming Pydio's commitment to open source, we have brought back the Enterpri
 
 Some specific commits are listed below
 
-Crop filenames to max length in bytes (details)
-Test creating virtual workspaces. Change isRemote() signature to take $url as parameter. (details)
-Fix EncFS and caching issues (cherry picked from commit 980895f) (details)
-Fix to HEAT #1824 - force download of vendor specific files (details)
-Fix for HEAT #1871: ssl config for custom upload (details)
-React upgrade Step 2: react 15 (details)
-Added Italian translations for core.notification (details)
-React 15 migration fixes MaterialUI legacy & recent now coexist in the application, start using new elements Start moving js out of the manifests (details)
-Definitely remove jumploader, project is dead. (details)
-Move old prototype-based Connexion class to window.fetch + polyfill. (details)
-Remove sync calls (details)
-BOLD MOVE: remove PrototypeJS !!! 10 YEARS OF GLORY !!! (details)
-Moved last php-based compilation to grunt instead. Move html templates to top level (details)
-Trusted Servers implementation by simply forwarding user_list_authorized_users to the remote server with valid credentials. (details)
-Add a "TARGET_USERS" concept to public links, to pass an ID in the url and increment counters only for this target user. (details)
-Replace hardcode "public" with PUBLIC_BASEURI (details)
-Fixing System JS (details)
-Change browserify options to use alias / external Use SystemJS instead of custom implementation for libraries dependencies. (details)
-Fix error No repo found for user (details)
-Fix error User not found when load shares (details)
-Fix sync user from ldap in cli mode consumes ram (details)
-For the moment, do not package access.mysql anymore (details)
-Php 7.1 does not support &$this anymore (details)
-Exec commands: break on error (details)
-Translate to Spanish (details)
-New photo were way-too-big... (details)
-Added Copyrights header in source files (details)
+Crop filenames to max length in bytes
+Test creating virtual workspaces. Change isRemote() signature to take $url as parameter.
+Fix EncFS and caching issues (cherry picked from commit 980895f)
+Fix to HEAT #1824 - force download of vendor specific files
+Fix for HEAT #1871: ssl config for custom upload
+React upgrade Step 2: react 15
+Added Italian translations for core.notification
+React 15 migration fixes MaterialUI legacy & recent now coexist in the application, start using new elements Start moving js out of the manifests
+Definitely remove jumploader, project is dead.
+Move old prototype-based Connexion class to window.fetch + polyfill.
+Remove sync calls
+BOLD MOVE: remove PrototypeJS !!! 10 YEARS OF GLORY !!!
+Moved last php-based compilation to grunt instead. Move html templates to top level
+Trusted Servers implementation by simply forwarding user_list_authorized_users to the remote server with valid credentials.
+Add a "TARGET_USERS" concept to public links, to pass an ID in the url and increment counters only for this target user.
+Replace hardcode "public" with PUBLIC_BASEURI
+Fixing System JS
+Change browserify options to use alias / external Use SystemJS instead of custom implementation for libraries dependencies.
+Fix error No repo found for user
+Fix error User not found when load shares
+Fix sync user from ldap in cli mode consumes ram
+For the moment, do not package access.mysql anymore
+Php 7.1 does not support &$this anymore
+Exec commands: break on error
+Translate to Spanish
+New photo were way-too-big...
+Added Copyrights header in source files
 
 
 --
