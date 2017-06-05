@@ -36,6 +36,7 @@ use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
