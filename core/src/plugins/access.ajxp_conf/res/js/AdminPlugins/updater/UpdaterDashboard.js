@@ -69,7 +69,7 @@ const UpdaterDashboard = React.createClass({
         if(confirm(this.context.getMessage('15', 'updater'))){
             var client = PydioApi.getClient();
             this.setState({src:''}, function(){
-                this.setState({src: client._baseUrl + '?secure_token=' + client._secureToken  + '&get_action=perform_upgrade&package_index=' + this.state.checks});
+                this.setState({src: client._baseUrl + '?secure_token=' + pydio.Parameters.get("SECURE_TOKEN")  + '&get_action=perform_upgrade&package_index=' + this.state.checks});
             }.bind(this));
 
         }
