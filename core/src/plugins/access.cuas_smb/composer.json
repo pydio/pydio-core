@@ -1,0 +1,14 @@
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/icewind1991/SMB.git"
+    }
+  ],
+  "require": {
+    "icewind/smb": "dev-master"
+  },
+  "config": {
+    "vendor-dir": "vendor/SMB"
+  }
+}
