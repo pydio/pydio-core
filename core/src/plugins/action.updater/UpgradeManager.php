@@ -248,8 +248,6 @@ class UpgradeManager
         $this->crawlPermissions(AJXP_INSTALL_PATH."/plugins");
 
         return "Crawling folders core, plugins and files /*.php to check that all code files are writeable : OK";
-
-        return "OK";
     }
 
     /**

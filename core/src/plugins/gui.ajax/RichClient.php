@@ -402,7 +402,7 @@ class RichClient extends Plugin
         try{
             $result = UpgradeManager::executeLocalScripts();
             $responseInterface = new JsonResponse(['success' => true, 'result' => $result]);
-        }catch(DibiException $de){
+        }catch(\DibiException $de){
             $responseInterface = new JsonResponse([
                 'error' => 'There was a database error, maybe the changes were too complex and you have to apply them manually.',
                 'exception' => $de->getMessage()

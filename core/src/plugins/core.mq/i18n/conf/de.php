@@ -104,7 +104,6 @@ $mess=array(
 "Stop Worker" => "Worker anhalten",
 "Switch a worker OFF" => "Worker deaktivieren",
 "Administrative API Key" => "Administrativer API-Schlüssel",
-"Pydio Booster uses an administrative API key pair to communicate with the server. If you start it manually, use the buttons below to generate or revoke key pairs. If you start using the admin dashboard, you should not need that." => "Pydio Booster uses an administrative API key pair to communicate with the server. If you start it manually, use the buttons below to generate or revoke key pairs. If you start using the admin dashboard, you should not need that.",
 "Generate Key" => "API-Schlüssel erstellen",
 "Generate API Key" => "API-Schlüssel erstellen",
 "Revoke existing API Key(s)" => "Vorhandene(n) API-Schlüssel widerrufen",

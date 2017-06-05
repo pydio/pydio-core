@@ -616,7 +616,7 @@ class NotificationCenter extends Plugin
      * @param \Pydio\Access\Core\Model\AJXP_Node $newNode
      * @param bool $copy
      * @param string $targetNotif
-     * @return Notification
+     * @return Notification|false
      */
     public function generateNotificationFromChangeHook(AJXP_Node $oldNode = null, AJXP_Node $newNode = null, $copy = false, $targetNotif = "new")
     {

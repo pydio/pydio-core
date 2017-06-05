@@ -1490,7 +1490,7 @@ class ShareCenter extends Plugin
     /**
      * @param array $httpVars
      * @param bool $update
-     * @return Repository
+     * @return RepositoryInterface
      * @throws \Exception
      */
     protected function createOrLoadSharedRepository($httpVars, &$update){

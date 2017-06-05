@@ -276,7 +276,7 @@ class SchemeTranslatorWrapper extends MetaStreamWrapper implements IAjxpWrapper
     /**
      * Enter description here...
      *
-     * @return array
+     * @return array|false
      */
     public function stream_stat()
     {

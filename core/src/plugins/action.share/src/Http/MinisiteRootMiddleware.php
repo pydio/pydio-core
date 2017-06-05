@@ -75,7 +75,7 @@ class MinisiteRootMiddleware extends SapiMiddleware
         if(!empty($data) && is_array($data)){
             if($data["SHARE_TYPE"] !== "minisite"){
                 ShareCenter::loadPubliclet($data);
-                return;
+                return null;
             }
             $request = $request->withAttribute("hash", $this->hash);
             $request = $request->withAttribute("data", $data);
