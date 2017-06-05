@@ -44,12 +44,12 @@ export const AspectRatio = connect(mapStateToProps)((props) =>
 
 export const Scale = connect(mapStateToProps)((props) =>
     <DropDownMenu>
-        <MenuItem primaryText={`${parseInt(props.tab.scale * 100)}%`} />
+        <MenuItem primaryText={`${parseInt(props.scale * 100)}%`} />
         <Slider
             axis="y"
             style={styles.sliderContainer}
             sliderStyle={styles.slider}
-            value={props.tab.scale}
+            value={props.scale}
             min={0.01}
             max={4}
             onChange={(_, scale) => handler("onSizeChange", props)({size: "auto", scale})} />

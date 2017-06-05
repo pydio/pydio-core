@@ -148,8 +148,8 @@ const mapStateToProps = (state, props) => {
 export default compose(
     withSelection(getSelection, getSelectionFilter),
     withResolution(sizes,
-        (node) => `${pydio.Parameters.get('ajxpServerAccess')}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}`,
-        (node, dimension) => `${pydio.Parameters.get('ajxpServerAccess')}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}`
+        (node) => node ? `${pydio.Parameters.get('ajxpServerAccess')}&action=preview_data_proxy&file=${encodeURIComponent(node.getPath())}` : "",
+        (node, dimension) => node ? `${pydio.Parameters.get('ajxpServerAccess')}&action=preview_data_proxy&get_thumb=true&dimension=${dimension}&file=${encodeURIComponent(node.getPath())}` : ""
     ),
     connect(mapStateToProps)
 )(Editor)

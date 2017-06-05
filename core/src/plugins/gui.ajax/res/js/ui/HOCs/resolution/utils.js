@@ -19,11 +19,14 @@
  */
 
 export const mapStateToProps = (state, props) => {
-    const {tabs} = state
-    const tab = tabs.filter(({editorData, node}) => (!editorData || editorData.id === props.editorData.id) && node.getPath() === props.node.getPath())[0] || {}
+    const {editor, tabs} = state
+
+    const tab = tabs.reduce((current, tab) => tab.id === editor.activeTabId ? tab : current, {})
+    const {resolution} = editor
 
     return {
-        tab,
-        ...props
+        ...props,
+        resolution,
+        tab
     }
 }
