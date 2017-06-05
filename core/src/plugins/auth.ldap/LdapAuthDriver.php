@@ -236,6 +236,9 @@ class LdapAuthDriver extends AbstractAuthDriver
         if ($ldapconn) {
             $this->logDebug(__FUNCTION__, 'ldap_connect(' . $this->ldapUrl . ',' . $this->ldapPort . ') OK');
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+            if (isSet($this->options["LDAP_PROTOCOL"]) && $this->options["LDAP_PROTOCOL"] === 'starttls'){
+                ldap_start_tls($ldapconn);
+            }
             //ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
 
             if (isSet($this->options["LDAP_PROTOCOL"]) &&
