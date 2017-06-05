@@ -641,9 +641,9 @@ class Editor extends React.Component{
         const close = () => { this.props.onRequestTabClose(); };
         var rightButtons = (
             <div>
-                <FlatButton key="undo" disabled={changes} primary={true} iconClassName="icon-undo" label={this.getMessage('plugins.6', 'ajxp_admin')} onTouchTap={this.resetRoleChanges.bind(this)}/>
-                <FlatButton key="save" disabled={changes} primary={true} iconClassName="icon-save" label={this.getRootMessage('53')} onTouchTap={save}/>
-                <FlatButton key="close" label={this.getMessage('33')} onTouchTap={close} secondary={true}/>
+                <FlatButton key="undo" disabled={changes} secondary={true} label={this.getMessage('plugins.6', 'ajxp_admin')} onTouchTap={this.resetRoleChanges.bind(this)}/>
+                <FlatButton key="save" disabled={changes} secondary={true} label={this.getRootMessage('53')} onTouchTap={save}/>
+                <RaisedButton key="close" label={this.getMessage('33')} onTouchTap={close}/>
             </div>
         );
 

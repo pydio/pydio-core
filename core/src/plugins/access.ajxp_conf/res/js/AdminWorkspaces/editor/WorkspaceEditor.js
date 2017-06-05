@@ -19,7 +19,7 @@
  */
 
 import React from 'react'
-import {FlatButton} from 'material-ui'
+import {FlatButton, RaisedButton} from 'material-ui'
 
 import Workspace from '../model/Workspace'
 import SharesList from '../panel/SharesList'
@@ -315,12 +315,12 @@ class WorkspaceEditor extends React.Component{
 
         var titleActionBarButtons = [];
         if(this.state.model && this.state.model.isEditable()){
-            titleActionBarButtons.push(<FlatButton key="delete" label={this.context.getMessage('ws.23')} primary={true} onTouchTap={this.deleteWorkspace.bind(this)}/>);
+            titleActionBarButtons.push(<FlatButton key="delete" label={this.context.getMessage('ws.23')} secondary={true} onTouchTap={this.deleteWorkspace.bind(this)}/>);
             titleActionBarButtons.push(<div className="separator" key="separator"></div>);
         }
         titleActionBarButtons.push(<FlatButton key="reset" label={this.context.getMessage('plugins.6')} onTouchTap={this.reset.bind(this)} secondary={true} disabled={!this.state.dirty}/>);
         titleActionBarButtons.push(<FlatButton key="save" label={this.context.getMessage('53', '')} onTouchTap={this.saveWorkspace.bind(this)} secondary={true} disabled={!this.state.dirty || !currentValid}/>);
-        titleActionBarButtons.push(<FlatButton key="close" label={this.context.getMessage('86', '')} onTouchTap={this.props.closeEditor} secondary={true}/>);
+        titleActionBarButtons.push(<RaisedButton key="close" label={this.context.getMessage('86', '')} onTouchTap={this.props.closeEditor}/>);
 
         return (
             <PydioComponents.PaperEditorLayout
