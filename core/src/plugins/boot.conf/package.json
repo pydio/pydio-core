@@ -3,7 +3,6 @@
   "version": "8.0.0",
   "description": "Application Installer Wizard",
   "source_path": "res/js",
-  "css_path":"res/css",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

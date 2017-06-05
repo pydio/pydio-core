@@ -298,10 +298,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 }
 .react-mui-context .logs-dashboard .log-detail .log-detail-value {
   word-break: break-all;
-  -webkit-user-select: initial;
-     -moz-user-select: initial;
-      -ms-user-select: initial;
-          user-select: initial;
+  user-select: initial;
 }
 .react-mui-context .logs-filter {
   float: right;
@@ -368,7 +365,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.52);
   z-index: 100;
-  display: -ms-flexbox;
   display: flex;
 }
 .react-mui-context .home-dashboard > .dashboard-layout div.react-grid-item .card-close-button {
@@ -507,15 +503,12 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   /*background-color: rgba(145, 217, 216, 0.32) !important;*/
 }
 .react-mui-context .quick-links > div.mui-paper-container {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: start;
-      align-items: flex-start;
+  align-items: flex-start;
 }
 .react-mui-context .quick-links > div.mui-paper-container h4 {
   padding-top: 11px;
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-shrink: 0;
   font-weight: 400;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -566,10 +559,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   height: 100%;
 }
 .react-mui-context .todo-list > div.mui-paper-container {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
+  flex-direction: column;
 }
 .react-mui-context .todo-list > div.mui-paper-container h4 {
   margin-bottom: 0;
@@ -581,8 +572,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   width: 100%;
 }
 .react-mui-context .todo-list > div.mui-paper-container > div.tasks-list {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   padding: 0 0 0 16px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -590,23 +580,18 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 .react-mui-context .todo-list > div.mui-paper-container > div.tasks-list > div.todo-item {
   width: 87%;
   height: 35px;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
-  -ms-flex-align: center;
-      align-items: center;
+  flex-direction: row;
+  align-items: center;
 }
 .react-mui-context .todo-list > div.mui-paper-container > div.tasks-list > div.todo-item .mui-checkbox {
   width: 10px;
 }
 .react-mui-context .todo-list > div.mui-paper-container > div.tasks-list > div.todo-item p {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   margin: 0;
   padding: 0;
-  -ms-flex-pack: center;
-      justify-content: center;
+  justify-content: center;
   display: inline;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -630,8 +615,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 .react-mui-context .people-dashboard .people-title {
   background-color: #f5f5f5;
   /*border-bottom: 1px solid rgba(224,224,224,1);*/
-  -ms-flex-align: end;
-      align-items: flex-end;
+  align-items: flex-end;
 }
 .react-mui-context .people-dashboard .people-title h1 {
   padding: 16px 20px !important;
@@ -667,10 +651,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   color: #454545 !important;
 }
 .react-mui-context .people-dashboard .mui-tab-template {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
+  flex-direction: column;
 }
 .react-mui-context .people-dashboard .people-tree {
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
@@ -699,8 +681,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   margin-left: 0;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   width: 0;
-  -ms-flex-align: end !important;
-      align-items: flex-end !important;
+  align-items: flex-end !important;
 }
 .react-mui-context .people-dashboard .role-panel > div {
   width: 256px !important;
@@ -803,7 +784,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 }
 .react-mui-context div.booster-panel div.pydio-booster-statuses {
   margin-top: 20px;
-  display: -ms-flexbox;
   display: flex;
   box-sizing: border-box;
 }
@@ -901,7 +881,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   clear: right;
 }
 .react-mui-context div.performance-panel div.perf-test-row {
-  display: -ms-flexbox;
   display: flex;
   padding: 25px 0;
   border-bottom: 1px solid #f2f2f2;
@@ -919,8 +898,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   padding-right: 5px;
 }
 .react-mui-context div.performance-panel div.perf-test-row div.perf-test-main {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   padding-right: 20px;
 }
 .react-mui-context div.performance-panel div.perf-test-row span.perf-test-fail-msg {
@@ -990,7 +968,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   margin-bottom: 0;
 }
 .react-mui-context .workspace-editor .workspace-activity-block .mui-paper-container {
-  background-color: white;
+  background-color: #ffffff;
 }
 .react-mui-context .workspace-editor .workspace-activity-block .graphs-card {
   padding: 0 16px;
@@ -1154,14 +1132,11 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 .react-mui-context .admin-tasks-panel div.task {
   padding: 10px;
   border-bottom: 1px solid #f2f2f2;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
+  flex-direction: row;
 }
 .react-mui-context .admin-tasks-panel div.task .task_texts {
-  -ms-flex: 5;
-      flex: 5;
+  flex: 5;
   max-width: 96%;
 }
 .react-mui-context .admin-tasks-panel div.task .task_texts div {
@@ -1317,8 +1292,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   top: 98px;
 }
 .react-mui-context .paper-editor > .mui-paper-container {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
 }
 .react-mui-context .paper-editor .mui-snackbar.mui-is-open {
   left: inherit;
@@ -1328,10 +1302,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.23);
 }
 .react-mui-context .paper-editor .paper-editor-content .paper-editor-title {
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-wrap: wrap;
+  flex-shrink: 0;
   margin: 0;
   background-color: #424242;
   border-radius: 2px 2px 0 0;
@@ -1527,8 +1499,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   .react-mui-context .paper-editor.visible .paper-editor-content .paper-editor-left {
     width: 100%;
     height: 0;
-    -ms-flex-negative: 0;
-        flex-shrink: 0;
+    flex-shrink: 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.17);
     text-align: center;
     transition: height 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
@@ -1748,16 +1719,13 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   white-space: nowrap;
 }
 .react-mui-context .mui-menu-item.tree-item.has-checkboxes {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
+  flex-direction: row;
   height: 48px;
   border-bottom: 1px solid #f4f4f4;
 }
 .react-mui-context .mui-menu-item.tree-item.has-checkboxes .tree-item-label {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;

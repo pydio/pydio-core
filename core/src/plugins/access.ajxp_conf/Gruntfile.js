@@ -63,6 +63,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('assemble-less');
-    grunt.registerTask('default', ['babel', 'browserify']);
+    grunt.registerTask('default', ['babel', 'browserify', 'less']);
+    grunt.registerTask('type:js', ['babel', 'browserify']);
+    grunt.registerTask('type:css', ['less']);
 
 };
