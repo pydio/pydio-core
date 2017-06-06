@@ -24,8 +24,10 @@ namespace Pydio\Share\Store;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\SqlConfDriver;
 
@@ -34,6 +36,7 @@ use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Crypto;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
@@ -285,6 +288,9 @@ class ShareStore {
                     ];
                 }
             }
+            usort($result, function($a, $b){
+                return $a['count'] === $b['count'] ? 0 : $a['count'] > $b['count'] ? -1 : 1 ;
+            });
             return $result;
 
         }else if($shareType === '__GROUP__'){
@@ -313,35 +319,62 @@ class ShareStore {
                     'child_parameters' => $paramsMini
                 ];
             }
+            usort($result, function($a, $b){
+                return $a['count'] === $b['count'] ? 0 : $a['count'] > $b['count'] ? -1 : 1 ;
+            });
             return $result;
 
         }else if($limitToUser === '__GROUP__'){
 
-            // Browse users and count
-            $result = [];
-            $total = UsersService::authCountUsers("/");
-            $cursor['total'] = $total;
-            $users = UsersService::listUsers("/", null, $cursor[0], $cursor[1], true, true);
-            foreach($users as $userObject){
-                $params = $childParameters;
-                $userId = $userObject->getId();
-                $userLikes = $dataLikes;
-                $userLikes[] = '%"OWNER_ID";s:'.strlen($userId).':"'.$userId.'"%';
-                $params['user_context'] = 'user';
-                $params['user_id'] = $userId;
-                $count = $this->confStorage->simpleStoreCount('share', '', 'serial', $userLikes, $parentRepository);
-                if($count){
-                   $result[$userId] = [
-                       'label'=> UsersService::getUserPersonalParameter('USER_DISPLAY_NAME', $userObject, 'core.conf', $userId),
-                       'count'=> $count,
-                       'child_parameters' => $params
-                   ];
-                }
+            // Build whole list
+            $params = $childParameters;
+            $userLikes = $dataLikes;
+            $params['user_context'] = 'user';
+            $namespace = AJXP_CACHE_SERVICE_NS_SHARED;
+            $cacheKey = "shareslist" . "-" . StringHelper::slugify(json_encode(array_merge($dataLikes, ["parent-repo-id" => $parentRepository])));
+
+
+            $users = [];
+            if(CacheService::contains($namespace, $cacheKey)){
+
+                $users = CacheService::fetch($namespace, $cacheKey);
+
+            }else{
+
+                $callbackFunction = function($objectId, $shareData) use (&$users, $cursor, $params) {
+
+                    $ownerID = $shareData['OWNER_ID'];
+                    if(empty($ownerID)) return false;
+                    if(!$users[$ownerID]){
+                        $userObject = UsersService::getUserById($ownerID, false);
+                        if(!$userObject instanceof UserInterface) return false;
+                        $users[$ownerID] = [
+                            'label'=> UsersService::getUserPersonalParameter('USER_DISPLAY_NAME', $userObject, 'core.conf', $ownerID),
+                            'count'=> 0,
+                            'child_parameters' => array_merge($params, ['user_id' => $ownerID])
+                        ];
+                    }
+                    $users[$ownerID]['count'] ++;
+                    return false;
+                };
+
+                $c = null;
+                $this->confStorage->simpleStoreList('share', $c, "", "serial", $userLikes, $parentRepository, $callbackFunction);
+
+                usort($users, function($a, $b){
+                    return $a['count'] === $b['count'] ? 0 : $a['count'] > $b['count'] ? -1 : 1 ;
+                });
+
+                CacheService::save($namespace, $cacheKey, $users, 600);
+
             }
-            if(count($result) < $total){
-                $cursor['total'] = count($result);
-            }
+
+
+
+            $cursor['total'] = count($users);
+            $result = array_slice($users, $cursor[0], $cursor[1]);
             return $result;
+
         }
 
         $dbLets = $this->confStorage->simpleStoreList(
