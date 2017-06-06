@@ -231,7 +231,7 @@ class FilteredUsersList{
      * @param $baseGroup
      * @return array
      */
-    protected function listGroupsOrRoles($baseGroup){
+    protected function listGroupsOrRoles($baseGroup, $regexp, $pregexp, $searchLimit = null){
 
         $allGroups = [];
 
@@ -290,7 +290,20 @@ class FilteredUsersList{
                 break;
         }
 
-        return $allGroups;
+
+        $result = [];
+        $indexGroup = 0;
+        foreach ($allGroups as $groupId => $groupLabel) {
+            if ($regexp == null
+                ||  preg_match($pregexp, $groupLabel)
+                ||  ( empty($rolePrefix) ? preg_match($pregexp, $groupId) : preg_match($pregexp, str_replace($rolePrefix, '', $groupId))) ) {
+                $result[$groupId] = $groupLabel;
+                $indexGroup++;
+            }
+            if($indexGroup == $searchLimit) break;
+        }
+
+        return $result;
 
     }
 
@@ -350,8 +363,8 @@ class FilteredUsersList{
             $FILTER['users_external'] = false;
         }
 
-        // No Regexp and it's mandatory. Just return the current user teams.
-        if($this->getConf('USERS_LIST_REGEXP_MANDATORY') && empty($searchQuery) && empty($groupPathFilter)){
+        // No Regexp and it's mandatory. Just return the current user teams. If asking for externals only, this is from address book, allow query
+        if($this->getConf('USERS_LIST_REGEXP_MANDATORY') && empty($searchQuery) && empty($groupPathFilter) && !($FILTER['users_external'] && !$FILTER['users_internal'])){
             return $this->listTeams();
         }
 
@@ -380,7 +393,7 @@ class FilteredUsersList{
             $allUsers = $this->listUsers($baseGroup, $searchQuery, $offset, $searchLimit, $FILTER, empty($groupPathFilter));
         }
         if( $FILTER['groups'] ) {
-            $allGroups = $this->listGroupsOrRoles($baseGroup);
+            $allGroups = $this->listGroupsOrRoles($baseGroup, $regexp, $pregexp, $searchLimit);
         }
 
         if ( $allowCreation && !empty($searchQuery) && (!count($allUsers) || !array_key_exists(strtolower($searchQuery), $allUsers)) ) {
@@ -390,13 +403,8 @@ class FilteredUsersList{
             $items[] = new AddressBookItem('group', 'AJXP_GRP_/', $mess['447']);
         }
 
-        $indexGroup = 0;
-        foreach ($allGroups as $groupId => $groupLabel) {
-            if ($regexp == null ||  preg_match($pregexp, $groupLabel)) {
-                $items[] = new AddressBookItem('group', $groupId, $groupLabel);
-                $indexGroup++;
-            }
-            if($indexGroup == $searchLimit) break;
+        foreach($allGroups as $groupId => $groupLabel) {
+            $items[] = new AddressBookItem('group', $groupId, $groupLabel);
         }
 
         if ( $FILTER['teams'] && empty($groupPathFilter) ) {
