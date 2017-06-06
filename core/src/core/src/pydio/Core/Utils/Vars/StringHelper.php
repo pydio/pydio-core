@@ -282,6 +282,9 @@ class StringHelper
         if (empty($regexp))
             return null;
 
+        // Escape parenthesis for LDAP
+        $regexp = str_replace(array("(", ")"), array("\(", "\)"), $regexp);
+
         $left = "*";
         $right = "*";
         if ($regexp[0] == "^") {
