@@ -61,7 +61,6 @@ let LeftPanel = ({muiTheme, style={}, userWidgetProps, workspacesListProps, pydi
                     style={wsListStyle}
                     sectionTitleStyle={wsSectionTitleStyle}
                     pydio={pydio}
-                    workspaces={pydio.user ? pydio.user.getRepositoriesList() : []}
                     showTreeForWorkspace={pydio.user?pydio.user.activeRepository:false}
                     {...wsListProps}
                 />

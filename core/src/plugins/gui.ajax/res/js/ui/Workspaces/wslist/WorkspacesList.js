@@ -24,28 +24,40 @@ const {withVerticalScroll} = Pydio.requireLib('hoc')
 import WorkspaceEntry from './WorkspaceEntry'
 import XMLUtils from 'pydio/util/xml'
 
-let WorkspacesList = React.createClass({
+class WorkspacesList extends React.Component{
 
-    propTypes:{
-        pydio                   : React.PropTypes.instanceOf(Pydio),
-        workspaces              : React.PropTypes.instanceOf(Map),
-        showTreeForWorkspace    : React.PropTypes.string,
-        onHoverLink             : React.PropTypes.func,
-        onOutLink               : React.PropTypes.func,
-        className               : React.PropTypes.string,
-        style                   : React.PropTypes.object,
-        sectionTitleStyle       : React.PropTypes.object,
-        filterByType            : React.PropTypes.oneOf(['shared', 'entries', 'create'])
-    },
+    constructor(props, context){
+        super(props, context);
+        this.state = this.stateFromPydio(props.pydio);
+        this._reloadObserver = () => {
+            this.setState(this.stateFromPydio(this.props.pydio));
+        };
+    }
 
-    createRepositoryEnabled:function(){
+    stateFromPydio(pydio){
+        return {
+            workspaces : pydio.user ? pydio.user.getRepositoriesList() : [],
+            showTreeForWorkspace: pydio.user ? pydio.user.activeRepository : false
+        };
+    }
+
+    componentDidMount(){
+        this.props.pydio.observe('repository_list_refreshed', this._reloadObserver);
+    }
+
+    componentWillUnmount(){
+        this.props.pydio.stopObserving('repository_list_refreshed', this._reloadObserver);
+    }
+
+    createRepositoryEnabled(){
         const reg = this.props.pydio.Registry.getXML();
         return XMLUtils.XPathSelectSingleNode(reg, 'actions/action[@name="user_create_repository"]') !== null;
-    },
+    }
 
-    render: function(){
+    render(){
         let entries = [], sharedEntries = [], inboxEntry, createAction;
-        const {workspaces, showTreeForWorkspace, pydio, className, style, filterByType} = this.props;
+        const {workspaces,showTreeForWorkspace} = this.state;
+        const {pydio, className, style, filterByType} = this.props;
 
         workspaces.forEach(function(object, key){
 
@@ -138,7 +150,20 @@ let WorkspacesList = React.createClass({
             </div>
         );
     }
-});
+}
+
+WorkspacesList.PropTypes =   {
+    pydio                   : React.PropTypes.instanceOf(Pydio),
+    workspaces              : React.PropTypes.instanceOf(Map),
+    showTreeForWorkspace    : React.PropTypes.string,
+    onHoverLink             : React.PropTypes.func,
+    onOutLink               : React.PropTypes.func,
+    className               : React.PropTypes.string,
+    style                   : React.PropTypes.object,
+    sectionTitleStyle       : React.PropTypes.object,
+    filterByType            : React.PropTypes.oneOf(['shared', 'entries', 'create'])
+};
+
 
 WorkspacesList = withVerticalScroll(WorkspacesList);
 

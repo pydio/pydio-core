@@ -33,6 +33,28 @@ const {withContextMenu} = Pydio.requireLib('hoc');
 const { Types, collect, collectDrop, nodeDragSource, nodeDropTarget } = DND;
 
 
+let Badge = ({children, muiTheme}) => {
+
+    const style = {
+        display: "inline-block",
+        backgroundColor: muiTheme.palette.accent1Color,
+        color: 'white',
+
+        fontSize: 10,
+        borderRadius: 6,
+        padding: '0 5px',
+        marginLeft: 5,
+        height: 16,
+        lineHeight: '17px',
+        fontWeight: 500
+    };
+
+    return <span style={style}>{children}</span>
+
+};
+
+Badge = muiThemeable()(Badge);
+
 const Confirm = React.createClass({
 
     propTypes:{
@@ -264,7 +286,7 @@ let WorkspaceEntry =React.createClass({
             const status = workspace.getAccessStatus();
 
             if (!isNaN(status) && status > 0) {
-                badgeNum = <span className="workspace-num-badge">{status}</span>;
+                badgeNum = <Badge>{status}</Badge>;
             }
 
             badge = <span className="workspace-badge"><span className="access-icon"/></span>;
@@ -279,7 +301,7 @@ let WorkspaceEntry =React.createClass({
         }
 
         if (workspace.getOwner() && !workspace.getAccessStatus() && !workspace.getLastConnection()) {
-            newWorkspace = <span className="workspace-new">NEW</span>;
+            newWorkspace = <Badge>NEW</Badge>;
             // Dialog for remote shares
             if (workspace.getRepositoryType() == "remote") {
                 onClick = this.handleOpenAlert.bind(this, 'new_share');
