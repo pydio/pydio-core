@@ -27,7 +27,7 @@ import PasswordPopover from './PasswordPopover'
 import EmailPanel from './EmailPanel'
 
 const FORM_CSS = ` 
-.react-mui-context .current-user-edit.pydio-form-panel > .pydio-form-group {
+.react-mui-context .current-user-edit.pydio-form-panel > .pydio-form-group:first-of-type {
   margin-top: 220px;
   overflow-y: hidden;
 }

@@ -84,8 +84,8 @@
             }, function(t){
                 if(!t.responseJSON) return;
                 this.setState({
-                    qrCode:responseJSON.qrcode,
-                    otpKey:responseJSON.key,
+                    qrCode:t.responseJSON.qrcode,
+                    otpKey:t.responseJSON.key,
                     loaded:true
                 });
             }.bind(this));
@@ -97,24 +97,24 @@
             if(this.state.loaded){
                 codes = (
                     <div class="codes">
-                        <ReactQRCode size={200} value={this.state.qrCode} level="L"/>
-                        <MaterialUI.TextField floatingLabelText="Google Key" ref="google_otp" defaultValue={this.state.otpKey}/>
+                        <div style={{textAlign:"center"}}><ReactQRCode size={100} value={this.state.qrCode} level="L"/></div>
+                        <MaterialUI.TextField fullWidth={true} floatingLabelText="Google Key" ref="google_otp" defaultValue={this.state.otpKey}/>
                     </div>
                 );
             }
 
             return (
-                <div id="otp_setup_screen" box_width="500">
-                    <div>{messages['authfront.otp.2']}</div>
-                    <div>{messages['authfront.otp.3']}</div>
-                    <div>{messages['authfront.otp.4']}</div>
+                <div id="otp_setup_screen">
+                    <p>{messages['authfront.otp.2']}</p>
+                    <p><big>1.</big> {messages['authfront.otp.3']}</p>
+                    <p><big>2.</big> {messages['authfront.otp.4']}</p>
                     {codes}
-                    <div class="verif">
-                        <MaterialUI.TextField
-                            floatingLabelText={messages['authfront.otp.5']}
-                            ref="verification"
-                        />
-                    </div>
+                    <p style={{paddingBottom: 0, marginBottom: 0}}><big>3.</big> {messages['authfront.otp.5']}</p>
+                    <MaterialUI.TextField
+                        fullWidth={true}
+                        floatingLabelText="Code"
+                        ref="verification"
+                    />
                 </div>
             );
 
@@ -134,7 +134,8 @@
 
     global.OTPAuthfrontActions = {
         Callbacks: Callbacks,
-        LoginDialogModifier: LoginDialogModifier
+        LoginDialogModifier: LoginDialogModifier,
+        OTPSetupScreen: OTPSetupScreen
     };
 
 
