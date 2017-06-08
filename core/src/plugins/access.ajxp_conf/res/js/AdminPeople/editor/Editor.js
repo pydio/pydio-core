@@ -23,7 +23,7 @@ const LangUtils = require('pydio/util/lang')
 const PathUtils = require('pydio/util/path')
 const {FormPanel} = require('pydio').requireLib('form')
 const {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} = require('pydio').requireLib('components')
-const {FlatButton} = require('material-ui')
+const {FlatButton, RaisedButton} = require('material-ui')
 
 import EditorCache from './util/EditorCache'
 import UserPasswordDialog from './user/UserPasswordDialog'
