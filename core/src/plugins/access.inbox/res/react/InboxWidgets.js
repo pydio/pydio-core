@@ -1,6 +1,24 @@
-(function(global){
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
+ */
 
-    var ns = global.InboxWidgets ||{};
+(function(global){
 
     var LeftPanel = React.createClass({
 
@@ -18,12 +36,6 @@
             document.getElementById('content_pane').ajxpPaneObject.addMetadataFilter('text', value);
         },
 
-        focus:function(){
-            this.props.pydio.UI.disableAllKeyBindings();
-        },
-        blur:function(){
-            this.props.pydio.UI.enableAllKeyBindings();
-        },
         filterByShareMetaType(type, event){
             if(type == '-1'){
                 type = '';
@@ -41,7 +53,7 @@
                     <h4>{messages['inbox_driver.8']}</h4>
                     <div>
                         <h5>{messages['inbox_driver.9']}</h5>
-                        <input type="text" placeholder="Filter..." onChange={this.handleChange} onFocus={this.focus} onBlur={this.blur}/>
+                        <input type="text" placeholder="Filter..." onChange={this.handleChange}/>
                     </div>
                     <div style={{paddingTop:20}}>
                         <h5><span className="clear" onClick={this.filterByShareMetaType.bind(this, '-1')}>{messages['inbox_driver.11']}</span>
@@ -104,8 +116,68 @@
 
     }
 
-    ns.filesListCellModifier = filesListCellModifier;
-    ns.LeftPanel = LeftPanel;
-    global.InboxWidgets = ns;
+    let pydio = global.pydio;
+
+    class Callbacks{
+
+        static download(){
+            PydioApi.getClient().downloadSelection(pydio.getUserSelection(), 'download');
+        }
+
+        static copyInbox(){
+
+            const {MessageHash} = pydio;
+            pydio.user.write = false;
+            const selection = pydio.getUserSelection();
+            const submit = function(path, wsId = null){
+                global.FSActions.Callbacks.applyCopyOrMove('copy', selection, path, wsId);
+            };
+            pydio.UI.openComponentInModal('FSActions', 'TreeDialog', {
+                isMove: false,
+                dialogTitle:MessageHash[159],
+                submitValue:submit
+            });
+
+        }
+
+        static acceptInvitation(){
+            const remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+            PydioApi.getClient().request({get_action:'accept_invitation', remote_share_id:remoteShareId}, function(){
+                pydio.fireContextRefresh();
+            });
+        }
+
+        static rejectInvitation(){
+            const remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+            PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
+                pydio.fireContextRefresh();
+            });
+        }
+
+        static rejectRemoteShare(){
+            const remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+            PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
+                pydio.fireContextRefresh();
+            });
+        }
+        
+        static copyContextListener(){
+            this.rightsContext.write = true;
+            const ajxpUser = pydio.user;
+            if(ajxpUser && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
+                this.rightsContext.write = false;
+                pydio.getController().defaultActions['delete']('ctrldragndrop');
+                pydio.getController().defaultActions['delete']('dragndrop');
+            }
+        }
+
+
+    }
+
+    global.InboxWidgets = {
+        filesListCellModifier,
+        LeftPanel,
+        Callbacks
+    };
 
 })(window);

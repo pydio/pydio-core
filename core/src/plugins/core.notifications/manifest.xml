@@ -10,9 +10,7 @@
             <i18n namespace="notification.tpl.block" path="plugins/core.notifications/templates/block"/>
             <i18n namespace="notification.tpl.location" path="plugins/core.notifications/templates/location"/>
             <i18n namespace="notification_center" path="plugins/core.notifications/res/i18n"/>
-            <css file="plugins/core.notifications/res/css/notification_center.css" autoload="true"/>
-            <img_library alias="notification_center" path="plugins/core.notifications/res/img"/>
-            <js className="NotificationLoader" file="plugins/core.notifications/class.NotificationLoader.js"/>
+            <js className="PydioNotifications" file="plugins/core.notifications/res/build/PydioNotifications.js" depends="React,PydioComponents"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -24,33 +22,7 @@
     <registry_contributions>
         <actions>
             <action name="get_my_feed">
-                <gui text="notification_center.1" title="notification_center.2" iconClass="icon-rss" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
-             		<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
-                </gui>
-                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
-                <subMenu>
-                    <dynamicBuilder><![CDATA[
-                        var context = window.builderContext;
-                        var protoMenu = window.builderProtoMenu;
-                        if(!window.ajxpMinisite){
-                            ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader', function(){
-                                NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
-                            });
-                        }
-                    ]]></dynamicBuilder>
-                </subMenu>
                 <processing>
-                    <clientCallback><![CDATA[
-                    ]]></clientCallback>
-                    <clientForm id="user_feed"><![CDATA[
-                        <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
-                        </div>
-                    ]]></clientForm>
-                    <clientListener name="contextChange"><![CDATA[
-                        if(!window.NotificationLoader && ajaxplorer.user && !window.ajxpMinisite){
-                            ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
-                        }
-                    ]]></clientListener>
                     <serverCallback methodName="loadUserFeed"/>
                 </processing>
             </action>
@@ -83,27 +55,23 @@
                 </gui>
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
                 <processing>
-                    <clientCallback><![CDATA[
-                    var selection = window.actionArguments[0];
-                    if(selection.getUniqueNode) selection = selection.getUniqueNode();
-                    if(selection && selection.getMetadata && selection.getMetadata().get("alert_id")){
-                        var elMeta = selection.getMetadata();
-                        var params = {
-                            get_action:'dismiss_user_alert',
-                            alert_id:elMeta.get('alert_id')
-                        };
-                        if(elMeta.get("event_occurence")){
-                            params['occurrences'] = elMeta.get("event_occurence");
-                        }
-                        PydioApi.getClient().request(params, function(){
-                            ajaxplorer.notify("server_message:tree/reload_user_feed");
-                        });
-                    }
-                    ]]></clientCallback>
+                    <clientCallback module="PydioCoreActions.Callbacks.dismissUserAlert"/>
                     <serverCallback methodName="dismissUserAlert" restParams="/alert_id/occurences" developerComment="Dismiss one or more occurences of alerts">
                         <input_param name="alert_id" type="integer" description="Id passed in /feed action list"/>
                         <input_param name="occurences" type="integer" description="1 or more"/>
                     </serverCallback>
+                </processing>
+            </action>
+            <action name="update_alerts_last_read">
+                <processing>
+                    <serverCallback methodName="updateAlertsLastRead" restParams="/repository_scope">
+                        <input_param name="repository_scope" type="string" description="all|repositoryId"/>
+                    </serverCallback>
+                </processing>
+            </action>
+            <action name="load_user_recent_items">
+                <processing>
+                    <serverCallback methodName="loadRecentItemsList" restParams="/"/>
                 </processing>
             </action>
             <action name="activateDesktopNotifications">
@@ -111,38 +79,22 @@
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        if(window.Notification){
-                            alert(pydio.MessageHash["notification_center.12"]);
-                            window.Notification.requestPermission(function(grant) {
-                                ['default', 'granted', 'denied'].indexOf(grant) === true
-                            });
-                        }else{
-                            alert(pydio.MessageHash["notification_center.13"]);
-                        }
-                    ]]></clientCallback>
+                    <clientCallback module="PydioCoreActions.Callbacks.activateDesktopNotifications"/>
                 </processing>
             </action>
         </actions>
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
+            <serverCallback methodName="persistReadHookToRecentList" hookName="node.read"/>
             <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
             <serverCallback methodName="loadRepositoryInfo" hookName="repository.load_info"/>
             <serverCallback methodName="shareAssignRight" hookName="node.share.assign_right"/>
         </hooks>
         <client_configs>
-            <component_config className="InfoPanel">
-                <infoPanelExtension mime="ajxp_root_node,generic_dir,generic_file" attributes="" modifier="NotificationLoader.prototype.loadInfoPanel">
-                    <messages>
-                        <message key="type_string" id="share_center.50"/>
-                    </messages>
-                    <html><![CDATA[
-                        <div id="ajxp_activity_panel" data-infoPanelPosition="last">
-                        </div>
-                    ]]></html>
-                </infoPanelExtension>
+            <component_config component="InfoPanel">
+                <infoPanel mime="ajxp_root_node,generic_dir,generic_file" reactComponent="PydioNotifications.ActivityPanel"/>
             </component_config>
-            <component_config className="AjxpReactComponent::left_navigator">
+            <component_config component="AjxpReactComponent::left_navigator">
                 <additional_content
                         id="navigation_alerts"
                         position="0"

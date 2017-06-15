@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -84,39 +84,35 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
      * @return  PydioPromptException
      */
     public static function promptForWorkspaceCredentials($parameters, $postSubmitCallback = ""){
+
         $mess = LocaleService::getMessages();
         $inputs = [];
-        foreach($parameters as $key => $value){
+        foreach($parameters as $key => &$value){
             if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_LOGIN) {
-                $loginString = str_replace("'","\'", $mess['181']);
-                $inputs[] = "<input type='text' name='$key' value='$value' placeholder='$loginString'>";
+                $inputs[$key] = [
+                    'labelId' => '181',
+                    'type'    => 'text',
+                    'value'   => $value
+                ];
             }else if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_PASS){
-                $passString = str_replace("'","\'", $mess['182']);
-                $inputs[] = "<input type='password' name='$key' value='' placeholder='$passString' autocomplete='off'>";
+                $inputs[$key] = [
+                    'labelId' => '182',
+                    'type'    => 'password'
+                ];
             }else{
-                $inputs[] = "<input type='hidden' name='$key' value='$value'>";
+                $inputs[$key] = [
+                    'type'    => 'hidden',
+                    'value'   => $value
+                ];
             }
         }
-        return new PydioPromptException(
-            "confirm",
-            array(
-                "DIALOG" => "<div>
-                                <h3>".$mess['557']."</h3>
-                                <div class='dialogLegend'>".$mess['558']."</div>
-                                <form autocomplete='off'>
-                                    ".implode("\n", $inputs)."
-                                </form>
-                            </div>
-                            ",
-                "OK"        => array(
-                    "GET_FIELDS" => array_keys($parameters),
-                    "EVAL" => $postSubmitCallback
-                ),
-                "CANCEL"    => array(
-                    "EVAL" => ""
-                )
-            ),
-            $mess['557']);
+
+        return new PydioPromptException("redirect", [
+            "dialogTitleId" => '557',
+            "dialogLegendId" => '558',
+            "fieldsDefinitions" => $inputs,
+            "postSubmitCallback" => $postSubmitCallback
+        ], $mess['557']);
 
     }
 
@@ -130,27 +126,12 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
 
         $mess = LocaleService::getMessages();
 
-        $redirect = "window.location.href = \"".$url."\";";
-        $cancel = "window.clearTimeout(window.OAuthTimeout); window.OAuthTimeout = null;";
+        return new PydioPromptException("redirect", [
+            "dialogTitleId" => '560',
+            "dialogLegendId" => '561',
+            "autoRedirectUrl" => $url
+        ], $mess['560']);
 
-        return new PydioPromptException(
-            "confirm",
-            array(
-                "DIALOG" => "<div>
-                                <h3>".$mess['560']."</h3>
-                                <div class='dialogLegend'>".$mess['561']."</div>
-
-                                <script type=\"text/javascript\">
-                                    window.OAuthTimeout = window.setTimeout(function() {".$redirect."}, 2000);
-                                </script>
-                            </div>
-                            ",
-                "OK"        => array(
-                    "EVAL" => $redirect
-                )
-            ),
-            $mess['557']
-        );
     }
 
     /**

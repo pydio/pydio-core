@@ -1,6 +1,6 @@
 {
   "name": "access.inbox",
-  "version": "6.5.1",
+  "version": "8.5.1",
   "description": "",
   "source_path":"res/react",
   "main": "index.js",

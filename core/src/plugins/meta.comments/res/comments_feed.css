@@ -1,0 +1,57 @@
+.comments_feed {
+  padding: 0 !important;
+}
+.comments_feed div.date {
+  color: rgba(0, 0, 0, 0.23);
+  text-align: center;
+  display: -ms-flexbox;
+  display: flex;
+  margin: 5px 0;
+}
+.comments_feed div.date:before,
+.comments_feed div.date:after {
+  content: ' -------- ';
+  display: block;
+  -ms-flex: 1;
+      flex: 1;
+}
+.comments_feed div.comment-line {
+  padding: 8px;
+  display: -ms-flexbox;
+  display: flex;
+}
+.comments_feed div.comment-line div.content {
+  -ms-flex: 1;
+      flex: 1;
+  margin-left: 8px;
+  position: relative;
+}
+.comments_feed div.comment-line div.content div.part {
+  font-size: 14px;
+  padding: 8px;
+}
+.comments_feed div.comment-line div.content div.link {
+  color: rgba(0, 0, 0, 0.53);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.13);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.comments_feed div.comment-line div.content div.delete-comment {
+  color: rgba(0, 0, 0, 0.23);
+  position: absolute;
+  display: none;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  line-height: 30px;
+  text-align: center;
+}
+.comments_feed div.comment-line div.content:hover div.delete-comment {
+  display: block;
+}

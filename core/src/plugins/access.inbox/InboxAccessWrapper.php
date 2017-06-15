@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -226,9 +226,10 @@ class InboxAccessWrapper implements IAjxpWrapper
     /**
      * Describe whether the current wrapper operates on a remote server or not.
      * @static
-     * @return boolean
+     * @param $url
+     * @return bool
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         return true;
     }

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -46,6 +46,9 @@ class SessionMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
+        if(ApplicationState::isAdminMode()){
+            SessionService::setSessionName(PYDIO_SESSION_NAME_SETTINGS);
+        }
         $getParams = $requestInterface->getQueryParams();
         $sessionName = SessionService::getSessionName();
 

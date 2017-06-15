@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -66,9 +66,10 @@ interface IAjxpWrapper
      * Describe whether the current wrapper operates on a remote server or not.
      * @static
      * @abstract
-     * @return boolean
+     * @param $url
+     * @return bool
      */
-    public static function isRemote();
+    public static function isRemote($url);
 
     /**
      * Describe whether the current wrapper can rewind a stream or not.

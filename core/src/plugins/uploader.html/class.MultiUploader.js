@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -215,7 +215,7 @@ Class.create("MultiUploader", {
 		// Delete button
 		var new_row_button = document.createElement( 'img' );
 		//new_row_button.appendChild(document.createTextNode('remove'));
-		new_row_button.src = ajxpResourcesFolder+'/images/actions/22/editdelete.png';
+		new_row_button.src = ResourcesManager.resolveImageSource('actions/22/editdelete.png');
 		new_row_button.align = 'absmiddle';
 		new_row_button.setAttribute("style", "border:0px;cursor:pointer;");
 

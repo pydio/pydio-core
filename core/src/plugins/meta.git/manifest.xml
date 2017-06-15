@@ -9,43 +9,22 @@
     <client_settings>
         <resources>
             <i18n namespace="meta.git" path="plugins/meta.git/i18n"/>
-            <js className="HistoryBrowser" file="plugins/meta.git/class.HistoryBrowser.js"/>
+            <js className="PydioVersioning" file="plugins/meta.git/res/build/PydioVersioning.js"/>
             <img_library alias="history_images" path="plugins/meta.git/images"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="git_history">
-                <gui text="meta.git.1" title="meta.git.2" iconClass="icon-undo" src="history_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+                <gui text="meta.git.1" title="meta.git.2" iconClass="icon-undo" hasAccessKey="false" weight="20">
                     <context selection="true" dir="false" recycle="false" behaviour="hidden"
                         actionBar="true" contextMenu="true" infoPanel="false"
-                        actionBarGroup="more">
+                        actionBarGroup="0_get">
                     </context>
                     <selectionContext dir="false" file="true" recycle="true" unique="true" behaviour="hidden"/></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        ResourcesManager.detectModuleToLoadAndApply('HistoryBrowser', function(){
-                            var loadFunc = function(oForm){
-                                pydio.getController().historyBrowser = new HistoryBrowser($(oForm));
-                                pydio.getController().historyBrowser.open();
-                            };
-                            var closeFunc = function(){
-                                pydio.getController().historyBrowser.close();
-                                hideLightBox();
-                                return false;
-                            };
-                            modal.showDialogForm('SVN', 'history_box', loadFunc, closeFunc, null, true, true);
-                        });
-                    ]]></clientCallback>
-                    <clientForm id="history_box"><![CDATA[
-                    <div id="history_box" action="git_history" box_width="60%" box_height="400">
-                        <div class="action_bar text_only" style="background-color:#ddd;">
-                        <div class="separator"></div>
-                        </div>
-                        <div id="versions_table"></div>
-                    </div>
-                    ]]></clientForm>
+                    <clientCallback module="PydioVersioning.loadHistoryBrowser"/>
                     <serverCallback methodName="applyActions" restParams="/file+" developerComment="Load the GIT history of this file">
                         <input_param name="file" type="path" description="Path to the file"/>
                         <output type="XML" description="XML list of all events that happened on the file"/>

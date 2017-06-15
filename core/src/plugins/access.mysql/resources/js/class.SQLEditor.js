@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
 Class.create("SQLEditor", {
 
 	initialize: function(oFormObject)
@@ -211,7 +212,7 @@ Class.create("SQLEditor", {
 			templateRow.select('input', 'textarea', 'select').invoke('disable');
 			templateRow.setAttribute('enabled', 'false');
 			var activator = new Element('img', {
-				src:ajxpResourcesFolder+'/images/actions/16/encrypted.png',
+				src:ResourcesManager.resolveImageSource('encrypted.png', 'actions/ICON_SIZE', 16),
 				height:'16',
 				width:'16',
 				border:'0',
@@ -221,7 +222,7 @@ Class.create("SQLEditor", {
 			templateRow.select('td[new="false"]')[0].update(activator);
 			// Additionnal actions
 			var deleteCol = new Element('img', {
-				src:ajxpResourcesFolder+'/images/actions/16/button_cancel.png',
+				src:ResourcesManager.resolveImageSource('actions/16/button_cancel.png'),
 				height:'16',
 				width:'16',
 				hspace:'5',
@@ -237,11 +238,11 @@ Class.create("SQLEditor", {
 					if(row.getAttribute('enabled') && row.getAttribute('enabled') == "true"){
 						row.select('input', 'textarea', 'select').invoke('disable');
 						row.setAttribute('enabled', 'false');
-						e.findElement('img').src=ajxpResourcesFolder+'/images/actions/16/encrypted.png';
+						e.findElement('img').src=ResourcesManager.resolveImageSource('actions/16/encrypted.png');
 					}else{
 						row.select('input', 'textarea', 'select').invoke('enable');
 						row.setAttribute('enabled', 'true');
-						e.findElement('img').src=ajxpResourcesFolder+'/images/actions/16/decrypted.png';
+						e.findElement('img').src=ResourcesManager.resolveImageSource('actions/16/decrypted.png');
 					}
 					Event.stop(e);
 				}else if(e.findElement('img') && e.findElement('img').hasClassName('deleteRow')){
@@ -353,7 +354,7 @@ Class.create("SQLEditor", {
 	setOnLoad : function(){	
 		addLightboxMarkupToElement(this.textareaContainer);
 		var img = document.createElement("img");
-		img.src = ajxpResourcesFolder+"/images/loadingImage.gif";
+		img.src = ResourcesManager.resolveImageSource('loadingImage.gif');
 		$(this.textareaContainer).select("#element_overlay")[0].appendChild(img);
 		this.loading = true;
 	},

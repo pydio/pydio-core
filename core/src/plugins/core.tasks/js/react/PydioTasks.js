@@ -80,6 +80,54 @@
     Task.FLAG_RESUMABLE = 2;
     Task.FLAG_HAS_PROGRESS = 4;
 
+    class AlertTask extends Task{
+
+        constructor(label, statusMessage){
+            super({
+                id              : 'local-alert-task-' + Math.random(),
+                userId          : global.pydio.user.id,
+                wsId            : global.pydio.user.activeRepository,
+                label           : label,
+                status          : PydioTasks.Task.STATUS_PENDING,
+                statusMessage   : statusMessage,
+                className       : 'alert-task'
+            });
+        }
+
+        show(){
+            this._timer = global.setTimeout(function(){
+                this.updateStatus(PydioTasks.Task.STATUS_COMPLETE);
+            }.bind(this), 7000);
+            PydioTasks.Store.getInstance().enqueueLocalTask(this);
+        }
+
+        updateStatus(status, statusMessage = ''){
+            this._internal['status'] = status;
+            this._internal['statusMessage'] = statusMessage;
+            this.notifyMainStore();
+        }
+
+        notifyMainStore(){
+            PydioTasks.Store.getInstance().notify("tasks_updated");
+        }
+
+        hasOpenablePane(){
+            return true;
+        }
+        openDetailPane(){
+            AlertTask.close();
+        }
+
+        static setCloser(click){
+            AlertTask.__CLOSER = click;
+        }
+
+        static close(){
+            AlertTask.__CLOSER();
+        }
+
+    }
+
     class TaskAPI{
         
         static createTask(task, targetUsers = null, targetRepositories = null){
@@ -267,15 +315,13 @@
 
             let actions;
             if(t.getStatus() === Task.STATUS_RUNNING && t.isStoppable()){
-                actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
+                actions = (<span className="mdi mdi-stop" onClick={t.pause.bind(t)}/>);
             }else{
-                actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
+                actions = (<span className="mdi mdi-close" onClick={t.stop.bind(t)}/>);
             }
             if(this.state.showProgress && t.hasProgress() && t.getStatus() !== Task.STATUS_FAILED){
                 actions = (
-                    <div className="radial-progress">
-                        <div className={"pie-wrapper pie-wrapper--solid progress-" + t.getProgress()}></div>
-                    </div>
+                    <MaterialUI.CircularProgress mode="determinate" value={t.getProgress()} size={26} style={{marginTop:8}}/>
                 );
             }
             return <div className="task_actions" onMouseOver={this.showAction} onMouseOut={this.showProgress}>{actions}</div>;
@@ -337,7 +383,7 @@
         },
 
         componentDidMount: function(){
-            TaskStore.getInstance().observe("tasks_updated", this.refreshTasks.bind(this));
+            TaskStore.getInstance().observe("tasks_updated", this.refreshTasks);
         },
 
         componentWillUnmount: function(){
@@ -356,19 +402,19 @@
             let tasks = [];
             this.state.tasks.forEach(function(t){
                 if(t.getStatus() === Task.STATUS_COMPLETE) return;
-                tasks.push(<TaskEntry task={t} showFull={this.state.mouseOver}/>);
+                tasks.push(<TaskEntry key={t.getId()} task={t} showFull={this.state.mouseOver}/>);
             }.bind(this));
             let className = "pydio-tasks-panel";
             let heightStyle;
             if(!tasks.length){
                 className += " invisible";
             }else{
-                heightStyle = {height: this.state.mouseOver ? 'auto' : Math.min(tasks.length * 60, 180)};
+                heightStyle = {height: this.state.mouseOver ? 'auto' : Math.min(tasks.length * 61, 180)};
             }
             return (
-                <div onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut} className={className} style={heightStyle}>
+                <MaterialUI.Paper zDepth={2} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut} className={className} style={heightStyle}>
                     {tasks}
-                </div>
+                </MaterialUI.Paper>
             );
         }
     });
@@ -377,6 +423,7 @@
     var ns = global.PydioTasks || {};
     ns.Store = TaskStore;
     ns.Task = Task;
+    ns.AlertTask = AlertTask;
     ns.API = TaskAPI;
     ns.Panel = TasksPanel;
     ns.TaskEntry = TaskEntry;

@@ -21,33 +21,30 @@
 			</processing>
 		</action>
 		<action name="up_dir">
-			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-left" hasAccessKey="true"
+			<gui text="148" title="24" iconClass="icon-chevron-left" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="false" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="navigation">
+					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="00_navigation">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					ajaxplorer.fireContextUp();
-					]]></clientCallback>
+				<clientCallback module="PydioCoreActions.Navigation.up"/>
 			</processing>
 		</action>
 		<action name="refresh">
-			<gui text="149" title="149" iconClass="icon-refresh" src="reload.png" hasAccessKey="true"
+			<gui text="149" title="149" iconClass="mdi mdi-refresh" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="true" recycle="false"
-					actionBar="false" actionBarGroup="navigation" contextMenu="true" infoPanel="false">
+					actionBar="true" actionBarGroup="00_navigation,display_toolbar" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					ajaxplorer.fireContextRefresh();
-					]]></clientCallback>
+				<clientCallback module="PydioCoreActions.Navigation.refresh"/>
 			</processing>
 		</action>
+        <!--
 		<action name="ext_select">
 			<gui text="321" title="322" src="download_manager.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"
@@ -57,110 +54,41 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					var userSelection = ajaxplorer.getUserSelection();
-					if((userSelection.isUnique() && !userSelection.hasDir()))
-					{
-						var fileName = userSelection.getUniqueFileName();
-						var selectorData = pydio.getController().selectorData;
-						if(selectorData.get('type') == "ckeditor"){
-							var ckData = selectorData.get('data');
-							if (ckData['CKEditorFuncNum']) {
-								var imagePath = fileName;
-								if(ckData['relative_path']){
-									imagePath = ckData['relative_path'] + fileName;
-								}
-								window.opener.CKEDITOR.tools.callFunction(ckData['CKEditorFuncNum'], imagePath);
-								window.close();
-							}
-						}
-					}
-					]]></clientCallback>
+				<clientCallback module="PydioCoreActions.Navigation.externalSelection"/>
 				</processing>
 		</action>
+		-->
 		<action name="bookmark">
-			<gui text="152" title="153" src="bookmark.png" iconClass="icon-bookmark-empty" hasAccessKey="true"
+			<gui text="152" title="153" iconClass="mdi mdi-bookmark-check" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
 				<context selection="true" dir="false" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="remote">
+					actionBarGroup="other">
 				</context>
                 <selectionContext dir="true" file="true" recycle="false" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					document.fire("ajaxplorer:add_bookmark");
-					]]></clientCallback>
-			</processing>
-		</action>
-		<action name="delete_bookmark">
-			<gui text="154" title="155" src="folder_new.png"
-				accessKey="folder_access_key">
-				<context selection="false" dir="" recycle="false"
-					actionBar="false" contextMenu="false" infoPanel="false">
-				</context>
-			</gui>
-			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					// TO DO
-					]]></clientCallback>
-			</processing>
-		</action>
-		<action name="rename_bookmark">
-			<gui text="154" title="155" src="folder_new.png"
-				accessKey="folder_access_key">
-				<context selection="false" dir="" recycle="false"
-					actionBar="false" contextMenu="false" infoPanel="false">
-				</context>
-			</gui>
-			<processing>
-				<clientCallback prepareModal="false"><![CDATA[]]></clientCallback>
-				<clientForm id="rename_bookmark"><![CDATA[
-				<div id="rename_bookmark" action="get_bookmarks" box_width="200">
-				<input type="text" name="bm_title" value="" id="bm_title" class="dialogFocus">
-				<input type="hidden" name="bm_path" value="">
-				</div>
-				]]></clientForm>
+				<clientCallback module="PydioCoreActions.Callbacks.toggleBookmark"/>
 			</processing>
 		</action>
 		<action name="splash">
-			<gui text="166" title="167" src="info.png" iconClass="icon-question-sign" hasAccessKey="true"
+			<gui text="166" title="167" iconClass="mdi mdi-information-outline" hasAccessKey="true"
 				accessKey="about_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="false" contextMenu="false" infoPanel="false"
-					actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string">
+					actionBarGroup="user" ajxpWidgets="UserWidget">
 				</context>
 			</gui>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-				modal.showDialogForm(
-					'Pydio',
-					'splash_form',
-					function(oForm){
-						var docDiv = $(oForm).down('#docDiv');
-						if(!docDiv.isLoaded){
-							var conn = new Connexion(window.ajxpServerAccessPath + '&get_action=display_doc&doc_file=CREDITS');
-							conn.onComplete = function(transport){
-								docDiv.insert({top:transport.responseText});
-								docDiv.isLoaded = true;
-								var updateLink = docDiv.down('#software_update');
-							};
-							conn.sendAsync();
-						}
-					},
-					function(){hideLightBox();return false;},
-					null,
-					true, true);
-					]]></clientCallback>
-				<clientForm id="splash_form"><![CDATA[
-					<div id="splash_form" box_width="600" box_padding="0">
-						<div id="docDiv" style="padding: 5px;overflow: auto;height: 410px;font-size: 12px;line-height: 16px; padding-bottom:52px;">
-							<div class="dialogButtons" style="text-align:right;padding-right:10px;"><input type="submit" value="Close" width="16" height="16" class="dialogButton"/></div>
-						</div>
-					</div>
-				]]></clientForm>
+				<clientCallback module="PydioCoreActions.Navigation.splash"/>
 			</processing>
 		</action>
+        <action name="packages_upgrade_script">
+            <processing>
+                <serverCallback methodName="packagesUpgradeScript" restParams="/"
+                                developerComment="Apply necessary upgrade after an external code update, typically when handled via Linux packages"/>
+            </processing>
+        </action>
 	</actions>
 </registry_contributions>

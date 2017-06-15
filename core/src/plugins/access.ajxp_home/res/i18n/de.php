@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ $mess=array(
 "46"=> "Adressbuch",
 "47"=> "Von Ihnen erstellte Benutzer",
 "48"=> "Meine Benutzer",
-"49"=> "Externe Benutzer, die Sie erstellt haben",
+"49"=> "Freigaben-Benutzer, die Sie erstellt haben",
 "50"=> "Meine Teams",
 "51"=> "Um Inhalte schnell an einen bestimmten Personenkreis freizugeben.",
 "52"=> "Möchten Sie dieses Team wirklich löschen? Es werden dabei keine Benutzer gelöscht.",
@@ -139,9 +139,18 @@ $mess=array(
     "71"=> "App für Android-Geräte",
     "72" => "Server-QRCode",
     "73" => "App schnell verbinden",
-    "74" => "Scannen Sie diesen QRCode um die Verbindung zum Server zu konfigurieren",
+    "74" => "QRCode scannen um eine Verbindung zum Server zu konfigurieren",
     "75"=> "Alle Dateien durchsuchen...",
     "76" => "Über das Menü oben rechts können Sie auf die %1 zugreifen",
     "77" => "Einstellungen",
     "78" => "Wählen Sie eine Ziel-Arbeitsumgebung",
+    "86" => "Video abspielen",
+    "87" => "Historie",
+    "88" => "Dateien vom Desktop hierher ziehen",
+    "89" => "Zum Hochladen ausgeählte Datei",
+    "90" => "Ziel-Arbeitsumgebung auswählen",
+    "91" => "Dateien mit dem Sync-Client offline synchronisieren",
+    "92" => "Programme herunterladen",
+    "93" => "Dateien hochladen",
+    "94" => "Video-Tutorial",
 );

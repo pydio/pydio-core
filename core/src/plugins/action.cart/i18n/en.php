@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -32,8 +32,11 @@ $mess = array(
     "9" => "Default cart",
     "10"=> "Carts",
     "11"=> "Compress and Share",
-    "12"=> "Create archive from selection and share this archive",
+    "12"=> "Create archive from selection",
     "13"=> "Provide a label for this selection cart",
-    "14"=> "This will create an archive with all files and share it. Please select enter a name for this archive:",
+    "14"=> "This will create an archive with all files. Please select enter a name for this archive:",
     "15"=> "Drop elements in selection carts to download them or share them later",
+    "16"=> "Remove from cart",
+    "17"=> "No items selected",
+    "18"=> "Use this cart to select files from any place and then download them at once."
 );

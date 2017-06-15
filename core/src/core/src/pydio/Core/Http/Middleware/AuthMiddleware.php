@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -32,9 +32,11 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Zend\Diactoros\Response\EmptyResponse;
 
@@ -77,8 +79,16 @@ class AuthMiddleware
         PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
         $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
-        if($response != null){
+        if($response !== null){
             return $response;
+        }
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute('ctx');
+        if($ctx->hasUser() && ApplicationState::sapiUsesSession() && SessionService::has(SessionService::USER_TEMPORARY_DISPLAY_NAME)){
+            $user = $ctx->getUser();
+            $user->getPersonalRole()->setParameterValue("core.conf", "USER_TEMPORARY_DISPLAY_NAME", SessionService::fetch(SessionService::USER_TEMPORARY_DISPLAY_NAME));
+            $ctx->setUserObject($user);
+            $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
         }
 
         try{

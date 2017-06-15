@@ -3,8 +3,8 @@
 	<class_definition filename="plugins/meta.exif/ExifMetaManager.php" classname="Pydio\Access\Meta\Exif\ExifMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
-			<i18n namespace="meta.exif" path="plugins/meta.exif/i18n" />
-			<js file="plugins/meta.exif/class.ExifCellRenderer.js" className="ExifCellRenderer" depends="OLViewer"/>
+			<i18n namespace="meta.exif" path="plugins/meta.exif/res/i18n" />
+            <js file="plugins/meta.exif/res/build/PydioExif.js" className="PydioExif"/>
 		</resources>
 	</client_settings>
 	<server_settings>
@@ -16,10 +16,8 @@
 			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"/>
 		</hooks>
 		<client_configs>
-			<component_config className="InfoPanel">
-				<infoPanelExtension mime="jpg,jpeg,tiff,riff" attributes="">
-					<html></html>
-				</infoPanelExtension>
+			<component_config component="InfoPanel">
+                <infoPanel mime="jpg,jpeg,tiff,riff" theme="material" reactComponent="PydioExif.Panel" weight="-10"/>
 			</component_config>
 		</client_configs>
 		<actions>

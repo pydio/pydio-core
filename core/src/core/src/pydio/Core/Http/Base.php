@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Http;
 
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -39,17 +40,29 @@ class Base
     public static function handleRoute($base, $route, $additionalAttributes = []){
 
         if ($route === "/api") {
+
             $server = new Rest\RestApiServer($base.$route, $additionalAttributes);
+
         } else if ($route == "/wopi") {
+
             $server = new Wopi\Server($base.$route, $additionalAttributes);
+
         } else if ($route === "/user") {
+
             $_GET["get_action"] = "user_access_point";
             $_GET["key"] = $additionalAttributes["key"];
             $server = new Server($base, $additionalAttributes);
-        } else if ($route == "/favicon"){
+
+        } else if ($route === "/favicon"){
+
             $_GET["get_action"] = "serve_favicon";
             $server = new Server($base, $additionalAttributes);
+
         } else {
+            $adminURI = ConfService::getGlobalConf("ADMIN_URI");
+            if(!empty($adminURI) && $route === $adminURI || isSet($_GET['settings_mode']) || isSet($_POST['settings_mode'])){
+                ApplicationState::setAdminMode();
+            }
             $server = new Server($base, $additionalAttributes);
         }
 

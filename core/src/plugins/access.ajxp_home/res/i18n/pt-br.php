@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -144,4 +144,13 @@ $mess=array(
 "76" => "Access the %1 through the top-right menu",
 "77" => "admin dashboard",
 "78" => "Pick a target workspace",
+    "86" => "Play video",
+    "87" => "Recent History",
+    "88" => "Drop a file here from your desktop",
+    "89" => "Selected file for upload",
+    "90" => "Select target workspace",
+    "91" => "Keep your files offline with our Desktop Sync Client",
+    "92" => "Applications Download",
+    "93" => "Quick Upload",
+    "94" => "Video Tutorial",
 );

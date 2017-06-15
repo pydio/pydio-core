@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -75,7 +75,7 @@ class MinisiteRootMiddleware extends SapiMiddleware
         if(!empty($data) && is_array($data)){
             if($data["SHARE_TYPE"] !== "minisite"){
                 ShareCenter::loadPubliclet($data);
-                return;
+                return null;
             }
             $request = $request->withAttribute("hash", $this->hash);
             $request = $request->withAttribute("data", $data);

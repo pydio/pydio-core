@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS ajxp_user_prefs_temp (
+	rid INTEGER PRIMARY KEY AUTO_INCREMENT,
+	login VARCHAR(255) NOT NULL,
+	name VARCHAR(255) NOT NULL,
+	val BLOB
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+/* SEPARATOR */
+CREATE UNIQUE INDEX prefs_login_name ON ajxp_user_prefs_temp(`login`, `name`);
+/* SEPARATOR */
+INSERT IGNORE INTO ajxp_user_prefs_temp (SELECT * FROM ajxp_user_prefs);
+/* SEPARATOR */
+DROP TABLE ajxp_user_prefs;
+/* SEPARATOR */
+RENAME TABLE ajxp_user_prefs_temp TO ajxp_user_prefs;
+/* SEPARATOR */
+ALTER TABLE ajxp_roles ADD COLUMN `owner_user_id` VARCHAR(255) DEFAULT NULL;
+/* SEPARATOR */
+CREATE UNIQUE INDEX owner_role ON ajxp_roles(`role_id`, `owner_user_id`);
+/* SEPARATOR */
+UPDATE ajxp_version SET db_build=68;

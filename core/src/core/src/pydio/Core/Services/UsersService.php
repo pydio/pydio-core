@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -127,7 +127,9 @@ class UsersService
             CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
         }else{
             CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
-            Controller::applyHook("msg.instant", array(Context::contextWithObjects($userObject, null), ReloadRepoListMessage::XML(), $userObject->getId()));
+            if(!ApplicationState::$silenceInstantMessages) {
+                Controller::applyHook("msg.instant", array(Context::contextWithObjects($userObject, null), ReloadRepoListMessage::XML(), $userObject->getId()));
+            }
         }
     }
 
@@ -164,7 +166,7 @@ class UsersService
         }
         $self = self::instance();
         $repos = $self->getFromCaches($user->getId());
-        if($repos !== null) {
+        if(!empty($repos)) {
             $userRepos =  $repos;
         } else{
             $list = new FilteredRepositoriesList($user);
@@ -194,7 +196,9 @@ class UsersService
     private function setInCache($userId, $repoList){
 
         $this->repositoriesCache[$userId] = $repoList;
-        SessionService::updateLoadedRepositories($repoList);
+        if(SessionService::has(SessionService::USER_KEY) && SessionService::fetch(SessionService::USER_KEY)->getId() === $userId){
+            SessionService::updateLoadedRepositories($repoList);
+        }
 
     }
 
@@ -204,10 +208,12 @@ class UsersService
      */
     private function getFromCaches($userId){
 
-        $fromSesssion = SessionService::getLoadedRepositories();
-        if($fromSesssion !== null){
-            $this->repositoriesCache[$userId] = $fromSesssion;
-            return $fromSesssion;
+        if(SessionService::has(SessionService::USER_KEY) && SessionService::fetch(SessionService::USER_KEY)->getId() === $userId) {
+            $fromSession = SessionService::getLoadedRepositories();
+            if ($fromSession !== null && is_array($fromSession) && count($fromSession)) {
+                $this->repositoriesCache[$userId] = $fromSession;
+                return $fromSession;
+            }
         }
         if(isSet($this->repositoriesCache[$userId])) {
             $configsNotCorrupted = array_reduce($this->repositoriesCache[$userId], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);

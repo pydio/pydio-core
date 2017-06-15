@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -56,8 +56,19 @@ $mess = array(
     "20d" => "Générer l'expression Cron",
     "21" => "Ajoutez la ligne suivante dans votre CRONTAB, en remplaçant le mot de passe par le votre, et la planification (ici configurée pour un déclenchement toutes les 5 minutes).",
     "22" => "Planificateur permettant l'exécution récurrente de tâches. Nécessite l'activation de la ligne de commande et un système type CRONTAB.",
-    "23" => "Execution Context",
-    "24" => "Parameters",
-    "25" => "Stop Job",
-    "26" => "Stop running job",
+    "23" => "Contexte d'execution",
+    "24" => "Paramètres",
+    "25" => "Arrêter  le jobs",
+    "26" => "Arrêter les jobs en cours",
+    "27" => "Plannifié",
+    "28" => "Tâche ajoutée/éditée",
+    "29" => "Cette tâche a actuellement des occurences en cours, veuillez patienter.",
+    "30" => "Tâche supprimée avec succès",
+    "31" => "Démarrage...",
+    "32" => "Lancement ",
+    "33" => "Rien à faire",
+    "34" => "Lancement de la tâche",
+    "35" => "JOB EN COURS",
+    "36" => "JOB EN ERREUR",
+    "37" => "Démarré le ",
 );

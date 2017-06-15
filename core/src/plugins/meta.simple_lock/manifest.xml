@@ -6,7 +6,8 @@
    		<resources>
    			<i18n namespace="meta.simple_lock" path="plugins/meta.simple_lock/i18n" />
             <img_library alias="meta_simple_lock" path="plugins/meta.simple_lock/icons"/>
-   		</resources>
+            <js className="LockActions" file="plugins/meta.simple_lock/res/build/LockActions.js"/>
+        </resources>
    	</client_settings>
    	<registry_contributions>
    		<hooks>
@@ -18,43 +19,13 @@
             <action name="sl_lock">
                 <gui src="meta_simple_lock/ICON_SIZE/lock.png" iconClass="icon-lock" text="meta.simple_lock.1" title="meta.simple_lock.2">
                     <context dir="false" recycle="false" selection="true" contextMenu="true" actionBar="true"
-                             actionBarGroup="more" />
+                             actionBarGroup="change" />
                     <selectionContext dir="false" file="true" recycle="false" unique="true"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var conn = new Connexion();
-                        conn.addParameter("get_action", "sl_lock");
-                        var n = ajaxplorer.getUserSelection().getUniqueNode();
-                        conn.addParameter("file", n.getPath());
-                        if(n.getMetadata().get("sl_locked")){
-                            conn.addParameter("unlock", "true");
-                        }
-                        conn.onComplete = function(transport){
-                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                        };
-                        conn.sendAsync();
-                    ]]></clientCallback>
-                    <clientListener name="selectionChange"><![CDATA[
-					if(ajaxplorer){
-						var action = pydio.getController().getActionByName("sl_lock");
-						var n = ajaxplorer.getUserSelection().getUniqueNode();
-                        if(action && n){
-                            action.selectionContext.allowedMimes = $([]);
-                            if(n.getMetadata().get("sl_locked")){
-                                action.setIconSrc('meta_simple_lock/ICON_SIZE/unlock.png', 'icon-unlock');
-                                action.setLabel('meta.simple_lock.3');
-                                if(!n.getMetadata().get("sl_mylock")){
-                                    action.selectionContext.allowedMimes = $(["fake_extension_that_never_exists"]);
-                                }
-                            }else{
-                                action.setIconSrc('meta_simple_lock/ICON_SIZE/lock.png', 'icon-lock');
-                                action.setLabel('meta.simple_lock.1');
-                            }
-                        }
-					}
-                    ]]></clientListener>
+                    <clientCallback module="LockActions.Callbacks.toggleLock"/>
+                    <clientListener module="LockActions.Listeners.selectionChange" name="selectionChange"/>
                     <serverCallback methodName="applyChangeLock" restParams="/file+" developerComment="Lock/Unlock a file for usage by other users.">
                         <input_param name="file" type="path" description="Path to the file to lock"/>
                         <input_param name="unlock" type="boolean" description="If set to true, will unlock the file"/>

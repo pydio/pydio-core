@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -70,17 +70,22 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
      */
     public function getDigestHash($realm, $username)
     {
-        try{
+        try {
             $user = UsersService::getUserById($username);
-        }catch (UserNotFoundException $e){
+        } catch (UserNotFoundException $e) {
             throw new Sabre\DAV\Exception\NotAuthenticated();
         }
         $webdavData = $user->getPref("AJXP_WEBDAV_DATA");
-        $active = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL");
-        if(!empty($webdavData) && isSet($webdavData["ACTIVE"]) && $webdavData["ACTIVE"] === false){
-            $active = false;
+        $globalActive = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL");
+        // If the user has no WebDAV Data, no WebDAV can be used
+        if (empty($webdavData)) {
+            return false;
         }
-        if (!$active || (!isSet($webdavData["PASS"]) && !isset($webdavData["HA1"]) ) ) {
+        // If WebDAV is not globally active and also inactive in user prefs
+        if (!$globalActive && (isSet($webdavData["ACTIVE"]) && $webdavData["ACTIVE"] === false)){
+            return false;
+        }
+        if (!isSet($webdavData["PASS"]) && !isset($webdavData["HA1"])) {
             return false;
         }
         if (isSet($webdavData["HA1"])) {
@@ -89,7 +94,6 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
             $pass = $this->_decodePassword($webdavData["PASS"], $username);
             return md5("{$username}:{$realm}:{$pass}");
         }
-
     }
 
     /**

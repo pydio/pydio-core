@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright 2013 Nikita ROUSSEAU <warhawk3407@gmail.com>
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -50,9 +50,10 @@ class SftpPSLAccessWrapper extends FsAccessWrapper
 {
 
     /**
+     * @param $url
      * @return bool
      */
-    public static function isRemote()
+    public static function isRemote($url)
     {
         return true;
     }

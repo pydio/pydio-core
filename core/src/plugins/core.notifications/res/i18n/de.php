@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu <contact (at) cdujeu.me>
+* Copyright 2007-2017 Charles du Jeu <contact (at) cdujeu.me>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 * German translation:
 *  	+ update: Florian Vogt <flori@vorlif.org>
 *  	+ update: Martin Schaible <martin@martinschaible.ch>
-*******************************************************************************/  
+*******************************************************************************/
 
 $mess=array(
 "1" => "Benachrichtigungen",
@@ -34,9 +34,11 @@ $mess=array(
 "6" => "Gehe zu ...",
 "7" => "Verwerfen",
 "8" => "Keine Benachrichtigungen",
-"9" => "Aktivit&auml;ten Arbeitsumgebungen",
-"10" => "Ordner-Aktivit&auml;ten",
-"11" => "Datei-Aktivit&auml;ten",
-    "12" => "Abhängig von Ihrem Browser werden Sie eine Abfrage erhalten um Benachrichtigungen zu erlauben. Diese Funktion kann über die Einstellungen des Browsers wieder deaktiviert werden.",
-    "13" => "Ihr Browser unterstützt noch keine Desktop-Benachrichtigungen."
+"9" => "Aktivitäten",
+"10" => "Ordner-Aktivitäten",
+"11" => "Datei-Aktivitäten",
+"12" => "Abhängig von Ihrem Browser werden Sie eine Abfrage erhalten um Benachrichtigungen zu erlauben. Diese Funktion kann über die Einstellungen des Browsers wieder deaktiviert werden.",
+"13" => "Ihr Browser unterstützt noch keine Desktop-Benachrichtigungen.",
+"14" => "Keine Benachrichtigungen",
+"15" => "Hier erscheinen Benachrichtigungen zu Dateien, die Sie überwachen",
 );

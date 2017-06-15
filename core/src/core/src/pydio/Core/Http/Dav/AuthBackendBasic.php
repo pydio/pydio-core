@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu <contact (at) cdujeu.me>
+ * Copyright 2007-2017 Charles du Jeu <contact (at) cdujeu.me>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -113,9 +113,11 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         }
         
         $webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
-        $active = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL");
-        if(!empty($webdavData) && isSet($webdavData["ACTIVE"]) && $webdavData["ACTIVE"] === false){
-            $active = false;
+        $globalActive = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL");
+        if(!empty($webdavData) && isSet($webdavData["ACTIVE"])){
+            $active = $webdavData["ACTIVE"];
+        } else {
+            $active = $globalActive;
         }
         if (!$active) {
             Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "WebDAV user not found or disabled"));

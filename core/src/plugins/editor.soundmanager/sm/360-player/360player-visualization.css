@@ -1,23 +1,23 @@
 /* larger canvas, spectrum + EQ visualization and other items */
 
-.ui360-vis,
+/*.ui360-vis,
 .ui360-vis .sm2-360ui,
 .sm2-inline-list .ui360-vis {
- /* size of the container for the circle, etc. */
- width:256px;
- height:256px;
+ /* size of the container for the circle, etc.
+ width: 198px;
+ height: 198px;
 }
 
 .ui360-vis {
  position:relative;
- /* a little extra spacing */
+ /* a little extra spacing
  padding-top:1px;
  padding-bottom:1px;
- margin-bottom:-18px; /* approximate "line height" we want */
+ margin-bottom:-18px; /* approximate "line height" we want
  padding-left:248px;
  margin-left:0px;
- background-position:22.6% 50%; /* (~109px) initial play button position */
-}
+ background-position:50% 50%; /* (~109px) initial play button position 
+}*/
 
 .sm2-inline-list .ui360-vis {
  cursor:pointer
@@ -31,23 +31,23 @@
 }
 
 .sm2-inline-list .ui360-vis a {
- line-height:256px;
+ line-height:198px;
  top:auto;
 }
 
-.ui360-vis .sm2-360ui {
+/*.ui360-vis .sm2-360ui {
  margin-left:-256px;
-}
+}*/
 
 .ui360-vis .sm2-timing {
- line-height:256px;
+ line-height:198px;
 }
 
 .ui360-vis .sm2-timing {
  font:bold 24px "helvetica neue",helvetica,monaco,lucida,terminal,monospace;
  color:#333;
  text-align:center;
- line-height:256px;
+ line-height:198px;
  text-indent:0px;
 }
 
@@ -62,13 +62,6 @@
  background-position:50% 50%; /* initial play button position */
 }
 
-.sm2-inline-list .ui360-vis .sm2-360ui {
- border:1px solid #eee;
- /* offset the border */
- margin-left:-1px;
- margin-top:-1px;
-}
-
 .sm2-inline-list .ui360-vis a {
  position:absolute;
  display:inline;
@@ -77,7 +70,7 @@
  top:1px;
  width:100%; /* 2px padding in box */
  height:99%; /* dumb vertical hack */
- *height:256px; /* IE is dumb. */
+ *height:198px; /* IE is dumb. */
  overflow:hidden;
  font-size:small;
  font-weight:300;
@@ -146,8 +139,8 @@
 
 .ui360-vis {
  /* non-JS / before-loaded state */
- background:transparent url(360-button-vis-play.png) no-repeat 21% 50%;
- _background:transparent url(360-button-vis-play.gif) no-repeat 21% 50%; /* IE 6-only: special crap GIF */
+ background:transparent url(360-button-vis-play.png) no-repeat 50% 50%;
+ _background:transparent url(360-button-vis-play.gif) no-repeat 50% 50%; /* IE 6-only: special crap GIF */
 }
 
 .ui360-vis .sm2-360btn-default {

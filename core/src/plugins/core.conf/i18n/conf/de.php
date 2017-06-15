@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ $mess=array(
 "Preferences Saving" => "Voreinstellungen",
 "Skip user history" => "Oberflächeneinstellungen nicht beibehalten",
 "Use this option to avoid automatic reloading of the interface state (last folder, opened tabs, etc)" => "Automatisches Laden der zuletzt geöffneten Programmoberfläche unterbinden. (zuletzt geöffneter Ordner, offene Tabs, etc)",
-"Internal / External Users" => "Interne / Externe Benutzer",
+"Internal / External Users" => "Interne- / Freigaben-Benutzer",
 "Maximum number of users displayed in the users autocompleter" => "Maximale Anzahl der Benutzern, die in der Autovervollständigung angezeigt werden",
 "Users completer limit" => "Anzahl Benutzer in Autovervollständigung",
 "Minimum number of characters to trigger the auto completion feature" => "Minimale Anzahl an Zeichen, bevor die Autovervollständigung angezeigt wird",

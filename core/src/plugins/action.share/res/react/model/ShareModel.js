@@ -12,14 +12,19 @@
             this._data = {link:{}};
             this._pendingData = {};
             this._pydio = pydio;
-            if(this._node.getMetadata().get('ajxp_shared')){
-                this.load();
-            }
             if(this._node.isLeaf()){
                 this._previewEditors = pydio.Registry.findEditorsForMime(this._node.getAjxpMime()).filter(function(entry){
                     return !(entry.editorClass == "OtherEditorChooser" || entry.editorClass == "BrowserOpener");
                 });
 
+            }
+        }
+
+        initLoad(){
+            if(this._node.getMetadata().get('ajxp_shared')){
+                this.load();
+            }else{
+                this._setStatus('loaded');
             }
         }
 
@@ -49,6 +54,10 @@
         hasPublicLink(){
             var publicLinks = this.getPublicLinks();
             return publicLinks.length > 0;
+        }
+
+        getLinkData(linkId){
+            return this._data['links'][linkId];
         }
 
         getPublicLink(linkId){
@@ -121,7 +130,7 @@
         }
 
         getSharedUsers(){
-            var data = [], sharedData = [];
+            let data = [], sharedData = [];
             if(this._pendingData['entries']){
                 data = this._pendingData['entries'];
             }else if(this._data['entries']){
@@ -135,7 +144,7 @@
         }
 
         getSharedUser(userId){
-            var data = [], user = null;
+            let data = [], user = null;
             if(this._pendingData['entries']){
                 data = this._pendingData['entries'];
             }else if(this._data['entries']){
@@ -219,24 +228,33 @@
             var entries = this.getSharedUsers();
             var index = 0;
             entries.map(function(e){
-                params['user_' + index] = e.ID;
+                params['user_' + index] = (e.TYPE && e.TYPE === 'team' ? '/AJXP_TEAM/' : '') +  e.ID;
                 params['right_read_' + index] = (e.RIGHT.indexOf('r') !== -1) ? 'true' : 'false';
                 params['right_write_' + index] = (e.RIGHT.indexOf('w') !== -1) ? 'true' : 'false';
                 if(e.WATCH){
                     params['right_watch_' + index] = 'true';
                 }
-                params['entry_type_' + index] = e.TYPE == 'group' ? 'group' : 'user';
+                params['entry_type_' + index] = (e.TYPE === 'group' || e.TYPE === 'team') ? 'group' : 'user';
                 index ++;
             });
         }
 
         saveSelectionAsTeam(teamName){
-            var userIds = [];
-            this.getSharedUsers().map(function(e){
-                if(e.TYPE == 'user') userIds.push(e.ID);
+            let userIds = [], commonRight;
+            this.getSharedUsers().map((e) => {
+                if(e.TYPE === 'user' || e.TYPE === 'tmp_user') {
+                    userIds.push(e.ID);
+                    if(commonRight === undefined) commonRight = e.RIGHT;
+                    else if(commonRight !== e.RIGHT) commonRight = false;
+                }
             });
-            PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, function(){
-                // Flatten Team?
+            PydioUsers.Client.saveSelectionAsTeam(teamName, userIds, (jsonResponse) => {
+                const {message, error, insertId} = jsonResponse;
+                if(error){
+                    this._pydio.displayMessage('ERROR', error);
+                }else{
+                    this._pydio.displayMessage('SUCCESS', message);
+                }
             });
         }
 
@@ -263,8 +281,8 @@
             this._setStatus('modified');
         }
         _globalsAsParameters(params){
-            params['repo_label'] = this.getGlobal("label");
-            params['repo_description'] = this.getGlobal("description");
+            params['repo_label'] = this.getGlobal("label") || '';
+            params['repo_description'] = this.getGlobal("description") || '';
             params['self_watch_folder'] = this.getGlobal("watch") ? 'true' : 'false';
         }
 
@@ -506,7 +524,6 @@
 
         /****************************/
         /* PUBLIC LINKS TEMPLATE    */
-        /* TODO: INFER FROM DEFAULT PUBLIC LINK
         /****************************/
         getTemplate(linkId){
             if(this._pendingData["links"] && this._pendingData["links"][linkId] && this._pendingData["links"][linkId]["layout"]){
@@ -624,6 +641,7 @@
             let remoteLoader = function(transport){
                 if(transport.responseJSON){
                     this._data = transport.responseJSON;
+                    if(this._data instanceof Array) this._data = {};
                     this._pendingData = {};
                     this._setStatus('idle');
                     return this._data;
@@ -737,17 +755,20 @@
 
             PydioApi.getClient().request(params, function(transport){
                 var _data = transport.responseJSON;
-                if(_data !== null){
+                if(_data !== null && _data !== undefined){
                     this._data = _data;
+                    if(this._data instanceof Array) this._data = {};
                     this._pendingData = {};
                     this._setStatus('saved');
                     this._pydio.fireNodeRefresh(this._node);
                 }else{
                     // There must have been an error, revert
-                    this.load();
+                    this.revertChanges();
                 }
                 this.notify('saved');
             }.bind(this), function(){
+                // The must have been an error, revert
+                this.revertChanges();
                 this.notify('saved');
             }.bind(this));
         }
@@ -820,9 +841,9 @@
             var tmpl;
             if(node.isLeaf()){
                 var currentExt = node.getAjxpMime();
-                tmpl = XPathSelectNodes(pydio.getXmlRegistry(), "//template[contains(@name, 'unique_preview_')]");
+                tmpl = XMLUtils.XPathSelectNodes(pydio.getXmlRegistry(), "//template[contains(@name, 'unique_preview_')]");
             }else{
-                tmpl = XPathSelectNodes(pydio.getXmlRegistry(), "//template[contains(@name, 'minisite_')]");
+                tmpl = XMLUtils.XPathSelectNodes(pydio.getXmlRegistry(), "//template[contains(@name, 'minisite_')]");
             }
 
             if(!tmpl.length){
@@ -831,7 +852,7 @@
             if(tmpl.length == 1){
                 return [{LAYOUT_NAME:tmpl[0].getAttribute('element'), LAYOUT_LABEL:''}];
             }
-            var crtTheme = ajxpBootstrap.parameters.get('theme');
+            var crtTheme = pydio.Parameters.get('theme');
             var values = [];
             var noEditorsFound = false;
             tmpl.map(function(node){

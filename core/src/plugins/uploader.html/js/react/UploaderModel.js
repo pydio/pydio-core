@@ -172,7 +172,7 @@
                 }.bind(this));
 
             }else{
-                
+
                 if(this.getSize() > maxUpload){
                     this.onError(global.pydio.MessageHash[211]);
                     completeCallback();
@@ -195,7 +195,7 @@
             let configs = this.getMqConfigs();
             var secure = configs.get("BOOSTER_MAIN_SECURE");
             if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE']){
-                secure = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
+                secure = configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
             }
             var host = configs.get("BOOSTER_MAIN_HOST");
             if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_HOST']){
@@ -209,7 +209,7 @@
             if(this._relativePath) {
                 fullPath += PathUtils.getDirname(this._relativePath);
             }
-            fullPath += '/' + PathUtils.getBasename(this._file.name);
+            fullPath += '/' + encodeURI(PathUtils.getBasename(this._file.name));
 
             let url = "http"+(secure?"s":"")+"://"+host+":"+port+"/"+configs.get("UPLOAD_PATH")+"/"+this._repositoryId + fullPath;
             let queryString = '';
@@ -326,6 +326,7 @@
             this._uploads = [];
             this._processing = [];
             this._processed = [];
+            this._errors = [];
             // Todo
             this._queueCounter = 0;
             this._maxQueueSize = 2;
@@ -333,16 +334,16 @@
         recomputeGlobalProgress(){
             let totalCount      = 0;
             let totalProgress   = 0;
-            this._uploads.concat(this._processing).forEach(function(item){
+            this._uploads.concat(this._processing).concat(this._processed).forEach(function(item){
                 if(!item.getProgress) return;
-                totalCount ++;
-                totalProgress += item.getProgress();
+                totalCount += item.getSize();
+                totalProgress += item.getProgress() * item.getSize() / 100;
             });
             let progress;
             if(!totalCount) {
                 progress = 0;
             }else{
-                progress = Math.ceil(totalProgress / totalCount);
+                progress = totalProgress / totalCount * 100;
             }
             return progress;
         }
@@ -353,14 +354,21 @@
             return UploaderConfigs.getInstance().getOptionAsBool("DEFAULT_AUTO_CLOSE", "upload_auto_close");
         }
         pushFolder(folderItem){
+            if(!this.getQueueSize()){
+                this._processed = [];
+            }
             this._folders.push(folderItem);
             UploadTask.getInstance().setPending(this.getQueueSize());
             if(this.getAutoStart() && !this._processing.length) {
                 this.processNext();
             } // Autostart with queue was empty before
             this.notify('update');
+            this.notify('item_added', folderItem);
         }
         pushFile(uploadItem){
+            if(!this.getQueueSize()){
+                this._processed = [];
+            }
             this._uploads.push(uploadItem);
             UploadTask.getInstance().setPending(this.getQueueSize());
             uploadItem.observe("progress", function(){
@@ -371,6 +379,7 @@
                 this.processNext();
             } // Autostart with queue was empty before
             this.notify('update');
+            this.notify('item_added', uploadItem);
         }
         log(){
         }
@@ -378,7 +387,11 @@
             let next = this.getNext();
             while(next !== null){
                 next.process(function(){
-                    this._processed.push(next);
+                    if(next.getStatus() === 'error') {
+                        this._errors.push(next);
+                    } else {
+                        this._processed.push(next);
+                    }
                     this.notify("update");
                 }.bind(this));
                 next = this.getNext();
@@ -392,6 +405,7 @@
             this._uploads = [];
             this._processing = [];
             this._processed = [];
+            this._errors = [];
             this.notify('update');
             UploadTask.getInstance().setIdle();
         }
@@ -402,7 +416,11 @@
                 UploadTask.getInstance().setRunning(this.getQueueSize());
                 processable.process(function(){
                     this._processing = LangUtils.arrayWithout(this._processing, this._processing.indexOf(processable));
-                    this._processed.push(processable);
+                    if(processable.getStatus() === 'error') {
+                        this._errors.push(processable)
+                    } else {
+                        this._processed.push(processable);
+                    }
                     this.processNext();
                     this.notify("update");
                 }.bind(this));
@@ -427,7 +445,7 @@
         }
         stopOrRemoveItem(item){
             item.abort();
-            ['_uploads', '_folders', '_processing', '_processed'].forEach(function(key){
+            ['_uploads', '_folders', '_processing', '_processed', '_errors'].forEach(function(key){
                 let arr = this[key];
                 if(arr.indexOf(item) !== -1) {
                     this[key] = LangUtils.arrayWithout(arr, arr.indexOf(item));
@@ -439,17 +457,12 @@
             return {
                 processing: this._processing,
                 pending: this._folders.concat(this._uploads),
-                processed: this._processed
+                processed: this._processed,
+                errors: this._errors
             };
         }
         hasErrors(){
-            let result = false;
-            this._processed.map(function(item){
-                if(item.getStatus() === 'error'){
-                    result = true;
-                }
-            });
-            return result;
+            return this._errors.length ? this._errors : false;
         }
         static getInstance(){
             if(!UploaderStore.__INSTANCE){
@@ -474,7 +487,7 @@
             }
         }
 
-        handleDropEventResults(items, files, targetNode, accumulator = null){
+        handleDropEventResults(items, files, targetNode, accumulator = null, filterFunction = null ){
 
             let oThis = this;
 
@@ -493,11 +506,13 @@
                         entry.file(function(File) {
                             if(File.size == 0) return;
                             let uploadItem = new UploadItem(File, targetNode);
+                            if(filterFunction && !filterFunction(uploadItem)) return;
                             if(!accumulator) oThis.pushFile(uploadItem);
                             else accumulator.push(uploadItem);
                         }, error );
                     } else if (entry.isDirectory) {
                         let folderItem = new FolderItem(entry.fullPath, targetNode);
+                        if(filterFunction && !filterFunction(folderItem)) continue;
                         if(!accumulator) oThis.pushFolder(folderItem);
                         else accumulator.push(folderItem);
 
@@ -506,12 +521,14 @@
                             fileEntry.file(function(File) {
                                 if(File.size == 0) return;
                                 let uploadItem = new UploadItem(File, targetNode, relativePath);
+                                if(filterFunction && !filterFunction(uploadItem)) return;
                                 if(!accumulator) oThis.pushFile(uploadItem);
                                 else accumulator.push(uploadItem);
 
                             }, error );
                         }, function(folderEntry){
                             let folderItem = new FolderItem(folderEntry.fullPath, targetNode);
+                            if(filterFunction && !filterFunction(uploadItem)) return;
                             if(!accumulator) oThis.pushFolder(folderItem);
                             else accumulator.push(folderItem);
                         }, error );
@@ -519,12 +536,12 @@
                 }
             }else{
                 for(var j=0;j<files.length;j++){
-                    console.log(files[j]);
                     if(files[j].size === 0){
                         alert(global.pydio.MessageHash['html_uploader.8']);
                         return;
                     }
                     let uploadItem = new UploadItem(files[j], targetNode);
+                    if(filterFunction && !filterFunction(uploadItem)) continue;
                     if(!accumulator) oThis.pushFile(uploadItem);
                     else accumulator.push(uploadItem);
                 }
@@ -547,7 +564,7 @@
                 dirReader.readEntries (function(results) {
                     if (!results.length) {
 
-                        $A(entries).each(function(e){
+                        entries.map(function(e){
                             if(e.isDirectory){
                                 folderHandler(e);
                                 recurseDir(e, fileHandler, folderHandler, errorHandler);

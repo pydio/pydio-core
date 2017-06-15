@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -121,7 +121,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
      * @param string $userId
      * @return array An array of stdClass objects with keys hookname, arguments, author, date, repository
      */
-    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId)
+    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId = null, $chainLoad = false)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         if(!dibi::isConnected()) {
@@ -203,6 +203,18 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
             $object->event_id = $row->id;
+            if(!empty($filterByPath) && !empty($chainLoad) && substr($row->index_path, -strlen($filterByPath)) === $filterByPath
+                && $object->arguments !== null && isSet($object->arguments[0]) && $object->arguments[0] instanceOf AJXP_Node ){
+                $oldNode = $object->arguments[0];
+                $oldPath = $oldNode->getPath();
+                if(!is_array($chainLoad)) $chainLoad = [];
+                $chainLoad[] = $filterByPath;
+                if(!in_array($oldPath, $chainLoad) && count($chainLoad) <= 10){
+                    // Load previous events when path was different.
+                    $chainData = $this->loadEvents($filterByRepositories, $oldPath, $userGroup, 0, $limit, $enlargeToOwned, $userId, $chainLoad);
+                    foreach($chainData as $chainObject)  $data[] = $chainObject;
+                }
+            }
             $data[] = $object;
         }
         return $data;
@@ -345,7 +357,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
      * @param string $repositoryOwner
      * @param string $userId
      * @param string $userGroup
-     * @return void
+     * @return int last insert ID
      */
     public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
     {
@@ -355,6 +367,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
         try {
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[index_path],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "meta", "comment", $indexPath, $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+            return dibi::getInsertId();
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist meta", $e->getMessage());
         }
@@ -381,13 +394,23 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         if($recurring){
             $res = dibi::query("SELECT * FROM [ajxp_feed]
                 WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )                
                 ORDER BY %by %lmt %ofs
-            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+            ", "meta", $repositoryId, $indexPath, $userId, $userGroup, array('edate' => $orderDir), $limit, $offset);
         }else{
             $res = dibi::query("SELECT * FROM [ajxp_feed]
                 WHERE [etype] = %s AND [repository_id] = %s AND [index_path] = %s
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )                
                 ORDER BY %by %lmt %ofs
-            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+            ", "meta", $repositoryId, $indexPath, $userId, $userGroup, array('edate' => $orderDir), $limit, $offset);
         }
 
         $data = array();

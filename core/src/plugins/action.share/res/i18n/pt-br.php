@@ -3,7 +3,6 @@
 $mess = array(
 // será substituido pelo título da aplicação
 "1" => "%s Download Público",
-// será substituido pelo nome do arquivo a ser baixado
 "2" => "Clique na imagem para fazer o download do <b>%s</b> para o seu computador",
 "3" => "Senha incorreta",
 "4" => "Insira a senha e clique na imagem para fazer o download do <b>%s</b> para o seu computador",
@@ -245,4 +244,21 @@ $mess = array(
 "226" => "Você não possui permissão de criar links públicos em diretórios",
 "227" => "Você não possui permissão de compartilhar arquivos internamente",
 "228" => "Você não possui permissão de compartilhar diretórios internamente",
+"229" => "Insert a preview of the file by pasting this code inside an HTML page.",
+"230" => "Please save before sending an invitation",
+"231" => "Click to start downloading",
+"232" => "No entries found for share, did you maybe delete some users?",
+"233" => "Reset this share",
+"234" => "It has been added to your %s workspace.",
+"235" => "Generate unique links to identify users",
+"236" => "Restrict access only to identified users",
+"237" => "Use a random key instead of email in link",
+"238" => "Share Types",
+"240" => "Group by...",
+"241" => "Shares List",
+"242" => "Load More Results",
+"243" => "Public Links",
+"244" => "Shared Folders",
+"245" => "%s personal invitation(s) sent",
+// será substituido pelo nome do arquivo a ser baixado
 );

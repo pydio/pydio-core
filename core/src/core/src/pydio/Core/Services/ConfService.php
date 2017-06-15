@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ use Pydio\Core\Model\Context;
 
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
+use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -133,6 +134,35 @@ class ConfService
         }
     }
 
+    public static function detectVersionMismatch(){
+        if(AJXP_VERSION_DB === '##DB_VERSION##') return false;
+        $p = PluginsService::getInstance(Context::emptyContext())->getPluginById("core.conf");
+        if($p === false) return false;
+        $confDriver = self::getConfStorageImpl();
+        if ($confDriver instanceof \Pydio\Conf\Sql\SqlConfDriver) {
+            $conf = OptionsHelper::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
+            if (is_array($conf) && isSet($conf["driver"])) {
+                try{
+                    \dibi::connect($conf);
+                    $res = \dibi::query("select MAX(db_build) from [ajxp_version]");
+                    if (!empty($res)) {
+                        $dbVersion = intval($res->fetchSingle());
+                        \dibi::disconnect();
+                        if($dbVersion < intval(AJXP_VERSION_DB))
+                        return [
+                            'current' => $dbVersion,
+                            'target' => intval(AJXP_VERSION_DB),
+                            'conf' => $conf
+                        ];
+                    }
+                }catch(\DibiException $de){
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * @static
      * @param $globalsArray
@@ -217,6 +247,7 @@ class ConfService
         if(isSet(self::$tmpConfStorageImpl)) return self::$tmpConfStorageImpl;
         /** @var CoreInstanceProvider $p */
         $p = PluginsService::getInstance(Context::emptyContext())->getPluginById("core.conf");
+        if($p === false) return false;
         return $p->getImplementation();
     }
 

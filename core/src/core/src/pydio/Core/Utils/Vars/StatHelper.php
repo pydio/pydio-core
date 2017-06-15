@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -345,6 +345,43 @@ class StatHelper
             return str_replace("DATE", $finalDate, $messages["date_relative_date"]);
         } else {
             return $finalDate = date("M Y", $time ? $time : time());
+        }
+
+    }
+
+    public static function relativeDateGroup($time, $messages){
+
+        $crtYear = date('Y');
+        $today = strtotime(date('M j, Y'));
+        $reldays = ($time - $today) / 86400;
+
+        if ($reldays >= 0 && $reldays < 1) {
+            return 'today';
+        } else if ($reldays >= 1 && $reldays < 2) {
+            return 'tomorrow';
+        } else if ($reldays >= -1 && $reldays < 0) {
+            return 'yesterday';
+        }
+
+        if (abs($reldays) < 7) {
+
+            if ($reldays > 0) {
+                $reldays = floor($reldays);
+                return str_replace("%s", $reldays, $messages['date_relative_days_ahead']);
+            } else {
+                $reldays = abs(floor($reldays));
+                return str_replace("%s", $reldays, $messages['date_relative_days_ago']);
+            }
+        }
+
+        if(abs($reldays) < 31) {
+
+            return 'more_than_week';
+
+        }else{
+
+            return 'more_than_month';
+
         }
 
     }

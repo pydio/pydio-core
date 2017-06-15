@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -61,4 +61,15 @@ $mess = array(
     "24" => "Parameters",
     "25" => "Stop Job",
     "26" => "Stop running job",
+    "27" => "Scheduled",
+    "28" => "Successfully added/edited task",
+    "29" => "This task has currently jobs running, please wait that they are finished",
+    "30" => "Successfully removed task",
+    "31" => "Starting...",
+    "32" => "Launching ",
+    "33" => "Nothing to do",
+    "34" => "Launching task now",
+    "35" => "JOB RUNNING",
+    "36" => "JOB ERROR",
+    "37" => "Started on ",
 );

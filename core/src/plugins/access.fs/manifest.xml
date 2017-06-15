@@ -3,6 +3,8 @@
     <client_settings icon="plugins/access.fs/icon.png" description_template="{PATH}" iconClass="icon-hdd">
         <resources>
             <i18n namespace="access_fs" path="plugins/access.fs/i18n"/>
+            <i18n namespace="openother" path="plugins/access.fs/res/editor.picker" />
+            <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
     </client_settings>
 	<server_settings>
@@ -22,7 +24,7 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<client_configs>
-			<component_config className="FilesList">
+			<component_config component="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile" defaultWidth="48%"/>
 					<column messageId="2" attributeName="filesize" sortType="CellSorterValue" modifier="FilesList.prototype.partSizeCellRenderer" defaultWidth="9%"/>
@@ -30,7 +32,7 @@
 					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate" defaultWidth="19%"/>
 				</columns>
 			</component_config>
-			<component_config className="FoldersTree">
+			<component_config component="FoldersTree">
 				<property name="display" value="dz"/>
 			</component_config>
 		</client_configs>

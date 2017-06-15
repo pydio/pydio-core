@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -30,17 +30,17 @@ $mess=array(
 "file.move" => "Die Datei AJXP_NODE_LABEL wurde von AJXP_SOURCE_FOLDER nach AJXP_PARENT_PATH verschoben. AJXP_DATE, von AJXP_USER",
 "file.move_to" => "Die Datei AJXP_NODE_LABEL wurde nach AJXP_TARGET_FOLDER verschoben. AJXP_DATE, von AJXP_USER",
 "file.move_from" => "Die Datei AJXP_NODE_LABEL wurde von AJXP_SOURCE_FOLDER verschoben. AJXP_DATE, von AJXP_USER",
-"folder.add" => "Das Verzeichnis AJXP_NODE_LABEL wurde in AJXP_PARENT_PATH erstellt. AJXP_DATE, von AJXP_USER",
-"folder.delete" => "Das Verzeichnis AJXP_NODE_LABEL in AJXP_PARENT_PATH wurde gelöscht. AJXP_DATE, von AJXP_USER.",
+"folder.add" => "Der Ordner AJXP_NODE_LABEL wurde in AJXP_PARENT_PATH erstellt. AJXP_DATE, von AJXP_USER",
+"folder.delete" => "Der Ordner AJXP_NODE_LABEL in AJXP_PARENT_PATH wurde gelöscht. AJXP_DATE, von AJXP_USER.",
 "folder.rename" => "Der Ordner AJXP_SOURCE_LABEL wurde zu AJXP_NODE_LABEL umbenannt. AJXP_DATE, von AJXP_USER",
-"folder.change" => "Innerhalb des Repositorie AJXP_REPOSITORY_LABEL wurde der Inhalt des Verzeichnisses AJXP_NODE_LABEL bearbeitet. AJXP_DATE, von AJXP_USER",
-"folder.view" => "Das Verzeichniss AJXP_NODE_LABEL wurde von AJXP_USER geöffnet. AJXP_DATE",
+"folder.change" => "Innerhalb der Arbeitsumgebung AJXP_REPOSITORY_LABEL wurde der Inhalt des Ordners AJXP_NODE_LABEL bearbeitet. AJXP_DATE, von AJXP_USER",
+"folder.view" => "Der Ordner AJXP_NODE_LABEL wurde von AJXP_USER geöffnet. AJXP_DATE",
 "folder.copy" => "Der Ordner AJXP_NODE_LABEL wurde von AJXP_SOURCE_FOLDER nach AJXP_PARENT_PATH kopiert. AJXP_DATE, von AJXP_USER",
-"folder.copy_to" => "Das Verzeichnis AJXP_NODE_LABEL wurde nach AJXP_TARGET_FOLDER kopiert. AJXP_DATE, von AJXP_USER",
-"folder.copy_from" => "Das Verzeichnis AJXP_NODE_LABEL wurde von AJXP_SOURCE_FOLDER kopiert. AJXP_DATE, von AJXP_USER",
+"folder.copy_to" => "Der Ordner AJXP_NODE_LABEL wurde nach AJXP_TARGET_FOLDER kopiert. AJXP_DATE, von AJXP_USER",
+"folder.copy_from" => "Der Ordner AJXP_NODE_LABEL wurde von AJXP_SOURCE_FOLDER kopiert. AJXP_DATE, von AJXP_USER",
 "folder.move" => "Der Ordner AJXP_NODE_LABEL wurder von AJXP_SOURCE_FOLDER nach AJXP_PARENT_PATH verschoben. AJXP_DATE, von AJXP_USER",
-"folder.move_to" => "Das Verzeichnis AJXP_NODE_LABEL wurde nach AJXP_TARGET_FOLDER verschoben. AJXP_DATE, von AJXP_USER",
-"folder.move_from" => "Das Verzeichnis AJXP_NODE_LABEL wurde von AJXP_SOURCE_FOLDER verschoben. AJXP_DATE, von AJXP_USER",
+"folder.move_to" => "Der Ordner AJXP_NODE_LABEL wurde nach AJXP_TARGET_FOLDER verschoben. AJXP_DATE, von AJXP_USER",
+"folder.move_from" => "Der Ordner AJXP_NODE_LABEL wurde von AJXP_SOURCE_FOLDER verschoben. AJXP_DATE, von AJXP_USER",
 "ajxp_link" => "Hier klicken um direkt nach <a href='AJXP_LINK'>AJXP_NODE_LABEL</a> zu wechseln.",
 "file.share" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
 "folder.share" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",

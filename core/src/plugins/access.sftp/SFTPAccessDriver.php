@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -205,6 +205,17 @@ class SFTPAccessDriver extends FsAccessDriver
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Specific isWriteable implementation
+     * @param AJXP_Node $node
+     * @return bool
+     */
+    public function isWriteable(AJXP_Node $node)
+    {
+        return true;
     }
 
 }

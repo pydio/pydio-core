@@ -5,15 +5,24 @@
  position:relative;
 }
 
-.ui360,
+/*.ui360,
 .sm2-360ui {
- min-width:50px; /* should always be at least this. */
+ min-width:50px; /* should always be at least this.
  min-height:50px;
-}
+}*/
+
+
 
 .sm2-360ui {
  width:50px;
  height:50px;
+}
+
+.ui360,
+.sm2-360ui {
+  /* size of the container for the circle, etc. */
+  width:40px;
+  height:40px;
 }
 
 .ui360,

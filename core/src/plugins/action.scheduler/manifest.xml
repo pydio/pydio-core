@@ -3,13 +3,13 @@
     <client_settings>
         <resources>
             <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
-            <img_library alias="scheduler" path="plugins/action.scheduler/icons"/>
+            <js className="SchedulerActions" file="plugins/action.scheduler/res/build/SchedulerActions.js"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="scheduler_menu">
-                <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
+                <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"/>
                 </gui>
@@ -22,26 +22,13 @@
                 </subMenu>
             </action>
             <action name="scheduler_generateCronExpression">
-                <gui text="action.scheduler.20" title="action.scheduler.20d" iconClass="icon-paste" src="scheduler/22/shellscript.png" hasAccessKey="false">
+                <gui text="action.scheduler.20" title="action.scheduler.20d" iconClass="icon-paste" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="false" contextMenu="true" infoPanel="true"
                              actionBarGroup="user"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="scheduler_cronExpression" dialogOkButtonOnly="true" dialogSkipButtons="false">
-                        <dialogOnOpen><![CDATA[
-                            var connexion = new Connexion();
-                            connexion.setParameters(new Hash({get_action:'scheduler_generateCronExpression'}));
-                            connexion.onComplete = function(transport){
-                                $("cron_expression").setValue(transport.responseText);
-                                $("cron_expression").select();
-                            };
-                            connexion.sendAsync();
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                                hideLightBox();
-                                ]]></dialogOnComplete>
-                    </clientCallback>
+                    <clientCallback module="SchedulerActions.Callbacks.generateCron"/>
                     <clientForm id="scheduler_cronExpression"><![CDATA[
                          <div id="scheduler_cronExpression" box_width="420">
                              <div class="dialogLegend" ajxp_message_id="action.scheduler.21">AJXP_MESSAGE[action.scheduler.21]</div>
@@ -52,20 +39,13 @@
                 </processing>
             </action>
             <action name="scheduler_runAll">
-                <gui text="action.scheduler.15" title="action.scheduler.16d" iconClass="icon-play-circle" src="scheduler/22/media_playback_start.png" hasAccessKey="false">
+                <gui text="action.scheduler.15" title="action.scheduler.16d" iconClass="icon-play-circle" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="false" contextMenu="true" infoPanel="true"
                              actionBarGroup="user"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var connexion = new Connexion();
-                        connexion.setParameters(new Hash({get_action:'scheduler_runAll'}));
-                        connexion.onComplete = function(transport){
-                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                        };
-                        connexion.sendAsync();
-                    ]]></clientCallback>
+                    <clientCallback module="SchedulerActions.Callbacks.runAll"/>
                     <serverCallback methodName="switchAction" restParams="/" developerComment="Run the scheduler: check if some tasks must be run now, and launch them. Generally launched from command line."/>
                 </processing>
             </action>
@@ -77,109 +57,8 @@
                 </processing>
             </action>
             <action name="scheduler_addTask">
-                <gui text="action.scheduler.8" title="action.scheduler.9" iconClass="icon-plus" src="scheduler/22/task_add.png" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
-                             actionBar="false" contextMenu="true" infoPanel="true"
-                             actionBarGroup="put">
-                    </context>
-                </gui>
                 <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="scheduler-task-form" dialogOkButtonOnly="false" dialogSkipButtons="false">
-                       <dialogOnOpen><![CDATA[
-                           this.currentFormManager = new FormManager();
-                           var xmlDefinition = ajaxplorer.getXmlRegistry();
-                           var node = XPathSelectSingleNode(xmlDefinition, 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
-
-                           this.currentFormManager.params = this.currentFormManager.parseParameters(node, "param");
-
-                           if(window.actionArguments && window.actionArguments[0]){
-                               var tId = window.actionArguments[0].getPath();
-                               tId = getBaseName(tId);
-                               this.currentFormManager.task_id = tId;
-                               var conn = new Connexion();
-                               conn.setParameters(new Hash({get_action:'scheduler_loadTask',task_id:tId}));
-                               var values;
-                               conn.onComplete = function(transport){
-                                    values = $H(transport.responseJSON);
-                                   this.currentFormManager.createParametersInputs(
-                                        $('scheduler-task-form'),
-                                        this.currentFormManager.params,
-                                        true,
-                                        values
-                                   );
-                               }.bind(this);
-                               conn.sendAsync();
-                           }else{
-                               this.currentFormManager.createParametersInputs(
-                                    $('scheduler-task-form'),
-                                    this.currentFormManager.params,
-                                    true
-                               );
-                           }
-                       ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-
-                            /**
-                             * @author Jordi Salvat i Alabart - with thanks to <a href="www.salir.com">Salir.com</a>.
-                             */
-                            var regStr = "^\\s*((\\*(\/\\d+)?|([0-5]?\\d)(-([0-5]?\\d)(\/\\d+)?)?(,([0-5]?\\d)(-([0-5]?\\d)(\/\\d+)?)?)*)\\s+(\\*(\/\\d+)?|([01]?\\d|2[0-3])(-([01]?\\d|2[0-3])(\/\\d+)?)?(,([01]?\\d|2[0-3])(-([01]?\\d|2[0-3])(\/\\d+)?)?)*)\\s+(\\*(\/\\d+)?|(0?[1-9]|[12]\\d|3[01])(-(0?[1-9]|[12]\\d|3[01])(\/\\d+)?)?(,(0?[1-9]|[12]\\d|3[01])(-(0?[1-9]|[12]\\d|3[01])(\/\\d+)?)?)*)\\s+(\\*(\/\\d+)?|([1-9]|1[012])(-([1-9]|1[012])(\/\\d+)?)?(,([1-9]|1[012])(-([1-9]|1[012])(\/\\d+)?)?)*|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\s+(\\*(\/\\d+)?|([0-7])(-([0-7])(\/\\d+)?)?(,([0-7])(-([0-7])(\/\\d+)?)?)*|mon|tue|wed|thu|fri|sat|sun)\\s*$|(@yearly|@annually|@monthly|@weekly|@daily|@midnight|@hourly)\\s*$)";
-
-                            /*
-                               form validation
-                            */
-                            var schLabel = $('scheduler-task-form').select('[name=label]')[0];
-                            // $('scheduler-task-form').select('[name=schedule]')[0].removeClassName('SF_failed')
-                            var schSch = $('scheduler-task-form').select('[name=schedule]')[0];
-                            var schUser = $('scheduler-task-form').select('[name=user_id]')[0];
-                            var schRepoId = $('scheduler-task-form').select('[name=repository_id]')[0];
-                            var schActionName = $('scheduler-task-form').select('[name=action_name]')[0];
-
-                            schSch.value = schSch.value.trim();
-                            /* check null value */
-
-                            var errorMsg = "";
-
-                            if( schLabel.value === "" ||
-                                schSch.value === "" ||
-                                schUser.value === "" ||
-                                schRepoId.value === "" ||
-                                schActionName.value === "loading"){
-                                    (schLabel.value === "" )?schLabel.addClassName("SF_failed"):schLabel.removeClassName("SF_failed");
-                                    (schSch.value === "")?schSch.addClassName("SF_failed"):schSch.removeClassName("SF_failed");
-                                    (schUser.value === "")?schUser.addClassName("SF_failed"):schUser.removeClassName("SF_failed");
-                                    (schRepoId.value === "")?schRepoId.addClassName("SF_failed"):schRepoId.removeClassName("SF_failed");
-                                    (schActionName.value === "")?schActionName.addClassName("SF_failed"):schActionName.removeClassName("SF_failed");
-                                    alert("Some fields should not be empty");
-                                    return 0;
-                                }
-                            /* check schedule format */
-                            if(schSch.value.match(regStr) != null){
-                                schSch.removeClassName("SF_failed");
-                            }else{
-                                schSch.addClassName("SF_failed");
-                                alert("Check format of Schedule");
-                                return 0;
-                            }
-
-                            var values = new Hash({});
-                            this.currentFormManager.serializeParametersInputs(
-                                $('scheduler-task-form'),
-                                values,
-                                '');
-
-                            var conn = new Connexion();
-                            values.set('get_action', 'scheduler_addTask');
-                            if(this.currentFormManager.task_id){
-                                values.set('task_id',this.currentFormManager.task_id);
-                            }
-                            conn.setParameters(values);
-                            conn.sendAsync();
-                            conn.onComplete = function(transport){
-                                var res = PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                                if(res) hideLightBox();
-                            };
-                       ]]></dialogOnComplete>
-                    </clientCallback>
+                    <clientCallback module="SchedulerActions.Callbacks.addTask"/>
                     <clientForm id="scheduler-task-form"><![CDATA[
                         <div id="scheduler-task-form" box_width="300"></div>
                     ]]></clientForm>
@@ -199,102 +78,53 @@
                 </processing>
             </action>
             <action name="scheduler_runTask">
-                <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" src="scheduler/22/task_run.png" hasAccessKey="false">
+                <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
                     <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        var userSelection;
-                        if(window.actionArguments && window.actionArguments.length){
-                            userSelection = window.actionArguments[0];
-                        }else{
-                            userSelection =  pydio.getUserSelection();
-                        }
-                        var taskId = getBaseName(userSelection.getUniqueNode().getPath());
-                        var connexion = new Connexion();
-                        connexion.setParameters(new Hash({
-                            get_action:'scheduler_runTask',
-                            task_id:taskId
-                        }));
-                        connexion.onComplete = function(transport){
-                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                        };
-                        connexion.sendAsync();
-                    ]]></clientCallback>
+                    <clientCallback module="SchedulerActions.Callbacks.runTask"/>
                     <serverCallback methodName="switchAction" developerComment="Force running a specific task">
                         <input_param description="The id of the task to run" name="task_id" type="string" mandatory="true"/>
                     </serverCallback>
                 </processing>
             </action>
             <action name="scheduler_editTask">
-                <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="mdi mdi-pencil" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="mdi mdi-pencil" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var userSelection;
-                        if(window.actionArguments && window.actionArguments.length){
-                            userSelection = window.actionArguments[0];
-                        }else{
-                            userSelection =  pydio.getUserSelection();
-                        }
-                        pydio.getController().fireAction('scheduler_addTask', userSelection.getUniqueNode());
-                    ]]></clientCallback>
+                    <clientCallback module="SchedulerActions.Callbacks.editTask"/>
                 </processing>
             </action>
             <action name="scheduler_removeTask">
-                <gui text="action.scheduler.19" title="action.scheduler.12" iconClass="icon-trash" src="scheduler/22/task_delete.png" hasAccessKey="false">
+                <gui text="action.scheduler.19" title="action.scheduler.12" iconClass="icon-trash" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task,scheduler_error_task"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var userSelection;
-                        if(window.actionArguments && window.actionArguments.length){
-                            userSelection = window.actionArguments[0];
-                        }else{
-                            userSelection =  pydio.getUserSelection();
-                        }
-                        var conn = new Connexion();
-                        conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(userSelection.getUniqueNode().getPath()) }));
-                        conn.onComplete = function(transport){
-                            PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                         };
-                        conn.sendAsync();
-
-                    ]]></clientCallback>
+                    <clientCallback module="SchedulerActions.Callbacks.removeTask"/>
                     <serverCallback methodName="handleTasks" developerComment="Remove a given task from scheduler">
                         <input_param description="Id of the task to delete" name="task_id" type="string" mandatory="true"/>
                     </serverCallback>
                 </processing>
             </action>
             <action name="scheduler_stopRunningTask">
-                <gui text="action.scheduler.25" title="action.scheduler.26" iconClass="icon-stop" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                <gui text="action.scheduler.25" title="action.scheduler.26" iconClass="icon-stop" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_running_task"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var userSelection;
-                        if(window.actionArguments && window.actionArguments.length){
-                            userSelection = window.actionArguments[0];
-                        }else{
-                            userSelection =  pydio.getUserSelection();
-                        }
-                        var taskId = userSelection.getUniqueNode().getMetadata().get("task_id");
-                        var task = new PydioTasks.Task({id:taskId});
-                        task.stop();
-                    ]]></clientCallback>
+                    <clientCallback module="SchedulerActions.Callbacks.stopTask"/>
                 </processing>
             </action>
             <action name="scheduler_fakeLongTask">

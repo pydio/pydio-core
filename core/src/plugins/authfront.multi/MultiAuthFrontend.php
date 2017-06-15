@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -59,23 +59,30 @@ class MultiAuthFrontend extends AbstractAuthFrontend
     protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         parent::parseSpecificContributions($ctx, $contribNode);
-        if ($contribNode->nodeName != "actions") return;
         $sources = array();
 
         if (!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])
             || (isSet($this->options["MODE"]) && $this->options["MODE"] == "MASTER_SLAVE")
         ) {
 
-            $actionXpath = new DOMXPath($contribNode->ownerDocument);
-            $action = $actionXpath->query('action[@name="login"]', $contribNode);
+            $contribXpath = new DOMXPath($contribNode->ownerDocument);
+
+            $action = $contribXpath->query('action[@name="login"]', $contribNode);
             if ($action->length) {
                 $action = $action->item(0);
                 $contribNode->removeChild($action);
             }
+
+            $clientConfigs = $contribXpath->query('component_config', $contribNode);
+            if($clientConfigs->length){
+                $contribNode->removeChild($clientConfigs->item(0));
+            }
+
             return;
 
         }
 
+        if ($contribNode->nodeName != "actions") return;
         $actionXpath = new DOMXPath($contribNode->ownerDocument);
         $loginCallbackNodeList = $actionXpath->query('//clientCallback', $contribNode);
         $callbackNode = $loginCallbackNodeList->item(0);

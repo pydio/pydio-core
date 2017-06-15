@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -20,9 +20,11 @@
  */
 namespace Pydio\Core\Http\Response;
 
+use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -160,12 +162,15 @@ class FileReaderResponse extends AsyncResponseStream
         if($this->preRead){
             call_user_func($this->preRead);
         }
-
-        $this->readFile($this->node, $this->file, $this->data, $this->headerType, $this->localName, $this->offset, $this->length);
-
-        if($this->postRead){
-            call_user_func($this->postRead);
+        try{
+            $this->readFile($this->node, $this->file, $this->data, $this->headerType, $this->localName, $this->offset, $this->length);
+            if($this->postRead){
+                call_user_func($this->postRead);
+            }
+        }catch (PydioException $e){
+            Logger::error('FileReader', 'Read Data', $e->getMessage()." ".$e->getTraceAsString());
         }
+
     }
 
     /**
@@ -187,7 +192,7 @@ class FileReaderResponse extends AsyncResponseStream
         }
 
         if($data === null && !file_exists($filePathOrData)){
-            throw new \Exception("File $filePathOrData not found!");
+            throw new FileNotFoundException($filePathOrData);
         }
         $confGzip               = ConfService::getGlobalConf("GZIP_COMPRESSION");
         $confGzipLimit          = ConfService::getGlobalConf("GZIP_LIMIT");

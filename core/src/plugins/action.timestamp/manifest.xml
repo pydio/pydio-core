@@ -2,7 +2,7 @@
 <ajxp_plugin id="action.timestamp"  enabled="false" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
         <core_relation packaged="true" tested_version="7.0"/>
-        <plugin_author>FDecourt</plugin_author>
+        <plugin_author>FDecourt / Charles du Jeu</plugin_author>
         <plugin_version>1.0</plugin_version>
     </plugin_info>
 	<class_definition filename="plugins/action.timestamp/TimestampCreator.php" classname="Pydio\Action\Timestamp\TimestampCreator"/>
@@ -10,12 +10,13 @@
         <resources>
             <img_library alias="timestamp_images" path="plugins/action.timestamp/images"/>
             <i18n path="plugins/action.timestamp/i18n" namespace="timestamp"/>
+            <js file="plugins/action.timestamp/res/build/TimestampActions.js" className="TimestampActions"/>
         </resources>
 	</client_settings>
 
 
 	<server_settings>
-		<global_param name="TIMESTAMP_URL" type="string" label="CONF_MESSAGE[Timestamp provider API URL]" description="CONF_MESSAGE[URL]" mandatory="true"/>
+		<global_param name="TIMESTAMP_URL" type="string" label="CONF_MESSAGE[Timestamp provider API URL]" description="CONF_MESSAGE[URL]" mandatory="true" default="https://ws.universign.eu/tsa/post/"/>
 		<global_param name="USER" type="string" label="CONF_MESSAGE[User Mail]" description="CONF_MESSAGE[User account]" mandatory="true"/>
 		<global_param name="PASS" type="password" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User Password]" mandatory="true"/>
 	</server_settings>
@@ -23,59 +24,20 @@
 
 	<registry_contributions>
 		<actions>
-			<action name="get_timestamp">
-                               <gui text="443" title="443" src="timestamp_images/actions/ICON_SIZE/horo.png" hasAccessKey="false">
-				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change" inZip="false">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" image="true" editable="true"></selectionContext>
-			</gui>
-
-			<processing>
-                <clientCallback prepareModal="true"><![CDATA[
-
-                        var onLoad = function(oForm){
-                             $(oForm).getElementsBySelector('span[id="timestamp_message"]')[0].innerHTML = "CONF_MESSAGE[msgBox1]";
-                        };
-                       var onok = function(){
-                            var oForm = modal.getForm();
-                            var userSelection = ajaxplorer.getUserSelection();
-                            var selected = userSelection.getFileNames()
-
-						var conn = new Connexion();
-						conn.addParameter('get_action', 'get_timestamp');
-						conn.addParameter('file', selected);
-						conn.addParameter('dir', userSelection.getContextNode().getPath());
-						conn.onComplete = function(transport){
-							this.parseXmlMessage(transport.responseXML);
-						};
-						conn.sendSync();
-
-						hideLightBox(true);
-                        ajaxplorer.fireContextRefresh()
-						return false;
-					};
-
-				var closeFunc = function(){
-                    hideLightBox();
-                    return false;
-                };
-
-				modal.showDialogForm('Horodater', 'timestamp_form', onLoad, onok);
-
-				]]></clientCallback>
-
-
-				<clientForm id="timestamp_form"><![CDATA[
-				<div id="timestamp_form" action="get_timestamp" box_width="200">
-				<span id="timestamp_message"></span>
-				</div>				]]></clientForm>
-
-
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-			</action>
+            <action name="get_timestamp">
+                <gui text="timestamp.6" title="timestamp.6" hasAccessKey="false" iconClass="mdi mdi-timer">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="change" inZip="false">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" image="true" editable="true"></selectionContext>
+                </gui>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="true"/>
+                <processing>
+                    <clientCallback module="TimestampActions.Callbacks.getTimestamp"/>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
 
 		</actions>
         <extensions>

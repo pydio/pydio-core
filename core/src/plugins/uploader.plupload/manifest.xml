@@ -8,6 +8,7 @@
 	<class_definition filename="plugins/uploader.plupload/Pluploader.php" classname="Pydio\Uploader\Processor\Pluploader"/>
 	<client_settings>
 		<resources>
+            <js file="plugins/uploader.plupload/js/build/UploaderView.js" className="PLUploaderView" depends="React"/>
 	        <i18n namespace="plupload" path="plugins/uploader.plupload/i18n" />
 		</resources>
 	</client_settings>
@@ -35,17 +36,6 @@
         <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|action.quicksend"/>
     </dependencies>
     <processing>
-		<clientForm id="plupload_form"><![CDATA[
-			<!-- PLUPLOAD UPLOAD FORM -->
-			<div id="plupload_form" box_width="550" box_padding="0">
-			<div id="pluploadscreen">
-			<iframe id="pluploadframe" style="width:548px; height:330px; border:0px none;" frameborder="0" src=""></iframe>
-			</div>
-			</div>
-		]]></clientForm>
-		<dialogOnOpen><![CDATA[
-        var src = window.ajxpServerAccessPath + '&get_action=plupload_tpl&encode=false';
-        modal.getForm().down('#pluploadframe').src = src;
-		]]></dialogOnOpen>
+        <clientForm module="PLUploaderView.Uploader"/>
 	</processing>
 </uploader>

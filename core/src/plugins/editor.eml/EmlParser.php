@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -381,7 +381,7 @@ class EmlParser extends Plugin
 
         // Add the columns template definition
         $insert = new \DOMDocument("1.0", "UTF-8");
-        $config = "<client_configs><component_config className=\"FilesList\" local=\"true\">$config</component_config></client_configs>";
+        $config = "<client_configs><component_config component=\"FilesList\" local=\"true\">$config</component_config></client_configs>";
         $insert->loadXML($config);
         $imported = $dom->importNode($insert->documentElement, true);
         $dom->documentElement->appendChild($imported);

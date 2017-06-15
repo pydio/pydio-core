@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -28,4 +28,6 @@ $mess=array(
 "Instance Params" => "Paramêtre d'instance",
 "Feed Instance" => "Feed Instance",
 "Choose the plugin" => "Choisir un plugin",
+"Display Workspaces Activity" => "Afficher l'activité des workspaces",
+"Display workspaces activity to the users in the right-hand information panel" => "Affiche un widget avec un flux d'activité dans le panneau d'information.",
 );

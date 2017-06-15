@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -24,5 +24,9 @@ $mess=array(
 "3" => "Déchiffrer le répertoire",
 "4" => "Décrpter les données du répertoire",
 "5" => "Chiffrer le répertoire",
-"6" => "Encrypter les données du répertoire"
+"6" => "Encrypter les données du répertoire",
+    "7" => "Enter the encryption key you have chosen when first encrypting this folder.",
+    "8" => "Encryption Key",
+    "9" => "Confirm Encryption Key",
+    "10" => "Choose an encryption key to make your data inaccessible by anyone but you. Be aware that if you loose the key, your data will be lost forever!",
 );

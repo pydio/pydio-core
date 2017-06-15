@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -82,7 +82,7 @@ class PluginCompression extends Plugin
             case "compression":
 
                 $archiveName = InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
-                $archiveFormat = $httpVars["type_archive"];
+                $archiveFormat = '.' . InputFilter::sanitize($httpVars["type_archive"], InputFilter::SANITIZE_ALPHANUM);
                 $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
                 $acceptedExtension = false;
                 foreach ($tabTypeArchive as $extensionArchive) {
@@ -189,7 +189,8 @@ class PluginCompression extends Plugin
 
             case "extraction":
 
-                $fileArchive = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["file"]), InputFilter::SANITIZE_DIRNAME);
+                //$fileArchive = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["file"]), InputFilter::SANITIZE_FILENAME);
+                $fileArchive = $userSelection->getUniqueFile();
                 $fileArchive = substr(strrchr($fileArchive, DIRECTORY_SEPARATOR), 1);
                 $authorizedExtension = array("tar" => 4, "gz" => 7, "bz2" => 8);
                 $acceptedArchive = false;

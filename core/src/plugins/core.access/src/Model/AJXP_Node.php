@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -262,7 +262,8 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function finishedUpdatingMetadata(){
         $this->_metadataBulkUpdate = false;
-        Controller::applyHook("node.meta_change", [&$this]);
+        $current = $this;
+        Controller::applyHook("node.meta_change", [&$current]);
     }
 
     /**
@@ -284,7 +285,8 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
         }
         if(!$this->_metadataBulkUpdate){
-            Controller::applyHook("node.meta_change", [&$this]);
+            $current = $this;
+            Controller::applyHook("node.meta_change", [&$current]);
         }
     }
 
@@ -304,7 +306,8 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             unset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace]);
         }
         if(!$this->_metadataBulkUpdate) {
-            Controller::applyHook("node.meta_change", [&$this]);
+            $current = $this;
+            Controller::applyHook("node.meta_change", [&$current]);
         }
     }
 
@@ -545,14 +548,15 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
                 if(is_object($driver)) $driver->detectStreamWrapper(true, $this->getContext());
             }
         }
-        Controller::applyHook("node.info.start", [&$this, $contextNode, $details, $forceRefresh]);
+        $current = $this;
+        Controller::applyHook("node.info.start", [&$current, $contextNode, $details, $forceRefresh]);
         if($this->nodeInfoLoaded && !$forceRefresh && (isSet($this->_metadata["ajxp_mime"]) || isSet($this->_metadata["mimestring_id"]))){
-            Controller::applyHook("node.info.nocache", [&$this, $contextNode, $details, $forceRefresh]);
+            Controller::applyHook("node.info.nocache", [&$current, $contextNode, $details, $forceRefresh]);
             return;
         }
-        Controller::applyHook("node.info", [&$this, $contextNode, $details, $forceRefresh]);
-        Controller::applyHook("node.info.end", [&$this, $contextNode, $details, $forceRefresh]);
-        Controller::applyHook("node.info.nocache", [&$this, $contextNode, $details, $forceRefresh]);
+        Controller::applyHook("node.info", [&$current, $contextNode, $details, $forceRefresh]);
+        Controller::applyHook("node.info.end", [&$current, $contextNode, $details, $forceRefresh]);
+        Controller::applyHook("node.info.nocache", [&$current, $contextNode, $details, $forceRefresh]);
         $this->nodeInfoLoaded = true;
         $this->nodeInfoLevel = $details;
     }
@@ -711,7 +715,8 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             return $this->_metadata["bytesize"];
         }else{
             $result = -1;
-            Controller::applyHook("node.size.recursive", [&$this, &$result]);
+            $current = $this;
+            Controller::applyHook("node.size.recursive", [&$current, &$result]);
             if($result == -1){
                 try{
                     return $this->getDriver()->directoryUsage($this);

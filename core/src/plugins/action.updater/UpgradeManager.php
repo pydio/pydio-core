@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@ use dibi;
 use DibiException;
 use Exception;
 use PclZip;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\FileHelper;
@@ -88,7 +89,7 @@ class UpgradeManager
             "checkDownloadFolder" => "Checking download permissions",
             "downloadArchive" => "Downloading upgrade archive",
             "checkArchiveIntegrity" => "Checking archive integrity",
-            "checkTargetFolder" => "Checking folders permissions",
+            "checkTargetFolder" => "Checking files and folders permissions, this may take a while.",
             "extractArchive" => "Extracting Archive",
             "backupMarkedFiles" => "Backuping your modified files",
             "copyCodeFiles" => "Copying core source files",
@@ -161,8 +162,20 @@ class UpgradeManager
         } else {
             $json = FileHelper::getRemoteContent($url . "?channel=" . $channel . "&version=" . AJXP_VERSION . "&package=" . $packageName);
         }
-        if ($format == "php") return json_decode($json, true);
-        else return $json;
+        if($channel === 'test'){
+            $data = json_decode($json, true);
+            $package = $data['packages'][0];
+            $data['packages'][] = str_replace('0.0.0', '0.0.1', $package);
+            $data['packages'][] = str_replace('0.0.0', '0.0.2', $package);
+            $data['packages'][] = str_replace('0.0.0', '0.0.3', $package);
+            $json = json_encode($data);
+        }
+
+        if ($format == "php") {
+            return json_decode($json, true);
+        } else {
+            return $json;
+        }
     }
 
     /**
@@ -222,14 +235,19 @@ class UpgradeManager
     public function checkTargetFolder()
     {
         if (!is_writable(AJXP_INSTALL_PATH)) {
-            throw new Exception("The root install path is not writeable, no file will be overriden!
+            throw new PydioException("The root install path is not writeable, no file will be overriden!
             <br>When performing upgrades, first change the ownership (using chown) of the Pydio root folder
             to your web server account (e.g. www-data or apache) and propagate that ownership change to all
             Pydio sub-folders. <br>Run the upgrade again then, post upgrade, change the ownership back
             to the previous settings for all Pydio folders, <b>except for the data/ folder</b> that must stay
             writeable by the web server.");
         }
-        return "OK";
+
+        $this->crawlPermissions(null, AJXP_INSTALL_PATH."/*.php");
+        $this->crawlPermissions(AJXP_INSTALL_PATH."/core");
+        $this->crawlPermissions(AJXP_INSTALL_PATH."/plugins");
+
+        return "Crawling folders core, plugins and files /*.php to check that all code files are writeable : OK";
     }
 
     /**
@@ -570,6 +588,96 @@ class UpgradeManager
         }
         print("Will replace the META_SOURCES options with the following : <br><pre>" . ($log) . "</pre>");
 
+    }
+
+    /**
+     * @throws DibiException
+     */
+    public static function executeLocalScripts(){
+
+        $workingDir = AJXP_INSTALL_PATH . '/' . AJXP_PLUGINS_FOLDER . '/action.updater/scripts';
+        $dbMismatch = ConfService::detectVersionMismatch();
+        if($dbMismatch !== false){
+            $conf = $dbMismatch['conf'];
+            $dbVersion = $dbMismatch['current'];
+            $targetDb = $dbMismatch['target'];
+
+            switch ($conf["driver"]) {
+                case "sqlite":
+                case "sqlite3":
+                    $ext = "sqlite";
+                    break;
+                case "postgre":
+                    $ext = "pgsql";
+                    break;
+                case "mysql":
+                    $ext = "mysql";
+                    break;
+                default:
+                    throw new PydioException("ERROR!, DB driver " . $conf["driver"] . " not supported yet");
+            }
+
+            dibi::connect($conf);
+            for($i = $dbVersion + 1; $i <= $targetDb; $i++ ){
+                $versionUpgrade = $workingDir.'/sql/'.$i.'.'.$ext;
+                $result[] = 'Applying script for DB version '.$i;
+                if(file_exists($versionUpgrade)){
+                    // Apply Upgrade Script
+                    $sqlInstructions = file_get_contents($versionUpgrade);
+                    $parts = array_map("trim", explode("/* SEPARATOR */", $sqlInstructions));
+                    dibi::begin();
+                    foreach ($parts as $sqlPart) {
+                        if (empty($sqlPart)) continue;
+                        dibi::nativeQuery($sqlPart);
+                        $result[] = ' - ' . $sqlPart;
+                    }
+                    dibi::commit();
+                }
+            }
+            dibi::disconnect();
+
+        }
+
+        $phpUpgrade = $workingDir . '/php/' . AJXP_VERSION . '.php';
+        if(file_exists($phpUpgrade)){
+            include_once($phpUpgrade);
+            $result[] = 'Applied specific script for version '.AJXP_VERSION;
+        }
+        ConfService::clearAllCaches();
+        return $result;
+    }
+
+    /**
+     * Crawl all files permissions to make sure they are writeable.
+     * @param $path
+     * @param null $glob
+     * @throws PydioException
+     */
+    public function crawlPermissions($path, $glob = null){
+
+        @set_time_limit(1000);
+        $error = false;
+        if($glob !== null){
+            $files = glob($glob);
+            foreach($files as $file){
+                if(!is_writeable($file)){
+                    $error = $file;
+                    break;
+                }
+            }
+        }else{
+            $directory = new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS);
+            $iterator = new \RecursiveIteratorIterator($directory);
+            foreach ($iterator as $info) {
+                if(!is_writable($info->getPathname())){
+                    $error = $info->getPathname();
+                    break;
+                }
+            }
+        }
+        if($error){
+            throw new PydioException("Crawling folder $path to check all files are writeable : File $info FAIL! Please make sure that the whole tree is currently writeable by the webserver, or upgrade may probably fail at one point.");
+        }
     }
 
     /**

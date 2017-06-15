@@ -21,7 +21,7 @@ RewriteRule (.*) index.php [L]
 # to make sure that authorization is transmitted.
 # Just remove the # at the beginning of the line
 
-SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+#SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 
 </IfModule>
 

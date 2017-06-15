@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -230,11 +230,15 @@ class SimpleUpload extends Plugin
             return;
         }
         $nodesDiff = new NodesDiff();
+        $consumeChannel = '';
         if(isSet($result["CREATED_NODE"])){
             $nodesDiff->add($result["CREATED_NODE"]);
         }
         if(isSet($result["UPDATED_NODE"])){
             $nodesDiff->update($result["UPDATED_NODE"]);
+        }
+        if(isSet($result["CONSUME_CHANNEL"])){
+            $consumeChannel = '<consume_channel/>';
         }
 
         if (isSet($httpVars["simple_uploader"])) {
@@ -246,7 +250,7 @@ class SimpleUpload extends Plugin
             } else {
                 print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext();");
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
-                    $s = '<tree>' . $nodesDiff->toXML() . '</tree>';
+                    $s = '<tree>' . $nodesDiff->toXML() . $consumeChannel . '</tree>';
                     $response->getBody()->write("\n var resultString = '".str_replace("'", "\'", $s)."'; var resultXML = parent.parseXml(resultString);");
                     $response->getBody()->write("\n parent.PydioApi.getClient().parseXmlMessage(resultXML);");
                 }
@@ -264,7 +268,7 @@ class SimpleUpload extends Plugin
                     $nodesDiffXML = $nodesDiff->toXML();
                 }
                 $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
-                $response->getBody()->write(XMLHelper::wrapDocument($nodesDiffXML));
+                $response->getBody()->write(XMLHelper::wrapDocument($nodesDiffXML . $consumeChannel));
 
                 /* for further implementation */
                 if (!isSet($result["PREVENT_NOTIF"])) {

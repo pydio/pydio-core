@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -36,6 +36,7 @@ use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
@@ -59,6 +60,7 @@ class UsersManager extends AbstractManager
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
      * @return ResponseInterface
+     * @throws PydioException
      */
     public function peopleApiActions(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
 
@@ -70,6 +72,7 @@ class UsersManager extends AbstractManager
                 // Create a user
                 $uLogin = basename($path);
                 $gPath  = dirname($path);
+                if($gPath === '.' || $gPath === '/.'  || empty($gPath)) $gPath = "/";
                 $requestInterface = $requestInterface
                     ->withAttribute("action", "create_user")
                     ->withParsedBody([
@@ -123,6 +126,11 @@ class UsersManager extends AbstractManager
                     case "userProfile":
                         $newAction = "update_user_profile";
                         $newVars["profile"] = $paramValue;
+                        break;
+                    case "userGroupPath":
+                        $newAction = "user_update_group";
+                        $newVars["file"] = basename($path);
+                        $newVars["group_path"] = $paramValue;
                         break;
                     case "userLock":
                         list($lockType, $lockValue) = explode(":", $paramValue);
@@ -309,7 +317,7 @@ class UsersManager extends AbstractManager
                 $repositoryId   = isSet($httpVars["repository_id"]) ? InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM) : null;
                 $rightString    = isSet($httpVars["right"]) ? InputFilter::sanitize($httpVars["right"], InputFilter::SANITIZE_ALPHANUM) : null;
 
-                if(empty($userId) || empty($repositoryId) || empty($rightString) || !UsersService::userExists($userId)) {
+                if($userId === null || $repositoryId === null || $rightString === null || !UsersService::userExists($userId)) {
 
                     $userMessage    = new UserMessage($mess["ajxp_conf.61"], LOG_LEVEL_ERROR);
                     $xmlMessage     = new XMLMessage("<update_checkboxes user_id=\"".$userId."\" repository_id=\"".$repositoryId."\" read=\"old\" write=\"old\"/>");
@@ -324,7 +332,7 @@ class UsersManager extends AbstractManager
                     AuthService::updateSessionUser($user);
                 }
                 $userMessage    = new UserMessage($mess["ajxp_conf.46"].$userId);
-                $xmlMessage     = new XMLMessage("<update_checkboxes user_id=\"".$userId."\" repository_id=\"".$repositoryId."\" read=\"".$user->canRead($repositoryId)."\" write=\"".$repositoryId."\"/>");
+                $xmlMessage     = new XMLMessage("<update_checkboxes user_id=\"".$userId."\" repository_id=\"".$repositoryId."\" read=\"".($user->canRead($repositoryId)?"1":"0")."\" write=\"".($user->canWrite($repositoryId)?"1":"0")."\"/>");
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage, $xmlMessage]));
 
                 break;
@@ -386,7 +394,7 @@ class UsersManager extends AbstractManager
                 $userId         = isSet($httpVars["user_id"]) ? InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS) : null;
                 $roleId         = isSet($httpVars["role_id"]) ? InputFilter::sanitize($httpVars["role_id"]) : null;
 
-                if (empty($userId) || empty($roleId) || !UsersService::userExists($userId) || !RolesService::getRole($roleId)) {
+                if ($userId === null || $roleId === null || !UsersService::userExists($userId) || !RolesService::getRole($roleId)) {
                     throw new PydioException($mess["ajxp_conf.61"]);
                 }
                 $this->getUserIfAuthorized($ctx, $userId, false);
@@ -602,6 +610,7 @@ class UsersManager extends AbstractManager
                 // Action for updating all Pydio's user from ldap in CLI mode
                 if((php_sapi_name() == "cli")){
                     // TODO : UPGRADE THIS TO NEW CLI FORMAT
+                    ApplicationState::$silenceInstantMessages = true;
                     $progressBar = new ProgressBarCLI();
                     $countCallback  = array($progressBar, "init");
                     $loopCallback   = array($progressBar, "update");
@@ -653,7 +662,7 @@ class UsersManager extends AbstractManager
             foreach($groups as $groupPath){
                 $groupPath = preg_replace('/^\/data\/users/', '', $groupPath);
                 if(empty($groupPath)){
-                    throw new PydioException("Oups trying to delete top-level role, there must be something wrong!");
+                    throw new PydioException("Trying to delete top-level role, there must be something wrong!");
                 }
                 $basePath = PathUtils::forwardSlashDirname($groupPath);
                 $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);

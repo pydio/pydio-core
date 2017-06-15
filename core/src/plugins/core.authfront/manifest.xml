@@ -4,4 +4,9 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="Pydio\Auth\Frontend\Core\FrontendsLoader" filename="plugins/core.authfront/FrontendsLoader.php"/>
+    <client_settings>
+        <resources>
+            <js className="AuthfrontCoreActions" file="plugins/core.authfront/res/build/AuthfrontCoreActions.js"/>
+        </resources>
+    </client_settings>
 </ajxpcore>

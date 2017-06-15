@@ -10,8 +10,8 @@
     <server_settings>
         <global_param type="button" name="INSTALL_SQL" choices="run_plugin_action:meta.syncable:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
         <param name="REPO_SYNCABLE" type="boolean" label="CONF_MESSAGE[Syncable Workspace]" description="CONF_MESSAGE[Workspace is syncable]" default="true" scope="repository" expose="true"/>
-        <param name="OBSERVE_STORAGE_CHANGES" type="boolean" label="Observe storage changes [Experimental]" description="Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio." default="false" expose="false"/>
-        <param name="OBSERVE_STORAGE_EVERY" type="integer" label="Observe storage changes every..." description="If previous option is set to Yes, this will trigger a storage indexation every X minutes. This can be heavy in memory, so it can be a good practice to use something between 5 and 60 minutes." default="5" expose="false"/>
+        <param name="OBSERVE_STORAGE_CHANGES" type="boolean" label="CONF_MESSAGE[Observe storage changes]" description="CONF_MESSAGE[Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio.]" default="false" expose="false"/>
+        <param name="OBSERVE_STORAGE_EVERY" type="integer" label="CONF_MESSAGE[Observe storage changes every...]" description="CONF_MESSAGE[If previous option is set to Yes, this will trigger a storage indexation every X minutes. This can be heavy in memory, so it can be a good practice to use something between 5 and 60 minutes.]" default="5" expose="false"/>
     </server_settings>
     <registry_contributions>
            <actions>

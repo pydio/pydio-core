@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -30,5 +30,11 @@ $mess=array(
 "6" => "A revisar",
 "7" => "Importante",
 "8" => "Urgente",
-"9" => "No Value",
+"9" => "Sin valor",
+"10" => "Nueva etiqueta o existente",
+"11" => "No hay metadatos, pulse para añadir",
+"12" => "Selección Múltiple:",
+"13" => "marque los campos que quiere actualizar, se aplicará en todos los archivos seleccionados",
+"14" => "Editar meta",
+"15" => "Guardar meta",
 );

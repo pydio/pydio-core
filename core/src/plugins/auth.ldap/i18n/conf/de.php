@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -58,7 +58,7 @@ $mess=array(
 "LDAP Server page size" => "LDAP-Server Anzahl Objekte",
 "Page size of LDAP Server" => "Anahl an Objekten, die bei einer Abfrage vom LDAP-Server geladen werden (PageSize)",
 "Search Users by Attribute" => "Attribut für Suche",
-"When looking for a user through autocomplete, search on a specific parameter instead of user ID" => "Benutzer über die Autovervollständigung anhand eines bestimmten Attributs suchen, statt über die Benutzer-ID.",
+"When looking for a user through autocomplete, search on a specific parameter instead of user ID" => "Verwenden Sie die Autovervollständigung, um Benutzer nicht nur anhand des Benutzernamens zu finden.",
 "Fake Member from..." => "Fake-Mitglied von...",
 "If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema." => "Falls es kein 'memberOf'-Attribut gibt kann es mit dieser Einstellung ein Attribut festgelegt werden. Geben Sie den Namen des Attributs ein, das abhängig vom Schema entweder MemberId, MemberUid oder das Member enthält.",
 "Role Prefix (for memberof)" => "Rollen-Prefix (von memberOf)",

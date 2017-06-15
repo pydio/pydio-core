@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -254,27 +254,32 @@ class Plugin implements \Serializable
     {
     }
     /**
+     * @param ContextInterface $context
      * @return bool
      */
-    public function isEnabled()
+    public function isEnabled($context = null)
     {
-        if(isSet($this->enabled)) return $this->enabled;
-        $this->enabled = true;
-        if(isSet($this->cachedXPathResults["@enabled"])){
-            $value = $this->cachedXPathResults["@enabled"];
-            if($value === "false"){
-                $this->enabled = false;
+        if(!isSet($this->enabled)){
+            $this->enabled = true;
+            if (isSet($this->cachedXPathResults["@enabled"])){
+                $value = $this->cachedXPathResults["@enabled"];
+                if($value === "false"){
+                    $this->enabled = false;
+                }
+            } else if ($this->manifestLoaded) {
+                if($this->manifestXML != null) $this->unserializeManifest();
+                $l = $this->xPath->query("@enabled", $this->manifestDoc->documentElement);
+                if ($l->length && $l->item(0)->nodeValue === "false") {
+                    $this->enabled = false;
+                }
             }
+        }
+        if($context !== null && $context->hasUser()){
+            $repoScope = $context->hasRepository() ? $context->getRepositoryId() : AJXP_REPO_SCOPE_ALL;
+            return $context->getUser()->getMergedRole()->filterParameterValue($this->id, 'AJXP_PLUGIN_ENABLED', $repoScope, $this->enabled);
+        }else{
             return $this->enabled;
         }
-        if ($this->manifestLoaded) {
-            if($this->manifestXML != null) $this->unserializeManifest();
-            $l = $this->xPath->query("@enabled", $this->manifestDoc->documentElement);
-            if ($l->length && $l->item(0)->nodeValue === "false") {
-                $this->enabled = false;
-            }
-        }
-        return $this->enabled;
     }
 
     /**

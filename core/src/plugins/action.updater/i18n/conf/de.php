@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Update Engine" => "Versionsaktualisierung",
-"Automatic update of Pydio. Since version 3.3.3" => "Automatic update of Pydio. Since version 3.3.3",
+"Automatic update of Pydio. Since version 3.3.3" => "Automatische Aktualisierung von Pydio (ab Version 3.3.3)",
 "Update Site" => "Update-URL",
 "Where to update" => "Die Update-URL mit /pub/ wird für die Community-Version verwendet und /auth/ für die Enterprise-Version. Stellen Sie sicher, dass die Authentifizierungs-Informationen aus Ihrem Pydio.com-Zugang hinterlegt sind.",
 "Preserve Files" => "Dateien beibehalten",

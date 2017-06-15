@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -126,17 +126,15 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
      * @param Repository $repository
      * @return \Pydio\Tasks\Task[]
      */
-    public function getCurrentRunningTasks($user = null, $repository = null)
-    {
-        // TODO: Implement getCurrentRunningTasks() method.
+    public function getCurrentRunningTasks($user = null, $repository = null){
+        return [];
     }
 
     /**
      * @return Task[]
      */
-    public function getScheduledTasks()
-    {
-        // TODO: Implement getScheduledTasks() method.
+    public function getScheduledTasks(){
+        return [];
     }
 
     /**
@@ -144,7 +142,6 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
      * @return Task[]
      */
     public function getChildrenTasks($taskId){
-
     }
 
 }

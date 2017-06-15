@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -81,7 +81,7 @@ class AudioPreviewer extends Plugin
             if(!is_readable($node->getUrl())){
                 throw new FileNotFoundException($node->getPath());
             }
-            
+
 
             $aSyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($node){
 
@@ -104,8 +104,6 @@ class AudioPreviewer extends Plugin
             });
 
             $responseInterface = $responseInterface->withBody($aSyncReader);
-
-            //exit(1);
 
         } else if ($action == "ls") {
 

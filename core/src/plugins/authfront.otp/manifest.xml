@@ -9,7 +9,7 @@
     <client_settings>
         <resources>
             <i18n namespace="authfront.otp" path="plugins/authfront.otp/i18n"/>
-            <js className="OTP_LoginForm" file="plugins/authfront.otp/class.OTP_LoginForm.js" autoload="true"/>
+            <js className="OTPAuthfrontActions" file="plugins/authfront.otp/res/build/OTPAuthfrontActions.js"/>
             <css file="plugins/authfront.otp/configurator.css" autoload="true"/>
         </resources>
     </client_settings>
@@ -35,89 +35,19 @@
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
         <actions>
             <action name="otp_show_setup_screen">
-                <gui src="icon-key" iconClass="icon-key" text="authfront.otp.1" title="authfront.otp.1">
+                <gui iconClass="icon-key" text="authfront.otp.1" title="authfront.otp.1">
                     <context dir="true" recycle="false" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="otp_setup_screen" dialogOkButtonOnly="true" dialogSkipButtons="false">
-                        <dialogOnOpen><![CDATA[
-                            PydioApi.getClient().request({get_action:"otp_show_setup_screen"}, function(t){
-                                if(t.responseJSON){
-                                    modal.getForm().down("#google_otp").setValue(t.responseJSON.key);
-                                    React.render(
-                                        React.createElement(ReactQRCode, {
-                                            size:200,
-                                            value:t.responseJSON.qrcode,
-                                            level:'L'
-                                        }),
-                                        modal.getForm().down("#qrcode")
-                                    );
-                                }
-                            });
-                            modal.refreshDialogPosition();
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                            if(!modal.getForm().down("#google_otp_verification").getValue()){
-                                pydio.displayMessage('ERROR', 'Please set up verification code');
-                                return false;
-                            }
-                            PydioApi.getClient().request({
-                                get_action:"otp_show_setup_screen",
-                                step:"verify",
-                                otp:modal.getForm().down("#google_otp_verification").getValue()
-                            }, function(t){
-                                if(t.responseJSON && t.responseJSON.RESULT === "OK"){
-                                    location.reload();
-                                }
-                            });
-                        ]]></dialogOnComplete>
-                    </clientCallback>
-                    <clientForm id="otp_setup_screen"><![CDATA[
-                         <div id="otp_setup_screen" box_width="500">
-                            <div data:ajxp_message_id="authfront.otp.2">AJXP_MESSAGE[authfront.otp.2]</div>
-                            <div data:ajxp_message_id="authfront.otp.3">AJXP_MESSAGE[authfront.otp.3]</div>
-                            <div data:ajxp_message_id="authfront.otp.4">AJXP_MESSAGE[authfront.otp.4]</div>
-                            <div class="codes">
-                                <div id="qrcode"></div>
-                                <input id="google_otp" type="text"/>
-                            </div>
-                            <div class="verif">
-                                <div data:ajxp_message_id="authfront.otp.5">AJXP_MESSAGE[authfront.otp.5]</div>
-                                <input id="google_otp_verification" type="text"/>
-                            </div>
-                         </div>
-					]]></clientForm>
+                    <clientCallback module="OTPAuthfrontActions.Callbacks.setupScreen"/>
                     <serverCallback methodName="getConfigurationCode"/>
                 </processing>
             </action>
         </actions>
         <client_configs>
-            <template element="ajxp_desktop" name="otp_script" position="bottom"><![CDATA[
-            <script>
-                  document.observe("ajaxplorer:afterApply-login", function(){
-                    var f= modal.getForm();
-
-                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp").get('MODIFY_LOGIN_SCREEN');
-
-                    if(!enableModifyGUI) return;
-
-                    if(f.down('input[name="otp_code"]')){
-                        return;
-                    }
-                    try{
-                        var el = f.down('input[name="password"]').up("div.SF_element");
-                        var clone = el.cloneNode(true);
-                        el.insert({after:clone});
-                        var newField = clone.down('input[name="password"]');
-                        newField.writeAttribute('name', 'otp_code');
-                        newField.writeAttribute('data-ajxpLoginAdditionalParameter', 'true');
-                        clone.down('div.SF_label').update('Unique Code (6 digits)');
-                    }catch(e){
-                        if(console) console.log('Error while replacing OTP field', e);
-                    }
-                  });
-            </script>
-            ]]></template>
+            <component_config component="AuthfrontCoreActions.LoginPasswordDialog">
+                <modifier module="OTPAuthfrontActions.LoginDialogModifier"/>
+            </component_config>
         </client_configs>
     </registry_contributions>
 </authdriver>

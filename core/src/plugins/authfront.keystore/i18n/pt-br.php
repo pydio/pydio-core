@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -28,5 +28,5 @@ $mess = array(
 "6" => "Invalidar chaves de API existentes",
 "7" => "Tem certeza que deseja revogar esta(s) chave(s)?",
 "8" => "Chaves(s) removidas com sucesso!",
-"9" => "Dispositivos conectados em sua conta:",
+"9" => "Dispositivos conectados em sua conta",
 );

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2011 Pierre Wirtz
+ * Copyright 2007-2017 Pierre Wirtz
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -218,9 +218,6 @@ class LdapAuthDriver extends AbstractAuthDriver
             if ($this->ldapconn == null) {
                 $this->logError(__FUNCTION__, 'LDAP Server connexion could NOT be established');
             }
-            if ($this->ldapconn !== null && isSet($this->options["LDAP_PROTOCOL"]) && $this->options["LDAP_PROTOCOL"] === 'starttls') {
-                ldap_start_tls($this->ldapconn);
-            }
         }
     }
 
@@ -239,7 +236,16 @@ class LdapAuthDriver extends AbstractAuthDriver
         if ($ldapconn) {
             $this->logDebug(__FUNCTION__, 'ldap_connect(' . $this->ldapUrl . ',' . $this->ldapPort . ') OK');
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
-            //ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
+            ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
+            if (empty($this->pageSize) || !is_numeric($this->pageSize)) {
+                $this->pageSize = 500;
+            }
+            ldap_set_option($ldapconn, LDAP_OPT_SIZELIMIT, $this->pageSize);
+
+            if (isSet($this->options["LDAP_PROTOCOL"]) &&
+                $this->options["LDAP_PROTOCOL"] === 'starttls') {
+                ldap_start_tls($ldapconn);
+            }
 
             if ($this->ldapAdminUsername === null) {
                 //connecting anonymously
@@ -477,7 +483,8 @@ class LdapAuthDriver extends AbstractAuthDriver
      */
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
-        $check_cache = $this->getCountFromCache($baseGroup);
+        $cacheKey = $baseGroup . (!empty($regexp) ? "-" . $regexp : "");
+        $check_cache = $this->getCountFromCache($cacheKey);
         if ((is_array($check_cache) && $check_cache["count"] > 0)) {
             return $check_cache["count"];
         }
@@ -489,7 +496,7 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
 
         $res = $this->getUserEntries(StringHelper::regexpToLdap($regexp), true, null);
-        $this->saveCountToCache($res, $baseGroup);
+        $this->saveCountToCache($res, $cacheKey);
         $this->dynamicFilter = null;
         return $res["count"];
     }

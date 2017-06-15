@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ $mess=array(
 "File System (Standard)" => "Sistema de Ficheiros (padrão)",
 "The most standard access to a filesystem located on the server." => "O tipo de acesso padrão para aceder ao sistema de ficheiros do servidor.",
 "Path" => "Caminho",
-"Real path to the root folder on the server" => "Caminho Real para a raíz da pasta no servidor",
+"Absolute path to the folder on the server. You can use AJXP_DATA_PATH and AJXP_INSTALL_PATH to point to Pydio default data path and root install path." => "Absolute path to the folder on the server. You can use AJXP_DATA_PATH and AJXP_INSTALL_PATH to point to Pydio default data path and root install path.",
 "Create" => "Criar",
 "Create folder if it does not exists" => "Criar pasta caso esta não exista",
 "File Creation Mask" => "Máscara de criação de Ficheiro",

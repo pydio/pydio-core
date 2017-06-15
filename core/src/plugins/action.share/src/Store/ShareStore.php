@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,8 +24,10 @@ namespace Pydio\Share\Store;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\SqlConfDriver;
 
@@ -34,6 +36,7 @@ use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Crypto;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
@@ -47,7 +50,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class ShareStore {
 
-    var $sqlSupported = false;
     var $legacyPublicFolder;
     /**
      * @var int
@@ -76,10 +78,7 @@ class ShareStore {
         $this->legacyPublicFolder = $downloadFolder;
         $this->hashMinLength = $hashMinLength;
         $storage = ConfService::getConfStorageImpl();
-        if($storage->getId() == "conf.sql") {
-            $this->sqlSupported = true;
-            $this->confStorage = $storage;
-        }
+        $this->confStorage = $storage;
     }
 
     /**
@@ -110,9 +109,6 @@ class ShareStore {
      */
     public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null, $updateHash = null){
 
-        if(!$this->sqlSupported){
-            throw new \Pydio\Core\Exception\PydioException("Please setup an SQL connexion to use sharing features");
-        }
         $data = serialize($shareData);
         if($existingHash){
             $hash = $existingHash;
@@ -173,11 +169,9 @@ class ShareStore {
         $dlFolder = $this->legacyPublicFolder;
         $file = $dlFolder."/".$hash.".php";
         if(!is_file($file)) {
-            if($this->sqlSupported){
-                $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
-                if(!empty($data)){
-                    return $data;
-                }
+            $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
+            if(!empty($data)){
+                return $data;
             }
             return [];
         }
@@ -220,7 +214,6 @@ class ShareStore {
      * @throws \Exception
      */
     public function updateShareProperty($hash, $pName, $pValue){
-        if(!$this->sqlSupported) return false;
         $relatedObjectId = $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
         if(is_array($data)){
             $data[$pName] = $pValue;
@@ -236,7 +229,6 @@ class ShareStore {
      * @return array
      */
     public function findSharesForRepo($repositoryId){
-        if(!$this->sqlSupported) return [];
         $cursor = null;
         return $this->confStorage->simpleStoreList("share", $cursor, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
     }
@@ -265,17 +257,134 @@ class ShareStore {
      */
     public function listShares($limitToUser = '', $parentRepository = '', &$cursor = null, $shareType = null){
 
-        $dbLets = [];
-        if($this->sqlSupported){
-            // Get DB files
-            $dbLets = $this->confStorage->simpleStoreList(
-                "share",
-                $cursor,
-                "",
-                "serial",
-                (!empty($limitToUser)?'%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%':''),
-                $parentRepository);
+        // Get DB files
+        $dataLikes = [];
+        $childParameters = [];
+
+        if(!empty($limitToUser) && $limitToUser !== '__GROUP__'){
+            $childParameters['user_id'] = $limitToUser;
+            $dataLikes[] = '%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%';
         }
+        if(!empty($shareType) && $shareType !== '__GROUP__'){
+            $childParameters['share_type'] = $shareType;
+            $dataLikes[] = '%"SHARE_TYPE";s:'.strlen($shareType).':"'.$shareType.'"%';
+        }
+        if($parentRepository !== '' && $parentRepository !== '__GROUP__'){
+            $childParameters['parent_repository_id'] = $parentRepository;
+        }
+        if($parentRepository === '__GROUP__'){
+
+            $result = [];
+            $counts = $this->confStorage->simpleStoreCount('share', '', 'serial', $dataLikes, '', true);
+            foreach($counts as $repoId => $count){
+                $repoObject = RepositoryService::getRepositoryById($repoId);
+                if(!empty($repoObject)){
+                    $params = $childParameters;
+                    $params['parent_repository_id'] = $repoId;
+                    $result[$repoId] = [
+                        'label' => $repoObject->getDisplay(),
+                        'count' => $count,
+                        'child_parameters' => $params
+                    ];
+                }
+            }
+            usort($result, function($a, $b){
+                return $a['count'] === $b['count'] ? 0 : $a['count'] > $b['count'] ? -1 : 1 ;
+            });
+            return $result;
+
+        }else if($shareType === '__GROUP__'){
+
+            $dataLikesMini = $dataLikesRepo = $dataLikes;
+            $paramsMini = $paramsRepo = $childParameters;
+            $paramsMini['share_type'] = 'minisite';
+            $paramsRepo['share_type'] = 'repository';
+            $dataLikesRepo[] = '%"SHARE_TYPE";s:10:"repository"%';
+            $dataLikesMini[] = '%"SHARE_TYPE";s:8:"minisite"%';
+            $repoCount = $this->confStorage->simpleStoreCount('share', '', 'serial', $dataLikesRepo, $parentRepository);
+            $linksCount = $this->confStorage->simpleStoreCount('share', '', 'serial', $dataLikesMini, $parentRepository);
+            $result = [];
+            $mess = LocaleService::getMessages();
+            if($repoCount){
+                $result['repository'] = [
+                    'label' => $mess['share_center.244'],
+                    'count' => $repoCount,
+                    'child_parameters' => $paramsRepo
+                ];
+            }
+            if($linksCount){
+                $result['minisite'] = [
+                    'label' => $mess['share_center.243'],
+                    'count' => $linksCount,
+                    'child_parameters' => $paramsMini
+                ];
+            }
+            usort($result, function($a, $b){
+                return $a['count'] === $b['count'] ? 0 : $a['count'] > $b['count'] ? -1 : 1 ;
+            });
+            return $result;
+
+        }else if($limitToUser === '__GROUP__'){
+
+            // Build whole list
+            $params = $childParameters;
+            $userLikes = $dataLikes;
+            $params['user_context'] = 'user';
+            $namespace = AJXP_CACHE_SERVICE_NS_SHARED;
+            $cacheKey = "shareslist" . "-" . StringHelper::slugify(json_encode(array_merge($dataLikes, ["parent-repo-id" => $parentRepository])));
+
+
+            $users = [];
+            if(CacheService::contains($namespace, $cacheKey)){
+
+                $users = CacheService::fetch($namespace, $cacheKey);
+
+            }else{
+
+                $callbackFunction = function($objectId, $shareData) use (&$users, $cursor, $params) {
+
+                    $ownerID = $shareData['OWNER_ID'];
+                    if(empty($ownerID)) return false;
+                    if(!$users[$ownerID]){
+                        $userObject = UsersService::getUserById($ownerID, false);
+                        if(!$userObject instanceof UserInterface) return false;
+                        $users[$ownerID] = [
+                            'label'=> UsersService::getUserPersonalParameter('USER_DISPLAY_NAME', $userObject, 'core.conf', $ownerID),
+                            'count'=> 0,
+                            'child_parameters' => array_merge($params, ['user_id' => $ownerID])
+                        ];
+                    }
+                    $users[$ownerID]['count'] ++;
+                    return false;
+                };
+
+                $c = null;
+                $this->confStorage->simpleStoreList('share', $c, "", "serial", $userLikes, $parentRepository, $callbackFunction);
+
+                usort($users, function($a, $b){
+                    return $a['count'] === $b['count'] ? 0 : $a['count'] > $b['count'] ? -1 : 1 ;
+                });
+
+                CacheService::save($namespace, $cacheKey, $users, 600);
+
+            }
+
+
+
+            $cursor['total'] = count($users);
+            $result = array_slice($users, $cursor[0], $cursor[1]);
+            return $result;
+
+        }
+
+        $dbLets = $this->confStorage->simpleStoreList(
+            "share",
+            $cursor,
+            "",
+            "serial",
+            $dataLikes,
+            $parentRepository
+        );
 
         // Update share_type and filter if necessary
         foreach($dbLets as $id => &$shareData){
@@ -283,12 +392,14 @@ class ShareStore {
                 unset($dbLets[$id]);
                 continue;
             }
+            /*
             $this->updateShareType($shareData);
             if(!empty($shareType) && $shareData["SHARE_TYPE"] != $shareType){
                 unset($dbLets[$id]);
             }
+            */
         }
-
+        /*
         if(empty($shareType) || $shareType == "repository"){
             // BACKWARD COMPATIBILITY: collect old-school shared repositories that are not yet stored in simpleStore
             $storedIds = [];
@@ -336,8 +447,73 @@ class ShareStore {
                 $cursor["total"] += $count;
             }
         }
+        */
 
         return $dbLets;
+    }
+
+    /**
+     * List all shares persisted in DB and on file.
+     * @param string $parentRepository
+     * @param ShareRightsManager $rightsManager
+     * @param bool $dryRun
+     * @return array
+     */
+    public function migrateInternalSharesToStore($parentRepository = '', $rightsManager, $dryRun = true){
+
+        $cursor = null;
+        // Get DB files
+        $dbLets = $this->confStorage->simpleStoreList( "share", $cursor, "", "serial", "", $parentRepository);
+
+        // Update share_type and filter if necessary
+        foreach($dbLets as $id => &$shareData){
+            if($shareData === false){
+                unset($dbLets[$id]);
+                continue;
+            }
+            $this->updateShareType($shareData);
+        }
+
+        $toStore = [];
+        // Collect pure shared repositories that are not stored in SimpleStore
+        $storedIds = [];
+        foreach($dbLets as $share){
+            if(is_string($share["REPOSITORY"])) $storedIds[] = $share["REPOSITORY"];
+            else if (is_object($share["REPOSITORY"])) $storedIds[] = $share["REPOSITORY"]->getUniqueId();
+        }
+        // Find repositories that would have a parent
+        $criteria = [];
+        $criteria["parent_uuid"] = ($parentRepository == "" ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
+        if(count($storedIds)){
+            $criteria["!uuid"] = $storedIds;
+        }
+        $oldRepos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
+        foreach($oldRepos as $sharedWorkspace){
+            $permissions = $rightsManager->computeSharedRepositoryAccessRights($sharedWorkspace->getId(), true);
+            $groups = array_filter($permissions, function($u){return $u['TYPE'] === 'group';});
+            $users  = array_filter($permissions, function($u){return empty($u['HIDDEN']) && $u['TYPE'] === 'user';});
+            if(!count($users) && !count($groups)){
+                continue;
+            }
+            $repoId = "repo-".$sharedWorkspace->getUniqueId();
+            $shareData = [
+                "SHARE_TYPE"    => "repository",
+                "OWNER_ID"      => $sharedWorkspace->getOwner(),
+                "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
+                "USERS_COUNT"   => count($users),
+                "GROUPS_COUNT"  => count($groups)
+            ];
+            $parentId = $sharedWorkspace->getParentId();
+            if(!$dryRun){
+                // STORE NOW
+                $this->storeShare($parentId, $shareData, "repository", $repoId);
+            }else{
+                $shareData["PARENT_ID"] = $parentId;
+            }
+            $toStore[$repoId] = $shareData;
+        }
+
+        return $toStore;
     }
 
     /**
@@ -412,17 +588,15 @@ class ShareStore {
                 }
                 $this->getMetaManager()->removeShareFromMeta($ajxpNode, $element);
             }
-            if($this->sqlSupported){
-                if(isSet($share) && count($share)){
-                    $this->confStorage->simpleStoreClear("share", $element);
-                }else{
-                    $shares = $this->findSharesForRepo($element);
-                    if(count($shares)){
-                        $keys = array_keys($shares);
-                        $this->confStorage->simpleStoreClear("share", $keys[0]);
-                        if($ajxpNode != null){
-                            $this->getMetaManager()->removeShareFromMeta($ajxpNode, $keys[0]);
-                        }
+            if(isSet($share) && count($share)){
+                $this->confStorage->simpleStoreClear("share", $element);
+            }else{
+                $shares = $this->findSharesForRepo($element);
+                if(count($shares)){
+                    $keys = array_keys($shares);
+                    $this->confStorage->simpleStoreClear("share", $keys[0]);
+                    if($ajxpNode != null){
+                        $this->getMetaManager()->removeShareFromMeta($ajxpNode, $keys[0]);
                     }
                 }
             }
@@ -456,7 +630,7 @@ class ShareStore {
             }
             if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
                 unlink($minisiteData["PUBLICLET_PATH"]);
-            }else if($this->sqlSupported){
+            }else{
                 $this->confStorage->simpleStoreClear("share", $element);
             }
             if($ajxpNode !== null){
@@ -476,7 +650,7 @@ class ShareStore {
             if ($publicletData!== false && isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"], $publicletData)) {
                 if(isSet($publicletData["PUBLICLET_PATH"]) && is_file($publicletData["PUBLICLET_PATH"])){
                     unlink($publicletData["PUBLICLET_PATH"]);
-                }else if($this->sqlSupported){
+                }else{
                     $this->confStorage->simpleStoreClear("share", $element);
                 }
             } else {
@@ -484,6 +658,13 @@ class ShareStore {
             }
         }
         return true;
+    }
+
+    /**
+     * @param $shareId
+     */
+    public function deleteShareEntry($shareId){
+        $this->confStorage->simpleStoreClear("share", $shareId);
     }
 
     /**
@@ -661,10 +842,8 @@ class ShareStore {
             if($fileExists) {
                 return true;
             }
-            if($this->sqlSupported) {
-                $this->confStorage->simpleStoreGet("share", $element, "serial", $data);
-                if(is_array($data)) return true;
-            }
+            $this->confStorage->simpleStoreGet("share", $element, "serial", $data);
+            if(is_array($data)) return true;
         }
         return false;
     }

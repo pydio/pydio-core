@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -21,8 +21,10 @@
 namespace Pydio\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Dav\DAVResponse;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Log\Core\Logger;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -77,7 +79,7 @@ class ShutdownScheduler
      * @return bool
      * @throws PydioException
      */
-    public function registerShutdownEventArray()
+    public function registerShutdownEvent()
     {
         $callback = func_get_args();
 
@@ -92,28 +94,58 @@ class ShutdownScheduler
         if (is_array($callback[1])) {
             foreach($callback[1] as $argument) $flattenArray[] = $argument;
         }
-        $this->callbacks[] = $flattenArray;
+        //$this->callbacks[] = $flattenArray;
+        $this->stackCallback($this->callbacks, $callback[0], $callback[1]);
         return true;
     }
 
     /**
-     * @return bool
-     * @throws PydioException
+     * @param array $callbacks
+     * @param callable $callable
+     * @param array $arguments
+     * @internal param array $cb
      */
-    public function registerShutdownEvent()
-    {
-        $callback = func_get_args();
+    private function stackCallback(&$callbacks, callable $callable, array $arguments = []){
+        // Try to detect if callback is already registered
+        $found = false;
+        foreach($callbacks as $index => $callback){
+            $crtCallable = $callback[0];
+            if($crtCallable !== $callable){
+                continue;
+            }
+            $crtArgs = array_slice($callback, 1);
+            if(count($crtArgs) !== count($arguments)){
+                continue;
+            }
+            $argsDiffer = false;
+            foreach($arguments as $id => $argument){
+                $crtArgument = $crtArgs[$id];
+                if($crtArgument === $argument
+                    || ($argument instanceof AJXP_Node && $crtArgument instanceof AJXP_Node && $argument->getUrl() === $crtArgument->getUrl())
+                    || ($argument instanceof ContextInterface && $crtArgument instanceof ContextInterface && $argument->getStringIdentifier() === $crtArgument->getStringIdentifier())
+                ){
+                    // Ok they are similar
+                }else{
+                    $argsDiffer = true;
+                    break;
+                }
+            }
+            if($argsDiffer) {
+                continue;
+            }
+            $found = $index;
+            break;
+        }
+        if($found === false){
+            $callbacks[] = array_merge([$callable], $arguments);
+        }else{
+            $tmp = $callbacks[$found];
+            unset($callbacks[$found]);
+            $callbacks = array_values($callbacks);
+            $callbacks[] = $tmp;
+        }
 
-        if (empty($callback)) {
-            throw new PydioException('No callback passed to '.__FUNCTION__.' method');
-        }
-        if (!is_callable($callback[0])) {
-            throw new PydioException('Invalid callback ('.$callback[0].') passed to the '.__FUNCTION__.' method');
-        }
-        $this->callbacks[] = $callback;
-        return true;
     }
-
 
     /**
      * Trigger the schedulers

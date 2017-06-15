@@ -8,15 +8,16 @@
 
     <client_settings>
         <resources>
-            <js className="DemoDeathCounter" file="plugins/action.demo_counter/build/DemoDeathCounter.js" depends="React"/>
+            <js className="DemoDeathCounter" file="plugins/action.demo_counter/res/build/DemoDeathCounter.js" depends="React"/>
         </resources>
     </client_settings>
 
     <registry_contributions>
         <client_configs>
-            <template name="pydio-demo-death-counter" element="ajxp_desktop" position="bottom"><![CDATA[
-                <div id="demo-death-counter" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"DemoDeathCounter","componentName":"Panel"}'></div>
-            ]]></template>
+            <template name="pydio-demo-death-counter" element="ajxp_desktop" position="bottom" namespace="DemoDeathCounter" component="Counter" props='{}' />
+            <component_config component="AuthfrontCoreActions.LoginPasswordDialog">
+                <modifier module="DemoDeathCounter.LoginDialogModifier"/>
+            </component_config>
         </client_configs>
    </registry_contributions>
 

@@ -2,37 +2,8 @@
 
     class Loader{
 
-        hookAfterDelete(){
-            // Modify the Delete window
-            // Uses only pure-JS
-            document.observe("ajaxplorer:afterApply-delete", function(){
-                try{
-                    var u = pydio.getContextHolder().getUniqueNode();
-                    if(u.getMetadata().get("ajxp_shared")){
-                        var f = document.querySelectorAll("#generic_dialog_box #delete_message")[0];
-                        var alert = f.querySelectorAll("#share_delete_alert");
-                        if(!alert.length){
-                            var message;
-                            if(u.isLeaf()){
-                                message = global.MessageHash["share_center.158"];
-                            }else{
-                                message = global.MessageHash["share_center.157"];
-                            }
-                            f.innerHTML += "<div id='share_delete_alert' style='padding-top: 10px;color: rgb(192, 0, 0);'><span style='float: left;display: block;height: 60px;margin: 4px 7px 4px 0;font-size: 2.4em;' class='icon-warning-sign'></span>"+message+"</div>";
-                        }
-                    }
-                }catch(e){
-                    if(console) console.log(e);
-                }
-            });
-        }
-
         static loadInfoPanel(container, node){
-            if(!Loader.INSTANCE){
-                Loader.INSTANCE = new Loader();
-                Loader.INSTANCE.hookAfterDelete();
-            }
-            var mainCont = container.querySelectorAll("#ajxp_shared_info_panel .infoPanelTable")[0];
+            let mainCont = container.querySelectorAll("#ajxp_shared_info_panel .infoPanelTable")[0];
             mainCont.destroy = function(){
                 React.unmountComponentAtNode(mainCont);
             };
@@ -44,96 +15,25 @@
         }
     }
 
-    var InfoPanelInputRow = React.createClass({
-
-        propTypes: {
-            inputTitle: React.PropTypes.string,
-            inputValue: React.PropTypes.string,
-            inputClassName: React.PropTypes.string,
-            getMessage: React.PropTypes.func,
-            inputCopyMessage: React.PropTypes.object
-        },
-
-        getInitialState: function(){
-            return {copyMessage: null};
-        },
-
-        componentDidMount:function(){
-            this.attachClipboard();
-        },
-        componentDidUpdate:function(){
-            this.attachClipboard();
-        },
-
-        attachClipboard:function(){
-            if(this._clip){
-                this._clip.destroy();
-            }
-            if(!this.refs['copy-button']) {
-                return;
-            }
-            this._clip = new Clipboard(this.refs['copy-button'].getDOMNode(), {
-                text: function(trigger) {
-                    return this.props.inputValue;
-                }.bind(this)
-            });
-            this._clip.on('success', function(){
-                this.setState({copyMessage:this.props.getMessage(this.props.inputCopyMessage)}, this.clearCopyMessage);
-            }.bind(this));
-            this._clip.on('error', function(){
-                var copyMessage;
-                if( global.navigator.platform.indexOf("Mac") === 0 ){
-                    copyMessage = this.props.getMessage('144');
-                }else{
-                    copyMessage = this.props.getMessage('143');
-                }
-                this.refs['input'].getDOMNode().focus();
-                this.setState({copyMessage:copyMessage}, this.clearCopyMessage);
-            }.bind(this));
-        },
-
-        clearCopyMessage:function(){
-            global.setTimeout(function(){
-                this.setState({copyMessage:''});
-            }.bind(this), 3000);
-        },
+    const InfoPanelInputRow = React.createClass({
 
         render: function(){
-
-            let select = function(e){
-                e.currentTarget.select();
-            };
-
-            let copyMessage = null;
-            if(this.state.copyMessage){
-                var setHtml = function(){
-                    return {__html:this.state.copyMessage};
-                }.bind(this);
-                copyMessage = <div className="copy-message" dangerouslySetInnerHTML={setHtml()}/>;
-            }
             return (
                 <div className="infoPanelRow">
                     <div className="infoPanelLabel">{this.props.getMessage(this.props.inputTitle)}</div>
-                    <div className="infoPanelValue" style={{position:'relative'}}>
-                        <input
-                            ref="input"
-                            type="text"
-                            className={this.props.inputClassName}
-                            readOnly={true}
-                            onClick={select}
-                            value={this.props.inputValue}
-                        />
-                        <span ref="copy-button" title={this.props.getMessage('191')} className="copy-button icon-paste"/>
-                        {copyMessage}
-                    </div>
+                    <PydioComponents.ClipboardTextField
+                        {...this.props}
+                        underlineShow={false}
+
+                    />
                 </div>
             );
-
         }
 
     });
 
-    var TemplatePanel = React.createClass({
+
+    const TemplatePanel = React.createClass({
 
         propTypes: {
             node:React.PropTypes.instanceOf(AjxpNode),
@@ -152,18 +52,19 @@
             if(!editors.length){
                 return null;
             }
-
-            let tplString ;
-            let messKey = "61";
-            let newlink = ReactModel.Share.buildDirectDownloadUrl(this.props.node, this.props.publicLink, true);
-            let template = global.pydio.UI.getSharedPreviewTemplateForEditor(editors[0], this.props.node);
-            if(template){
-                tplString = template.evaluate({WIDTH:350, HEIGHT:350, DL_CT_LINK:newlink});
+            let newLink = ReactModel.Share.buildDirectDownloadUrl(this.props.node, this.props.publicLink, true);
+            let editor = FuncUtils.getFunctionByName(editors[0].editorClass, global);
+            if(editor && editor.getSharedPreviewTemplate){
+                return {
+                    messageKey:61,
+                    templateString:editor.getSharedPreviewTemplate(this.props.node, newLink, {WIDTH:350, HEIGHT:350, DL_CT_LINK:newLink})
+                };
             }else{
-                tplString = newlink;
-                messKey = "60";
+                return{
+                    messageKey:60,
+                    templateString:newLink
+                }
             }
-            return {messageKey:messKey, templateString:tplString};
 
         },
 
@@ -183,7 +84,7 @@
 
     });
 
-    var InfoPanel = React.createClass({
+    const InfoPanel = React.createClass({
 
         propTypes: {
             node:React.PropTypes.instanceOf(AjxpNode),
@@ -196,8 +97,23 @@
                 model : new ReactModel.Share(this.props.pydio, this.props.node)
             };
         },
+
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.node && nextProps.node !== this.props.node){
+                const model = new ReactModel.Share(this.props.pydio, nextProps.node);
+                this.setState({
+                    status:'loading',
+                    model : model
+                }, function(){
+                    model.observe("status_changed", this.modelUpdated);
+                    model.initLoad();
+                }.bind(this))
+            }
+        },
+
         componentDidMount:function(){
             this.state.model.observe("status_changed", this.modelUpdated);
+            this.state.model.initLoad();
         },
 
         modelUpdated: function(){
@@ -246,26 +162,37 @@
                     />;
                 }
             }
-            var users = this.state.model.getSharedUsers();
-            var sharedUsersEntries = [], remoteUsersEntries = [];
+            const users = this.state.model.getSharedUsers();
+            let sharedUsersEntries = [], remoteUsersEntries = [], sharedUsersBlock;
+            const {pydio} = this.props;
             if(users.length){
                 sharedUsersEntries = users.map(function(u){
-                    var rights = [];
+                    let rights = [];
                     if(u.RIGHT.indexOf('r') !== -1) rights.push(global.MessageHash["share_center.31"]);
                     if(u.RIGHT.indexOf('w') !== -1) rights.push(global.MessageHash["share_center.181"]);
+                    const userType = (u.TYPE === 'team' ? 'team' : (u.TYPE === 'group'  ? 'group' : 'user'))
                     return (
-                        <div key={u.ID} className="uUserEntry">
-                            <span className="uLabel">{u.LABEL}</span>
-                            <span className="uRight">{rights.join(' & ')}</span>
+                        <div key={u.ID} className="uUserEntry" title={rights.join(' & ')} style={{padding:'10px 0'}}>
+                            <PydioComponents.UserAvatar
+                                useDefaultAvatar={true}
+                                userId={u.ID}
+                                userLabel={u.LABEL}
+                                userType={userType}
+                                pydio={pydio}
+                                style={{flex:1, display:'flex', alignItems:'center'}}
+                                labelStyle={{fontSize: 15, paddingLeft: 10}}
+                                avatarSize={30}
+                                richOnHover={true}
+                            />
                         </div>
                     );
                 });
             }
-            var ocsLinks = this.state.model.getOcsLinks();
+            const ocsLinks = this.state.model.getOcsLinks();
             if(ocsLinks.length){
                 remoteUsersEntries = ocsLinks.map(function(link){
-                    var i = link['invitation'];
-                    var status;
+                    const i = link['invitation'];
+                    let status;
                     if(!i){
                         status = '214';
                     }else {
@@ -280,16 +207,25 @@
                     status = this.getMessage(status);
 
                     return (
-                        <div key={"remote-"+link.hash} className="uUserEntry">
-                            <span className="uLabel">{i.USER} @ {i.HOST}</span>
-                            <span className="uStatus">{status}</span>
+                        <div key={"remote-"+link.hash} className="uUserEntry" style={{padding:'10px 0'}}>
+                            <PydioComponents.UserAvatar
+                                useDefaultAvatar={true}
+                                userId={"remote-"+link.hash}
+                                userLabel={i.USER + '@'+ i.HOST}
+                                userType={'remote'}
+                                pydio={pydio}
+                                style={{flex:1, display:'flex', alignItems:'center'}}
+                                labelStyle={{fontSize: 15, paddingLeft: 10}}
+                                avatarSize={30}
+                                richOnHover={true}
+                            />
                         </div>
                     );
                 }.bind(this));
             }
             if(sharedUsersEntries.length || remoteUsersEntries.length){
-                var sharedUsersBlock = (
-                    <div className="infoPanelRow">
+                sharedUsersBlock = (
+                    <div className="infoPanelRow" style={{paddingTop:10}}>
                         <div className="infoPanelLabel">{this.getMessage('54')}</div>
                         <div className="infoPanelValue">
                             {sharedUsersEntries}
@@ -311,20 +247,48 @@
             }
 
             return (
-                <div>
+                <div style={{padding: 0}}>
+                    <div style={{padding: '0px 16px'}}>
                     {linkField}
                     {downloadField}
                     {templateField}
+                    </div>
+                    <div style={{padding: '0px 16px'}}>
                     {sharedUsersBlock}
                     {noEntriesFoundBlock}
+                    </div>
                 </div>
             );
         }
 
     });
 
+    const ReactInfoPanel = React.createClass({
+
+        render: function(){
+
+            let actions = [
+                <MaterialUI.FlatButton
+                    key="edit-share"
+                    label={this.props.pydio.MessageHash['share_center.125']}
+                    primary={true}
+                    onTouchTap={()=>{global.pydio.getController().fireAction("share-edit-shared");}}
+                />
+            ];
+
+            return (
+                <PydioWorkspaces.InfoPanelCard title={this.props.pydio.MessageHash['share_center.50']} actions={actions} icon="share-variant" iconColor="#009688" iconStyle={{fontSize:13, display:'inline-block', paddingTop:3}}>
+                    <InfoPanel {...this.props}/>
+                </PydioWorkspaces.InfoPanelCard>
+            );
+
+        }
+
+    });
+
     global.ShareInfoPanel = {};
     global.ShareInfoPanel.loader = Loader.loadInfoPanel;
+    global.ShareInfoPanel.InfoPanel = ReactInfoPanel;
 
 
 })(window);

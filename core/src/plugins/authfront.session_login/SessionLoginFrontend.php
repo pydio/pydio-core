@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ namespace Pydio\Auth\Frontend;
 use Exception;
 use Pydio\Core\Http\Message\ReloadRepoListMessage;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
@@ -46,12 +47,13 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
     /**
      * Override parent method : disable me if applicationFirstRun ( = installation steps ).
+     * @param ContextInterface $context
      * @inheritdoc
      */
-    function isEnabled()
+    function isEnabled($context = null)
     {
         if (ApplicationState::detectApplicationFirstRun()) return false;
-        return parent::isEnabled();
+        return parent::isEnabled($context);
     }
 
     /**
@@ -112,7 +114,15 @@ class SessionLoginFrontend extends AbstractAuthFrontend
         $secureToken = "";
         $loggedUser = null;
         $cookieLogin = (isSet($httpVars["cookie_login"]) ? true : false);
-        if (BruteForceHelper::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
+        $bruteForce = BruteForceHelper::suspectBruteForceLogin();
+        $captchaPassed = false;
+        if(isSet($httpVars["captcha_code"]) && empty($httpVars["captcha_code"])) {
+            $bruteForce = true;
+        }
+        if(isSet($httpVars["captcha_code"]) && !empty($httpVars["captcha_code"])){
+            $captchaPassed = CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]);
+        }
+        if ($bruteForce && !$captchaPassed) {
 
             $loggingResult = -4;
 

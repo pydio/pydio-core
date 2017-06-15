@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,5 +24,5 @@ $mess = array(
     "2" => "Aktuellen Ordner neu laden",
     "3" => "Der Download des Archivs sollte automatisch starten",
     "4" => "Archiv wird erstellt - %s%",
-    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
+    "5" => "Archiv zum Herunterladen konnte nicht gefunden werden! Ist das Zip-Programm auf dem Server installiert?",
 );

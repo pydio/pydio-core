@@ -63,7 +63,7 @@
     var initialized = false;
 
     var initUploaderExtension = function(){
-
+return;
         if(initialized) return;
         else initialized = true;
         let mainElement = global.pydio.Parameters.get('MAIN_ELEMENT');

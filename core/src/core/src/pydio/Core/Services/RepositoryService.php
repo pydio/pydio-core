@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -90,10 +90,15 @@ class RepositoryService
         if ($repositoryObject->isTemplate()) {
             return false;
         }
-        if (($repositoryObject->getAccessType()=="ajxp_conf" || $repositoryObject->getAccessType()=="ajxp_admin") && $userObject != null) {
+        $isAdminRepo = ($repositoryObject->getAccessType()==="ajxp_conf" || $repositoryObject->getAccessType()==="ajxp_admin");
+        if ($isAdminRepo && $userObject !== null) {
             if (UsersService::usersEnabled() && !$userObject->isAdmin()) {
                 return false;
             }
+        }
+        $adminURI = ConfService::getGlobalConf("ADMIN_URI");
+        if(ApplicationState::sapiIsCli() && !empty($adminURI) && (($isAdminRepo && !ApplicationState::isAdminMode()) || (!$isAdminRepo && ApplicationState::isAdminMode()))){
+            return false;
         }
         $repositoryId = $repositoryObject->getId();
         if ($repositoryObject->getAccessType()=="ajxp_user" && $userObject != null) {

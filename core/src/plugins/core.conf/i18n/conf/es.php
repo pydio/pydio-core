@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@ $mess=array(
 "Name" => "Nombre",
 "Full name displayed to others" => "Mostrar el nombre completo a los demás",
 "Avatar" => "Avatar",
-"Image displayed next to the user name" => "Imagen mostrada junto al nombre de usuario",
+"Image displayed next to the user name" => "Imágen mostrada junto al nombre de usuario",
 "Email" => "Correo electrónico",
 "Address used for notifications" => "Dirección utilizada para las notificaciones",
 "Country" => "País",
@@ -88,8 +88,8 @@ $mess=array(
 "Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex." => "Roles ocultos en la lista. Lista separada por ',' o empezar con 'preg: ' para expresiones regulares regex.",
 "Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex." => "Roles que deben mostrarse en la lista. Lista separada por ',' o empezar con 'preg: ' para expresiones regulares regex.",
 "External Users Creation" => "Creación de usuarios externos",
-"Always override other roles, included group roles." => "Always override other roles, included group roles.",
-"Always Override" => "Always Override",
-"Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP." => "Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP.",
-"Make regexp mandatory" => "Make regexp mandatory",
+"Always override other roles, included group roles." => "Ignorar siempre otros roles, incluido los roles de grupo.",
+"Always Override" => "Ignorar Siempre",
+"Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP." => "No cargar la lista de grupos y usuarios si no se introduce una regexp. Evita enviar búsquedas largas a LDAP.",
+"Make regexp mandatory" => "Regexp obligatorio",
 );

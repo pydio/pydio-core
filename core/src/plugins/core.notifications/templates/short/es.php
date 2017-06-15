@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -20,10 +20,10 @@
 */
 //      spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2016
 $mess=array(
-"file.add" => "Fichero AJXP_NODE_LABEL creado en AJXP_PARENT_PATH",
-"file.delete" => "Fichero AJXP_NODE_LABEL eliminado de AJXP_PARENT_PATH",
-"file.change" => "Fichero AJXP_NODE_LABEL modificado por AJXP_USER",
-"file.view" => "Fichero AJXP_NODE_LABEL consultado por AJXP_USER",
+"file.add" => "Archivo AJXP_NODE_LABEL creado en AJXP_PARENT_PATH",
+"file.delete" => "Archivo AJXP_NODE_LABEL eliminado de AJXP_PARENT_PATH",
+"file.change" => "Archivo AJXP_NODE_LABEL modificado por AJXP_USER",
+"file.view" => "Archivo AJXP_NODE_LABEL consultado por AJXP_USER",
 "file.copy_to" => "AJXP_NODE_LABEL copiado a AJXP_TARGET_FOLDER",
 "file.copy_from" => "AJXP_NODE_LABEL copiado desde AJXP_SOURCE_FOLDER",
 "file.move_to" => "AJXP_NODE_LABEL movido a AJXP_TARGET_FOLDER",
@@ -38,7 +38,6 @@ $mess=array(
 "folder.move_from" => "Carpeta AJXP_NODE_LABEL movida desde AJXP_SOURCE_FOLDER",
 "file.rename" => "AJXP_SOURCE_LABEL fue renombrado a AJXP_NODE_LABEL",
 "folder.rename" => "AJXP_SOURCE_LABEL fue renombrada a AJXP_NODE_LABEL",
-"share.file" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
-"share.folder" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",
-
+"share.file" => "El usuario AJXP_USER ha compartido el archivo AJXP_NODE_LABEL contigo",
+"share.folder" => "El usuario AJXP_USER ha compartido la carpeta AJXP_NODE_LABEL contigo",
 );

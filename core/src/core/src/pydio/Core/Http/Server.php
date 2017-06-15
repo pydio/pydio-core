@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -238,9 +238,9 @@ class Server
         }
         if(AJXP_SERVER_DEBUG){
             if($context instanceof  \Exception){
-                $message .= $context->getTraceAsString();
+                $message .= "\n".$context->getTraceAsString();
             }else{
-                $message .= PydioException::buildDebugBackTrace();
+                $message .= "\n".PydioException::buildDebugBackTrace();
             }
         }
         $req = $this->getRequest();

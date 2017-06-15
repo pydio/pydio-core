@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -85,22 +85,11 @@ class UserMetaManager extends AbstractMetaSource
         $this->exposeConfigInManifest("meta_definitions", json_encode($def));
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
-        $editButton = '';
-        $u = $ctx->getUser();
-        if($u != null && $u->canWrite($ctx->getRepositoryId())){
-            $editButton = '<span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
-        }
-        $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup">'.$editButton.'AJXP_MESSAGE[meta.user.1]</div>
-                     ';
-        $cdataFoot = '</div>';
-        $cdataParts = "";
 
-        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
+        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@component="FilesList"]/columns');
         $contrib = $selection->item(0);
         $even = false;
-        $searchables = array();
-        $searchablesRenderers = array();
+        $searchables = []; $searchablesReactRenderers = [];
         $index = 0;
 
         foreach ($def as $key=> $data) {
@@ -118,16 +107,16 @@ class UserMetaManager extends AbstractMetaSource
             if(isSet($lastVisibility)) $col->setAttribute("defaultVisibilty", $lastVisibility);
             switch ($fieldType) {
                 case "stars_rate":
-                    $col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderStars");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
-                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelStars";
+                    $searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelStars";
                     break;
                 case "css_label":
-                    $col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderCSSLabel");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
-                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelCssLabels";
+                    $searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelCssLabels";
                     break;
                 case "textarea":
                     $searchables[$key] = $label;
@@ -137,50 +126,34 @@ class UserMetaManager extends AbstractMetaSource
                     break;
                 case "choice":
                     $searchables[$key] = $label;
-                    $col->setAttribute("modifier", "MetaCellRenderer.prototype.selectorsFilter");
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderSelector");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $col->setAttribute("metaAdditional", $this->fieldsAdditionalData[$key]);
-                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelSelectorFilter";
+                    $searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelSelectorFilter";
                     break;
                 case "tags":
                     $searchables[$key] = $label;
-                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelTags";
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderTagsCloud");
+                    $searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelTags";
                     break;
                 default:
                     break;
             }
             $contrib->appendChild($col);
-            $trClass = ($even?" class=\"even infoPanelRow\"":" class=\"infoPanelRow\"");
-            $even = !$even;
-            $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
-
-        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
-        $contrib = $selection->item(0);
-        $contrib->setAttribute("attributes", implode(",", array_keys($def)));
-        if (!empty($this->fieldsAdditionalData)) {
-            $contrib->setAttribute("metaAdditional", json_encode($this->fieldsAdditionalData));
-        }
-        $contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelModifier");
-
-        $htmlSel = $this->getXPath()->query('html', $contrib);
-        $html = $htmlSel->item(0);
-        $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
-        $html->appendChild($cdata);
 
         $selection = $this->getXPath()->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
         foreach ($selection as $tag) {
             $v = $tag->attributes->getNamedItem("ajxpOptions")->nodeValue;
-            $metaV = count($searchables)? '"metaColumns":'.json_encode($searchables): "";
-            if (count($searchablesRenderers)) {
-                $metaV .= ',"metaColumnsRenderers":'.json_encode($searchablesRenderers);
+            if(!empty($v)) $vDat = json_decode($v, true);
+            else $vDat = [];
+            if(count($searchables)){
+                $vDat['metaColumns'] = $searchables;
             }
-            if (!empty($v) && trim($v) != "{}" && !empty($metaV)) {
-                $v = str_replace("}", ", ".$metaV."}", $v);
-            } else {
-                $v = "{".$metaV."}";
+            if(count($searchablesReactRenderers)){
+                $vDat['reactColumnsRenderers'] = $searchablesReactRenderers;
             }
-            $tag->setAttribute("ajxpOptions", $v);
+            $tag->setAttribute("ajxpOptions", json_encode($vDat));
         }
 
         parent::init($ctx, $this->options);

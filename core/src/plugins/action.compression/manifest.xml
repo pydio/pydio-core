@@ -6,6 +6,7 @@
     <client_settings>
         <resources>
             <i18n namespace="compression" path="plugins/action.compression/res/i18n"/>
+            <js className="CompressionActions" file="plugins/action.compression/res/build/CompressionActions.js"/>
         </resources>
     </client_settings>
 
@@ -22,92 +23,7 @@
             </action>
             <action name="compress_ui">
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        var crtDir = pydio.getContextHolder().getContextNode().getPath();
-                        var userSelection = pydio.getUserSelection();
-                        if (!userSelection.isEmpty()) {
-                            var loadFunc = function (oForm) {
-                                if (userSelection.isEmpty()) {
-                                    return;
-                                }
-                                var archive_nameInput = oForm.down('input[id="archive_name"]');
-                                var changeDuplicateArchiveName = function (name, extension) {
-                                    var nameLastIndexOf = name.lastIndexOf("-");
-                                    var tmpFileName = name.substr(0, nameLastIndexOf);
-                                    var compteurFileName = name.substr(nameLastIndexOf + 1);
-                                    if (nameLastIndexOf == -1) {
-                                        tmpFileName = name;
-                                        compteurFileName = 1;
-                                    }
-                                    while(userSelection.fileNameExists(name + extension)){
-                                        name = tmpFileName + "-" + compteurFileName;
-                                        compteurFileName ++;
-                                        if(compteurFileName > 20){
-                                            break;
-                                        }
-                                    }
-                                    archive_nameInput.setValue(name + extension);
-                                    return name;
-                                };
-                                var archive_name = archive_nameInput.getValue();
-                                var archiveTypeSelect = oForm.down('select[id="type_archive"]');
-                                if(window.multipleFilesDownloadEnabled){
-                                    archiveTypeSelect.insert({top:'<option value=".zip">ZIP</option>'});
-                                }
-                                var archiveExtension = archiveTypeSelect.getValue();
-                                if (userSelection.isUnique()) {
-                                    if (userSelection.getUniqueNode().isLeaf() == true) {
-                                        archive_name = getBaseName(userSelection.getUniqueFileName()).split(".").shift();
-                                    } else {
-                                        archive_name = getBaseName(userSelection.getUniqueFileName());
-                                    }
-                                } else if (crtDir.length == 1) {
-                                    archive_name = "Archive";
-                                } else {
-                                    archive_name = getBaseName(crtDir);
-                                }
-                                var updateFormAndArchiveName = function (){
-                                    var archiveExtension = archiveTypeSelect.getValue();
-                                    if(archiveExtension == ".zip"){
-                                        oForm.setAttribute("action", "compress");
-                                        oForm.down("#compression_form").setAttribute("action", "compress");
-                                        oForm.down('input[name="get_action"]').value = "compress";
-                                    }else{
-                                        oForm.setAttribute("action", "compression");
-                                        oForm.down("#compression_form").setAttribute("action", "compression");
-                                        oForm.down('input[name="get_action"]').value = "compression";
-                                    }
-                                    changeDuplicateArchiveName(archive_name, archiveExtension);
-                                };
-                                updateFormAndArchiveName();
-                                archiveTypeSelect.observe("change", updateFormAndArchiveName);
-                                archive_nameInput.observe("change", function () {
-                                    archive_name = archive_nameInput.getValue().slice(0, -archiveTypeSelect.getValue().length);
-                                    changeDuplicateArchiveName(archive_name, archiveTypeSelect.getValue());
-                                });
-                            };
-                            var closeFunc = function(){
-                                userSelection.updateFormOrUrl(modal.getForm());
-                                PydioApi.getClient().submitForm(modal.getForm(), true);
-                                hideLightBox();
-                            };
-                            modal.showDialogForm('Compress selection to ...', 'compression_form', loadFunc, closeFunc);
-                        }
-                    ]]></clientCallback>
-                    <clientForm id="compression_form"><![CDATA[
-                        <div id="compression_form" action="compression" box_width="272">
-                            <label class="dialogLegend" id="type_archive" style="display: inline-block;margin-top: 11px;">AJXP_MESSAGE[compression.3]</label>
-                            <select style="width:100px;"  name="type_archive" id="type_archive" class="dialogFocus initFicName">
-                                <option value=".tar">TAR</option>
-                                <option value=".tar.gz">TAR.GZ</option>
-                                <option value=".tar.bz2">TAR.BZ2</option>
-                            </select>
-                            <br/>
-                            <label class="dialogLegend" for="archive_name"  style="display: inline-block;margin-top: 11px;">AJXP_MESSAGE[compression.4]</label>
-                            <br/>
-                            <input style="width: 93%;margin-left: 9px;margin-top: 7px; margin-bottom:12px;" type="text" name="archive_name" id="archive_name" class="dialogFocus initFicName" />
-                        </div>
-				]]></clientForm>
+                    <clientCallback module="CompressionActions.Callbacks.compressUI"/>
                 </processing>
             </action>
             <action name="extraction">
@@ -119,20 +35,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="tar,gz,bz2"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
-                        var crtDir = pydio.getContextHolder().getContextNode().getPath();
-                        var userSelection = pydio.getUserSelection();
-                        if (!userSelection.isEmpty()) {
-                            var file = userSelection.getFileNames();
-                            var dir = userSelection.getContextNode().getPath();
-                            var connexion = new Connexion();
-                            connexion.setParameters({get_action : "extraction", file : file, currentDir : dir});
-				   		    connexion.sendAsync();
-                            connexion.onComplete=function(transport){
-                                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                            };
-                        }
-                    ]]></clientCallback>
+                    <clientCallback module="CompressionActions.Callbacks.extract"/>
                     <serverCallback methodName="receiveAction" pluginId="action.compression" />
                 </processing>
             </action>

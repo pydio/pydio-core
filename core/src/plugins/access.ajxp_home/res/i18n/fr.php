@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ $mess=array(
 "60"=>"Mac OS",
 "61"=>"Windows",
 
-    "62"=> "<h2>Qu’est-ce qu’un workspace?</h2>
+    "62"=> "<h2>[Tuto] Qu’est-ce qu’un workspace?</h2>
             Cette vidéo explique pourquoi APPLICATION_TITLE est basé sur des Workspaces
             <ul>
                 <li>Qu'est ce qu'un workspace dans APPLICATION_TITLE?</li>
@@ -54,7 +54,7 @@ $mess=array(
             </ul>
             ",
 
-    "63"=> "<h2>Comment uploader des fichiers dans pydio ?</h2>
+    "63"=> "<h2>[Tuto] Comment uploader des fichiers dans pydio ?</h2>
             Pour débuter, découvrez comment uploader des fichiers dans APPLICATION_TITLE:
             <ul>
                 <li>Faire Cliquer-Glisser des fichiers vers APPLICATION_TITLE</li>
@@ -64,7 +64,7 @@ $mess=array(
             </ul>
             ",
 
-    "64"=> "<h2>Rechercher, consulter et gérer vos fichiers</h2>
+    "64"=> "<h2>[Tuto] Rechercher, consulter et gérer vos fichiers</h2>
             Cette vidéo vous montre différentes astuces pour gérer efficacement vos fichiers avec APPLICATION_TITLE
             <ul>
                 <li>Barre de recherche Cross-Workspaces</li>
@@ -75,7 +75,7 @@ $mess=array(
             </ul>
             ",
 
-    "79"=> "<h2>Partager des fichiers et des dossiers avec pydio</h2>
+    "79"=> "<h2>[Tuto] Partager des fichiers et des dossiers avec pydio</h2>
             Ce tutoriel vous montre comment partager des fichiers et des dossiers, aussi bien en interne qu’en externe:
             <ul>
                 <li>Créer des liens de partage publics</li>
@@ -87,7 +87,7 @@ $mess=array(
             </ul>
             ",
 
-    "80"=> "<h2>Partage avancé : fonctionnalités de sécurité</h2>
+    "80"=> "<h2>[Tuto] Partage avancé : fonctionnalités de sécurité</h2>
             Cette vidéo vous présente différentes fonctionnalités permettant de sécuriser vos partages avec APPLICATION_TITLE:
             <ul>
                 <li>Protection par mot de passe</li>
@@ -96,11 +96,11 @@ $mess=array(
             </ul>
             ",
 
-    "81"=> "<h2>Personnalisation des liens de partage</h2>
+    "81"=> "<h2>[Tuto] Personnalisation des liens de partage</h2>
             Découvrez comment personnaliser l’URL de vos liens de partage pour les rendre plus user-friendly.
             ",
 
-    "82"=> "<h2>Gestions des permissions liées aux liens de partage</h2>
+    "82"=> "<h2>[Tuto] Gestions des permissions liées aux liens de partage</h2>
             Cette vidéo vous montre comment gérer les permissions liées à vos partages publics:
             <ul>
                 <li>Prévisualisation</li>
@@ -109,15 +109,15 @@ $mess=array(
             </ul>
             ",
 
-    "83"=> "<h2>Langues</h2>
+    "83"=> "<h2>[Tuto] Langues</h2>
             APPLICATION_TITLE est disponibles dans 28 langues. Cette vidéo vous montre comment changer la langue dans APPLICATION_TITLE.
             ",
 
-    "84"=> "<h2>Alertes</h2>
+    "84"=> "<h2>[Tuto] Alertes</h2>
             Découvrez comment paramétrer des alertes sur certains fichiers, afin de suivre leur modification ou leur consultation.
             ",
 
-    "85"=> "<h2>Edition Collaborative</h2>
+    "85"=> "<h2>[Tuto] Edition Collaborative</h2>
             Cette vidéo vous montre comment collaborer sur des documents bureautiques, grâce à l’intégration de la suite Office Collabora Online
             <ul>
                 <li>Travaillez en ligne sur des documents textes, présentations, tableurs</li>
@@ -127,7 +127,7 @@ $mess=array(
             ",
 
     "65"=> "Découvrir plus de vidéos sur le canal APPLICATION_TITLE!",
-"66"=>"<h2>Utiliser APPLICATION_TITLE sur un appareil iOS</h2>
+"66"=>"<h2>[Tuto] Utiliser APPLICATION_TITLE sur un appareil iOS</h2>
                      Cette vidéo décrit l'utilisation de l'application APPLICATION_TITLE disponible sur l'App Store. Le processus est similaire sur Android.
 <ul><li>Configurer la connexion</li>
 <li>Naviguer dans les fichiers</li>
@@ -141,10 +141,18 @@ $mess=array(
 "71"=> "Application pour smartphones Android",
     "72" => "QRCode du serveur",
     "73" => "Connexion aux applications mobiles",
-    "74" => "Scannez ce QRCode avec votre application mobile pour configurer facilement la connexion.",
+    "74" => "Scannez ce code avec votre mobile pour configurer l'application.",
     "75"=> "Chercher dans tous les fichiers...",
     "76" => "Utilisez le menu en haut à droite pour acceder au %1.",
     "77" => "panneau d'administration",
     "78" => "Sélectionnez un workspace",
     "86" => "Voir la vidéo",
+    "87" => "Historique",
+    "88" => "Glissez un fichier depuis votre bureau",
+    "89" => "Fichier sélectionné",
+    "90" => "Choisir un workspace de destination",
+    "91" => "Vos fichiers hors-ligne avec l'application de synchro",
+    "92" => "Applications Download",
+    "93" => "Quick Upload",
+    "94" => "Video Tutorial",
 );

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -276,7 +276,7 @@ class SchemeTranslatorWrapper extends MetaStreamWrapper implements IAjxpWrapper
     /**
      * Enter description here...
      *
-     * @return array
+     * @return array|false
      */
     public function stream_stat()
     {

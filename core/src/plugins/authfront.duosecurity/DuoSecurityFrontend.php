@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -67,12 +67,12 @@ class DuoSecurityFrontend extends SessionLoginFrontend
         }
 
 
-        require_once($this->getBaseDir() . "/duo_php/duo_web.php");
+        require_once($this->getBaseDir() . "/vendor/autoload.php");
         $appUnique = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
         $iKey = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
         $sKey = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
 
-        $res = \Duo::signRequest($iKey, $sKey, $appUnique, $uObject->getId());
+        $res = Duo\Web::signRequest($iKey, $sKey, $appUnique, $uObject->getId());
 
         $uObject->getPersonalRole()->setParameterValue("authfront.duosecurity", "DUO_AUTH_LAST_SIGNATURE", $res);
         $uObject->setLock("duo_show_iframe");
@@ -104,12 +104,12 @@ class DuoSecurityFrontend extends SessionLoginFrontend
         if ($u == null) return;
         $sigResponse = $httpVars["sig_response"];
 
-        require_once($this->getBaseDir() . "/duo_php/duo_web.php");
+        require_once($this->getBaseDir() . "/vendor/autoload.php");
         $appUnique = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
         $iKey = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
         $sKey = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
 
-        $verif = Duo::verifyResponse($iKey, $sKey, $appUnique, $sigResponse);
+        $verif = Duo\Web::verifyResponse($iKey, $sKey, $appUnique, $sigResponse);
 
         if ($verif != null && $verif == $u->getId()) {
             $u->removeLock("duo_show_iframe");

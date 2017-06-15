@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -113,4 +113,6 @@ $mess=array(
 "Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option." => "Palette anzeigen, um die Farben der Oberfläche und Logos zu ändern. Nach dem Ändern der Einstellung muss die Seite neu geladen werden.",
 "Use configured branding" => "Konfiguriertes Branding verwenden",
 "Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option." => "Die konfigurierten Farben verwenden. Nach dem Ändern der Einstellung muss die Seite neu geladen werden.",
+"Enable Welcome Tour" => "Enable Welcome Tour",
+"Enable the small tour triggered at first visit" => "Enable the small tour triggered at first visit",
 );

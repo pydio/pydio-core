@@ -5,63 +5,19 @@
     AJXP_REBASE
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" type="text/css" href="AJXP_THEME_FOLDER/css/allz.css?v=AJXP_CURRENT_VERSION">
-    <!--[if IE 8]>
-    <script src="AJXP_CLIENT_RESOURCES_FOLDER/js/vendor/es6/es5-shim.min.js"></script>
-    <script src="AJXP_CLIENT_RESOURCES_FOLDER/js/vendor/es6/es5-sham.min.js"></script>
-    <![endif]-->
-    <!--[if IE 7]>
-    <script src="AJXP_CLIENT_RESOURCES_FOLDER/js/vendor/es6/json3.min.js"></script>
-    <![endif]-->
-    AJXP_ADDITIONAL_JS_FRAMEWORKS
-    <script language="javascript" type="text/javascript" src="AJXP_CLIENT_RESOURCES_FOLDER/js/ajaxplorer_boot.js?v=AJXP_CURRENT_VERSION"></script>
+    <link rel="stylesheet" type="text/css" href="AJXP_CLIENT_RESOURCES_FOLDER/build/pydio.CRT_THEME.min.css?v=AJXP_CURRENT_VERSION">
+    <script language="javascript" type="text/javascript" src="AJXP_CLIENT_RESOURCES_FOLDER/build/pydio.boot.min.js?v=AJXP_CURRENT_VERSION"></script>
     <link rel="icon" type="image/x-png" href="index.php?get_action=serve_favicon">
 </head>
-<body style="overflow: hidden;">
+<body style="overflow: hidden;" class="react-mui-context">
 <script type="text/javascript">
-    window.ajxpNoNotifLoader = true;
-    window.ajxpThemeSkipLoaderProgress = true;
     // Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is
     // dynamically replaced by the application!
-    var ajaxplorer, startParameters = {}, MessageHash={};
+    var pydio, startParameters = {}, MessageHash={};
     //AJXP_JSON_START_PARAMETERS
-    document.observe("ajaxplorer:before_gui_load", function(e){
-        if(window.React){
-            React.initializeTouchEvents(true);
-        }
-        ajaxplorer.currentThemeUsesIconFonts = true;
-        pydio.Parameters.set('currentThemeUsesIconFonts', true);
-        document.documentElement.className += " ajxp_theme_orbit";
-    });
-    window.ajxpBootstrap = new AjxpBootstrap(startParameters);
-    //window.onbeforeunload = function(){return "Do you want to quit?";};
-</script>
-<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"window","fitMarginBottom":"$(\"optional_bottom_div\").getHeight()"}'></div>
-<div id="all_forms">
-    <div id="generic_dialog_box" class="dialogBox form-login_form"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
-    <div id="hidden_frames" style="display:none;"></div>
-    <div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
+    window.pydioBootstrap = new PydioBootstrap(startParameters);
 
-    <!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
-    <form id="login_form" style="display:none;" box_width="320" box_padding="0">
-        <input type="hidden" name="get_action" value="login">
-        <input type="hidden" name="login_seed" id="login_seed" value="">
-        <a href="javascript:pydio.getController().fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]" class="icon-flag">&nbsp;</a>
-        <div class="dialogLegend" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
-        <div style="width:100%;">
-            <div class="SF_element">
-                <div class="SF_label"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message></div>
-                <div class="SF_input"><input type="text" name="userid" class="dialogFocus" placeholder="AJXP_MESSAGE[181]"></div>
-            </div>
-            <div class="SF_element">
-                <div class="SF_label"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message></div>
-                <div class="SF_input"><input type="password" name="password"  placeholder="AJXP_MESSAGE[182]"></div>
-            </div>
-            <div class="SF_element">
-                <input type="checkbox" class="radio" name="remember_me" id="remember_me"/><label for="remember_me" ajxp_message_id="261">AJXP_MESSAGE[261]</label>
-            </div>
-        </div>
-    </form>
-</div>
+</script>
+<div id="ajxp_desktop"></div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -35,10 +35,10 @@ $mess=array(
 "Default Language" => "Standardsprache",
 "Default language when a user does not have set his/her own." => "Sprache die vorausgewählt ist, wenn der Benutzer keine abweichende konfiguriert.",
 "Sharing" => "Freigaben",
-"Download Folder" => "Download-Ordner",
-"Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." => "Absoluter Pfad zu einem Ordner für temporäre Freigaben und Download-Links. Leer lassen, um die Freigabe-Funktion zu deaktivieren.",
+"Download Folder (Legacy)" => "Download-Ordner (veraltet)",
+"Absolute path to the public folder where temporary download links will be created. This is used for legacy purpose, newly created links do not use it anymore, but use the Base URI instead." => "Absoluter Pfad zu einem Ordner für temporäre Freigaben und Download-Links. Diese Einstellung existiert aus Kompatibilitätsgründen und wird für neue Links nicht mehr verwendet.",
 "Download URL" => "Download-URL",
-"If not inferred directly from the current ajaxplorer URI plus the public download folder name, replace the public access URL here." => "Wenn nicht 'Server-URL' + Ordnername aus 'Download-Ordner' muss hier die URL angegeben werden.",
+"If not inferred directly from the current pydio URL plus the public base URI, replace the public access URL here." => "Tragen Sie hier die URL für öffentliche Links ein, falls diese nicht 'Server-URL' + 'Base-URI' ist.",
 "Existing users" => "Bestehende Benutzer",
 "Allow the users to pick an existing user when sharing a folder" => "Erlaubt den Benutzern bei der Freigabe von Ordnern einen anderen Benutzer auszuwählen",
 "Compression Features" => "Komprimierungsfunktionen",
@@ -65,7 +65,7 @@ $mess=array(
 "Filename length" => "Dateinamen länge",
 "Maximum characters length of new files or folders" => "Anzahl der Zeichen für neue Ordner und Dateien",
 "Temporary Folder" => "Ordner für temporäre Daten",
-"This is necessary only if you have errors concerning the tmp dir access or writeability : most probably, they are due to PHP SAFE MODE (should disappear in php6) or various OPEN_BASEDIR restrictions. In that case, create and set writeable a tmp folder somewhere at the root of your hosting (but above the web/ or www/ or http/ if possible!!) and enter here the full path to this folder" => "Nur nötig, wenn es Problem beim (Schreib-)zugriff auf das Tmp-Verzeichnis gibt. Meistens verursacht durch den PHP SAFE MODE (in php6 nicht mehr vorhanden) oder durch verschiedene OPEN_BASEDIR-Einschränkungen. In diesem Fall kann ein eigener tmp-Ordner erstellt (wenn möglich außerhalb von web/, www/ oder http/) und hier eingetragen werden.",
+"This is necessary only if you have errors concerning the tmp dir access or writeability : most probably, they are due to PHP SAFE MODE (should disappear in php6) or various OPEN_BASEDIR restrictions. In that case, create and set writeable a tmp folder somewhere at the root of your hosting (but above the web/ or www/ or http/ if possible!!) and enter here the full path to this folder" => "Nur nötig, wenn es Problem beim (Schreib-)zugriff auf den Tmp-Ordner gibt. Meistens verursacht durch den PHP SAFE MODE (in php6 nicht mehr vorhanden) oder durch verschiedene OPEN_BASEDIR-Einschränkungen. In diesem Fall kann ein eigener tmp-Ordner erstellt (wenn möglich außerhalb von web/, www/ oder http/) und hier eingetragen werden.",
 "Admin email" => "Administrator E-Mail-Adresse",
 "Administrator email, not used for the moment" => "Administrator E-Mail-Adresse",
 "User Credentials" => "Anmeldeinformationen",
@@ -90,7 +90,7 @@ $mess=array(
 "Big Icon" => "Großes Symbol",
 "Big Icon for representing the template" => "Großes Symbol der Arbeitsumgebung",
 "Filesystem Commons" => "Dateisystem Allgemein",
-"Recycle Bin Folder" => "Papierkorb-Verzeichnis",
+"Recycle Bin Folder" => "Papierkorb-Ordner",
 "Leave empty if you do not want to use a recycle bin." => "Leer lassen, um keinen Papierkorb zu verwenden.",
 "Default Rights" => "Standardrechte",
 "This right pattern (empty, r, or rw) will be applied at user creation for this repository." => "Rechte die auf Benutzer angewendet werden, wenn Sie für diesen Arbeitsbereich erstellt werden. (leer, r, oder rw)",
@@ -185,5 +185,12 @@ $mess=array(
 "Redirect URL" => "Weiterleitungs-URL",
 "API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "API-Endpunkt - Ermöglicht den Benutzern die Anmeldung und das Akzeptieren der Nutzungsbedingungen der Anwendung",
 "API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API-Endpunkt - Wird zur Authentifizierung verwendet, um den Token zu erneuern oder zu überprüfen",
-"API setting - Redirect URL for the OAuth Application" => "API-Einstellung - Weiterleitungs-URL für die OAuth-Anwendung"
+"API setting - Redirect URL for the OAuth Application" => "API-Einstellung - Weiterleitungs-URL für die OAuth-Anwendung",
+"Public Base URI" => "Base-URI für öffentliche Links",
+"URI where to serve the public links" => "Base-URI für öffentliche Links",
+"Enable for all users" => "Für alle Benutzer aktivieren",
+"Enable WebDAV for all users by default. If set to false, users will have to manually enable WebDAV via their preferences panel." => "WebDAV standardmäßig für alle Benutzer aktivieren. Mit dem Wert 'Nein' müssen Benutzer WebDAV in ihren Einstellungen manuell aktivieren.",
+"Download Delegation" => "Download-Delegation",
+"Delegates download operations to an alternative agent, either webserver or pydio agent. Warning, this requires external modules to be installed. When using XSendFile/XaccelRedirect, you have to manually add the folders where files will be downloaded in the module configuration" => "Delegiert Download-Operationen an einen alternativen Agent (Webserver oder Pydio-Agent). Achtung, dies erfordert ein externes Modul. Mit 'XSendFile/XaccelRedirect' müssen die Download-Ordner manuell in der Modul-Konfiguration hinterlegt werden.",
+"Core Connexion" => "Core-Verbindung",
 );

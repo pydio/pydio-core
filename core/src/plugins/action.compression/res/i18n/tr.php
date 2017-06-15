@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ $mess=array(
     "1" => "Sıkıştır",
     "2" => "Seçtinizi sıkıştır",
     "3" => "Arşiv biçimi seçiniz",
-    "4" => "Arşivin ismi :",
+    "4" => "Arşivin ismi",
     "5" => "Sıkıştırma başlıyor...",
     "6" => "Dosya arşivin içine ekleniyor... %s ",
     "7" => "%s ile sıkıştırma...",

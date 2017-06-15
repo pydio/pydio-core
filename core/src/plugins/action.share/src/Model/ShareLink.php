@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -21,6 +21,9 @@
 namespace Pydio\Share\Model;
 
 
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\ApplicationState;
@@ -154,7 +157,7 @@ class ShareLink
     }
 
     /**
-     * @return \Pydio\Access\Core\Model\Repository
+     * @return RepositoryInterface
      * @throws \Exception
      */
     public function getRepository(){
@@ -231,7 +234,7 @@ class ShareLink
         $shareMeta = isSet($this->additionalMeta) ? $this->additionalMeta : array();
         $internalUserId = (isSet($storedData["PRELOG_USER"]) ? $storedData["PRELOG_USER"] : $storedData["PRESET_LOGIN"]);
         if(empty($internalUserId)){
-            throw new \Exception("Oups, link ".$this->getHash()." has no internal user id, this is not normal.");
+            throw new \Exception("Oops, link ".$this->getHash()." has no internal user id, this is not normal.");
         }
 
         $jsonData = array(
@@ -270,6 +273,12 @@ class ShareLink
         }
         if(!$minisiteIsPublic){
             $jsonData["has_password"] = true;
+        }
+        if(isSet($storedData['TARGET_USERS'])){
+            $jsonData["target_users"] = $storedData["TARGET_USERS"];
+        }
+        if(isSet($storedData['RESTRICT_TO_TARGET_USERS']) && $storedData['RESTRICT_TO_TARGET_USERS']){
+            $jsonData["restrict_to_target_users"] = true;
         }
         foreach($this->store->modifiableShareKeys as $key){
             if(isSet($storedData[$key])) $jsonData[$key] = $storedData[$key];
@@ -408,8 +417,21 @@ class ShareLink
      * @return bool
      */
     public static function isShareExpired($data){
-        return (isSet($data["EXPIRE_TIME"]) && time() > $data["EXPIRE_TIME"]) ||
-            ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && isSet($data["DOWNLOAD_COUNT"]) &&  $data["DOWNLOAD_LIMIT"] <= $data["DOWNLOAD_COUNT"]);
+        $timeExpire = isSet($data["EXPIRE_TIME"]) && time() > $data["EXPIRE_TIME"];
+        if($timeExpire) return true;
+        if($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0){
+            $dlLimit = $data['DOWNLOAD_LIMIT'];
+            $expired = ($data['DOWNLOAD_COUNT'] >= $dlLimit);
+            if(isSet($data['TARGET_USERS'])){
+                // If there are target users, make sure they are all expired
+                $expired = array_reduce($data['TARGET_USERS'], function($input, $entry) use ($dlLimit) {
+                    return $input || ($entry['download_count'] >= $dlLimit);
+                }, $expired);
+            }
+            if($expired) return true;
+        }
+        return false;
+
     }
 
     /**
@@ -417,14 +439,41 @@ class ShareLink
      * @return int|mixed
      */
     public function getDownloadCount(){
-        return isSet($this->internal["DOWNLOAD_COUNT"]) ? $this->internal["DOWNLOAD_COUNT"] : 0;
+        $globalDl = isSet($this->internal["DOWNLOAD_COUNT"]) ? $this->internal["DOWNLOAD_COUNT"] : 0;
+        if($this->hasTargetUsers()){
+            foreach($this->internal['TARGET_USERS'] as $entry){
+                $globalDl += $entry['download_count'];
+            }
+        }
+        return $globalDl;
     }
 
     /**
      * Increments internal counter
+     * @param ContextInterface $ctx
+     * @throws PydioException
      */
-    public function incrementDownloadCount(){
-        $this->internal["DOWNLOAD_COUNT"] = $this->getDownloadCount() + 1;
+    public function incrementDownloadCount($ctx){
+        $found = false;
+        if($this->hasTargetUsers() && $ctx->hasUser()){
+            $u = $ctx->getUser();
+            $tmpLabel = $u->getPersonalRole()->filterParameterValue("core.conf","USER_TEMPORARY_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+            if(!empty($tmpLabel)){
+                foreach($this->internal['TARGET_USERS'] as &$entry){
+                    if($entry['display'] === $tmpLabel){
+                        if(!empty($this->internal['DOWNLOAD_LIMIT']) && $entry['download_count'] >= $this->internal['DOWNLOAD_LIMIT']){
+                            throw new PydioException("You have reached the maximum number of downloads!");
+                        }
+                        $entry['download_count'] ++;
+                        $found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(!$found){
+            $this->internal["DOWNLOAD_COUNT"] = $this->getDownloadCount() + 1;
+        }
     }
 
     /**
@@ -432,6 +481,45 @@ class ShareLink
      */
     public function resetDownloadCount(){
         $this->internal["DOWNLOAD_COUNT"] = 0;
+        if($this->hasTargetUsers()){
+            foreach($this->internal['TARGET_USERS'] as &$entry){
+                $entry['download_count'] = 0;
+            }
+        }
+    }
+
+    /**
+     * @param array $usersList
+     * @param bool $restrict
+     */
+    public function addTargetUsers($usersList, $restrict = false){
+        $internal = isSet($this->internal['TARGET_USERS']) ? $this->internal['TARGET_USERS'] : [];
+        foreach($usersList as $id => $display){
+            $internal[$id] = ['display' => $display, 'download_count' => 0];
+        }
+        $this->internal['TARGET_USERS'] = $internal;
+        $this->internal["RESTRICT_TO_TARGET_USERS"] = $restrict;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasTargetUsers(){
+        return isSet($this->internal['TARGET_USERS']) && count($this->internal['TARGET_USERS']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function restrictToTargetUsers(){
+        return (isSet($this->internal['RESTRICT_TO_TARGET_USERS']) && $this->internal['RESTRICT_TO_TARGET_USERS'] === true);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTargetUsers(){
+        return $this->internal['TARGET_USERS'];
     }
 
     /**

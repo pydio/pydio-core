@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 $mess=array(
 "Timestamp" => "Timestamp",
 "Allow Timestamp file with Universign." => "Abilita il file Timestamp con Universing.",
-"msgBox1" => "Conferma di voler aggiungere un timestamp a questo file",
 "URL" => "URL",
 "Timestamp provider API URL" => "URL delle API del fornitore di Timestamp",
 "User Mail" => "Email Utente",

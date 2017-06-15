@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Abstrium <contact (at) pydio.com>
+ * Copyright 2007-2017 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -69,6 +69,14 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
     public function setParentNode(AJXP_Node $parentNode){
         $this->parentNode = $parentNode;
     }
+
+    /**
+     * @return AJXP_Node
+     */
+    public function getParentNode(){
+        return $this->parentNode;
+    }
+
     /**
      * @param AJXP_Node|NodesList $nodeOrList
      */
@@ -146,7 +154,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
                 $xmlChildren[] = XMLHelper::toXmlElement("column", $column);
             }
             $xmlConfig = XMLHelper::toXmlElement("columns", $this->columnsDescription['description'], implode("", $xmlChildren));
-            $xmlConfig = XMLHelper::toXmlElement("component_config", ["className" => "FilesList"], $xmlConfig);
+            $xmlConfig = XMLHelper::toXmlElement("component_config", ["component" => "FilesList"], $xmlConfig);
             $buffer .= XMLHelper::toXmlElement("client_configs", [], $xmlConfig);
         }
         foreach ($this->children as $child){
@@ -308,7 +316,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
      * @param integer $totalPages
      * @param integer $dirsCount
      * @param null $remoteSortAttributes
-     * @return void|string
+     * @return string
      */
     private function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
     {
