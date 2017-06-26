@@ -512,7 +512,11 @@ class Stream implements StreamInterface
      */
     public function mkdir() {
 
-        $this->prepare('Mkdir');
+        $this->prepare('Mkdir', [
+            'path' => $this->node,
+            'label' => $this->node,
+            'folder' => $this->node
+        ]);
 
         $this->client->execute($this->command);
 
