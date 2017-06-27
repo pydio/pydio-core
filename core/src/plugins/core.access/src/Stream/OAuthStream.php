@@ -21,17 +21,24 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Utils\FileHelper;
 
+use GuzzleHttp\Event\ErrorEvent;
+use GuzzleHttp\Event\RequestEvents;
+use GuzzleHttp\Event\SubscriberInterface;
+use GuzzleHttp\Message\Response;
+
 
 /**
  * Class OAuthStream
  * @package Pydio\Access\Core\Stream
  */
-class OAuthStream implements StreamInterface
+class OAuthStream implements StreamInterface, SubscriberInterface
 {
     use StreamDecoratorTrait;
 
     /** @var ContextInterface Context */
     private $context;
+
+
 
     /**
      * OAuthStream constructor.
@@ -135,10 +142,22 @@ class OAuthStream implements StreamInterface
 
         Stream::addContextOption($this->context, [
             "auth" => "oauth2",
-            "subscribers" => [$oauth2]
+            "subscribers" => [$oauth2, $this]
         ]);
 
         $this->stream = $stream;
+    }
+
+    /**
+     * Get the list of events this subscriber is being triggered on
+     *
+     * @return array Events
+     */
+    public function getEvents()
+    {
+        return [
+            'error'    => ['onError', RequestEvents::EARLY],
+        ];
     }
 
     /**
@@ -226,5 +245,27 @@ class OAuthStream implements StreamInterface
      */
     public function getContents() {
         return $this->stream->getContents();
+    }
+
+    /**
+     * Handle the before trigger
+     *
+     * @param ErrorEvent $event
+     * @internal param ErrorEvent $e
+     */
+    public function onError(ErrorEvent $event)
+    {
+        $response = $event->getResponse();
+
+        if ($response && 401 == $response->getStatusCode()) {
+            $request = $event->getRequest();
+
+            if ($request->getConfig()->get('auth') == 'oauth2' && $request->getConfig()->get('retried')) {
+                $this->setTokens("", "");
+
+                //$request->getConfig()->set('retried', false);
+                //$event->intercept($event->getClient()->send($request));
+            }
+        }
     }
 }
