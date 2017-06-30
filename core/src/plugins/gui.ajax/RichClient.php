@@ -208,6 +208,7 @@ class RichClient extends Plugin
         $out = array();
         self::parseApplicationGetParameters($ctx, $request->getQueryParams(), $out, $_SESSION);
         $config = $this->computeBootConf($ctx);
+        Controller::applyHook("loader.filter_boot_conf", array($ctx, &$config));
         $response = new JsonResponse($config);
 
     }
