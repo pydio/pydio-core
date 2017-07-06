@@ -104,6 +104,7 @@ class S3AccessWrapper extends FsAccessWrapper
             $baseURL = $repoObject->getContextOption($ctx, "STORAGE_URL");
             if (!empty($baseURL)) {
                 $config["endpoint"] = $baseURL;
+                $config["use_path_style_endpoint"] = true;
             }
             require_once("S3Client.php");
             $s3Client = new S3Client($config, $repoObject->getId());
