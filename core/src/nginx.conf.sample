@@ -20,6 +20,12 @@ server {
                 include snippets/fastcgi-php.conf;
                 fastcgi_pass unix:/var/lib/php5-fpm/www.sock;
         }
+
+        # Manually deny some paths to ensure Pydio security
+        location ~* ^/(?:\.|conf|data/(?:files|personal|logs|plugins|tmp|cache)|plugins/editor.zoho/agent/files) {
+                deny all;
+        }
+
 }
 types {
         application/font-woff2                 woff2;
