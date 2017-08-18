@@ -13,9 +13,11 @@
         </resources>
     </client_settings>
 
+    <!--
     <dependencies>
         <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
     </dependencies>
+    -->
 
     <registry_contributions>
         <client_configs>
