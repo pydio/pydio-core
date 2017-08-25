@@ -1014,7 +1014,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }else if(!$selection->isUnique() || !$selection->getUniqueNode()->isLeaf()){
                     $size = -1;
                 }
-                if($taskId === null && ($size === -1 || $size > $bgSizeThreshold)){
+                if($request->getAttribute("api") === "session" && $taskId === null && ($size === -1 || $size > $bgSizeThreshold)){
                     $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $task->setActionLabel($mess, $action === 'copy' ? '66' : '70');
                     //$task->setFlags(Task::FLAG_STOPPABLE);
