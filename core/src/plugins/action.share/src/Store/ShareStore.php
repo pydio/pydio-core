@@ -175,7 +175,9 @@ class ShareStore {
             }
             return [];
         }
-        class_alias("Pydio\\Share\\ShareCenter", "ShareCenter");
+        if(!class_exists("ShareCenter")) {
+            class_alias("Pydio\\Share\\ShareCenter", "ShareCenter");
+        }
         $lines = file($file);
 
         // Eval the existing line 3, should be like
