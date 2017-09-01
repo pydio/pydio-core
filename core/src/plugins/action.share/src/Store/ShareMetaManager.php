@@ -163,6 +163,7 @@ class ShareMetaManager
             return $shares;
         }
         foreach($meta["shares"] as $id => $shareData){
+            if(!isset($shareData["type"])) continue;
             $type = $shareData["type"];
             if($type == "repository"){
                 if(!isSet($shares[$id])) {
