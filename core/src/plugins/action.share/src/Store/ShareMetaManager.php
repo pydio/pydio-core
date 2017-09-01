@@ -243,14 +243,16 @@ class ShareMetaManager
             $shares = array();
             $update = false;
             foreach($meta["shares"] as $hashOrRepoId => $shareData){
-                $type = $shareData["type"];
-                if(is_array($type)) {
-                    $shareData["type"] = $type[0];
-                }
-                if(!$clearIfEmpty || $this->shareStore->shareExists($shareData["type"],$hashOrRepoId)){
-                    $shares[$hashOrRepoId] = $shareData;
-                }else{
-                    $update = true;
+                if(isset($shareData["type"])) {
+                    $type = $shareData["type"];
+                    if (is_array($type)) {
+                        $shareData["type"] = $type[0];
+                    }
+                    if (!$clearIfEmpty || $this->shareStore->shareExists($shareData["type"], $hashOrRepoId)) {
+                        $shares[$hashOrRepoId] = $shareData;
+                    } else {
+                        $update = true;
+                    }
                 }
             }
             if($update && !count($shares)){
