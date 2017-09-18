@@ -23,10 +23,12 @@ namespace Pydio\Core\Http\Wopi;
 use JWT;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ApiKeysService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Conf\Sql\SqlConfDriver;
+use Pydio\Core\Services\CacheService;
 use Pydio\Log\Core\Logger;
 use Zend\Diactoros\UploadedFile;
 
