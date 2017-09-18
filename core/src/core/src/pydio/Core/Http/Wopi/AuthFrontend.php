@@ -137,6 +137,12 @@ class AuthFrontend extends AbstractAuthFrontend
         $token = $payload->token;
         $task = $payload->task;
 
+        // store  encrypted user's credential in cache.
+        $sessionId = $payload->session_id;
+        $encryptedString = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $sessionId);
+        $credential = MemorySafe::getCredentialsFromEncodedString($encryptedString);
+        MemorySafe::storeCredentials($credential["user"], $credential["password"]);
+
         $key = ApiKeysService::findPairForAdminTask($task, $currentUser->getId());
 
         if ($key["t"] !== $token) {
