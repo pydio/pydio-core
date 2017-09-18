@@ -131,6 +131,11 @@ class Driver extends Plugin
             $payload["uri"] = $uri;
             $payload["task"] = $task;
 
+            // Enable access to smb + session credential workspace
+            $payload["session_id"] = session_id();
+            $encryptedString = SessionService::fetch(MemorySafe::SAFE_CREDENTIALS_KEY);
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, session_id(), $encryptedString, 24*60*60);
+
             $jwt = JWT::encode($payload, $private);
 
             $resp = [
