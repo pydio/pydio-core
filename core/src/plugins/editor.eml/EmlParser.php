@@ -40,6 +40,8 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Vars\UrlUtils;
 
+use Mail_mimeDecode;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -49,13 +51,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class EmlParser extends Plugin
 {
     public static $currentListingOnlyEmails;
-
-    public function performChecks()
-    {
-        if (!ApplicationState::searchIncludePath("Mail/mimeDecode.php")) {
-            throw new \Exception("Cannot find Mail/mimeDecode PEAR library");
-        }
-    }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
@@ -117,7 +112,6 @@ class EmlParser extends Plugin
                 $x->addChunk($doc);
             break;
             case "eml_get_bodies":
-                require_once("Mail/mimeDecode.php");
                 $params = array(
                     'include_bodies' => true,
                     'decode_bodies' => true,
@@ -130,7 +124,7 @@ class EmlParser extends Plugin
                     $content = file_get_contents($file);
                 }
 
-                $decoder = new \Mail_mimeDecode($content);
+                $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $html = $this->_findPartByCType($structure, "text", "html");
                 $text = $this->_findPartByCType($structure, "text", "plain");
@@ -148,7 +142,6 @@ class EmlParser extends Plugin
                 $attachId = $httpVars["attachment_id"];
                 if(!isset($attachId)) break;
 
-                require_once("Mail/mimeDecode.php");
                 $params = array(
                     'include_bodies' => true,
                     'decode_bodies' => true,
@@ -160,7 +153,7 @@ class EmlParser extends Plugin
                 } else {
                     $content = file_get_contents($file);
                 }
-                $decoder = new \Mail_mimeDecode($content);
+                $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
 
@@ -178,7 +171,6 @@ class EmlParser extends Plugin
                     throw new \Pydio\Core\Exception\PydioException("Wrong Parameters");
                 }
 
-                require_once("Mail/mimeDecode.php");
                 $params = array(
                     'include_bodies' => true,
                     'decode_bodies' => true,
@@ -191,7 +183,7 @@ class EmlParser extends Plugin
                     $content = file_get_contents($file);
                 }
 
-                $decoder = new \Mail_mimeDecode($content);
+                $decoder = new Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
                 if ($part !== false) {
@@ -289,14 +281,13 @@ class EmlParser extends Plugin
     public function mimeExtractorCallback($masterFile, $targetFile)
     {
         $metadata = array();
-        require_once("Mail/mimeDecode.php");
         $params = array(
             'include_bodies' => true,
             'decode_bodies' => false,
             'decode_headers' => 'UTF-8'
         );
         $content = file_get_contents($masterFile);
-        $decoder = new \Mail_mimeDecode($content);
+        $decoder = new Mail_mimeDecode($content);
         $structure = $decoder->decode($params);
         $allowedHeaders = array("to", "from", "subject", "message-id", "mime-version", "date", "return-path");
         foreach ($structure->headers as $hKey => $hValue) {
@@ -397,18 +388,17 @@ class EmlParser extends Plugin
      * Enter description here ...
      * @param string $file url
      * @param boolean $cacheRemoteContent
-     * @return \Mail_mimeDecode
+     * @return Mail_mimeDecode
      */
     public function getStructureDecoder($file, $cacheRemoteContent = false)
     {
-        require_once ("Mail/mimeDecode.php");
         if ($cacheRemoteContent) {
             $cache = LocalCache::getItem ( "eml_remote", $file , null, array($this, "computeCacheId"));
             $content = $cache->getData ();
         } else {
             $content = file_get_contents ( $file );
         }
-        $decoder = new \Mail_mimeDecode ( $content );
+        $decoder = new Mail_mimeDecode ( $content );
 
         header ( 'Content-Type: text/xml; charset=UTF-8' );
         header ( 'Cache-Control: no-cache' );

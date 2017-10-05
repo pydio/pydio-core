@@ -20,7 +20,8 @@
     "aws/aws-sdk-php": "^3.19.4",
     "meenie/javascript-packer":"1.1",
     "dapphp/securimage":"3.6.4",
-    "phpseclib/phpseclib":"2.0.3"
+    "phpseclib/phpseclib":"2.0.3",
+    "pear/mail_mime-decode":"1.5.5.2"
   }
 
 }
