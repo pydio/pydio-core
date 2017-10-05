@@ -368,13 +368,6 @@ class PydioApi{
                 let errorId = false;
                 switch(result){
                     case '1':
-                        try{
-                            if(child.getAttribute('remember_login') && child.getAttribute('remember_pass')){
-                                PydioApi.storeRememberData();
-                            }
-                        }catch(e){
-                            Logger.error('Error after login, could prevent registry loading!', e);
-                        }
                         this._pydioObject.loadXmlRegistry();
                         break;
                     case '0':
@@ -491,48 +484,6 @@ class PydioApi{
      */
     static triggerDownload(url){
         document.location.href = url;
-    }
-
-    static storeRememberData(){
-        if(!CookiesManager.supported()) return false;
-        let cManager = new CookiesManager({
-            expires: 3600*24*10,
-            path:'/',
-            secure: true
-        });
-        cManager.putCookie('remember', 'true');
-    }
-
-    static clearRememberData(){
-        if(!CookiesManager.supported()) return false;
-        let cManager = new CookiesManager({
-            path:'/',
-            secure: true
-        });
-        return cManager.removeCookie('remember');
-    }
-
-    static hasRememberData(){
-        if(!CookiesManager.supported()) return false;
-        let cManager = new CookiesManager({
-            path:'/',
-            secure: true
-        });
-        return (cManager.getCookie('remember') === 'true');
-    }
-
-    tryToLogUserFromRememberData(){
-        if(!CookiesManager.supported()) return false;
-        if(PydioApi.hasRememberData()){
-            this.request({
-                get_action:'login',
-                userid:'notify',
-                password:'notify',
-                cookie_login:'true'
-            }, function(transport){
-                this.parseXmlMessage(transport.responseXML);
-            }.bind(this), null, {async:false});
-        }
     }
 
 }

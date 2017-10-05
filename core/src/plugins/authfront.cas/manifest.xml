@@ -62,7 +62,6 @@
                 <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly="" forbidOverride="true"/>
                 <processing forbidOverride="true">
                     <clientCallback><![CDATA[
-                  PydioApi.clearRememberData();
                   PydioApi.getClient().request({get_action:'logout'}, function(transport){
                         var child = transport.responseXML.documentElement.childNodes;
                         try {

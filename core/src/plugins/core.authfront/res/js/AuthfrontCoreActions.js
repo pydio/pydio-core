@@ -439,7 +439,6 @@
 
         static sessionLogout(){
 
-            PydioApi.clearRememberData();
             let client = PydioApi.getClient();
             client.request({get_action:'logout'}, function(responseObject){
                 client.parseXmlMessage(responseObject.responseXML);
