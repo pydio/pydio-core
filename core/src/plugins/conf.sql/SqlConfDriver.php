@@ -1094,6 +1094,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @param string $dataType
      * @param string|array $serialDataLike
      * @param string $relatedObjectId
+     * @param callable $callbackFunction
      * @return array
      */
     public function simpleStoreList($storeId, &$cursor=null, $dataIdLike="", $dataType="serial", $serialDataLike="", $relatedObjectId="", $callbackFunction = null){
