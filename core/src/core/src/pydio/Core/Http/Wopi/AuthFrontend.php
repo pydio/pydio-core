@@ -23,10 +23,12 @@ namespace Pydio\Core\Http\Wopi;
 use JWT;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ApiKeysService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Conf\Sql\SqlConfDriver;
+use Pydio\Core\Services\CacheService;
 use Pydio\Log\Core\Logger;
 use Zend\Diactoros\UploadedFile;
 
@@ -136,6 +138,12 @@ class AuthFrontend extends AbstractAuthFrontend
         // We have a token - retrieve private signature
         $token = $payload->token;
         $task = $payload->task;
+
+        // store  encrypted user's credential in cache.
+        $sessionId = $payload->session_id;
+        $encryptedString = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $sessionId);
+        $credential = MemorySafe::getCredentialsFromEncodedString($encryptedString);
+        MemorySafe::storeCredentials($credential["user"], $credential["password"]);
 
         $key = ApiKeysService::findPairForAdminTask($task, $currentUser->getId());
 

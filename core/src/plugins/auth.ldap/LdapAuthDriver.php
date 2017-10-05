@@ -425,7 +425,7 @@ class LdapAuthDriver extends AbstractAuthDriver
             }
             if ($isSupportPagedResult)
                 foreach ($ret as $element) {
-                    if (is_resource($element))
+                    if (is_resource($element) && count($allEntries["count"]) > 1)
                         @ldap_control_paged_result_response($this->ldapconn, $element, $cookie);
                 }
         } while (($cookie !== null && $cookie != '') && ($isSupportPagedResult) && (!$gotAllEntries));
@@ -1176,4 +1176,23 @@ class LdapAuthDriver extends AbstractAuthDriver
         $newS = preg_replace($preg, '_', $s);
         return $newS;
     }
+
+    /*
+    public $rebind_dn;
+    public $rebind_pass;
+    function rebind($ldap, $referral) {
+        $server= preg_replace('!^(ldap://[^/]+)/.*$!', '\\1', $referral);
+        if (!($ldap = ldap_connect($server))){
+            return true;
+        }
+        ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($ldap, LDAP_OPT_REFERRALS, 1);
+        ldap_set_rebind_proc($ldap, "rebind");
+        if (!ldap_bind($ldap,$this->rebind_dn,$this->rebind_pass)){
+            return true;
+        }
+        return 0;
+    }
+
+    */
 }
