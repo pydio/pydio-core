@@ -160,7 +160,7 @@ class UsersList extends React.Component{
 
         return (
             <div style={{flex:1, flexDirection:'column', display:'flex'}} onTouchTap={this.props.onTouchTap}>
-                {mode !== 'inner' && (!emptyState || mode !== 'book') && !this.props.noToolbar && toolbar}
+                {mode !== 'inner' && /*(!emptyState || mode !== 'book') &&*/ !this.props.noToolbar && toolbar}
                 {!emptyState && !loading &&
                     <List style={{flex: 1, overflowY: mode !== 'inner' ? 'auto' : 'initial'}}>
                         {this.props.subHeader && <Subheader>{this.props.subHeader}</Subheader>}
