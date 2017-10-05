@@ -34,6 +34,6 @@ class ForbiddenCharacterException extends PydioException
      */
     public function __construct($originalString)
     {
-        parent::__construct("$originalString contains forbbiden characters", null, 5012);
+        parent::__construct("$originalString contains forbidden characters", null, 5012);
     }
 }
