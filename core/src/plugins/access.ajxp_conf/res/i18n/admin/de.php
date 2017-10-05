@@ -146,7 +146,7 @@ $mess=array(
     "logs.6" => "Export logs",
     "logs.7" => "Export from",
     "logs.8" => "To",
-    "logs.9" => "File will be export as CSV format with semi-colmuns (;) separators and fields enclosed in double-quotes (\").",
+    "logs.9" => "File will be exported as CSV format with semi-colmuns (;) separators and fields enclosed in double-quotes (\").",
     "logs.10"=> "Export and download",
     "logs.11"=> "Export...",
 
