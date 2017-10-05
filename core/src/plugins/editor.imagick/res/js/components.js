@@ -25,13 +25,15 @@ import React, {Component} from 'react'
 export class Image extends Component {
     render() {
         const {src, style, ...remainingProps} = this.props
+        let cleanSrc = src.replace(new RegExp("'", 'g') , "\\'");
+        cleanSrc = cleanSrc.replace(new RegExp("\\+", 'g') , encodeURIComponent("+"));
 
         return (
             <div
                 {...remainingProps}
                 style={{
                     ...style,
-                    backgroundImage: `url('${src}')`,
+                    backgroundImage: `url('${cleanSrc}')`,
                     backgroundSize : "cover",
                     backgroundPosition: 'center center',
                     backgroundRepeat: 'no-repeat',
