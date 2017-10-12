@@ -8,6 +8,6 @@
     }
   },
   "require":{
-    "ruflin/elastica" : "3.2"
+    "ruflin/elastica" : "5.3.0"
   }
 }

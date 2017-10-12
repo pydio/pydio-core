@@ -187,7 +187,6 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
             $this->currentIndex->open();
             $fieldQuery = new Elastica\Query\QueryString();
             $fieldQuery->setAllowLeadingWildcard(true);
-            $fieldQuery->setFuzzyMinSim(0.8);
 
             if($textQuery == "*"){
 
@@ -307,8 +306,6 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
 
             $fieldQuery->setFields($fields);
             $fieldQuery->setAllowLeadingWildcard(false);
-            $fieldQuery->setFuzzyMinSim(0.8);
-
 
             $search = new Elastica\Search($this->client);
             $search->addIndex($this->currentIndex)->addType($this->currentType);
