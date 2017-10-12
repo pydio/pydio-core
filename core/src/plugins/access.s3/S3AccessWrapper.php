@@ -109,6 +109,29 @@ class S3AccessWrapper extends FsAccessWrapper
             require_once("S3Client.php");
             $s3Client = new S3Client($config, $repoObject->getId());
             $s3Client->registerStreamWrapper();
+			
+	    //This attempts to create the bucket if it does not exist, which removes the need for an admin
+	    //to have to have access to the aws system to create the bucket prior to creating a new workspace
+	    $container =  $repoObject->getContextOption($ctx, "CONTAINER");
+            $region = $repoObject->getContextOption($ctx, "REGION");
+            $ctr_exists =  $s3Client->doesBucketExist($container,true, config);
+
+            if(!empty($container)){
+                if($ctr_exists != 1){
+                        try{
+                            	// Create a valid bucket and use a LocationConstraint
+                                $result = $s3Client->createBucket(array(
+                                    'Bucket'             => $container,
+                                    'LocationConstraint' => $region,
+                                ));
+
+
+                        } catch (Exception $e) {
+				//Return a simple message rather than aws standard error message
+							
+                        }
+                }
+             }
             self::$clients[$repoObject->getId()] = $s3Client;
         }
         return self::$clients[$repoObject->getId()];
