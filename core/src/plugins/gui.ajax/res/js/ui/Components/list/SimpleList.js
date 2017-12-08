@@ -310,7 +310,6 @@ let SimpleList = React.createClass({
             state.elementHeight = this.computeElementHeightResponsive();
         }
         state.infiniteLoadBeginBottomOffset = 200;
-        console.log('SimpleList.getInitialState', sortingInfo);
         return state;
     },
 
@@ -340,7 +339,6 @@ let SimpleList = React.createClass({
             this._manualScrollPe.stop();
             this._manualScrollPe = null;
         }
-        console.log('SimpleList.componentWillReceiveProps', sortingInfo);
     },
 
     observeNodeChildren: function(node, stop = false){
@@ -925,7 +923,6 @@ let SimpleList = React.createClass({
 
         }
 
-        console.log('SimpleList', sortingInfo);
         if(sortingInfo && !this.remoteSortingInfo()){
             const {attribute, direction, sortType} = sortingInfo;
             let sortFunction;
@@ -994,7 +991,6 @@ let SimpleList = React.createClass({
     },
 
     handleInfiniteLoad: function() {
-        console.log("HandleInfiniteLoad", this, this.state.sortingInfo);
         let elemLength = this.state.elements.length;
         let newElements = this.buildElements(this.state.sortingInfo, elemLength, elemLength + this.props.infiniteSliceCount);
         let infiniteLoadBeginBottomOffset = newElements.length? 200 : 0;

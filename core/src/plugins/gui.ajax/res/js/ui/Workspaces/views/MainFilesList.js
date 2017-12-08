@@ -141,7 +141,6 @@ class ComponentConfigsParser {
                     break;
             }
         }
-        console.log(res);
         return res;
     }
 }
