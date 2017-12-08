@@ -59,7 +59,7 @@ If you think you have found a bug and a way to fix it neatly in the code, use a 
 
 #### Writing new plugins
 
-Please read the Developer doc located at https://pydio.com/en/docs/developer-guide-v7, you will find here a bunch of useful information about the plugins architecture, how to create your own plugin, etc. The action.skeleton plugin is a perfect start for that. 
+Please read the Developer doc located at https://pydio.com/en/docs/developer-guide, you will find here a bunch of useful information about the plugins architecture, how to create your own plugin, etc. The action.skeleton plugin is a perfect start for that. 
 
 New in latest build, in the Settings panel, you can find a new "Developer" node where all actions contributed by all plugins are listed. These can be called either by http, or via the CLI API. At the same location, you will find all "hooks" registered and triggered in the server, that are VERY useful when you want your plugin to be really sandboxed.  
 
