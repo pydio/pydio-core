@@ -82,7 +82,7 @@ class AudioPreviewer extends Plugin
                 throw new FileNotFoundException($node->getPath());
             }
 
-
+            session_write_close();
             $aSyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($node){
 
                 $fileUrl    = $node->getUrl();
