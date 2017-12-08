@@ -1101,9 +1101,12 @@ class RepositoriesManager extends AbstractManager
             $iconClass = $clientSettings->item(0)->getAttribute("iconClass");
             $descriptionTemplate = $clientSettings->item(0)->getAttribute("description_template");
         }
-        $metas = $pServ->getPluginsByType("metastore");
-        $metas = array_merge($metas, $pServ->getPluginsByType("meta"));
-        $metas = array_merge($metas, $pServ->getPluginsByType("index"));
+
+        $metas = array_merge(
+            array_values($pServ->getPluginsByType("metastore")),
+            array_values($pServ->getPluginsByType("meta")),
+            array_values($pServ->getPluginsByType("index"))
+        );
 
         if($format === "xml"){
             $buffer = "<ajxpdriver name=\"".$repository->getAccessType()."\" label=\"". StringHelper::xmlEntities($plug->getManifestLabel()) ."\" 
