@@ -72,7 +72,7 @@ class S3AccessWrapper extends FsAccessWrapper
      * @param boolean $registerStream
      * @return S3Client
      */
-    protected static function getClientForContext(ContextInterface $ctx, $registerStream = true)
+    public static function getClientForContext(ContextInterface $ctx, $registerStream = true)
     {
         $repoObject = $ctx->getRepository();
         if (!isSet(self::$clients[$repoObject->getId()])) {
