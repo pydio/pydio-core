@@ -7,7 +7,6 @@
     <class_definition filename="plugins/index.elasticsearch/vendor/autoload.php" classname="Pydio\Access\Indexer\Implementation\ElasticSearchIndexer"/>
     <client_settings>
         <resources>
-            <img_library alias="elastic_search_images" path="plugins/index.elasticsearch/resources/images"/>
             <i18n namespace="index.elasticsearch" path="plugins/index.elasticsearch/resources/i18n" />
         </resources>
     </client_settings>

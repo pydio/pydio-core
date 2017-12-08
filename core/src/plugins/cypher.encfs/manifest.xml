@@ -8,7 +8,6 @@
     <client_settings>
         <resources>
             <i18n namespace="encfs" path="plugins/cypher.encfs/resources/i18n"/>
-            <img_library alias="cypher.encfs" path="plugins/cypher.encfs/resources/img"/>
             <js className="EncFSActions" file="plugins/cypher.encfs/res/build/EncFSActions.js"/>
         </resources>
     </client_settings>

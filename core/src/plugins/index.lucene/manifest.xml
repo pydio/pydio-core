@@ -3,7 +3,6 @@
 	<class_definition filename="plugins/index.lucene/LuceneIndexer.php" classname="Pydio\Access\Indexer\Implementation\LuceneIndexer"/>
     <client_settings>
         <resources>
-            <img_library alias="lucene_images" path="plugins/index.lucene/resources/images"/>
             <i18n namespace="index.lucene" path="plugins/index.lucene/resources/i18n" />
         </resources>
     </client_settings>

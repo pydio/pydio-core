@@ -590,7 +590,6 @@
             <xs:choice maxOccurs="unbounded">
                 <xs:element ref="css"/>
                 <xs:element ref="i18n"/>
-                <xs:element ref="img_library"/>
                 <xs:element ref="js"/>
             </xs:choice>
         </xs:complexType>
@@ -607,12 +606,6 @@
         <xs:complexType>
             <xs:attribute name="autoload" type="xs:boolean"/>
             <xs:attribute name="namespace" use="required"/>
-            <xs:attribute name="path" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="img_library">
-        <xs:complexType>
-            <xs:attribute name="alias" use="required" type="xs:NCName"/>
             <xs:attribute name="path" use="required"/>
         </xs:complexType>
     </xs:element>

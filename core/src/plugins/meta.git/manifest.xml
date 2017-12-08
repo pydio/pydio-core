@@ -10,7 +10,6 @@
         <resources>
             <i18n namespace="meta.git" path="plugins/meta.git/i18n"/>
             <js className="PydioVersioning" file="plugins/meta.git/res/build/PydioVersioning.js"/>
-            <img_library alias="history_images" path="plugins/meta.git/images"/>
         </resources>
     </client_settings>
     <registry_contributions>

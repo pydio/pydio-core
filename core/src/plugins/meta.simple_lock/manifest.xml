@@ -5,7 +5,6 @@
    	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
    		<resources>
    			<i18n namespace="meta.simple_lock" path="plugins/meta.simple_lock/i18n" />
-            <img_library alias="meta_simple_lock" path="plugins/meta.simple_lock/icons"/>
             <js className="LockActions" file="plugins/meta.simple_lock/res/build/LockActions.js"/>
         </resources>
    	</client_settings>
