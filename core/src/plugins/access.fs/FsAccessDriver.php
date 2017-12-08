@@ -89,6 +89,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public $driverConf;
     protected $wrapperClassName;
     protected $urlBase;
+    protected $exposeRepositoryOptions = ["UX_DISPLAY_DEFAULT_MODE", "UX_SORTING_DEFAULT_COLUMN", "UX_SORTING_DEFAULT_DIRECTION"];
 
     /**
      * @param ContextInterface $contextInterface
@@ -143,6 +144,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
         if ($recycle != "") {
             RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
+        }
+
+        foreach ($this->exposeRepositoryOptions as $paramName){
+            $this->exposeConfigInManifest($paramName, $repository->getContextOption($contextInterface, $paramName));
         }
     }
 

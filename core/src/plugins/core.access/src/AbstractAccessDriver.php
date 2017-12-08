@@ -60,6 +60,7 @@ abstract class AbstractAccessDriver extends Plugin
     */
     public $repository;
     public $driverType = "access";
+    protected $exposeRepositoryOptions = [];
 
     /**
      * @param ContextInterface $ctx

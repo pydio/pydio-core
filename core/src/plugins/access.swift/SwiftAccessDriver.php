@@ -90,6 +90,10 @@ class SwiftAccessDriver extends FsAccessDriver
         if ($recycle != "") {
             RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
+        foreach ($this->exposeRepositoryOptions as $paramName){
+            $this->exposeConfigInManifest($paramName, $contextInterface->getRepository()->getContextOption($contextInterface, $paramName));
+        }
+
     }
 
     /**
