@@ -459,6 +459,8 @@ class LdapAuthDriver extends AbstractAuthDriver
 
         } else if (!empty($this->separateGroup) && $baseGroup != "/" . $this->separateGroup) {
             return array();
+        } else if (empty($this->separateGroup) && empty($this->hasGroupsMapping) && ($baseGroup != "/")){
+            return array();
         }
 
         $entries = $this->getUserEntries(StringHelper::regexpToLdap($regexp), false, $offset, $limit, true);

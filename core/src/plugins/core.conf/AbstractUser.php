@@ -282,7 +282,7 @@ abstract class AbstractUser implements UserInterface
     public function getLock()
     {
         if(AJXP_SERVER_DEBUG && $this->isAdmin() && $this->getGroupPath() === "/") return false;
-        if (!empty($this->rights["ajxp.lock"])) {
+        if (!empty($this->rights["ajxp.lock"]) && ($this->rights["ajxp.lock"] !== "false")) {
             return $this->rights["ajxp.lock"];
         }
         return $this->mergedRole->filterParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_REPO_SCOPE_ALL, false);
