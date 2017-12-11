@@ -1042,8 +1042,18 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($selection->isUnique() && isSet($httpVars["targetBaseName"])){
                     $targetBaseName = $httpVars["targetBaseName"];
                 }
-                if(isSet($httpVars["recycle_restore"]) && !file_exists($selection->nodeForPath($destPath)->getUrl())){
-                    $this->mkDir($selection->nodeForPath(PathUtils::forwardSlashDirname($destPath)), basename($destPath), false, true);
+                if(isSet($httpVars["recycle_restore"])){
+                    $targetPath =  rtrim($destPath, "/") . "/" . PathUtils::forwardSlashBasename($selection->getUniqueNode()->getPath());
+                    if(file_exists($selection->nodeForPath($targetPath)->getUrl())){
+                        if(is_file($selection->nodeForPath($targetPath)->getUrl())){
+                            throw new PydioException(sprintf($mess[631], $targetPath));
+                        } else {
+                            throw new PydioException(sprintf($mess[632], $targetPath));
+                        }
+                    }
+                    if(!file_exists($selection->nodeForPath($destPath)->getUrl())){
+                        $this->mkDir($selection->nodeForPath(PathUtils::forwardSlashDirname($destPath)), basename($destPath), false, true);
+                    }
                 }
                 $this->filterUserSelectionToHidden($ctx, [$httpVars["dest"]]);
                 if ($selection->inZip()) {

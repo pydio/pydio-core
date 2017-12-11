@@ -725,10 +725,12 @@ $mess=array(
 "623" => "Copier",
 "624" => "Copié!",
 "625" => "Lettre",
-"626" => "Files Shared with me",
-"627" => "Shares from remote servers",
-"628" => "Revert",
-"629" => "No records yet",
-"630" => "Folders shared with me",
+"626" => "Fichiers partagés avec moi",
+"627" => "Partages de serveurs distants",
+"628" => "Revenir",
+"629" => "Pas d'enregistrements",
+"630" => "Dossiers partagés avec moi",
+"631" => "Attention, cette opération va écraser un fichier existant (%s). Veuillez renommer le fichier pour rendre possible la restauration depuis la corbeille.",
+"632" => "Attention, cette opération va écraser un répertoire existant (%s). Veuillez renommer le répertoire pour rendre possible la restauration depuis la corbeille.",
 /* END SENTENCE */
 );
