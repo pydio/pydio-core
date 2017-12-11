@@ -235,7 +235,7 @@ class UsersService
 
     }
 
-    
+
 
     /**
      * Whether the whole users management system is enabled or not.
@@ -623,7 +623,7 @@ class UsersService
         if($recursive){
             $childrenGroups = $authDriver->listChildrenGroups($baseGroup);
             foreach($childrenGroups as $relativePath => $groupLabel){
-                self::browseUsersGroupsWithCallback(rtrim($baseGroup, "/")."/".$relativePath, $userCallback, true, $groupCallback, $groupLabel);
+                self::browseUsersGroupsWithCallback(rtrim($baseGroup, "/")."/".ltrim($relativePath,"/"), $userCallback, true, $groupCallback, $groupLabel);
             }
         }
 
