@@ -67,6 +67,7 @@ class UsersManager extends AbstractManager
         $a = $requestInterface->getAttribute("action");
         $vars = $requestInterface->getParsedBody();
         $path = $vars["path"];
+        $path = '/'.ltrim($path, '/');
         if($a === "people-create-resource"){
             if($vars["request_body"]["resourceType"] === "user"){
                 // Create a user
