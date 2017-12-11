@@ -228,6 +228,7 @@ class Controller
                         && $loggedUser->canWrite($ctx->getRepositoryId()."")){
                         // Special case of "write only" right : return empty listing, no auth error.
                         $response = new Response();
+                        $response = $response->withHeader("Content-type", "text/xml");
                         $response->getBody()->write(XMLHelper::wrapDocument(""));
                         return $response;
                     }else{
