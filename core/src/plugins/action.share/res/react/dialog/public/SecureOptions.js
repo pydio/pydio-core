@@ -40,8 +40,14 @@ let PublicLinkSecureOptions = React.createClass({
     },
 
     updatePassword: function(newValue, oldValue){
+        if(newValue && !this.refs.passField.isValid()){
+            this.props.shareModel.setValidStatus(false);
+        } else{
+            this.props.shareModel.setValidStatus(true);
+        }
         this.props.shareModel.updatePassword(this.props.linkData.hash, newValue);
     },
+
 
     renderPasswordContainer: function(){
         var linkId = this.props.linkData.hash;
@@ -60,7 +66,6 @@ let PublicLinkSecureOptions = React.createClass({
                     floatingLabelText={this.props.getMessage('23')}
                     disabled={true}
                     value={'********'}
-                    onChange={this.updatePassword}
                     fullWidth={true}
                 />
             );
@@ -68,6 +73,7 @@ let PublicLinkSecureOptions = React.createClass({
             passwordField = (
                 <ValidPassword
                     name="share-password"
+                    ref="passField"
                     attributes={{label:this.props.getMessage('23')}}
                     value={this.props.shareModel.getPassword(linkId)}
                     onChange={this.updatePassword}

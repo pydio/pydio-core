@@ -17,6 +17,10 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+const PassUtils = require('pydio/util/pass');
+const PydioDataModel = require('pydio/model/data-model');
+import React from 'react'
+import {TextField} from 'material-ui'
 
 const CreateUserForm = React.createClass({
 
@@ -39,47 +43,44 @@ const CreateUserForm = React.createClass({
         }
     },
 
-    checkPassword:function(){
-        var value1 = this.refs.pass.getValue();
-        var value2 = this.refs.passconf.getValue();
-        var minLength = parseInt(global.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
-        if(value1 && value1.length < minLength){
-            this.refs.pass.setErrorText(this.context.getMessage('378'));
-            return;
+    getInitialState: function(){
+        const passState = PassUtils.getState();
+        return {
+            step:1,
+            ...passState
         }
-        if(value1 && value2 && value2 != value1){
-            this.refs.passconf.setErrorText(this.context.getMessage('238'));
-            return;
-        }
-        this.refs.pass.setErrorText(null);
-        this.refs.passconf.setErrorText(null);
     },
 
-    getInitialState: function(){
-        return {
-            step:1
-        }
+    checkPassword:function(){
+        const value1 = this.refs.pass.getValue();
+        const value2 = this.refs.passconf.getValue();
+        this.setState(PassUtils.getState(value1, value2, this.state));
     },
 
     submit: function(dialog){
-        var parameters = {};
-        var ctx = this.props.dataModel.getUniqueNode() || this.props.dataModel.getContextNode();
+        if(!this.state.valid){
+            this.props.pydio.UI.displayMessage('ERROR', this.state.passErrorText || this.state.confirmErrorText);
+            return;
+        }
+
+        let parameters = {};
+        const ctx = this.props.dataModel.getUniqueNode() || this.props.dataModel.getContextNode();
         parameters['get_action'] = 'create_user';
         parameters['new_user_login'] = this.refs.user_id.getValue();
         parameters['new_user_pwd'] = this.refs.pass.getValue();
-        var currentPath = ctx.getPath();
+        const currentPath = ctx.getPath();
         if(currentPath.startsWith("/data/users")){
             parameters['group_path'] = currentPath.substr("/data/users".length);
         }
         PydioApi.getClient().request(parameters, function(transport){
-            var xml = transport.responseXML;
-            var message = XMLUtils.XPathSelectSingleNode(xml, "//reload_instruction");
+            const xml = transport.responseXML;
+            const message = XMLUtils.XPathSelectSingleNode(xml, "//reload_instruction");
             if(message){
-                var node = new AjxpNode(currentPath + "/"+ parameters['new_user_login'], true);
+                let node = new AjxpNode(currentPath + "/"+ parameters['new_user_login'], true);
                 node.getMetadata().set("ajxp_mime", "user");
                 //global.pydio.UI.openCurrentSelectionInEditor(node);
                 this.props.openRoleEditor(node);
-                var currentNode = global.pydio.getContextNode();
+                let currentNode = global.pydio.getContextNode();
                 if(global.pydio.getContextHolder().getSelectedNodes().length){
                     currentNode = global.pydio.getContextHolder().getSelectedNodes()[0];
                 }
@@ -90,9 +91,9 @@ const CreateUserForm = React.createClass({
     },
 
     render: function(){
-        var ctx = this.props.dataModel.getUniqueNode() || this.props.dataModel.getContextNode();
-        var currentPath = ctx.getPath();
-        var path;
+        const ctx = this.props.dataModel.getUniqueNode() || this.props.dataModel.getContextNode();
+        const currentPath = ctx.getPath();
+        let path;
         if(currentPath.startsWith("/data/users")){
             path = currentPath.substr("/data/users".length);
             if(path){
@@ -102,28 +103,27 @@ const CreateUserForm = React.createClass({
         return (
             <div>
                 {path}
-                <div>
-                    <ReactMUI.TextField
-                        ref="user_id"
-                        floatingLabelText={this.context.getMessage('ajxp_admin.user.21')}
-                    />
-                </div>
-                <div>
-                    <ReactMUI.TextField
-                        ref="pass"
-                        type="password"
-                        floatingLabelText={this.context.getMessage('ajxp_admin.user.22')}
-                        onChange={this.checkPassword}
-                    />
-                </div>
-                <div>
-                    <ReactMUI.TextField
-                        ref="passconf"
-                        type="password"
-                        floatingLabelText={this.context.getMessage('ajxp_admin.user.23')}
-                        onChange={this.checkPassword}
-                    />
-                </div>
+                <TextField
+                    ref="user_id"
+                    fullWidth={true}
+                    floatingLabelText={this.context.getMessage('ajxp_admin.user.21')}
+                />
+                <TextField
+                    ref="pass"
+                    type="password"
+                    fullWidth={true}
+                    floatingLabelText={this.context.getMessage('ajxp_admin.user.22')}
+                    onChange={this.checkPassword}
+                    errorText={this.state.passErrorText || this.state.passHintText}
+                />
+                <TextField
+                    ref="passconf"
+                    type="password"
+                    fullWidth={true}
+                    floatingLabelText={this.context.getMessage('ajxp_admin.user.23')}
+                    onChange={this.checkPassword}
+                    errorText={this.state.confirmErrorText}
+                />
             </div>
         );
     }
