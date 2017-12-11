@@ -118,8 +118,8 @@ class FilesystemMounter extends AbstractMetaSource
      */
     protected function isAlreadyMounted(ContextInterface $contextInterface)
     {
-        list($user, $password) = $this->getCredentials();
-        $MOUNT_POINT = $this->getOption($contextInterface, "MOUNT_POINT", $user, $password);
+        $user = $contextInterface->getUser()->getId();
+        $MOUNT_POINT = $this->getOption($contextInterface, "MOUNT_POINT", $user);
         if( is_dir($MOUNT_POINT) ){
             $statParent = stat(dirname($MOUNT_POINT));
             $statMount = stat($MOUNT_POINT);
