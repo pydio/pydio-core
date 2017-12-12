@@ -240,8 +240,13 @@ class FileReaderResponse extends AsyncResponseStream
 
         $localName = ($localName =="" ? basename((isSet($originalFilePath)?$originalFilePath:$filePathOrData)) : $localName);
 
-        if ($headerType == "plain") {
 
+        header("Pragma: public");
+        //header("Expires: -1");
+        header("Cache-Control: public, must-revalidate, post-check=0, pre-check=0");
+        //header("Content-Disposition: attachment; filename=\"$file_name\"");
+
+        if ($headerType == "plain") {
             header("Content-type:text/plain");
             header("Content-Length: ".$size);
 
@@ -254,13 +259,13 @@ class FileReaderResponse extends AsyncResponseStream
         } else {
 
             if ($isFile) {
-                header("Accept-Ranges: 0-$size");
                 $this->logDebug("Sending accept range 0-$size");
+                $tsstring = gmdate('D, d M Y H:i:s ', filemtime($filePathOrData)) . 'GMT';
+                header("Last-Modified: $tsstring");
             }
 
             // Check if we have a range header (we are resuming a transfer)
             if ( isset($serverParams['HTTP_RANGE']) && $isFile && $size != 0 ) {
-
                 if ($headerType == "stream_content") {
 
                     if (extension_loaded('fileinfo')  && (( $node !== null && !$node->wrapperIsRemote()) || $filePath !== null)) {
@@ -282,16 +287,27 @@ class FileReaderResponse extends AsyncResponseStream
                 // multiple ranges, which can become pretty complex, so ignore it for now
                 $ranges = explode('=', $_SERVER['HTTP_RANGE']);
                 $offsets = explode('-', $ranges[1]);
-                $offset = floatval($offsets[0]);
+                if(!$offsets[0]) {
+                    $offset = 0;
+                }else{
+                    $offset = floatval($offsets[0]);
+                }
 
-                $length = floatval($offsets[1]) - $offset;
-                if (!$length) $length = $size - $offset;
-                if ($length + $offset > $size || $length < 0) $length = $size - $offset;
+                if (!$offsets[1]) {
+                    $length = $size - $offset;
+                }else{
+                    $length = floatval($offsets[1]) - $offset;
+                    if ($length + $offset > $size || $length < 0) {
+                        $length = $size - $offset;
+                    }
+                }
+
+                $dataSizeFromOffset = ($offset + $length - 1) >= 0 ? ($offset + $length - 1): 0;
                 $this->logDebug('Content-Range: bytes ' . $offset . '-' . $length . '/' . $size);
                 header('HTTP/1.1 206 Partial Content');
-                header('Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $size);
-
+                header('Content-Range: bytes ' . $offset . '-' . $dataSizeFromOffset . '/' . $size);
                 header("Content-Length: ". $length);
+                header("Accept-Ranges: $offset-".$dataSizeFromOffset);
                 $file = fopen($filePathOrData, 'rb');
                 if(!is_resource($file)){
                     throw new \Exception("Failed opening file ".$filePathOrData);
@@ -304,14 +320,13 @@ class FileReaderResponse extends AsyncResponseStream
                     $relOffset -= 2000000000;
                     // This works because we never overcome the PHP 32 bit limit
                 }
-                fseek($file, $relOffset, SEEK_CUR);
+                $fseek = fseek($file, $relOffset, SEEK_CUR);
 
                 while(ob_get_level()) ob_end_flush();
                 $readSize = 0.0;
                 $bufferSize = 1024 * 8;
                 while (!feof($file) && $readSize < $length && connection_status() == 0) {
-                    $this->logDebug("dl reading $readSize to $length", ["httpRange" => $serverParams["HTTP_RANGE"]]);
-                    echo fread($file, $bufferSize);
+                    echo  fread($file, $bufferSize);
                     $readSize += $bufferSize;
                     flush();
                 }
@@ -319,17 +334,15 @@ class FileReaderResponse extends AsyncResponseStream
                 fclose($file);
                 return;
 
-            } else {
-
+            }
+            else {
+                header("Accept-Ranges: 0-$size");
                 if ($confGzip) {
-
                     $gzippedData = ($data?gzencode($filePathOrData,9):gzencode(file_get_contents($filePathOrData), 9));
                     $size = strlen($gzippedData);
 
                 }
-
                 HTMLWriter::emitAttachmentsHeaders($localName, $size, $isFile, $confGzip);
-
                 if ($confGzip && isSet($gzippedData)) {
                     print $gzippedData;
                     return;
@@ -448,7 +461,7 @@ class FileReaderResponse extends AsyncResponseStream
         // Pydio Agent acceleration - We make sure that request was really proxied by Agent, by checking a specific header.
         if($accelConfiguration === "pydio" && array_key_exists("HTTP_X_PYDIO_DOWNLOAD_SUPPORTED", $serverParams)
             && ApiKeysService::requestHasValidHeadersForAdminTask($serverParams, PYDIO_BOOSTER_TASK_IDENTIFIER)) {
-            
+
             if ($localPathOrNode instanceof AJXP_Node) {
                 $options = MetaStreamWrapper::getResolvedOptionsForNode($localPathOrNode);
                 if($options["TYPE"] === "php"){
