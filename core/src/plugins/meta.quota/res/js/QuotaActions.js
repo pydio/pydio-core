@@ -69,20 +69,20 @@
 
         loadQuota(){
             if(!this.quotaEnabled()) return;
-            PydioApi.getClient().request({get_action:'monitor_quota'}, function(transport){
+            PydioApi.getClient().request({get_action:'monitor_quota'}, (transport) => {
                 if(!this.quotaEnabled()) return;
                 const data = transport.responseJSON;
                 this.usage = data.USAGE;
                 this.total = data.TOTAL;
                 this.notify('update');
-            }.bind(this));
+            });
         }
 
         startListening(){
-            var configs = pydio.getPluginConfigs("mq");
+            const configs = pydio.getPluginConfigs("mq");
             if(configs){
-                pydio.observe("server_message", function(event){
-                    var newValue = XMLUtils.XPathSelectSingleNode(event, "/tree/metaquota");
+                pydio.observe("server_message", (event) => {
+                    const newValue = XMLUtils.XPathSelectSingleNode(event, "/tree/metaquota");
                     if(newValue){
                         this.usage = parseInt(newValue.getAttribute("usage"));
                         this.total = parseInt(newValue.getAttribute("total"));
