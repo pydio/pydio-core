@@ -161,7 +161,13 @@ class AdvancedMetaFields extends Component {
     build() {
 
         const {options, indexerData} = this.state
-        const {metaColumns, reactColumnsRenderers} = {...options}
+        let {metaColumns, reactColumnsRenderers} = {...options}
+        if(!metaColumns){
+            metaColumns = {};
+        }
+        if(!reactColumnsRenderers){
+            reactColumnsRenderers = {};
+        }
         let {indexed_meta_fields, additionnal_meta_columns} = indexerData;
         if(!indexed_meta_fields){
             indexed_meta_fields = [];
@@ -173,8 +179,12 @@ class AdvancedMetaFields extends Component {
         const generic = {basename: this.props.getMessage(1), ...additionnal_meta_columns}
 
         // Looping through the options to check if we have a special renderer for any
-        const specialRendererKeys = Object.keys({...reactColumnsRenderers}).filter((key) => {return indexed_meta_fields.indexOf(key) > -1});
-        const standardRendererKeys = indexed_meta_fields.filter((key) => {return specialRendererKeys.indexOf(key) === -1 && !additionnal_meta_columns[key]})
+        const specialRendererKeys = Object.keys({...reactColumnsRenderers}).filter((key) => {
+            return indexed_meta_fields.indexOf(key) > -1;
+        });
+        const standardRendererKeys = indexed_meta_fields.filter((key) => {
+            return metaColumns[key] && specialRendererKeys.indexOf(key) === -1 && !additionnal_meta_columns[key];
+        });
 
         const columns = standardRendererKeys.map((key) => {
             let obj = {};obj[key] = metaColumns[key];
