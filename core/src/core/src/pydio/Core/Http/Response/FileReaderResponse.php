@@ -242,9 +242,7 @@ class FileReaderResponse extends AsyncResponseStream
 
 
         header("Pragma: public");
-        //header("Expires: -1");
         header("Cache-Control: public, must-revalidate, post-check=0, pre-check=0");
-        //header("Content-Disposition: attachment; filename=\"$file_name\"");
 
         if ($headerType == "plain") {
             header("Content-type:text/plain");
@@ -257,6 +255,8 @@ class FileReaderResponse extends AsyncResponseStream
             header('Cache-Control: public');
 
         } else {
+
+            header("Accept-Ranges: bytes");
 
             if ($isFile) {
                 $this->logDebug("Sending accept range 0-$size");
@@ -307,7 +307,6 @@ class FileReaderResponse extends AsyncResponseStream
                 header('HTTP/1.1 206 Partial Content');
                 header('Content-Range: bytes ' . $offset . '-' . $dataSizeFromOffset . '/' . $size);
                 header("Content-Length: ". $length);
-                header("Accept-Ranges: $offset-".$dataSizeFromOffset);
                 $file = fopen($filePathOrData, 'rb');
                 if(!is_resource($file)){
                     throw new \Exception("Failed opening file ".$filePathOrData);
@@ -336,7 +335,6 @@ class FileReaderResponse extends AsyncResponseStream
 
             }
             else {
-                header("Accept-Ranges: 0-$size");
                 if ($confGzip) {
                     $gzippedData = ($data?gzencode($filePathOrData,9):gzencode(file_get_contents($filePathOrData), 9));
                     $size = strlen($gzippedData);
