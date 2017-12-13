@@ -57,6 +57,11 @@ Fix write-only workspace : wrong response header - do not show activity log. Clo
 Hack for user specific locks and api access
 Fix quota not updating on workspace switch
 Change Accept-Ranges header
+Plugin Load ClassFile for a given php version if necessary
+Fix Advanced Search and meta fields, inc. missing Content field. Factorize in AbstractSearchEngineIndexer. Try to fix login window not appearing in some case Fix Quota panel not refreshed
+New BookmarksList - Meta/Ctrl key support in main files list (close #1351)
+Forms: lower onChange trigger timeout to avoid field blinking
+Fix field validation
 
 ========================
 
