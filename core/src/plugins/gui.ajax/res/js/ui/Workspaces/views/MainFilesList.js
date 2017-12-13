@@ -141,7 +141,6 @@ class ComponentConfigsParser {
                     break;
             }
         }
-        console.log(res);
         return res;
     }
 }
@@ -322,9 +321,17 @@ let MainFilesList = React.createClass({
             return;
         }
         if(!mobile && ( !clickType || clickType === SimpleList.CLICK_TYPE_SIMPLE )){
-            if(event && event.shiftKey && dm.getSelectedNodes().length){
-                const newSelection = this.refs.list.computeSelectionFromCurrentPlusTargetNode(dm.getSelectedNodes(), node);
+            const crtSelection = dm.getSelectedNodes();
+            if(event && event.shiftKey && crtSelection.length) {
+                const newSelection = this.refs.list.computeSelectionFromCurrentPlusTargetNode(crtSelection, node);
                 dm.setSelectedNodes(newSelection);
+            } else if(event && (event.ctrlKey || event.metaKey) && crtSelection.length){
+                if(crtSelection.indexOf(node) === -1){
+                    dm.setSelectedNodes([...crtSelection, node]);
+                } else {
+                    const otherSelection = crtSelection.filter((obj) => {return obj!== node;})
+                    dm.setSelectedNodes(otherSelection);
+                }
             }else{
                 dm.setSelectedNodes([node]);
             }

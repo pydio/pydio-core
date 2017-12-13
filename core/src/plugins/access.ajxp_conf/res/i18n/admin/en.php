@@ -282,7 +282,7 @@ $mess=array(
     "ws.55" => "Automatic Purge",
     "ws.56" => "This workspace has a \"purge\" setup, to automatically remove documents that were left untouched since %s days. Make sure to add a task in the
                     scheduler to regularly process this workspace and look for expired document. You can use the buttons below to create this task automatically,
-                    ok run the purge directly.",
+                    or run the purge directly.",
     "ws.57" => "Please note: as this worksace has user-specific contents, purge will be running for each user.",
     "ws.58" => "Purge now",
     "ws.59" => "Schedule every day at 4AM",

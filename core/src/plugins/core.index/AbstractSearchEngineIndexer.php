@@ -23,9 +23,11 @@ namespace Pydio\Access\Indexer\Core;
 
 use DOMNode;
 use DOMXPath;
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 use Pydio\Core\Utils\Vars\VarsFilter;
@@ -37,6 +39,33 @@ use Pydio\Access\Meta\Core\AbstractMetaSource;
  */
 abstract class AbstractSearchEngineIndexer extends AbstractMetaSource
 {
+    protected $metaFields = [];
+    protected $indexContent = false;
+
+    /**
+     * @param ContextInterface $contextInterface
+     * @param AbstractAccessDriver $accessDriver
+     */
+    public function initMeta(ContextInterface $contextInterface, AbstractAccessDriver $accessDriver)
+    {
+        $messages = LocaleService::getMessages();
+        parent::initMeta($contextInterface, $accessDriver);
+        if (!empty($this->metaFields) || $this->indexContent) {
+            $metaFields = $this->metaFields;
+            $el = $this->getXPath()->query("/indexer")->item(0);
+            if ($this->indexContent) {
+                $metaFields[] = "ajxp_document_content";
+                $data = ["indexed_meta_fields" => $metaFields,
+                    "additionnal_meta_columns" => ["ajxp_document_content" => $messages["index.lucene.13"]]
+                ];
+                $el->setAttribute("indexed_meta_fields", json_encode($data));
+            } else {
+                $el->setAttribute("indexed_meta_fields", json_encode(["indexed_meta_fields" => $metaFields, "additionnal_meta_columns" => []]));
+            }
+        }
+        parent::init($contextInterface, $this->options);
+    }
+
 
     /**
      * @param DOMNode $contribNode

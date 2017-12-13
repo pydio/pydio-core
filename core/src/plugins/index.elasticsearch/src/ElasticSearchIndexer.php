@@ -51,8 +51,6 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
     private $nextId;
     private $lastIdPath;
 
-    private $metaFields = [];
-    private $indexContent = false;
     private $specificId = "";
     private $verboseIndexation = false;
 
@@ -80,30 +78,6 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
         );
 
         $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
-    }
-
-    /**
-     * @param ContextInterface $ctx
-     * @param \Pydio\Access\Core\AbstractAccessDriver $accessDriver
-     */
-    public function initMeta(ContextInterface $ctx, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
-    {
-        $messages = LocaleService::getMessages();
-        if (!empty($this->metaFields) || $this->indexContent) {
-            $metaFields = $this->metaFields;
-            /** @var \DOMElement $el */
-            $el = $this->getXPath()->query("/indexer")->item(0);
-            if ($this->indexContent) {
-                if($this->indexContent) $metaFields[] = "ajxp_document_content";
-                $data = ["indexed_meta_fields" => $metaFields,
-                    "additionnal_meta_columns" => ["ajxp_document_content" => $messages["index.lucene.13"]]
-                ];
-                $el->setAttribute("indexed_meta_fields", json_encode($data));
-            } else {
-                $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
-            }
-        }
-        parent::init($ctx, $this->options);
     }
 
     /**

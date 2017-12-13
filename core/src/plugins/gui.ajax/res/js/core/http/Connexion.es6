@@ -312,7 +312,9 @@ class Connexion{
 					root.clear();
 				}
 				pydio.getController().fireAction('logout');
-				pydio.getController().fireAction('login');
+				setTimeout(() => {
+				    pydio.getController().fireAction('login')
+				}, 350);
 			}
 
 			const messageNode = XMLUtils.XPathSelectSingleNode(parsedBody.responseXML.documentElement, "message");

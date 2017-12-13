@@ -31,6 +31,7 @@
             return {
                 dialogTitle: global.pydio.MessageHash['disclaimer.3'],
                 dialogIsModal: true,
+                dialogScrollBody: true,
                 dialogSize:'lg'
             };
         },
@@ -74,9 +75,9 @@
             }.bind(this);
             let messages = global.pydio.MessageHash;
             return (
-                <div>
+                <div style={{width: '100%'}}>
                     <div id="disclaimer_content" style={{height: 350, overflow:'auto', margin:'15px 0', padding: 10}} dangerouslySetInnerHTML={content()}></div>
-                    <div>
+                    <div style={{paddingBottom: 20}}>
                         <MaterialUI.Checkbox label={messages['disclaimer.4']} onCheck={this.onCheck} checked={this.state.accepted}/>
                     </div>
                 </div>

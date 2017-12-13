@@ -21,15 +21,14 @@
 import FormMixin from '../mixins/FormMixin'
 const PassUtils = require('pydio/util/pass')
 const React = require('react')
-const ReactMUI = require('material-ui-legacy')
+const {TextField} = require('material-ui')
 
 export default React.createClass({
 
     mixins:[FormMixin],
 
     isValid:function(){
-        return (this.state.value && this.checkMinLength(this.state.value) &&
-        this.state.confirmValue && this.state.confirmValue === this.state.value);
+        return this.state.valid;
     },
 
     checkMinLength:function(value){
@@ -45,26 +44,23 @@ export default React.createClass({
         }
     },
 
-    getComplexityString:function(value){
-        let response;
-        PassUtils.checkPasswordStrength(value, function(segment, percent){
-            let responseString;
-            if(global.pydio && global.pydio.MessageHash){
-                responseString = this.getMessage(PassUtils.Options.pydioMessages[segment]);
-            }else{
-                responseString = PassUtils.Options.messages[segment];
-            }
-            response = {
-                segment:segment,
-                color:(segment>1) ? PassUtils.Options.colors[segment] : null,
-                responseString:responseString
-            };
-        }.bind(this));
-        return response;
+    updatePassState: function(){
+        const prevStateValid = this.state.valid;
+        const newState = PassUtils.getState(this.refs.pass.getValue(), this.refs.confirm ? this.refs.confirm.getValue() : '');
+        this.setState(newState);
+        if(prevStateValid !== newState.valid && this.props.onValidStatusChange){
+            this.props.onValidStatusChange(newState.valid);
+        }
+    },
+
+    onPasswordChange: function(event){
+        this.updatePassState();
+        this.onChange(event, event.target.value);
     },
 
     onConfirmChange:function(event){
         this.setState({confirmValue:event.target.value});
+        this.updatePassState();
         this.onChange(event, this.state.value);
     },
 
@@ -73,21 +69,8 @@ export default React.createClass({
             const value = this.state.value;
             return <div onClick={this.props.disabled?function(){}:this.toggleEditMode} className={value?'':'paramValue-empty'}>{!value?'Empty':value}</div>;
         }else{
-            let errorText = this.state.errorText;
-            let className, confirmError;
-            if(this.state.value){
-                const response = this.getComplexityString(this.state.value);
-                errorText = <span style={{color: response.color}}>{response.responseString}</span>;
-                if(response.segment > 1){
-                    className = "mui-error-as-hint";
-                }
-            }
-            if(this.state.confirmValue && this.state.confirmValue !== this.state.value){
-                errorText = 'Passwords differ';
-                className = undefined;
-                confirmError = '   ';
-            }
             const overflow = {overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', width:'100%'};
+            let className = this.state.valid ? '' : 'mui-error-as-hint' ;
             if(this.props.className){
                 className = this.props.className + ' ' + className;
             }
@@ -95,8 +78,9 @@ export default React.createClass({
             if(this.state.value && !this.props.disabled){
                 confirm = [
                     <div key="sep" style={{width: 20}}></div>,
-                    <MaterialUI.TextField
+                    <TextField
                         key="confirm"
+                        ref="confirm"
                         floatingLabelText={this.getMessage(199)}
                         floatingLabelShrinkStyle={{...overflow, width:'130%'}}
                         floatingLabelStyle={overflow}
@@ -108,25 +92,26 @@ export default React.createClass({
                         disabled={this.props.disabled}
                         fullWidth={true}
                         style={{flex:1}}
-                        errorText={confirmError}
+                        errorText={this.state.confirmErrorText}
                     />
                 ];
             }
             return(
                 <form autoComplete="off">
                     <div style={{display:'flex', marginTop:-16}}>
-                        <MaterialUI.TextField
+                        <TextField
+                            ref="pass"
                             floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
                             floatingLabelShrinkStyle={{...overflow, width:'130%'}}
                             floatingLabelStyle={overflow}
                             className={className}
                             value={this.state.value}
-                            onChange={this.onChange}
+                            onChange={this.onPasswordChange}
                             onKeyDown={this.enterToToggle}
                             type='password'
                             multiLine={false}
                             disabled={this.props.disabled}
-                            errorText={errorText}
+                            errorText={this.state.passErrorText}
                             fullWidth={true}
                             style={{flex:1}}
                         />

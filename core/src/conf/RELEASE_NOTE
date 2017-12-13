@@ -1,6 +1,71 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-Bug Fixes for 8.0.0 :
+This is a bugfix for Pydio 8.0.1, below is a list of the commits
+
+Fix ldap mapping attribute to roles
+Update version to 8.0.1
+Fixing a remote stream function
+Adding ability to re-generate refresh token if expired
+Missing hook for filter_boot.conf
+Previous vpath adapter is replaced by use_path_style_endpoint in client config (for custom url)
+Make sure action.cart will mount its react component by default.
+Clean manifest from old actions
+Disable background copy if not using session api, seems to break sync client in some case.
+Fix test before create new alias class
+Fix set context for object
+Fix test key "type" if it exists
+Fix test key "type" if it exists
+Fix migration public link with password
+Fix collabora on smb + session credential workspace
+Fix collabora on smb + session credential workspace
+Fix collabora on smb + session credential workspace
+Updated Korean translation
+Missing comma in Korean i18n file was added
+Fix remember me feature
+Fix upload dialog width when there are few uploaders - Close #1384
+Fix #1376
+Replace Pear dependency to Mail_mimeDecode to Composer library. Should remove problematic plugin dependency, see #1385
+Force redirecting to https version of Pixlr - See #1371
+Php doc fix
+False negtive on OB detection
+Fix #1393
+Typo in forbidden
+Typo
+Fix postgresql convert false to "false"
+Remove fuzzy search and upgrade elastica to 5.3.0
+Fix displaying user in sql groups
+Close session before reading audio file
+Remove unused img_library and associated images
+Fix developer doc link - Close #1395
+Add support referral binding
+Implement a default displaymode and default sorting parameter per workspace
+Fix download resuming
+Fix #1355 - Use renamed from SOURCE instead of renamed to NODE
+Remove src attributes
+Fix api v2 create user
+Reduce Batch size for delete - Fix usage of PATH parameter in S3 driver - Close #1365 at last !
+Avoid some js errors with empty values
+Forgotten console
+Fix getS3Service() method
+Add param for smb option
+Fix error while index mounted repo
+Update password fields everywhere to avoid allowing save when not correctly set.
+Fix Admin create/delete group works only if group id starts with double slash
+Fix disclaimer dialog (enable scrollBody)
+Throw an error when trying to restore on an existing file. Close #1368
+Fix write-only workspace : wrong response header - do not show activity log. Close #1367
+Hack for user specific locks and api access
+Fix quota not updating on workspace switch
+Change Accept-Ranges header
+Plugin Load ClassFile for a given php version if necessary
+Fix Advanced Search and meta fields, inc. missing Content field. Factorize in AbstractSearchEngineIndexer. Try to fix login window not appearing in some case Fix Quota panel not refreshed
+New BookmarksList - Meta/Ctrl key support in main files list (close #1351)
+Forms: lower onChange trigger timeout to avoid field blinking
+Fix field validation
+
+========================
+
+Pydio 8.0.1 - 2017/06/15 - Bug Fixes for 8.0.0
 
 [Most noticeable]
 Fix wrong path separator, triggering error on open_basedir

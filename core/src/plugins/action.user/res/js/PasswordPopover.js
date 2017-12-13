@@ -64,10 +64,11 @@ class PasswordPopover extends React.Component{
                     anchorOrigin={{horizontal: 'left', vertical: 'top'}}
                     targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
                     onRequestClose={this.passClosePopover.bind(this)}
+                    zDepth={2}
                 >
                     <div>
                         <PasswordForm
-                            style={{padding:10, backgroundColor:'#fafafa'}}
+                            style={{padding:10, paddingBottom: 30, backgroundColor:'#fafafa'}}
                             pydio={pydio}
                             ref="passwordForm"
                             onValidStatusChange={this.passValidStatusChange.bind(this)}

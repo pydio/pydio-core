@@ -27,6 +27,7 @@ const {PydioContextConsumer} = require('pydio').requireLib('boot')
 import DatePanel from './DatePanel';
 import FileFormatPanel from './FileFormatPanel';
 import FileSizePanel from './FileSizePanel';
+import XMLUtils from 'pydio/util/xml'
 
 class AdvancedSearch extends Component {
 
@@ -43,16 +44,12 @@ class AdvancedSearch extends Component {
         super(props)
 
         this.state = {
-            value: props.values['basename'] || ''
+            values: props.values
         };
     }
 
     onChange(values) {
-        if (values.hasOwnProperty('basename')) {
-            this.setState({
-                value: values.basename
-            })
-        }
+        this.setState({values: {...this.state.values, ...values}});
         this.props.onChange(values)
     }
 
@@ -87,7 +84,7 @@ class AdvancedSearch extends Component {
         return (
             <TextField
                 key={fieldname}
-                value={this.state.value || ''}
+                value={this.state.values[fieldname] || ''}
                 style={text}
                 className="mui-text-field"
                 floatingLabelFixed={true}
@@ -140,12 +137,18 @@ class AdvancedMetaFields extends Component {
 
         const registry = pydio.getXmlRegistry()
 
+        let indexed = {indexed_meta_fields: [], additional_meta_columns:{}};
+        const indexerData = XMLUtils.XPathGetSingleNodeText(registry, 'plugins/indexer/@indexed_meta_fields');
+        if(indexerData){
+            indexed = JSON.parse(indexerData);
+        }
         // Parse client configs
         let options = JSON.parse(XMLUtils.XPathGetSingleNodeText(registry, 'client_configs/template_part[@ajxpClass="SearchEngine" and @theme="material"]/@ajxpOptions'));
 
         this.build = _.debounce(this.build, 500)
 
         this.state = {
+            indexerData:indexed,
             options,
             fields: {}
         }
@@ -157,18 +160,41 @@ class AdvancedMetaFields extends Component {
 
     build() {
 
-        const {options} = this.state
-        const {metaColumns, reactColumnsRenderers} = {...options}
+        const {options, indexerData} = this.state
+        let {metaColumns, reactColumnsRenderers} = {...options}
+        if(!metaColumns){
+            metaColumns = {};
+        }
+        if(!reactColumnsRenderers){
+            reactColumnsRenderers = {};
+        }
+        let {indexed_meta_fields, additionnal_meta_columns} = indexerData;
+        if(!indexed_meta_fields){
+            indexed_meta_fields = [];
+        }
+        if(!additionnal_meta_columns){
+            additionnal_meta_columns = {};
+        }
 
-        const generic = {basename: this.props.getMessage(1)}
+        const generic = {basename: this.props.getMessage(1), ...additionnal_meta_columns}
 
         // Looping through the options to check if we have a special renderer for any
-        const specialRendererKeys = Object.keys({...reactColumnsRenderers})
-        const standardRendererKeys = Object.keys({...metaColumns}).filter((key) => specialRendererKeys.indexOf(standardRendererKeys) > -1)
+        const specialRendererKeys = Object.keys({...reactColumnsRenderers}).filter((key) => {
+            return indexed_meta_fields.indexOf(key) > -1;
+        });
+        const standardRendererKeys = indexed_meta_fields.filter((key) => {
+            return metaColumns[key] && specialRendererKeys.indexOf(key) === -1 && !additionnal_meta_columns[key];
+        });
 
-        const columns = standardRendererKeys.map((key) => {key: metaColumns[key]}).reduce((obj, current) => obj = {...obj, ...current}, [])
+        const columns = standardRendererKeys.map((key) => {
+            let obj = {};obj[key] = metaColumns[key];
+            return obj;
+        }).reduce((obj, current) => obj = {...obj, ...current}, [])
 
-        const renderers = Object.keys({...reactColumnsRenderers}).map((key) => {
+        const renderers = specialRendererKeys.map((key) => {
+            if(indexed_meta_fields[key] === -1){
+                return;
+            }
             const renderer = reactColumnsRenderers[key]
             const namespace = renderer.split('.',1).shift()
 

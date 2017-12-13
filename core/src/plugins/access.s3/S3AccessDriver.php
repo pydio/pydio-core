@@ -92,10 +92,11 @@ class S3AccessDriver extends FsAccessDriver
     }
 
     /**
+     * @param ContextInterface $ctx
      * @return S3Client
      */
-    public function getS3Service(){
-        return $this->s3Client;
+    public function getS3Service(ContextInterface $ctx){
+        return S3AccessWrapper::getClientForContext($ctx);
     }
 
     /**
@@ -103,7 +104,7 @@ class S3AccessDriver extends FsAccessDriver
      * @return int
      */
     public function directoryUsage(AJXP_Node $node){
-        $client = $this->getS3Service();
+        $client = $this->getS3Service($node->getContext());
         $bucket = $node->getRepository()->getContextOption($node->getContext(), "CONTAINER"); //(isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
         $path   = rtrim($node->getRepository()->getContextOption($node->getContext(), "PATH"), "/").$node->getPath(); //(isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");
         $objects = $client->getIterator('ListObjects', array(

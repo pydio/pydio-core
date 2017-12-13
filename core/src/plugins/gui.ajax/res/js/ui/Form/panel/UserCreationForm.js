@@ -115,7 +115,7 @@ class UserCreationForm extends React.Component{
             values['new_user_id'] = userPrefix + newUserName;
             values['lang'] = pydio.currentLanguage;
         }
-        this.state = { values: values };
+        this.state = { values: values, valid: false };
     }
 
     onValuesChange(newValues){
@@ -144,8 +144,16 @@ class UserCreationForm extends React.Component{
         this.props.onCancel();
     }
 
+    changeValidStatus(status){
+        this.setState({valid: status});
+    }
+
     render(){
         const pydio = this.props.pydio;
+        let status = this.state.valid;
+        if(!status && this.props.editMode && !this.state.values['new_password']){
+            status = true;
+        }
         return (
             <Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth : 2} style={{height: 250, display:'flex', flexDirection:'column', ...this.props.style}}>
                 <FormPanel
@@ -154,12 +162,13 @@ class UserCreationForm extends React.Component{
                     parameters={this.getParameters()}
                     values={this.state.values}
                     onChange={this.onValuesChange.bind(this)}
+                    onValidStatusChange={this.changeValidStatus.bind(this)}
                     style={{overflowY: 'auto', flex:1}}
                 />
                 <Divider style={{flexShrink:0}}/>
                 <div style={{padding:8, textAlign:'right'}}>
-                    <FlatButton label={this.props.editMode ? pydio.MessageHash[519] : pydio.MessageHash[484]} secondary={true} onTouchTap={this.submitCreationForm.bind(this)} />
                     <FlatButton label={pydio.MessageHash[49]} onTouchTap={this.cancelCreationForm.bind(this)} />
+                    <FlatButton label={this.props.editMode ? pydio.MessageHash[519] : pydio.MessageHash[484]} secondary={true} onTouchTap={this.submitCreationForm.bind(this)} disabled={!status}/>
                 </div>
             </Paper>
         )
@@ -167,11 +176,12 @@ class UserCreationForm extends React.Component{
 }
 
 UserCreationForm.propTypes = {
-    newUserName     : React.PropTypes.string,
-    onUserCreated   : React.PropTypes.func.isRequired,
-    onCancel        : React.PropTypes.func.isRequired,
-    editMode        : React.PropTypes.bool,
-    userData        : React.PropTypes.object
+    newUserName         : React.PropTypes.string,
+    onUserCreated       : React.PropTypes.func.isRequired,
+    onCancel            : React.PropTypes.func.isRequired,
+    onValidStatusChange : React.PropTypes.func,
+    editMode            : React.PropTypes.bool,
+    userData            : React.PropTypes.object
 };
 
 export {UserCreationForm as default}

@@ -1027,7 +1027,7 @@ class RepositoriesManager extends AbstractManager
             $buffer .= ">" ;
             foreach ($nested as $option) {
                 foreach ($option as $key => $optValue) {
-                    if (is_array($optValue) && count($optValue)) {
+                    if (is_array($optValue) /*&& count($optValue)*/) {
                         $buffer .= "<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>" ;
                     } else if (is_object($optValue)){
                         $buffer .= "<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>";

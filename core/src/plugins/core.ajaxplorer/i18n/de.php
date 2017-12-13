@@ -735,6 +735,8 @@ $mess=array(
 "628" => "Zurücksetzen",
 "629" => "Noch keine Einträge",
 "630" => "Mit mir geteilte Dateien",
+"631" => "Warning, trying to restore from recycle bin on top on an existing file (%s). Please rename this file manually in order to enable restoration from the recycle bin!",
+"632" => "Warning, trying to restore from recycle bin on top on an existing folder (%s). Please rename this folder in order to enable restoration from the recycle bin!",
 /* END SENTENCE */
 /* password strength tester */
 );

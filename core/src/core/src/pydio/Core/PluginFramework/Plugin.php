@@ -782,7 +782,18 @@ class Plugin implements \Serializable
         if($this->manifestXML != null) $this->unserializeManifest();
         $files = $this->xPath->query("class_definition");
         if(!$files->length) return false;
-        return $this->nodeAttrToHash($files->item(0));
+        foreach($files as $classDef){
+            $data = $this->nodeAttrToHash($classDef);
+            if(!empty($data["version"])){
+                if (version_compare(phpversion(), $data["version"]) >= 0) {
+                    return $data;
+                } else {
+                    continue;
+                }
+            } else {
+                return $data;
+            }
+        }
     }
 
     /**

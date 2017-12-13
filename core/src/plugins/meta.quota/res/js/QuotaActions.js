@@ -23,9 +23,10 @@
     let pydio = global.pydio;
     let MessageHash = global.pydio.MessageHash;
 
-    class Model{
+    class Model extends Observable{
 
         constructor(){
+            super();
             this.usage = '';
             this.total = '';
             this.startListening();
@@ -68,22 +69,24 @@
 
         loadQuota(){
             if(!this.quotaEnabled()) return;
-            PydioApi.getClient().request({get_action:'monitor_quota'}, function(transport){
+            PydioApi.getClient().request({get_action:'monitor_quota'}, (transport) => {
                 if(!this.quotaEnabled()) return;
                 const data = transport.responseJSON;
                 this.usage = data.USAGE;
                 this.total = data.TOTAL;
-            }.bind(this));
+                this.notify('update');
+            });
         }
 
         startListening(){
-            var configs = pydio.getPluginConfigs("mq");
+            const configs = pydio.getPluginConfigs("mq");
             if(configs){
-                pydio.observe("server_message", function(event){
-                    var newValue = XMLUtils.XPathSelectSingleNode(event, "/tree/metaquota");
+                pydio.observe("server_message", (event) => {
+                    const newValue = XMLUtils.XPathSelectSingleNode(event, "/tree/metaquota");
                     if(newValue){
                         this.usage = parseInt(newValue.getAttribute("usage"));
                         this.total = parseInt(newValue.getAttribute("total"));
+                        this.notify('update');
                     }
                 });
             }else{
@@ -96,6 +99,14 @@
                 }, 20);
             }
             this.loadQuota();
+        }
+
+        getState(){
+            return {
+                text: this.getText(),
+                total: this.getTotal(),
+                usage: this.getUsage()
+            };
         }
 
     }
@@ -118,9 +129,24 @@
 
     }
 
-    const QuotaPanel = React.createClass({
+    class QuotaPanel extends React.Component{
 
-        render: function(){
+
+        constructor(props){
+            super(props);
+            const model = Model.getInstance();
+            this.state = model.getState();
+            this._observer = () => {
+                this.setState(model.getState());
+            };
+            model.observe('update', this._observer);
+        }
+
+        componentWillUnmount(){
+            Model.getInstance().stopObserving('update', this._observer);
+        }
+
+        render(){
             let model = Model.getInstance();
             return (
                 <PydioWorkspaces.InfoPanelCard title={this.props.pydio.MessageHash['meta.quota.4']} icon="speedometer" iconColor="#1565c0">
@@ -132,7 +158,7 @@
             );
         }
 
-    }) ;
+    }
 
     global.QuotaActions = {
         Callbacks: Callbacks,

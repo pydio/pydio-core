@@ -22,11 +22,15 @@ const React = require('react')
 const {TextField, FlatButton} = require('material-ui')
 const Pydio = require('pydio');
 const {ActionDialogMixin, CancelButtonProviderMixin, SubmitButtonProviderMixin} = Pydio.requireLib('boot');
+const PassUtils = require('pydio/util/pass');
 
 export default React.createClass({
 
     mixins: [
-        ActionDialogMixin, CancelButtonProviderMixin, SubmitButtonProviderMixin
+        AdminComponents.MessagesConsumerMixin,
+        ActionDialogMixin,
+        CancelButtonProviderMixin,
+        SubmitButtonProviderMixin
     ],
 
     propTypes: {
@@ -42,23 +46,21 @@ export default React.createClass({
     },
 
     getInitialState: function () {
-        return {okEnabled: false};
+        const pwdState = PassUtils.getState();
+        return {...pwdState};
     },
 
     onChange: function (event, value) {
-        const minLength = parseInt(global.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
-
-        const enabled = (this.refs.pass.getValue()
-            && this.refs.pass.getValue().length >= minLength
-            && this.refs.pass.getValue() == this.refs.confirm.getValue()
-        );
-
-        this.setState({okEnabled: enabled});
+        const passValue = this.refs.pass.getValue();
+        const confirmValue = this.refs.confirm.getValue();
+        const newState = PassUtils.getState(passValue, confirmValue, this.state);
+        this.setState(newState);
     },
 
     submit: function () {
 
-        if(!this.state.okEnabled){
+        if(!this.state.valid){
+            this.props.pydio.UI.displayMessage('ERROR', this.state.passErrorText || this.state.confirmErrorText);
             return;
         }
 
@@ -84,13 +86,16 @@ export default React.createClass({
         return (
             <div style={{width: '100%'}}>
                 <TextField ref="pass" type="password" fullWidth={true}
-                            onChange={this.onChange}
-                            floatingLabelText={getMessage('523')}
-                           errorText={!this.state.okEnabled ? getMessage('378') : null}
+                           onChange={this.onChange}
+                           floatingLabelText={getMessage('523')}
+                           errorText={this.state.passErrorText}
+                           hintText={this.state.passHintText}
                 />
                 <TextField ref="confirm" type="password" fullWidth={true}
-                            onChange={this.onChange}
-                            floatingLabelText={getMessage('199')}/>
+                           onChange={this.onChange}
+                           floatingLabelText={getMessage('199')}
+                           errorText={this.state.confirmErrorText}
+                />
             </div>
         );
 

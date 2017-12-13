@@ -751,6 +751,7 @@
         <xs:complexType>
             <xs:attribute name="classname" use="required" type="xs:string"/>
             <xs:attribute name="filename" use="required"/>
+            <xs:attribute name="version" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="dependencies">
