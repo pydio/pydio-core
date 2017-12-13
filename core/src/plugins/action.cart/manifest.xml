@@ -13,40 +13,13 @@
         </resources>
     </client_settings>
 
-    <dependencies>
-        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-    </dependencies>
-
     <registry_contributions>
         <client_configs>
             <template element="body" name="cart-panel" position="bottom" namespace="PydioCart" component="CartMounter"/>
         </client_configs>
         <actions>
-            <action name="create-cart-from-search">
-                <gui src="" iconClass="icon-save" text="action.cart.5" title="action.cart.6">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-search-result-bar"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var tabulator = $('cart-manager-header').ajxpPaneObject;
-                        var searchEngine;
-                        try{
-                            searchEngine = $$('[ajxpClass="SearchEngine"]')[0].ajxpPaneObject;
-                        }catch(e){};
-                        if(searchEngine){
-                            var value = searchEngine.crtText;
-                            var newLabel = "Search "+value;
-                            newLabel = window.prompt('This will save this search in your Carts. Change the name if you want to:', newLabel);
-                            if(newLabel && tabulator && value){
-                                tabulator.addTab({"id":"new-cart-"+new Date().getTime(),"label":newLabel,"iconClass":"icon-search", closeable:true, dontFocus:false},
-                                {type:"widget", widgetClass:FetchedResultPane, widgetOptions:{label:newLabel,"nodeProviderProperties":searchEngine.buildNodeProviderProperties(),"reloadOnServerMessage":"tree/reload_bookmarks"}});
-                            }
-                        }
-                    ]]></clientCallback>
-                </processing>
-            </action>
             <action name="send-selection-to-cart">
-                <gui src="" text="action.cart.1" title="action.cart.2" iconClass="mdi mdi-cart-plus">
+                <gui text="action.cart.1" title="action.cart.2" iconClass="mdi mdi-cart-plus">
                     <context dir="true" recycle="true" selection="true" actionBar="true" contextMenu="true" actionBarGroup="other"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="false"  evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')"/>
                 </gui>

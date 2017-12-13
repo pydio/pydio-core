@@ -235,7 +235,7 @@ class UsersService
 
     }
 
-    
+
 
     /**
      * Whether the whole users management system is enabled or not.
@@ -331,7 +331,7 @@ class UsersService
      * @param $userId
      * @param $userPass
      * @param bool $cookieString
-     * @return bool|void
+     * @return bool
      * @throws UserNotFoundException
      */
     public static function checkPassword($userId, $userPass, $cookieString = false)
@@ -341,7 +341,7 @@ class UsersService
         $authDriver = ConfService::getAuthDriverImpl();
         if ($cookieString) {
             $userObject = self::getUserById($userId);
-            $res = CookiesHelper::checkCookieString($userObject, $userPass);
+            $res = CookiesHelper::checkCookieString($userObject, $cookieString);
             return $res;
         }
         return $authDriver->checkPassword($userId, $userPass);
@@ -623,7 +623,7 @@ class UsersService
         if($recursive){
             $childrenGroups = $authDriver->listChildrenGroups($baseGroup);
             foreach($childrenGroups as $relativePath => $groupLabel){
-                self::browseUsersGroupsWithCallback(rtrim($baseGroup, "/")."/".$relativePath, $userCallback, true, $groupCallback, $groupLabel);
+                self::browseUsersGroupsWithCallback(rtrim($baseGroup, "/")."/".ltrim($relativePath,"/"), $userCallback, true, $groupCallback, $groupLabel);
             }
         }
 

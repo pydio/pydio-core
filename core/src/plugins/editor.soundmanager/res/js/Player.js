@@ -23,9 +23,11 @@ import React from 'react'
 import { soundManager } from 'soundmanager2';
 import { threeSixtyPlayer } from '../../../sm/360-player/script/360player';
 
+
 soundManager.setup({
     // path to directory containing SM2 SWF
-    url: 'plugins/editor.soundmanager/sm/swf/'
+    url: 'plugins/editor.soundmanager/sm/swf/',
+    debugMode: true
 });
 
 class Player extends React.Component {
@@ -98,7 +100,7 @@ class Player extends React.Component {
         }
 
         return (
-            <div className="ui360 ui360-vis" style={this.props.style}>
+            <div className={className} style={this.props.style}>
                 {this.props.children}
             </div>
         )
@@ -106,6 +108,7 @@ class Player extends React.Component {
 }
 
 Player.propTypes = {
+    threeSixtyPlayer: React.PropTypes.object,
     autoPlay: React.PropTypes.bool,
     rich: React.PropTypes.bool.isRequired,
     onReady: React.PropTypes.func

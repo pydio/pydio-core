@@ -67,8 +67,9 @@ class UsersManager extends AbstractManager
         $a = $requestInterface->getAttribute("action");
         $vars = $requestInterface->getParsedBody();
         $path = $vars["path"];
+        $path = '/'.ltrim($path, '/');
         if($a === "people-create-resource"){
-            if($vars["resourceType"] === "user"){
+            if($vars["request_body"]["resourceType"] === "user"){
                 // Create a user
                 $uLogin = basename($path);
                 $gPath  = dirname($path);
@@ -77,7 +78,7 @@ class UsersManager extends AbstractManager
                     ->withAttribute("action", "create_user")
                     ->withParsedBody([
                         "new_user_login" => $uLogin,
-                        "new_user_pwd"   => $vars["userPass"],
+                        "new_user_pwd"   => $vars["request_body"]["userPass"],
                         "group_path"     => $gPath
                     ]);
             }else{
@@ -86,7 +87,7 @@ class UsersManager extends AbstractManager
                     ->withAttribute("action", "create_group")
                     ->withParsedBody([
                         "group_path"  => $path,
-                        "group_label" => $vars["groupLabel"]
+                        "group_label" => $vars["request_body"]["groupLabel"]
                     ]);
             }
             return $this->usersActions($requestInterface, $responseInterface);

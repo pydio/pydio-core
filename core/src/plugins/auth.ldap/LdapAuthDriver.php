@@ -55,6 +55,7 @@ class LdapAuthDriver extends AbstractAuthDriver
     public $mappedRolePrefix;
     public $pageSize;
     public $userRecursiveMemberOf = false;
+    public $referralBind = false;
 
     public $ldapconn = null;
     public $separateGroup = "";
@@ -98,6 +99,7 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
 
         if ($options["LDAP_PAGE_SIZE"]) $this->pageSize = $options["LDAP_PAGE_SIZE"];
+        if ($options["LDAP_REFERRAL_BIND"]) $this->referralBind = $options["LDAP_REFERRAL_BIND"];
         if ($options["LDAP_GROUP_PREFIX"]) $this->mappedRolePrefix = $options["LDAP_GROUP_PREFIX"];
         if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
         if ($options["LDAP_GDN"]) $this->ldapGDN = $this->parseReplicatedParams($options, array("LDAP_GDN"));
@@ -236,7 +238,11 @@ class LdapAuthDriver extends AbstractAuthDriver
         if ($ldapconn) {
             $this->logDebug(__FUNCTION__, 'ldap_connect(' . $this->ldapUrl . ',' . $this->ldapPort . ') OK');
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
-            ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
+            if($this->referralBind){
+                ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 1);
+            }else{
+                ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0);
+            }
             if (empty($this->pageSize) || !is_numeric($this->pageSize)) {
                 $this->pageSize = 500;
             }
@@ -425,7 +431,7 @@ class LdapAuthDriver extends AbstractAuthDriver
             }
             if ($isSupportPagedResult)
                 foreach ($ret as $element) {
-                    if (is_resource($element))
+                    if (is_resource($element) && count($allEntries["count"]) > 1)
                         @ldap_control_paged_result_response($this->ldapconn, $element, $cookie);
                 }
         } while (($cookie !== null && $cookie != '') && ($isSupportPagedResult) && (!$gotAllEntries));
@@ -458,6 +464,8 @@ class LdapAuthDriver extends AbstractAuthDriver
             }
 
         } else if (!empty($this->separateGroup) && $baseGroup != "/" . $this->separateGroup) {
+            return array();
+        } else if (empty($this->separateGroup) && empty($this->hasGroupsMapping) && ($baseGroup != "/")){
             return array();
         }
 
@@ -594,6 +602,15 @@ class LdapAuthDriver extends AbstractAuthDriver
         $entries = $this->getUserEntries($login);
         if ($entries['count'] > 0) {
             $this->logDebug(__FUNCTION__, 'Ldap Password Check: Got user ' . $login);
+            if($this->referralBind){
+                $this->rebind_pass = $pass;
+                $this->rebind_dn    = $entries[0]["dn"];
+                @ldap_set_rebind_proc($this->ldapconn, 'rebind');
+                // bind
+                if(@ldap_bind($this->ldapconn, $this->rebind_dn, $pass)){
+                    return true;
+                }
+            }
             if (@ldap_bind($this->ldapconn, $entries[0]["dn"], $pass)) {
                 $this->logDebug(__FUNCTION__, 'Ldap Password Check: Got user ' . $entries[0]["cn"][0]);
                 return true;
@@ -860,6 +877,14 @@ class LdapAuthDriver extends AbstractAuthDriver
                                     }
 
                                 } else {  // Others attributes mapping
+                                    if(isSet($entry[$key]["count"])) unset($entry[$key]["count"]);
+
+                                    if ($this->mappedRolePrefix) {
+                                        $rolePrefix = $this->mappedRolePrefix;
+                                    } else {
+                                        $rolePrefix = "";
+                                    }
+
                                     $oldRoles = array();
                                     $newRoles = array();
                                     $userroles = $userObject->getRoles();
@@ -867,7 +892,7 @@ class LdapAuthDriver extends AbstractAuthDriver
                                     // Get old roles
                                     if (is_array($userroles)) {
                                         foreach ($userroles as $rkey => $role) {
-                                            if ((RolesService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 if (isSet($matchFilter) && !preg_match($matchFilter, $rkey)) continue;
                                                 if (isSet($valueFilters) && !in_array($rkey, $valueFilters)) continue;
                                                 $oldRoles[$rkey] = $rkey;
@@ -877,16 +902,17 @@ class LdapAuthDriver extends AbstractAuthDriver
 
                                     // Get new roles
                                     foreach ($entry[$key] as $uniqValue) {
-                                        if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
-                                        if (isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
+                                        $uniqValueWithPrefix = $rolePrefix . $uniqValue;
+                                        if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValueWithPrefix)) continue;
+                                        if (isSet($valueFilters) && !in_array($uniqValueWithPrefix, $valueFilters)) continue;
                                         if (!empty($uniqValue)) {
-                                            $roleToAdd = RolesService::getRole($uniqValue);
+                                            $roleToAdd = RolesService::getRole($uniqValueWithPrefix);
                                             if($roleToAdd === false){
-                                                $roleToAdd = RolesService::getOrCreateRole($uniqValue);
+                                                $roleToAdd = RolesService::getOrCreateRole($uniqValueWithPrefix);
                                                 $roleToAdd->setLabel($uniqValue);
                                                 RolesService::updateRole($roleToAdd);
                                             }
-                                            $newRoles[$uniqValue]  = $roleToAdd;
+                                            $newRoles[$uniqValueWithPrefix]  = $roleToAdd;
                                         }
                                     }
 
@@ -895,13 +921,13 @@ class LdapAuthDriver extends AbstractAuthDriver
                                         (count(array_diff(array_keys($newRoles), array_keys($oldRoles))) > 0)){
                                         // remove old roles
                                         foreach ($oldRoles as $rkey => $role) {
-                                            if ((RolesService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 $userObject->removeRole($rkey);
                                             }
                                         }
                                         //Add new roles;
                                         foreach($newRoles as $rkey => $role){
-                                            if ((RolesService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 $userObject->addRole($role);
                                             }
                                         }
@@ -1166,5 +1192,25 @@ class LdapAuthDriver extends AbstractAuthDriver
          */
         $newS = preg_replace($preg, '_', $s);
         return $newS;
+    }
+
+
+    public $rebind_dn;
+    public $rebind_pass;
+    public function rebind($ldap, $referral) {
+        $server= preg_replace('!^(ldap://[^/]+)/.*$!', '\\1', $referral);
+        if (!($ldap = ldap_connect($server))){
+            // return error
+            return 1;
+        }
+        ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+        ldap_set_option($ldap, LDAP_OPT_REFERRALS, 1);
+        ldap_set_rebind_proc($ldap, "rebind");
+        if (!ldap_bind($ldap,$this->rebind_dn,$this->rebind_pass)){
+            // return error
+            return 1;
+        }
+        // return success
+        return 0;
     }
 }

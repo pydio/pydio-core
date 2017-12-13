@@ -41,7 +41,7 @@ class PHP_OB extends AbstractTest
     {
         $this->failedLevel = "warning";
         $v = @ini_get("output_buffering");
-        if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")) {
+        if (isSet($v) && ( (is_numeric($v) && $v != "0") || strtolower($v) == "on")) {
             $this->testedParams["PHP Output Buffer disabled"] = "No";
             return FALSE;
         } else if (!isSet($v)) {

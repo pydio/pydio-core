@@ -18,7 +18,7 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-export {default as Badge} from './preview'
+export {default as Badge} from './badge'
 export {default as Panel} from './preview'
 import Editor from './editor'
 import * as Controls from './controls'

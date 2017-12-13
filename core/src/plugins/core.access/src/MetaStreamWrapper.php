@@ -601,7 +601,11 @@ class MetaStreamWrapper implements IAjxpWrapper
     public function stream_seek($offset, $whence = SEEK_SET)
     {
         if(isSet($this->handle) && is_resource($this->handle)){
-            return fseek($this->handle, $offset, $whence);
+            // fseek returns 0 if success, otherwise -1
+            // but steam_seek return true/false
+            if(fseek($this->handle, $offset, $whence) == 0) {
+                return true;
+            }
         }
         return false;
     }

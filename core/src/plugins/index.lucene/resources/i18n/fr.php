@@ -32,5 +32,5 @@ $mess = array(
     "10" => "Indexation des sous-répertoires en arrière-plan",
     "11" => "Le workspace est en cours d'indexation, veuillez attendre 3 minutes avant de réessayer.",
     "12" => "Le workspace n'est pas indexé pour le moment, veuillez lancer l'indexation manuellement!",
-    "13" => "Content",
+    "13" => "Contenu",
 );

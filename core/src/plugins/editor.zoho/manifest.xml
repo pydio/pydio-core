@@ -14,7 +14,6 @@
         <resources>
             <js file="plugins/editor.zoho/res/build/PydioZoho.js" className="PydioZoho"/>
             <i18n path="plugins/editor.zoho/i18n" namespace="zoho_editor"/>
-            <img_library path="plugins/editor.zoho/images" alias="zoho_img"/>
         </resources>
 	</client_settings>
 	<clientForm id="zoho_box"><![CDATA[

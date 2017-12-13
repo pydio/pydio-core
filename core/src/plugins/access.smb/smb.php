@@ -37,8 +37,12 @@ if (!defined('SMB4PHP_SMBCLIENT')) {
 if (!defined('SMB4PHP_SMBTMP')) {
     define ('SMB4PHP_SMBTMP', '/tmp');
 }
-
-define ('SMB4PHP_SMBOPTIONS', 'TCP_NODELAY IPTOS_LOWDELAY SO_KEEPALIVE SO_RCVBUF=8192 SO_SNDBUF=8192');
+if (defined('SMB_DISABLE_BUFFER')){
+    define ('SMB4PHP_SMBOPTIONS', 'TCP_NODELAY IPTOS_LOWDELAY SO_KEEPALIVE');
+}
+else {
+    define ('SMB4PHP_SMBOPTIONS', 'TCP_NODELAY IPTOS_LOWDELAY SO_KEEPALIVE SO_RCVBUF=8192 SO_SNDBUF=8192');
+}
 define ('SMB4PHP_AUTHMODE', 'arg'); # set to 'env' to use USER enviroment variable
 
 ###################################################################

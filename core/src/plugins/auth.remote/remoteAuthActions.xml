@@ -10,7 +10,6 @@
 			<rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly="" forbidOverride="true"/>
 			<processing forbidOverride="true">
 				<clientCallback><![CDATA[
-					PydioApi.clearRememberData();
 					PydioApi.getClient().request({get_action:'back'}, function(transport){
 						var child = transport.responseXML.documentElement.childNodes;
                         document.location.href = child[0].nodeValue;

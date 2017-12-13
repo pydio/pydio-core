@@ -33,8 +33,8 @@ use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Http\BruteForceHelper;
 use Pydio\Core\Utils\Http\CookiesHelper;
-use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Utils\Http\CaptchaProvider;
+use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -103,7 +103,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @param bool $isLast
-     * @return \Psr\Http\Message\ResponseInterface|static
+     * @return bool
      */
     function logUserFromLoginAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, $isLast = false)
     {
@@ -184,7 +184,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
         $stream->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken));
         $responseInterface = $responseInterface->withBody($stream);
 
-        return $responseInterface;
+        return true; //$responseInterface;
 
     }
 
@@ -204,8 +204,16 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
         } else {
 
-            return $this->logUserFromSession($request);
-
+            $sessionResult = $this->logUserFromSession($request);
+            // Try to silently log from  remember me cookie
+            if (!$sessionResult && CookiesHelper::hasRememberCookie()) {
+                $params = $request->getParsedBody();
+                $params["cookie_login"] = true;
+                $request = $request->withParsedBody($params);
+                $quietResponse = new Response();
+                return $this->logUserFromLoginAction($request, $quietResponse, $isLast);
+            }
+            return $sessionResult;
         }
 
     }

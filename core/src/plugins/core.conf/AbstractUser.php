@@ -22,6 +22,7 @@ namespace Pydio\Conf\Core;
 
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
@@ -282,7 +283,7 @@ abstract class AbstractUser implements UserInterface
     public function getLock()
     {
         if(AJXP_SERVER_DEBUG && $this->isAdmin() && $this->getGroupPath() === "/") return false;
-        if (!empty($this->rights["ajxp.lock"])) {
+        if (!empty($this->rights["ajxp.lock"]) && ($this->rights["ajxp.lock"] !== "false")) {
             return $this->rights["ajxp.lock"];
         }
         return $this->mergedRole->filterParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_REPO_SCOPE_ALL, false);
@@ -345,7 +346,12 @@ abstract class AbstractUser implements UserInterface
      */
     public function canRead($repositoryId)
     {
-        if($this->getLock() != false) return false;
+        if($this->getLock() != false) {
+            if(ApplicationState::getSapiRestBase() !== null && !$this->hasLockByName("logout")){
+                return $this->mergedRole->canRead($repositoryId);
+            }
+            return false;
+        }
         return $this->mergedRole->canRead($repositoryId);
     }
 
@@ -355,7 +361,12 @@ abstract class AbstractUser implements UserInterface
      */
     public function canWrite($repositoryId)
     {
-        if($this->getLock() != false) return false;
+        if($this->getLock() != false) {
+            if(ApplicationState::getSapiRestBase() !== null && !$this->hasLockByName("logout")){
+                return $this->mergedRole->canWrite($repositoryId);
+            }
+            return false;
+        }
         return $this->mergedRole->canWrite($repositoryId);
     }
 

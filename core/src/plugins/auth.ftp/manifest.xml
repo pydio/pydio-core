@@ -31,7 +31,6 @@
 				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""/>
 				<processing>
 					<clientCallback><![CDATA[
-						PydioApi.clearRememberData();
 						PydioApi.getClient().request({get_action:'ftp_logout'});
 						]]></clientCallback>
 					<serverCallback methodName="logoutCallback"/>

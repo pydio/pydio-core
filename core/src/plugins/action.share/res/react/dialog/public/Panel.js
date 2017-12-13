@@ -44,12 +44,13 @@ let PublicLinkPanel = React.createClass({
     },
 
     getInitialState: function(){
-        return {showTemporaryPassword: false, temporaryPassword: null, disabled: false};
+        return {showTemporaryPassword: false, temporaryPassword: null, passValid: false, disabled: false};
     },
 
     updateTemporaryPassword: function(value, event){
         if(value == undefined) value = event.currentTarget.getValue();
-        this.setState({temporaryPassword:value});
+        let passValid = this.refs.passField.isValid();
+        this.setState({temporaryPassword:value, passValid: passValid});
     },
 
     enableLinkWithPassword:function(){
@@ -88,13 +89,14 @@ let PublicLinkPanel = React.createClass({
                     <div style={{display:'flex', alignItems:'baseline'}}>
                         <div style={{flex:1}}>
                             <ValidPassword
+                                ref="passField"
                                 attributes={{label:this.props.getMessage('23')}}
                                 value={this.state.temporaryPassword}
                                 onChange={this.updateTemporaryPassword}
                             />
                         </div>
                         <div style={{marginLeft:7,marginTop: 26}}>
-                            <RaisedButton label={this.props.getMessage('92')} secondary={true} onClick={this.enableLinkWithPassword}/>
+                            <RaisedButton label={this.props.getMessage('92')} secondary={true} disabled={!this.state.passValid} onClick={this.enableLinkWithPassword}/>
                         </div>
                     </div>
                 </div>

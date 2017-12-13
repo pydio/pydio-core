@@ -89,6 +89,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public $driverConf;
     protected $wrapperClassName;
     protected $urlBase;
+    protected $exposeRepositoryOptions = ["UX_DISPLAY_DEFAULT_MODE", "UX_SORTING_DEFAULT_COLUMN", "UX_SORTING_DEFAULT_DIRECTION"];
 
     /**
      * @param ContextInterface $contextInterface
@@ -143,6 +144,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
         if ($recycle != "") {
             RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
+        }
+
+        foreach ($this->exposeRepositoryOptions as $paramName){
+            $this->exposeConfigInManifest($paramName, $repository->getContextOption($contextInterface, $paramName));
         }
     }
 
@@ -1014,7 +1019,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }else if(!$selection->isUnique() || !$selection->getUniqueNode()->isLeaf()){
                     $size = -1;
                 }
-                if($taskId === null && ($size === -1 || $size > $bgSizeThreshold)){
+                if($request->getAttribute("api") === "session" && $taskId === null && ($size === -1 || $size > $bgSizeThreshold)){
                     $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $task->setActionLabel($mess, $action === 'copy' ? '66' : '70');
                     //$task->setFlags(Task::FLAG_STOPPABLE);
@@ -1037,8 +1042,18 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($selection->isUnique() && isSet($httpVars["targetBaseName"])){
                     $targetBaseName = $httpVars["targetBaseName"];
                 }
-                if(isSet($httpVars["recycle_restore"]) && !file_exists($selection->nodeForPath($destPath)->getUrl())){
-                    $this->mkDir($selection->nodeForPath(PathUtils::forwardSlashDirname($destPath)), basename($destPath), false, true);
+                if(isSet($httpVars["recycle_restore"])){
+                    $targetPath =  rtrim($destPath, "/") . "/" . PathUtils::forwardSlashBasename($selection->getUniqueNode()->getPath());
+                    if(file_exists($selection->nodeForPath($targetPath)->getUrl())){
+                        if(is_file($selection->nodeForPath($targetPath)->getUrl())){
+                            throw new PydioException(sprintf($mess[631], $targetPath));
+                        } else {
+                            throw new PydioException(sprintf($mess[632], $targetPath));
+                        }
+                    }
+                    if(!file_exists($selection->nodeForPath($destPath)->getUrl())){
+                        $this->mkDir($selection->nodeForPath(PathUtils::forwardSlashDirname($destPath)), basename($destPath), false, true);
+                    }
                 }
                 $this->filterUserSelectionToHidden($ctx, [$httpVars["dest"]]);
                 if ($selection->inZip()) {

@@ -621,6 +621,10 @@
         /*********************************/
         /* GENERIC: STATUS / LOAD / SAVE */
         /*********************************/
+        setValidStatus(status){
+            this.notify('valid_status', status);
+        }
+
         _setStatus(status){
             this._status = status;
             this.notify('status_changed', {

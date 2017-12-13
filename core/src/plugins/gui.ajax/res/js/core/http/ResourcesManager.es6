@@ -199,8 +199,6 @@ class ResourcesManager{
                     );
 				}else if(node.childNodes[k].nodeName == 'css'){
 					this.addCSSResource(ResourcesManager.getFileOrFallback(node.childNodes[k]));
-				}else if(node.childNodes[k].nodeName == 'img_library'){
-					ResourcesManager.addImageLibrary(node.childNodes[k].getAttribute('alias'), node.childNodes[k].getAttribute('path'));
 				}
 			}		
 		}else if(node.nodeName == "dependencies"){
@@ -295,10 +293,6 @@ class ResourcesManager{
         SystemJS.config({map: sysjsMap, meta:sysjsMeta});
         ResourcesManager.__configsParsed = true;
 
-		const imgNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/img_library');
-        for(node of imgNodes){
-            ResourcesManager.addImageLibrary(node.getAttribute('alias'), node.getAttribute('path'));
-        }
 		const cssNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/css[@autoload="true"]');
         for(node of cssNodes){
 			manager.loadCSSResource(ResourcesManager.getFileOrFallback(node));

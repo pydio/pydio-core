@@ -163,6 +163,7 @@ class ShareMetaManager
             return $shares;
         }
         foreach($meta["shares"] as $id => $shareData){
+            if(!isset($shareData["type"])) continue;
             $type = $shareData["type"];
             if($type == "repository"){
                 if(!isSet($shares[$id])) {
@@ -243,14 +244,16 @@ class ShareMetaManager
             $shares = array();
             $update = false;
             foreach($meta["shares"] as $hashOrRepoId => $shareData){
-                $type = $shareData["type"];
-                if(is_array($type)) {
-                    $shareData["type"] = $type[0];
-                }
-                if(!$clearIfEmpty || $this->shareStore->shareExists($shareData["type"],$hashOrRepoId)){
-                    $shares[$hashOrRepoId] = $shareData;
-                }else{
-                    $update = true;
+                if(isset($shareData["type"])) {
+                    $type = $shareData["type"];
+                    if (is_array($type)) {
+                        $shareData["type"] = $type[0];
+                    }
+                    if (!$clearIfEmpty || $this->shareStore->shareExists($shareData["type"], $hashOrRepoId)) {
+                        $shares[$hashOrRepoId] = $shareData;
+                    } else {
+                        $update = true;
+                    }
                 }
             }
             if($update && !count($shares)){

@@ -70,6 +70,7 @@ class SFTPAccessDriver extends FsAccessDriver
             throw new \Exception("You must have the php ssh2 extension active!");
         }
         ConfService::setConf("PROBE_REAL_SIZE", false);
+        $repository = $contextInterface->getRepository();
         $path       = $contextInterface->getRepository()->getContextOption($contextInterface, "PATH");
         $recycle    = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         $this->urlBase = $contextInterface->getUrlBase();
@@ -87,6 +88,11 @@ class SFTPAccessDriver extends FsAccessDriver
         if ($recycle != "") {
             RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
+
+        foreach ($this->exposeRepositoryOptions as $paramName){
+            $this->exposeConfigInManifest($paramName, $repository->getContextOption($contextInterface, $paramName));
+        }
+
     }
 
     /**

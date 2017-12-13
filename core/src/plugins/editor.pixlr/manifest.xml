@@ -13,7 +13,6 @@
         <resources>
             <js file="plugins/editor.diaporama/res/build/PydioDiaporama.js" className="PydioDiaporama"/>
             <js file="plugins/editor.pixlr/res/build/PydioPixlr.js" className="PydioPixlr"/>
-            <img_library alias="pixlr_images" path="plugins/editor.pixlr/images"/>
             <i18n path="plugins/editor.pixlr/i18n" namespace="pixlr_editor"/>
         </resources>
 	</client_settings>

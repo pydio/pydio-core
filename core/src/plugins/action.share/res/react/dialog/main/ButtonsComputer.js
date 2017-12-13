@@ -31,18 +31,25 @@ class ButtonsComputer{
     modelUpdated(){
         this._buttonsUpdater(this.getButtons());
     }
+    validStatusObserver(status){
+        if(status) this.enableSave();
+        else this.disableSave();
+    }
     start(){
         this._modelObserver = this.modelUpdated.bind(this);
         this._disableSaveObserver = this.disableSave.bind(this);
         this._enableSaveObserver = this.enableSave.bind(this);
+        this._validStatusObserver = this.validStatusObserver.bind(this);
         this._shareModel.observe("status_changed", this._modelObserver);
         this._shareModel.observe('saving', this._disableSaveObserver);
         this._shareModel.observe('saved', this._enableSaveObserver);
+        this._shareModel.observe('valid_status', this._validStatusObserver);
     }
     stop(){
         this._shareModel.stopObserving("status_changed", this._modelObserver);
         this._shareModel.stopObserving('saving', this._disableSaveObserver);
         this._shareModel.stopObserving('saved', this._enableSaveObserver);
+        this._shareModel.stopObserving('valid_status', this._validStatusObserver);
     }
     getButtons(){
         let buttons = [];

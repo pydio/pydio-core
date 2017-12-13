@@ -67,7 +67,7 @@ let UploadDialog = React.createClass({
         });
 
         return (
-            <MaterialUI.Tabs>
+            <MaterialUI.Tabs style={{width:'100%'}}>
                 {tabs}
             </MaterialUI.Tabs>
         );

@@ -559,8 +559,9 @@ class ShareCenter extends Plugin
      */
     public function migrateLegacyShares(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
+        $this->currentContext = $requestInterface->getAttribute("ctx");
         LegacyPubliclet::migrateLegacyMeta(
-            $requestInterface->getAttribute("ctx"),
+            $this->currentContext,
             $this,
             $this->getShareStore(),
             $this->getRightsManager(),

@@ -456,6 +456,7 @@ function ThreeSixtyPlayer() {
       oContainer = o.parentNode;
       has_vis = (self.getElementsByClassName('ui360-vis','div',oContainer.parentNode).length);
 
+      console.log(self.config)
       // create sound
       thisSound = sm.createSound({
        id:'ui360Sound_'+parseInt(Math.random()*10000000),

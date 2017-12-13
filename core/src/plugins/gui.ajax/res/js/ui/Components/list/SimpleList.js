@@ -60,6 +60,7 @@ let SimpleList = React.createClass({
         observeNodeReload   : React.PropTypes.bool,
         defaultGroupBy      : React.PropTypes.string,
         defaultGroupByLabel : React.PropTypes.string,
+        defaultSortingInfo  : React.PropTypes.object,
 
         skipParentNavigation: React.PropTypes.bool,
         skipInternalDataModel:React.PropTypes.bool,
@@ -296,13 +297,14 @@ let SimpleList = React.createClass({
         }else{
             this.dm = this.props.dataModel;
         }
+        const sortingInfo = this.props.defaultSortingInfo || null;
         let state = {
             loaded: this.props.node.isLoaded(),
             loading             : !this.props.node.isLoaded(),
             showSelector        : false,
-            elements            : this.props.node.isLoaded()?this.buildElements(0, this.props.infiniteSliceCount):[],
+            elements            : this.props.node.isLoaded()?this.buildElements(sortingInfo, 0, this.props.infiniteSliceCount):[],
             containerHeight     : this.props.containerHeight ? this.props.containerHeight  : (this.props.heightAutoWithMax ? 0 : 500),
-            sortingInfo         : this.props.defaultSortingInfo || null
+            sortingInfo         : sortingInfo
         };
         if(this.props.elementHeight instanceof Object){
             state.elementHeight = this.computeElementHeightResponsive();
@@ -314,13 +316,14 @@ let SimpleList = React.createClass({
     componentWillReceiveProps: function(nextProps) {
         this.indexedElements = null;
         const currentLength = Math.max(this.state.elements.length, nextProps.infiniteSliceCount);
+        const sortingInfo = this.state.sortingInfo || nextProps.defaultSortingInfo || null;
         this.setState({
             loaded: nextProps.node.isLoaded(),
             loading:!nextProps.node.isLoaded(),
             showSelector:false,
-            elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
+            elements:nextProps.node.isLoaded()?this.buildElements(sortingInfo, 0, currentLength, nextProps.node):[],
             infiniteLoadBeginBottomOffset:200,
-            sortingInfo: this.state.sortingInfo || nextProps.defaultSortingInfo || null
+            sortingInfo: sortingInfo,
         }, () => {if (nextProps.node.isLoaded()) this.updateInfiniteContainerHeight()});
         if(!nextProps.autoRefresh&& this.refreshInterval){
             window.clearInterval(this.refreshInterval);
@@ -375,7 +378,7 @@ let SimpleList = React.createClass({
                     this.setState({
                         loaded:true,
                         loading: false,
-                        elements:this.buildElements(0, this.props.infiniteSliceCount)
+                        elements:this.buildElements(this.state.sortingInfo, 0, this.props.infiniteSliceCount)
                     });
                 }
                 if(this.props.heightAutoWithMax){
@@ -397,7 +400,7 @@ let SimpleList = React.createClass({
         const currentLength = Math.max(this.state.elements.length, this.props.infiniteSliceCount);
         this.setState({
             loading:false,
-            elements:this.buildElements(0, currentLength, this.props.node)
+            elements:this.buildElements(this.state.sortingInfo, 0, currentLength, this.props.node)
         });
         if(this.props.heightAutoWithMax){
             this.updateInfiniteContainerHeight();
@@ -854,7 +857,7 @@ let SimpleList = React.createClass({
 
     },
 
-    buildElements: function(start, end, node, showSelector){
+    buildElements: function(sortingInfo, start, end, node, showSelector){
         let theNode = this.props.node;
         if (node) theNode = node;
         let theShowSelector = this.state && this.state.showSelector;
@@ -920,8 +923,8 @@ let SimpleList = React.createClass({
 
         }
 
-        if(this.state && this.state.sortingInfo && !this.remoteSortingInfo()){
-            const {sortingInfo:{attribute, direction, sortType}} = this.state;
+        if(sortingInfo && !this.remoteSortingInfo()){
+            const {attribute, direction, sortType} = sortingInfo;
             let sortFunction;
             if(sortType === 'file-natural'){
                 sortFunction = (a, b) => {
@@ -978,7 +981,7 @@ let SimpleList = React.createClass({
     },
 
     rebuildLoadedElements: function(){
-        let newElements = this.buildElements(0, Math.max(this.state.elements.length, this.props.infiniteSliceCount));
+        let newElements = this.buildElements(this.state.sortingInfo, 0, Math.max(this.state.elements.length, this.props.infiniteSliceCount));
         let infiniteLoadBeginBottomOffset = newElements.length? 200 : 0;
         this.setState({
             elements:newElements,
@@ -989,7 +992,7 @@ let SimpleList = React.createClass({
 
     handleInfiniteLoad: function() {
         let elemLength = this.state.elements.length;
-        let newElements = this.buildElements(elemLength, elemLength + this.props.infiniteSliceCount);
+        let newElements = this.buildElements(this.state.sortingInfo, elemLength, elemLength + this.props.infiniteSliceCount);
         let infiniteLoadBeginBottomOffset = newElements.length? 200 : 0;
         this.setState({
             isInfiniteLoading: false,

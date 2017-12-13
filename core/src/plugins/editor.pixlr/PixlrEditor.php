@@ -127,10 +127,13 @@ class PixlrEditor extends Plugin
             ];
 
             $postResponse = $this->client->post("/editor/", $params);
-
+            // Make sure we load the https
+            $redirect = $postResponse->getHeader("Location");
+            $redirect = str_replace("http://", "https://", $redirect);
+            // Send redirect Header
             $response = $response
                 ->withStatus(302)
-                ->withHeader("Location", $postResponse->getHeader("Location"));
+                ->withHeader("Location", $redirect);
 
         } else if ($action == "retrieve_pixlr_image") {
 

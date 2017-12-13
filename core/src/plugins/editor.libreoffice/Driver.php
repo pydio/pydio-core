@@ -27,6 +27,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\UserMessage;
@@ -37,8 +38,10 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Zend\Diactoros\Response\JsonResponse;
@@ -130,6 +133,11 @@ class Driver extends Plugin
             $payload["hash"] = $auth_hash;
             $payload["uri"] = $uri;
             $payload["task"] = $task;
+
+            // Enable access to smb + session credential workspace
+            $payload["session_id"] = session_id();
+            $encryptedString = SessionService::fetch(MemorySafe::SAFE_CREDENTIALS_KEY);
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, session_id(), $encryptedString, 24*60*60);
 
             $jwt = JWT::encode($payload, $private);
 

@@ -191,9 +191,14 @@ class LegacyPubliclet
                                     }
                                     $shareLink = new ShareLink($shareStore, $publiclet);
                                     $user = $shareLink->getUniqueUser();
+                                    $oldPassword = $publiclet["PASSWORD"];
                                     if(UsersService::userExists($user)){
                                         $userObject = UsersService::getUserById($user, false);
                                         $userObject->setHidden(true);
+                                        if(!empty($oldPassword)){
+                                            UsersService::updatePassword($user, $oldPassword);
+                                            $shareLink->setUniqueUser($user, true);
+                                        }
                                         print("\n--Should set existing user $user as hidden");
                                         if(!$dryRun){
                                             $userObject->save();

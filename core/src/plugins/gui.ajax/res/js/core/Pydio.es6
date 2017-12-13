@@ -152,9 +152,6 @@ class Pydio extends Observable{
             ResourcesManager.loadClassesAndApply(["React", "PydioReactUI"], () => {
                 this.UI = new window.PydioReactUI.Builder(this);
                 this.UI.initTemplates();
-                if(!this.user) {
-                    PydioApi.getClient().tryToLogUserFromRememberData();
-                }
                 this.fire("registry_loaded", this.Registry.getXML());
                 setTimeout(() => { this.fire('loaded'); }, 200);
             });

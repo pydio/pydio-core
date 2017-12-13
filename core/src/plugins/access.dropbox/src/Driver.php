@@ -69,7 +69,10 @@ class Driver extends FsAccessDriver
             ]
         ]);
 
-        return true;
+        foreach ($this->exposeRepositoryOptions as $paramName){
+            $this->exposeConfigInManifest($paramName, $repository->getContextOption($context, $paramName));
+        }
+
     }
 
     /**
