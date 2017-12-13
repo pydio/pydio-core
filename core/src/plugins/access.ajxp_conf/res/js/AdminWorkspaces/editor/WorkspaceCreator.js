@@ -88,7 +88,7 @@ export default React.createClass({
 
     onFormParameterChange(paramName, newValue, oldValue){
 
-        if(this.state.selectedDriver === 'fs' && paramName === 'PATH'){
+        if(global.pydio.Controller.getActionByName('validate_driver_field') && this.state.selectedDriver === 'fs' && paramName === 'PATH'){
             FuncUtils.bufferCallback('validate-parameter', 750, function(){
                 this.validateDriverParameter(paramName, newValue);
             }.bind(this));
@@ -210,7 +210,7 @@ export default React.createClass({
                 }
                 if(!formDefs.length){
                     editor = (
-                        <div>{pydio.MessageHash['ajxp_admin.ws.68']}</div>
+                        <div>{global.pydio.MessageHash['ajxp_admin.ws.68']}</div>
                     );
                 }else{
                     editor = (
