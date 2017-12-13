@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin name="multi" label="CONF_MESSAGE[Multiple Auth Chooser]" enabled="true" description="CONF_MESSAGE[Add a selector on top of the login screen. DO NOT ENABLE MANUALLY, will be activated by auth.multi automatically.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxp_plugin name="multi" label="CONF_MESSAGE[Multiple Auth Chooser]" enabled="false" description="CONF_MESSAGE[Add a selector on top of the login screen. DO NOT ENABLE MANUALLY, will be activated by auth.multi automatically.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
