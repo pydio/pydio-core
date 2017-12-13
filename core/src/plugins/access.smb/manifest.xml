@@ -16,6 +16,7 @@
         <global_param name="SMBCLIENT" type="string" label="CONF_MESSAGE[Smbclient]" description="CONF_MESSAGE[Path to smbclient executable, considered to be in the path by default.]" mandatory="true" default="smbclient"/>
         <global_param name="SMB_PATH_TMP" type="string" label="CONF_MESSAGE[Path Tmp]" description="CONF_MESSAGE[OS Path Temporary if not the default one]" mandatory="true" default="/tmp"/>
         <global_param name="SMB_ENABLE_ZIP" type="boolean" label="CONF_MESSAGE[Enable Zip]" description="CONF_MESSAGE[Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!]" mandatory="false" default="false"/>
+        <global_param name="SMB_DISABLE_BUFFER" type="boolean" label="CONF_MESSAGE[Disable smb buffer option]" description="CONF_MESSAGE[The setting socket options SO_RCVBUF=8192 sometimes can seriously degrade performance]" mandatory="false" default="false"/>
         <global_param group="MIXIN_MESSAGE[Metadata and indexation]" name="DEFAULT_METASOURCES" type="string" label="MIXIN_MESSAGE[Default Metasources]" description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false" default="metastore.serial,meta.filehasher,index.lucene"/>
     </server_settings>
 	<registry_contributions>

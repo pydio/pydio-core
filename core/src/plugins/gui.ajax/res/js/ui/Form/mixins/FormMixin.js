@@ -89,7 +89,7 @@ export default {
             value:newValue
         });
         if(!this.props.skipBufferChanges) {
-            let timerLength = 250;
+            let timerLength = 50;
             if(this.props.attributes['type'] === 'password'){
                 timerLength = 1200;
             }

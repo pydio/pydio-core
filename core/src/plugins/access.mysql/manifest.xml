@@ -8,7 +8,6 @@
 			<js file="plugins/access.mysql/resources/js/class.SQLEditor.js" className="SQLEditor"/>
 			<js file="plugins/access.mysql/resources/js/class.SQLSearchEngine.js" className="SQLSearchEngine"/>
 			<css file="plugins/access.mysql/resources/css/sqlEditor.css"/>
-			<img_library alias="sql_images" path="plugins/access.mysql/resources/images"/>
 			<i18n namespace="sql" path="plugins/access.mysql/resources/i18n" />
 		</resources>
 	</client_settings>

@@ -22,6 +22,7 @@ const React = require('react')
 const {AsyncComponent} = require('pydio/http/resources-manager').requireLib('boot')
 const {UserAvatar, IconButtonMenu, Toolbar} = require('pydio/http/resources-manager').requireLib('components')
 const {IconButton, Paper} = require('material-ui')
+import BookmarksList from './BookmarksList'
 
 export default React.createClass({
 
@@ -50,7 +51,7 @@ export default React.createClass({
         const messages = this.props.pydio.MessageHash;
 
         let avatar;
-        let homeButton, infoButton, logoutButton, notificationsButton, settingsButton, currentIsSettings;
+        let homeButton, infoButton, logoutButton, notificationsButton, currentIsSettings, bookmarksButton;
         let avatarStyle = this.props.avatarStyle || {};
         if(this.props.pydio.user){
             const user = this.props.pydio.user;
@@ -88,6 +89,7 @@ export default React.createClass({
                         tooltipPosition="bottom-left"
                     />
                 );
+                bookmarksButton = <BookmarksList pydio={this.props.pydio}/>
             }
             if(this.props.pydio.Controller.getActionByName('get_my_feed') && !this.props.hideNotifications && !(this.props.pydio.user && this.props.pydio.user.activeRepository === 'inbox')){
                 notificationsButton = (
@@ -123,8 +125,8 @@ export default React.createClass({
                         tooltipPosition="bottom-right"
                         className="user-widget-toolbar"
                     />
+                    {bookmarksButton}
                     {notificationsButton}
-                    {settingsButton}
                     <span style={{flex:1}}/>
                     {homeButton}
                 </div>

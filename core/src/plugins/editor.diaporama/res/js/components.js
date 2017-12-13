@@ -27,7 +27,6 @@ export class Image extends Component {
         const {src, style, ...remainingProps} = this.props
         let cleanSrc = src.replace(new RegExp("'", 'g') , "\\'");
         cleanSrc = cleanSrc.replace(new RegExp("\\+", 'g') , encodeURIComponent("+"));
-        console.log(cleanSrc);
 
         return (
             <div

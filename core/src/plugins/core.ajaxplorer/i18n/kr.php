@@ -733,5 +733,13 @@ $mess=array(
 "628" => "실해 취소",
 "629" => "레코드 없음",
 "630" => "나와 공유된 파일",
+"plugtype.title.cache" => "Cache server",
+"plugtype.desc.cache" => "Unique plugin to set up the cache server used by the application",
+"plugtype.title.sec" => "Security",
+"plugtype.desc.sec" => "Advanced Security Features",
+"plugtype.title.helper" => "Helper",
+"plugtype.desc.helper" => "Helpers tools for administrative tasks",
+"631" => "Warning, trying to restore from recycle bin on top on an existing file (%s). Please rename this file manually in order to enable restoration from the recycle bin!",
+"632" => "Warning, trying to restore from recycle bin on top on an existing folder (%s). Please rename this folder in order to enable restoration from the recycle bin!",
 /* END SENTENCE */
 );

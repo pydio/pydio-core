@@ -13,7 +13,6 @@
             <js file="plugins/editor.ckeditor/res/build/ckeditor/ckeditor.js" className="CKEDITOR"/>
             <js file="plugins/editor.ckeditor/res/build/PydioCKEditor.js" className="PydioCKEditor"/>
             <css file="plugins/editor.ckeditor/res/css/ckeditor.css"/>
-            <img_library alias="ckeditor_images" path="plugins/editor.ckeditor"/>
             <i18n namespace="ckeditor" path="plugins/editor.ckeditor/i18n" />
         </resources>
     </client_settings>

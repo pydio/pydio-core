@@ -22,6 +22,7 @@ import Workspace from '../model/Workspace'
 import FeaturesListWizard from './FeaturesListWizard'
 import FeaturesStepper from './FeaturesStepper'
 import TplFieldsChooser from './TplFieldsChooser'
+import React from 'react'
 
 export default React.createClass({
 
@@ -87,8 +88,8 @@ export default React.createClass({
 
     onFormParameterChange(paramName, newValue, oldValue){
 
-        if(this.state.selectedDriver === 'fs' && paramName === 'PATH'){
-            FuncUtils.bufferCallback('validate-parameter', 1000, function(){
+        if(global.pydio.Controller.getActionByName('validate_driver_field') && this.state.selectedDriver === 'fs' && paramName === 'PATH'){
+            FuncUtils.bufferCallback('validate-parameter', 750, function(){
                 this.validateDriverParameter(paramName, newValue);
             }.bind(this));
         }
@@ -96,9 +97,12 @@ export default React.createClass({
     },
 
     validateDriverParameter(paramName, paramValue){
+        if(this.state.validating){
+            return;
+        }
         let fieldStates = this.state.fieldStates || {};
         fieldStates[paramName] = {msg: 'Validating value ... '};
-        this.setState({fieldStates: fieldStates});
+        this.setState({fieldStates: fieldStates, validating: true});
 
         PydioApi.getClient().request({
             get_action:'validate_driver_field',
@@ -114,7 +118,7 @@ export default React.createClass({
             }else if(fieldStates[paramName]){
                 delete fieldStates[paramName];
             }
-            this.setState({fieldStates: fieldStates});
+            this.setState({fieldStates: fieldStates, validating: false});
         }.bind(this));
     },
 
@@ -206,7 +210,7 @@ export default React.createClass({
                 }
                 if(!formDefs.length){
                     editor = (
-                        <div>{pydio.MessageHash['ajxp_admin.ws.68']}</div>
+                        <div>{global.pydio.MessageHash['ajxp_admin.ws.68']}</div>
                     );
                 }else{
                     editor = (

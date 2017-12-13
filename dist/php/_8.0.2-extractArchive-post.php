@@ -18,18 +18,27 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
-namespace Pydio\Access\Driver\StreamProvider\Virtual;
 
-use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
+if(!function_exists('checkIonCubeVersion')){
 
-defined('AJXP_EXEC') or die('Access not allowed');
+    function checkIonCubeVersion(){
 
+        if(AJXP_PACKAGE_NAME !== 'pydio-enterprise'){
+            // Ignore
+            return;
+        }
+        $ionCubeVersion = phpversion("ionCube Loader");
+        if($ionCubeVersion === false){
+            throw new Exception("Warning, you must install the IonCube Loaders (v10+) in order to run this upgrade. Aborting.");
+        } else if (version_compare($ionCubeVersion, "10.0.0") < 0){
+            throw new Exception("Warning, you must upgrade your IonCube Loader to the latest version (v10+) in order to run this upgrade. Aborting.");
+        }else{
+            print "<div class='upgrade_result success'>IonCube Loader Version is correct ($ionCubeVersion) : OK</div>";
+        }
 
-/**
- * Class VirtualAccessDriver
- * @package Pydio\Access\Driver\StreamProvider\Virtual
- */
-class VirtualAccessDriver extends FsAccessDriver
-{
-    
+    }
+
 }
+
+
+checkIonCubeVersion();

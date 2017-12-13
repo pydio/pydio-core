@@ -10,7 +10,6 @@
         <resources>
             <i18n namespace="skeleton" path="plugins/action.skeleton/res/i18n"/>
             <js className="SkeletonActions" file="plugins/action.skeleton/res/build/SkeletonActions.js"/>
-            <img_library alias="skeleton_images" path="plugins/action.skeleton/res/images"/>
         </resources>
     </client_settings>
 

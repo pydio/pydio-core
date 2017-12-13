@@ -55,6 +55,7 @@ class LdapAuthDriver extends AbstractAuthDriver
     public $mappedRolePrefix;
     public $pageSize;
     public $userRecursiveMemberOf = false;
+    public $referralBind = false;
 
     public $ldapconn = null;
     public $separateGroup = "";
@@ -98,6 +99,7 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
 
         if ($options["LDAP_PAGE_SIZE"]) $this->pageSize = $options["LDAP_PAGE_SIZE"];
+        if ($options["LDAP_REFERRAL_BIND"]) $this->referralBind = $options["LDAP_REFERRAL_BIND"];
         if ($options["LDAP_GROUP_PREFIX"]) $this->mappedRolePrefix = $options["LDAP_GROUP_PREFIX"];
         if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
         if ($options["LDAP_GDN"]) $this->ldapGDN = $this->parseReplicatedParams($options, array("LDAP_GDN"));
@@ -236,7 +238,11 @@ class LdapAuthDriver extends AbstractAuthDriver
         if ($ldapconn) {
             $this->logDebug(__FUNCTION__, 'ldap_connect(' . $this->ldapUrl . ',' . $this->ldapPort . ') OK');
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
-            ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0 );
+            if($this->referralBind){
+                ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 1);
+            }else{
+                ldap_set_option( $ldapconn, LDAP_OPT_REFERRALS, 0);
+            }
             if (empty($this->pageSize) || !is_numeric($this->pageSize)) {
                 $this->pageSize = 500;
             }
@@ -459,6 +465,8 @@ class LdapAuthDriver extends AbstractAuthDriver
 
         } else if (!empty($this->separateGroup) && $baseGroup != "/" . $this->separateGroup) {
             return array();
+        } else if (empty($this->separateGroup) && empty($this->hasGroupsMapping) && ($baseGroup != "/")){
+            return array();
         }
 
         $entries = $this->getUserEntries(StringHelper::regexpToLdap($regexp), false, $offset, $limit, true);
@@ -594,6 +602,15 @@ class LdapAuthDriver extends AbstractAuthDriver
         $entries = $this->getUserEntries($login);
         if ($entries['count'] > 0) {
             $this->logDebug(__FUNCTION__, 'Ldap Password Check: Got user ' . $login);
+            if($this->referralBind){
+                $this->rebind_pass = $pass;
+                $this->rebind_dn    = $entries[0]["dn"];
+                @ldap_set_rebind_proc($this->ldapconn, 'rebind');
+                // bind
+                if(@ldap_bind($this->ldapconn, $this->rebind_dn, $pass)){
+                    return true;
+                }
+            }
             if (@ldap_bind($this->ldapconn, $entries[0]["dn"], $pass)) {
                 $this->logDebug(__FUNCTION__, 'Ldap Password Check: Got user ' . $entries[0]["cn"][0]);
                 return true;
@@ -1177,22 +1194,23 @@ class LdapAuthDriver extends AbstractAuthDriver
         return $newS;
     }
 
-    /*
+
     public $rebind_dn;
     public $rebind_pass;
-    function rebind($ldap, $referral) {
+    public function rebind($ldap, $referral) {
         $server= preg_replace('!^(ldap://[^/]+)/.*$!', '\\1', $referral);
         if (!($ldap = ldap_connect($server))){
-            return true;
+            // return error
+            return 1;
         }
         ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ldap, LDAP_OPT_REFERRALS, 1);
         ldap_set_rebind_proc($ldap, "rebind");
         if (!ldap_bind($ldap,$this->rebind_dn,$this->rebind_pass)){
-            return true;
+            // return error
+            return 1;
         }
+        // return success
         return 0;
     }
-
-    */
 }

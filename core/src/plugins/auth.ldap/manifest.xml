@@ -46,6 +46,7 @@
         <param name="LDAP_VALUE_MEMBERATTR_IN_GROUP" group="CONF_MESSAGE[Advanced Parameters]" type="boolean" label="CONF_MESSAGE[Fake MemberOf. value of member/memberUid attribute of group]" description="CONF_MESSAGE[value of member/memberUid attribute of group: can be user DN or user CN. Use with Fake memberOf enabled. YES use DN, otherwise CN]" default="true" mandatory="false"/>
         <param name="LDAP_SEARCHUSER_ATTR" group="CONF_MESSAGE[Advanced Parameters]" type="string" label="CONF_MESSAGE[Search Users by Attribute]" description="CONF_MESSAGE[When looking for a user through autocomplete, search on a specific parameter instead of user ID]" mandatory="false" default=""/>
         <param name="LDAP_PAGE_SIZE" group="CONF_MESSAGE[Advanced Parameters]" type="string" label="CONF_MESSAGE[LDAP Server page size]" description="CONF_MESSAGE[Page size of LDAP Server]" mandatory="false" default="500"/>
+        <param name="LDAP_REFERRAL_BIND" group="CONF_MESSAGE[Advanced Parameters]" type="boolean" label="CONF_MESSAGE[Use referral bind]" description="CONF_MESSAGE[Use referral bind]" mandatory="false" default="false"/>
         <param name="LDAP_COUNT_CACHE_TTL" group="CONF_MESSAGE[Advanced Parameters]" type="integer" label="CONF_MESSAGE[Cache User Count (hours)]" description="CONF_MESSAGE[Locally cache the total number of users during X hours. Can be handy for huge directories.]" mandatory="false" default="1"/>
 
     </server_settings>

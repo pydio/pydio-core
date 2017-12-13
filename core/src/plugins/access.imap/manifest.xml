@@ -3,7 +3,6 @@
 	<client_settings icon="plugins/access.imap/resources/images/16/mail_folder_inbox.png"  description_template="{HOST}"  iconClass="icon-envelope-alt">
 		<resources>
             <i18n namespace="imap_access" path="plugins/access.imap/resources/i18n"/>
-			<img_library alias="imap_images" path="plugins/access.imap/resources/images"/>
 			<js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer"/>
 		</resources>
 	</client_settings>

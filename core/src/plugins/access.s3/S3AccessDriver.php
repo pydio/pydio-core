@@ -21,12 +21,12 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\S3;
 
-use DOMNode;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 
@@ -40,7 +40,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class S3AccessDriver extends FsAccessDriver
 {
     /**
-    * @var \Pydio\Access\Core\Model\Repository
+    * @var RepositoryInterface
     */
     public $repository;
     public $driverConf;
@@ -84,13 +84,19 @@ class S3AccessDriver extends FsAccessDriver
         if ($recycle != "") {
             RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
         }
+
+        foreach ($this->exposeRepositoryOptions as $paramName){
+            $this->exposeConfigInManifest($paramName, $contextInterface->getRepository()->getContextOption($contextInterface, $paramName));
+        }
+
     }
 
     /**
-     * @return Aws\Common\Client\AbstractClient
+     * @param ContextInterface $ctx
+     * @return S3Client
      */
-    public function getS3Service(){
-        return $this->s3Client;
+    public function getS3Service(ContextInterface $ctx){
+        return S3AccessWrapper::getClientForContext($ctx);
     }
 
     /**
@@ -98,7 +104,7 @@ class S3AccessDriver extends FsAccessDriver
      * @return int
      */
     public function directoryUsage(AJXP_Node $node){
-        $client = $this->getS3Service();
+        $client = $this->getS3Service($node->getContext());
         $bucket = $node->getRepository()->getContextOption($node->getContext(), "CONTAINER"); //(isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
         $path   = rtrim($node->getRepository()->getContextOption($node->getContext(), "PATH"), "/").$node->getPath(); //(isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");
         $objects = $client->getIterator('ListObjects', array(
@@ -160,8 +166,7 @@ class S3AccessDriver extends FsAccessDriver
 
 
     /**
-     * @param AJXP_Node $dir
-     * @param string $type
+     * @param AJXP_Node $node
      * @return bool
      */
     public function isWriteable(AJXP_Node $node)
@@ -178,7 +183,7 @@ class S3AccessDriver extends FsAccessDriver
     }
 
     /**
-     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
+     * @param AJXP_Node $node
      * @param bool $parentNode
      * @param bool $details
      * @return void
@@ -200,8 +205,7 @@ class S3AccessDriver extends FsAccessDriver
     public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
         $newOptions                 = parent::makeSharedRepositoryOptions($ctx, $httpVars);
-        $newOptions["CONTAINER"]    = "AJXP_PARENT_OPTION:CONTAINER"; //$ctx->getRepository()->getContextOption($ctx, "CONTAINER");
-        
+        $newOptions["CONTAINER"]    = "AJXP_PARENT_OPTION:CONTAINER";
         return $newOptions;
     }
 

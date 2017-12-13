@@ -8,7 +8,6 @@
 		<resources>
 			<i18n namespace="meta.svn" path="plugins/meta.svn/i18n" />
 			<js file="plugins/meta.svn/class.SVNLogger.js" className="SVNLogger"/>
-			<img_library alias="svn_images" path="plugins/meta.svn/images"/>
 		</resources>
 	</client_settings>
 	<registry_contributions>

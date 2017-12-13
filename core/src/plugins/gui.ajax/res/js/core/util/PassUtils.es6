@@ -18,12 +18,45 @@
  * The latest code can be found at <https://pydio.com/>.
  *
  */
+import ResourcesManager from '../http/ResourcesManager'
 /**
  *
  * Utils to compute password strength
  *
  */
 export default class PassUtils{
+
+    static getState(passValue = '', confirmValue = '', crtState={valid: false}, onChange = (status)=>{}){
+        let state = {
+            valid: true,
+            passErrorText: null,
+            passHintText: null,
+            confirmErrorText: null,
+        };
+        if (!passValue && !confirmValue ){
+            state.valid = false;
+        } else {
+            PassUtils.checkPasswordStrength(passValue, (valid, message) => {
+                state.valid = valid;
+                if(!valid){
+                    state.passErrorText = message;
+                } else {
+                    state.passHintText = message;
+                }
+            });
+            if(!confirmValue) {
+                state.valid = false;
+                state.confirmErrorText = global.pydio.MessageHash[621];
+            } else if (confirmValue !== passValue) {
+                state.valid = false;
+                state.confirmErrorText = global.pydio.MessageHash[238];
+            }
+        }
+        if(crtState.valid !== state.valid){
+            onChange(state.valid);
+        }
+        return state;
+    }
 
     static getOptions(){
         if(PassUtils.Options){
@@ -37,38 +70,55 @@ export default class PassUtils{
             common: ["password", "123456", "123", "1234", "mypass", "pass", "letmein", "qwerty", "monkey", "asdfgh", "zxcvbn", "pass"],
             minchar: 8
         };
+        const pydioMin = parseInt(global.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
+        if(pydioMin){
+            PassUtils.Options.minchar = pydioMin;
+        }
         return PassUtils.Options;
     }
 
     static checkPasswordStrength(value, callback) {
-        // Update with Pydio options
-        PassUtils.getOptions();
-        if(!PassUtils.Options.pydioMinChar && window.pydio){
-            var pydioMin = parseInt(window.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
-            PassUtils.Options.pydioMinChar = true;
-            if(pydioMin){
-                PassUtils.Options.minchar = pydioMin;
+        try{
+            const PassPolicyLib = ResourcesManager.requireLib("PasswordPolicy", false);
+            if(PassPolicyLib && PassPolicyLib.Checker){
+                const {Checker} = PassPolicyLib;
+                if(Checker) {
+                    Checker.checkPasswordStrength(value, callback);
+                    return;
+                }
             }
+        } catch (e){}
+        // Update with Pydio options
+        const options = PassUtils.getOptions();
+        if(options.minchar && value.length < options.minchar){
+            callback(false, global.pydio.MessageHash[380]);
+            return;
         }
-        var options = PassUtils.Options;
-        var strength = PassUtils.getPasswordScore(value, options.minchar);
+        const wrappedCallback = (msgId, percent) => {
+            let s = options.messages[msgId];
+            try{
+                s = global.pydio.MessageHash[options.pydioMessages[msgId]];
+            }catch(e){}
+            callback(percent > 1, s);
+        };
+        const strength = PassUtils.getPasswordScore(value, options.minchar);
         if (strength == -200) {
-            callback(0, 0);
+            wrappedCallback(0, 0);
         } else {
             if (strength < 0 && strength > -199) {
-                callback(1, 10);
+                wrappedCallback(1, 10);
             } else {
                 if (strength <= options.scores[0]) {
-                    callback(2, 10);
+                    wrappedCallback(2, 10);
                 } else {
                     if (strength > options.scores[0] && strength <= options.scores[1]) {
-                        callback(3, 25);
+                        wrappedCallback(3, 25);
                     } else if (strength > options.scores[1] && strength <= options.scores[2]) {
-                        callback(4, 55);
+                        wrappedCallback(4, 55);
                     } else if (strength > options.scores[2] && strength <= options.scores[3]) {
-                        callback(5, 80);
+                        wrappedCallback(5, 80);
                     } else {
-                        callback(6, 98);
+                        wrappedCallback(6, 98);
                     }
                 }
             }
@@ -77,7 +127,7 @@ export default class PassUtils{
 
     static getPasswordScore(value, minchar) {
 
-        var strength = 0;
+        let strength = 0;
         if (value.length < minchar) {
             strength = (strength - 100);
         } else {
@@ -105,10 +155,10 @@ export default class PassUtils{
         if (value.match(/(.*[0-9].*[0-9].*[0-9])/)) {
             strength = (strength + 7);
         }
-        if (value.match(/.[!,@,#,$,%,^,&,*,?,_,~]/)) {
+        if (value.match(/.[!,@#$%^&*?_~]/)) {
             strength = (strength + 5);
         }
-        if (value.match(/(.*[!,@,#,$,%,^,&,*,?,_,~].*[!,@,#,$,%,^,&,*,?,_,~])/)) {
+        if (value.match(/(.*[!,@#$%^&*?_~].*[!,@#$%^&*?_~])/)) {
             strength = (strength + 7);
         }
         if (value.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) {
@@ -117,10 +167,10 @@ export default class PassUtils{
         if (value.match(/([a-zA-Z])/) && value.match(/([0-9])/)) {
             strength = (strength + 3);
         }
-        if (value.match(/([a-zA-Z0-9].*[!,@,#,$,%,^,&,*,?,_,~])|([!,@,#,$,%,^,&,*,?,_,~].*[a-zA-Z0-9])/)) {
+        if (value.match(/([a-zA-Z0-9].*[!,@#$%^&*?_~])|([!,@#$%^&*?_~].*[a-zA-Z0-9])/)) {
             strength = (strength + 3);
         }
-        var common = ["password", "123456", "123", "1234", "mypass", "pass", "letmein", "qwerty", "monkey", "asdfgh", "zxcvbn", "pass"];
+        const common = ["password", "123456", "123", "1234", "mypass", "pass", "letmein", "qwerty", "monkey", "asdfgh", "zxcvbn", "pass"];
         if(common.indexOf(value.toLowerCase()) !== -1){
             strength = -200;
         }

@@ -89,6 +89,60 @@ class ComponentConfigsParser {
         return configs;
     }
 
+    static loadDefaultDisplayOptions(props){
+        const {pydio, displayMode} = props;
+        let repoType;
+        let res = {
+            displayMode : displayMode || 'list',
+            defaultSortingInfo : {sortType:'file-natural',attribute:'',direction:'asc'}
+        };
+        try{
+            repoType = pydio.user.getRepositoriesList().get(pydio.user.getActiveRepository()).getAccessType()
+        }catch(e){
+            return res;
+        }
+        const data = pydio.getPluginConfigs("access." + repoType);
+        if(!displayMode && data.get('UX_DISPLAY_DEFAULT_MODE')){
+            res.displayMode = data.get('UX_DISPLAY_DEFAULT_MODE');
+        }
+        if(data.get('UX_SORTING_DEFAULT_COLUMN')){
+            const sort = data.get('UX_SORTING_DEFAULT_COLUMN');
+            const dir = data.get('UX_SORTING_DEFAULT_DIRECTION') || 'asc';
+            switch(sort){
+                case 'natural':
+                    res.defaultSortingInfo = {
+                        sortType: 'file-natural',
+                        attribute: '',
+                        direction: dir
+                    }
+                    break;
+                case 'filename':
+                    res.defaultSortingInfo = {
+                        sortType: 'string',
+                        attribute: 'text',
+                        direction: dir
+                    }
+                    break;
+                case 'ajxp_modiftime':
+                    res.defaultSortingInfo = {
+                        sortType: 'string',
+                        attribute: 'ajxp_modiftime',
+                        direction: dir
+                    }
+                    break;
+                case 'bytesize':
+                    res.defaultSortingInfo = {
+                        sortType: 'number',
+                        attribute: 'bytesize',
+                        direction: dir
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        return res;
+    }
 }
 
 let MainFilesList = React.createClass({
@@ -107,15 +161,16 @@ let MainFilesList = React.createClass({
     getInitialState: function(){
         let configParser = new ComponentConfigsParser();
         let columns = configParser.loadConfigs('FilesList').get('columns');
+        const uxProps = ComponentConfigsParser.loadDefaultDisplayOptions(this.props);
         return {
             contextNode : this.props.pydio.getContextHolder().getContextNode(),
-            displayMode : this.props.displayMode?this.props.displayMode:'list',
             thumbNearest: 200,
             thumbSize   : 200,
             elementsPerLine: 5,
             columns     : columns ? columns : configParser.getDefaultListColumns(),
             parentIsScrolling: this.props.parentIsScrolling,
-            repositoryId: this.props.pydio.repositoryId
+            repositoryId: this.props.pydio.repositoryId,
+            ...uxProps
         }
     },
 
@@ -151,13 +206,15 @@ let MainFilesList = React.createClass({
         return (!this.state || this.state.repositoryId !== nextProps.pydio.repositoryId || nextState !== this.state );
     },
 
-    componentWillReceiveProps: function(){
+    componentWillReceiveProps: function(nextProps){
         if(this.state && this.state.repositoryId !== this.props.pydio.repositoryId ){
             this.props.pydio.getController().updateGuiActions(this.getPydioActions());
             let configParser = new ComponentConfigsParser();
             const columns = configParser.loadConfigs('FilesList').get('columns');
-            this.setState({
+            const uxProps = ComponentConfigsParser.loadDefaultDisplayOptions(nextProps);
+            this.setState({...uxProps,
                 columns: columns ? columns : configParser.getDefaultListColumns(),
+                repositoryId: this.props.pydio.repositoryId,
             })
         }
     },
@@ -264,9 +321,17 @@ let MainFilesList = React.createClass({
             return;
         }
         if(!mobile && ( !clickType || clickType === SimpleList.CLICK_TYPE_SIMPLE )){
-            if(event && event.shiftKey && dm.getSelectedNodes().length){
-                const newSelection = this.refs.list.computeSelectionFromCurrentPlusTargetNode(dm.getSelectedNodes(), node);
+            const crtSelection = dm.getSelectedNodes();
+            if(event && event.shiftKey && crtSelection.length) {
+                const newSelection = this.refs.list.computeSelectionFromCurrentPlusTargetNode(crtSelection, node);
                 dm.setSelectedNodes(newSelection);
+            } else if(event && (event.ctrlKey || event.metaKey) && crtSelection.length){
+                if(crtSelection.indexOf(node) === -1){
+                    dm.setSelectedNodes([...crtSelection, node]);
+                } else {
+                    const otherSelection = crtSelection.filter((obj) => {return obj!== node;})
+                    dm.setSelectedNodes(otherSelection);
+                }
             }else{
                 dm.setSelectedNodes([node]);
             }
@@ -478,7 +543,7 @@ let MainFilesList = React.createClass({
                 entryHandleClicks={this.entryHandleClicks}
                 horizontalRibbon={this.props.horizontalRibbon}
                 emptyStateProps={emptyStateProps}
-                defaultSortingInfo={{sortType:'file-natural',attribute:'',direction:'asc'}}
+                defaultSortingInfo={this.state.defaultSortingInfo}
             />
         );
     }

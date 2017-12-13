@@ -35,7 +35,7 @@
 			</processing>
 		</action>
         <action name="user_create_repository">
-            <gui text="417" title="418" src="user-create-repository.png" accessKey="" hasAccessKey="false" iconClass="icon-plus-sign">
+            <gui text="417" title="418" accessKey="" hasAccessKey="false" iconClass="icon-plus-sign">
                 <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"/>
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
@@ -74,7 +74,7 @@
 			</processing>
 		</action>
         <action name="user_team_create">
-            <gui src="delete.png" iconClass="icon-plus" text="user_dash.57" title="user_dash.57">
+            <gui iconClass="icon-plus" text="user_dash.57" title="user_dash.57">
                 <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="team_address_book"/>
             </gui>
             <processing>
@@ -97,7 +97,7 @@
             </processing>
         </action>
         <action name="user_team_delete">
-            <gui src="delete.png" iconClass="icon-trash" text="7" title="7">
+            <gui iconClass="icon-trash" text="7" title="7">
                 <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="team_address_book"/>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
             </gui>
@@ -111,7 +111,7 @@
             </processing>
         </action>
         <action name="user_team_edit_users">
-            <gui src="delete.png" iconClass="icon-edit" text="user_dash.54" title="user_dash.55">
+            <gui iconClass="icon-edit" text="user_dash.54" title="user_dash.55">
                 <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="team_address_book"/>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
             </gui>
@@ -120,7 +120,7 @@
             </processing>
         </action>
 		<action name="get_bookmarks">
-            <gui text="145" title="145" src="edit_user.png" iconClass="icon-bookmark" accessKey="" hasAccessKey="false">
+            <gui text="145" title="145" iconClass="icon-bookmark" accessKey="" hasAccessKey="false">
                 <context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="filter" contextMenu="false" infoPanel="false"/>
             </gui>
             <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
@@ -168,7 +168,7 @@
             </processing>
         </action>
         <action name="custom_data_edit">
-            <gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
+            <gui text="442" title="443" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
                 <context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
@@ -177,7 +177,7 @@
             </processing>
         </action>
         <action name="user_update_user">
-            <gui text="519" title="520" src="edit_user.png" iconClass="icon-user" accessKey="" hasAccessKey="false">
+            <gui text="519" title="520" iconClass="icon-user" accessKey="" hasAccessKey="false">
                 <context selection="true" dir="" recycle="true" actionBar="true" actionBarGroup="address_book" contextMenu="false" infoPanel="false"/>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_user"/>
             </gui>
@@ -187,7 +187,7 @@
             </processing>
         </action>
         <action name="user_create_user">
-      			<gui text="484" title="485" src="edit_user.png" iconClass="icon-user" accessKey="" hasAccessKey="false">
+      			<gui text="484" title="485" iconClass="icon-user" accessKey="" hasAccessKey="false">
       				<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="address_book" contextMenu="false" infoPanel="false"/>
       			</gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
@@ -196,7 +196,7 @@
             </processing>
         </action>
 		<action name="switch_language">
-			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false" iconClass="icon-flag">
+			<gui text="190" title="190" accessKey="" hasAccessKey="false" iconClass="icon-flag">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
 			</gui>
 			<processing>
@@ -205,7 +205,7 @@
 			</processing>
 		</action>
 		<action name="webdav_preferences">
-			<gui text="403" title="403" src="drive_remote.png" iconClass="icon-cog" accessKey="" hasAccessKey="false">
+			<gui text="403" title="403" iconClass="icon-cog" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
 			</gui>
             <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""/>

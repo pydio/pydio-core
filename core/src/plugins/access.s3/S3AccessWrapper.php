@@ -57,7 +57,7 @@ class S3AccessWrapper extends FsAccessWrapper
         $options = [
             "TYPE" => "s3"
         ];
-        $optKeys = ["API_KEY", "SECRET_KEY", "CONTAINER", "SIGNATURE_VERSION", "STORAGE_URL", "REGION", "PROXY", "API_VERSION", "VHOST_NOT_SUPPORTED"];
+        $optKeys = ["API_KEY", "SECRET_KEY", "CONTAINER", "PATH", "SIGNATURE_VERSION", "STORAGE_URL", "REGION", "PROXY", "API_VERSION", "VHOST_NOT_SUPPORTED"];
         foreach($optKeys as $key){
             $options[$key] = $repository->getContextOption($context, $key);
         }
@@ -72,7 +72,7 @@ class S3AccessWrapper extends FsAccessWrapper
      * @param boolean $registerStream
      * @return S3Client
      */
-    protected static function getClientForContext(ContextInterface $ctx, $registerStream = true)
+    public static function getClientForContext(ContextInterface $ctx, $registerStream = true)
     {
         $repoObject = $ctx->getRepository();
         if (!isSet(self::$clients[$repoObject->getId()])) {
@@ -145,7 +145,7 @@ class S3AccessWrapper extends FsAccessWrapper
         $basePath       = $repoObject->getContextOption($node->getContext(), "PATH");
         $baseContainer  = $repoObject->getContextOption($node->getContext(), "CONTAINER");
         if (!empty($basePath)) {
-            $baseContainer .= rtrim($basePath, "/");
+            $baseContainer .= "/".trim($basePath, "/");
         }
         $p = $protocol . $baseContainer . str_replace("//", "/", $url["path"]);
         return $p;
@@ -159,7 +159,7 @@ class S3AccessWrapper extends FsAccessWrapper
      * @param String $mode
      * @param string $options
      * @param resource $context
-     * @return resource
+     * @return resource|bool
      * @internal param string $opened_path
      */
     public function stream_open($path, $mode, $options, &$context)
@@ -200,9 +200,10 @@ class S3AccessWrapper extends FsAccessWrapper
             $node       = new AJXP_Node($path);
             $ctx = $node->getContext();
             $repoObject = $node->getRepository();
+            $basePath = $repoObject->getContextOption($ctx, "PATH");
             $result = $this->getClientForContext($ctx)->listObjects([
                 'Bucket'  => $repoObject->getContextOption($ctx, "CONTAINER"),
-                'Prefix'  => ltrim($node->getPath(), "/"). '/',
+                'Prefix'  =>  ltrim( trim($basePath, "/") ."/". ltrim($node->getPath(), "/"), '/') . '/',
                 'MaxKeys' => 1
             ]);
             if (isSet($result['Contents']) && isSet($result['Contents'][0]['LastModified'])) {
@@ -244,7 +245,7 @@ class S3AccessWrapper extends FsAccessWrapper
      *
      * @param string $path
      * @param string $options
-     * @return resource
+     * @return resource|bool
      */
     public function dir_opendir($path, $options)
     {
@@ -260,8 +261,14 @@ class S3AccessWrapper extends FsAccessWrapper
         return $this->dH !== false;
     }
 
+    /**
+     * @param string $path
+     * @param int $mode
+     * @param int $options
+     * @return bool
+     * @throws \Exception
+     */
     public function mkdir($path, $mode, $options){
-        $url        = UrlUtils::mbParseUrl($path);
         $node       = new AJXP_Node($path);
         $repoId     = $node->getRepositoryId();
         $repoObject = $node->getRepository();
@@ -414,7 +421,7 @@ class S3AccessWrapper extends FsAccessWrapper
             $clear = \Aws\S3\BatchDelete::fromIterator($s3Client, $bucket, $s3Client->getIterator('ListObjects', array(
                 'Bucket' => $bucket,
                 'Prefix' => $fromKeyname
-            )));
+            )), ['batch_size' => 5]);
             $clear->delete();
 
             if (count($failed)) {

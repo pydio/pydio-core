@@ -62,6 +62,9 @@ class SMBAccessDriver extends FsAccessDriver
         if(!empty($this->pluginConf['SMB_PATH_TMP']) && !defined('SMB_PATH_TMP')){
             define ('SMB4PHP_SMBTMP', $this->pluginConf["SMB_PATH_TMP"]);
         }
+        if(!empty($this->pluginConf['SMB_DISABLE_BUFFER'])){
+            define ('SMB_DISABLE_BUFFER', true);
+        }
         require_once($this->getBaseDir()."/smb.php");
     }
 
@@ -92,6 +95,10 @@ class SMBAccessDriver extends FsAccessDriver
         }
         if ($recycle != "") {
             RecycleBinManager::init($contextInterface->getUrlBase(), "/".$recycle);
+        }
+
+        foreach ($this->exposeRepositoryOptions as $paramName){
+            $this->exposeConfigInManifest($paramName, $contextInterface->getRepository()->getContextOption($contextInterface, $paramName));
         }
 
     }

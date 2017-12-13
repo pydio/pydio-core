@@ -3,7 +3,6 @@
     <class_definition filename="plugins/meta.watch/WatchRegister.php" classname="Pydio\Access\Meta\Watch\WatchRegister"/>
     <client_settings>
         <resources>
-            <img_library alias="meta.watch" path="plugins/meta.watch/icons"/>
             <i18n namespace="meta.watch" path="plugins/meta.watch/i18n"/>
             <js className="WatcherActions" file="plugins/meta.watch/res/build/WatcherActions.js"/>
         </resources>

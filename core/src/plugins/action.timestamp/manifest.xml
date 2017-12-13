@@ -8,7 +8,6 @@
 	<class_definition filename="plugins/action.timestamp/TimestampCreator.php" classname="Pydio\Action\Timestamp\TimestampCreator"/>
 	<client_settings>
         <resources>
-            <img_library alias="timestamp_images" path="plugins/action.timestamp/images"/>
             <i18n path="plugins/action.timestamp/i18n" namespace="timestamp"/>
             <js file="plugins/action.timestamp/res/build/TimestampActions.js" className="TimestampActions"/>
         </resources>

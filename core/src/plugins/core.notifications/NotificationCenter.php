@@ -279,13 +279,18 @@ class NotificationCenter extends Plugin
         $userGroup = $u->getGroupPath();
         $authRepos = array();
         $crtRepId = $ctx->getRepositoryId();
-        if (isSet($httpVars["repository_id"]) && $u->getMergedRole()->canRead($httpVars["repository_id"])) {
+        if (isSet($httpVars["repository_id"])) {
             $authRepos[] = $httpVars["repository_id"];
         } else if (isSet($httpVars["current_repository"]) && $httpVars['current_repository'] === 'true'){
             $authRepos[] = $crtRepId;
         } else {
             $accessibleRepos =  \Pydio\Core\Services\UsersService::getRepositoriesForUser($u, false);
             $authRepos = array_keys($accessibleRepos);
+        }
+        foreach($authRepos as $key => $repoId){
+            if(!$u->getMergedRole()->canRead($repoId)){
+                unset($authRepos[$key]);
+            }
         }
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;
         $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]): 15;
@@ -454,11 +459,14 @@ class NotificationCenter extends Plugin
         $repositoryFilter = null;
         $httpVars = $requestInterface->getParsedBody();
 
-        if (isSet($httpVars["repository_id"]) && $u->getMergedRole()->canRead($httpVars["repository_id"])) {
+        if (isSet($httpVars["repository_id"])) {
             $repositoryFilter = $httpVars["repository_id"];
         }
         if ($repositoryFilter === null && isSet($httpVars['current_repository']) && $httpVars['current_repository'] === 'true') {
             $repositoryFilter = $ctx->getRepositoryId();
+        }
+        if(!$u->getMergedRole()->canRead($repositoryFilter)){
+            return;
         }
         $res = $this->eventStore->loadAlerts($u, $repositoryFilter);
         if(!count($res)) return;
