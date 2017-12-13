@@ -1,43 +1,28 @@
 /* larger canvas, spectrum + EQ visualization and other items */
 
-/*.ui360-vis,
+.ui360-vis,
 .ui360-vis .sm2-360ui,
 .sm2-inline-list .ui360-vis {
- /* size of the container for the circle, etc.
+ /* size of the container for the circle, etc.*/
  width: 198px;
  height: 198px;
 }
 
 .ui360-vis {
  position:relative;
- /* a little extra spacing
+ /* a little extra spacing */
  padding-top:1px;
  padding-bottom:1px;
- margin-bottom:-18px; /* approximate "line height" we want
+ margin-bottom:-18px; /* approximate "line height" we want */
  padding-left:248px;
  margin-left:0px;
- background-position:50% 50%; /* (~109px) initial play button position 
-}*/
-
-.sm2-inline-list .ui360-vis {
- cursor:pointer
-}
-
-.ui360-vis a {
- font:14px "helvetica neue",helvetica,monaco,lucida,terminal,monospace;
- white-space:nowrap;
- text-indent:0px; /* undo inline style */
- top:46%; /* ehh. */
+ background-position:50% 50%; /* (~109px) initial play button position */
 }
 
 .sm2-inline-list .ui360-vis a {
  line-height:198px;
  top:auto;
 }
-
-/*.ui360-vis .sm2-360ui {
- margin-left:-256px;
-}*/
 
 .ui360-vis .sm2-timing {
  line-height:198px;
@@ -108,6 +93,8 @@
  height:48px;
  margin-left:-24px;
  margin-top:-24px;
+ top: 50%;
+ left: 50%;
 }
 
 .ui360-vis:hover .sm2-360btn {

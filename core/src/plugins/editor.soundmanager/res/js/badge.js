@@ -23,10 +23,15 @@
 import React, {Component} from 'react'
 import Player from './Player';
 
-export default class Preview extends Component {
+// The threeSixytPlayer is the same for all badges
+var threeSixtyPlayer = new ThreeSixtyPlayer();
+
+export default class Badge extends Component {
 
     componentDidMount() {
         this.loadNode(this.props)
+
+        threeSixtyPlayer.init()
     }
 
     componentWillReceiveProps(nextProps) {
@@ -39,7 +44,7 @@ export default class Preview extends Component {
         const {pydio, node} = props
 
         this.setState({
-            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&panel=true',
+            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&badge=true',
             mimeType: "audio/" + node.getAjxpMime()
         })
     }
@@ -50,7 +55,7 @@ export default class Preview extends Component {
         if (!url) return null
 
         return (
-            <Player rich={true} style={{width: "auto", height: "auto"}} onReady={this.props.onLoad}>
+            <Player rich={false} style={{width: 40, height: 40, margin: "auto"}} onReady={() => {}}>
                 <a type={mimeType} href={url} />
             </Player>
         );
