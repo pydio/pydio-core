@@ -394,9 +394,10 @@ abstract class AbstractCacheDriver extends Plugin
     public function __destruct()
     {
         if(count($this->httpDeletion)){
+            $baseUrl = ApplicationState::detectServerURL(true);
             $client = $this->getHttpClient();
             if(empty($client)) return;
-            $client->post('/?get_action=clear_cache_key', [
+            $client->post($baseUrl.'/?get_action=clear_cache_key', [
                 'body' => [
                     'data' => json_encode($this->httpDeletion)
                 ]
