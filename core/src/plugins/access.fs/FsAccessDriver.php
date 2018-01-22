@@ -2407,8 +2407,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function makeZip (UserSelection $selection, $dest, $basedir, $taskId = null)
     {
-
-
         @set_time_limit(0);
         require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $filePaths = [];
@@ -2430,7 +2428,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $fsEncoding = TextEncoder::getEncoding();
         $ctx = $selection->getContext();
 
-        $preAddCallback = function($value, &$header) use ($ctx, $taskId, $zipEncoding, $fsEncoding){
+        $preAddCallback = function($value, &$header) use ($ctx, $taskId, $zipEncoding, $fsEncoding, $selection){
             if($taskId !== null){
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Adding ".$header["stored_filename"]." to archive");
             }
@@ -2441,7 +2439,15 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $header["stored_filename"] = $test;
                 }
             }
-            return !($this->filterFile($ctx, $search, true) || $this->filterFolder($ctx, $search, "contains"));
+
+            // test permission on all files before adding to zip
+            $topUrl = $selection->currentBaseUrl();
+            $realPath = MetaStreamWrapper::getRealFSReference($topUrl);
+            $newNode = new AJXP_Node(str_replace($realPath, $topUrl, $search));
+            $newNode->setUserId($ctx->getUser()->getId());
+            $isAccessible = $this->isReadable($newNode) || $this->isWriteable($newNode);
+
+            return !($this->filterFile($ctx, $search, true) || $this->filterFolder($ctx, $search, "contains")) && $isAccessible;
         };
 
         if($basedir == "__AJXP_ZIP_FLAT__/"){
@@ -2580,8 +2586,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
         return $newOptions;
     }
-
-
 }
 
 function cropFilename($filename, $max_length)
