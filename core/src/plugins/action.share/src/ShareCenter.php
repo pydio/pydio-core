@@ -1278,12 +1278,12 @@ class ShareCenter extends Plugin
                     if($node->getRepository()->hasContentFilter()){
                         $cFilter = $node->getRepository()->getContentFilter();
                         $parentNodePath = array_keys($cFilter->filters)[0];
-                        $parentNodeURL = $newContext->getUrlBase().$parentNodePath;
+                        $parentNodeURL = trim($newContext->getUrlBase(), '/').'/'.ltrim($parentNodePath, '/');
                     }else{
                         $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
                         $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
                         $relative = substr($currentRoot, strlen($parentRoot));
-                        $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
+                        $parentNodeURL = trim($newContext->getUrlBase(), '/').'/'.ltrim($relative.$node->getPath(), '/');
                     }
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
