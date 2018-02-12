@@ -266,6 +266,9 @@ class StatHelper
      */
     public static function isBrowsableArchive($fileName)
     {
+        if(!ConfService::zipBrowsingEnabled()){
+            return false;
+        }
         return preg_match("/\.zip$/i", $fileName);
     }
 
