@@ -145,7 +145,7 @@ class S3AccessWrapper extends FsAccessWrapper
         $basePath       = $repoObject->getContextOption($node->getContext(), "PATH");
         $baseContainer  = $repoObject->getContextOption($node->getContext(), "CONTAINER");
         if (!empty($basePath)) {
-            $baseContainer .= "/".trim($basePath, "/");
+            $baseContainer .= rtrim("/".trim($basePath, "/"), "/");
         }
         $p = $protocol . $baseContainer . str_replace("//", "/", $url["path"]);
         return $p;
