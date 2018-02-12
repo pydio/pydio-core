@@ -194,7 +194,7 @@ class MetaStreamWrapper implements IAjxpWrapper
 
                 if (!empty($baseDir) || $baseDir != "/") {
                     $crtPath = $node->getPath();
-                    if(empty($crtPath)){
+                    if(empty($crtPath) || $crtPath === "/." || $crtPath === "/.."){
                         $crtPath = "/";
                     }
                     $crtBase = basename($crtPath);
