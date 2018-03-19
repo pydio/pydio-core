@@ -29,9 +29,10 @@ let UploadDialog = React.createClass({
     ],
 
     getDefaultProps: function(){
+        const mobile = pydio.UI.MOBILE_EXTENSIONS;
         return {
             dialogTitle: '',
-            dialogSize: 'lg',
+            dialogSize: mobile ? 'md':'lg',
             dialogPadding: false,
             dialogIsModal: true
         };

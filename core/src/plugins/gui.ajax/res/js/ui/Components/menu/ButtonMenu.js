@@ -72,7 +72,8 @@ const ButtonMenu = React.createClass({
             secondary: this.props.secondary,
             disabled: this.props.disabeld,
             label: label,
-            onTouchTap: this.showMenu
+            onTouchTap: this.showMenu,
+            onClick:(e => e.stopPropagation())
         };
         const {menuItems} = this.props;
         const {showMenu, anchor} = this.state;
