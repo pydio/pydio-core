@@ -274,7 +274,9 @@ class ResourcesManager{
         let node;
 
         let sysjsMap = {};
-        let sysjsMeta = {};
+        let sysjsMeta = {
+            '*': { authorization: true }
+        };
         let requires = {};
 
         for(node of jsNodes){
