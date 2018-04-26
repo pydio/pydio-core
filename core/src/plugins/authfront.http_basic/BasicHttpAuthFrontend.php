@@ -75,7 +75,7 @@ class BasicHttpAuthFrontend extends AbstractAuthFrontend
 
         try {
 
-            $loggedUser = AuthService::logUser($localHttpLogin, $localHttpPassw, false, false);
+            $loggedUser = AuthService::logUser(trim($localHttpLogin), $localHttpPassw, false, false);
             $request = $request->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
             return true;
 
