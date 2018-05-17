@@ -20,6 +20,6 @@
     "lodash": "*",
     "react": "15.4.2",
     "react-dom": "15.4.2",
-    "video.js": "*"
+    "video.js": "^5.20.5"
   }
 }
