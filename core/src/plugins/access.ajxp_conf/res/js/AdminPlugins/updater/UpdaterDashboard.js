@@ -47,7 +47,7 @@ const UpdaterDashboard = React.createClass({
                 this.setState({packages:response.packages});
                 if(response.latest_note){
                     let latest = response.latest_note;
-                    latest = pydio.Parameters.get('ajxpServerAccess')+"&get_action=display_upgrade_note&url=" + encodeURIComponent(latest);
+                    latest = pydio.Parameters.get('ajxpServerAccess') + '&get_action=display_upgrade_note';
                     this.setState({src:latest});
                 }
             }else{
