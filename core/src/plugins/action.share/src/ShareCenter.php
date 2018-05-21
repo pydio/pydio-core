@@ -1376,7 +1376,7 @@ class ShareCenter extends Plugin
         }
 
         $this->applyForwardEvent($fromMirrors, $toMirrors, $copy, $direction);
-        if(count($fromMirrors) || count($toMirrors)){
+        if((is_array($fromMirrors) && count($fromMirrors)) || (is_array($toMirrors) && count($toMirrors))){
             // Make sure to switch back to correct repository in memory
             if($fromNode != null) {
                 $fromNode->getRepository()->driverInstance = null;
@@ -1409,7 +1409,7 @@ class ShareCenter extends Plugin
             $toMirrors = $this->findMirrorNodesInShares($toNode, $httpVars["direction"]);
         }
         $this->applyForwardEvent($fromMirrors, $toMirrors, ($httpVars["copy"] === "true"), $httpVars["direction"]);
-        if(count($fromMirrors) || count($toMirrors)){
+        if((is_array($fromMirrors) && count($fromMirrors)) || (is_array($toMirrors) && count($toMirrors))){
             // Make sure to switch back to correct repository in memory
             if($fromNode != null) {
                 $fromNode->getRepository()->driverInstance = null;
