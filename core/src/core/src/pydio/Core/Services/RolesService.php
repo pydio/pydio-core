@@ -77,6 +77,37 @@ class RolesService
      * @static
      * @param UserInterface $userObject
      */
+    public static function updateApplyProfile(&$userObject)
+    {
+        if (in_array($userObject->getProfile(),
+            ['standard', 'admin', 'guest', 'shared']))
+        {
+            switch ($userObject->rights["ajxp.profile"]) {
+            case 'admin':
+                if ($userObject->getPersonalRole()->getAcl('ajxp_conf') != "rw")
+                {
+                    $userObject->getPersonalRole()->setAcl('ajxp_conf', 'rw');
+                    $userObject->recomputeMergedRole();
+                }
+                $userObject->hasAdmin = true;
+                $userObject->save('superuser');
+                break;
+
+                default:
+                $userObject->save();
+                break;
+            }
+        } else {
+            throw new \Exception("Invalid profile parameter value.");
+        }
+
+    }
+
+
+    /**
+     * @static
+     * @param UserInterface $userObject
+     */
     public static function updateAutoApplyRole(&$userObject)
     {
         $roles = self::getRolesList(array(), true);
