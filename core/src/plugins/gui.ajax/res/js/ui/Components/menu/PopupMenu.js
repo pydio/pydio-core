@@ -50,6 +50,10 @@ export default React.createClass({
             if(this.props.onMenuClosed) this.props.onMenuClosed();
             return;
         }
+        // Firefox trigger a click event when you mouse up on contextmenu event
+        if (typeof event !== 'undefined' && event.button === 2 && event.type !== 'contextmenu') {
+            return;
+        }
         const node = ReactDOM.findDOMNode(this.refs.menuContainer);
         if(node.contains(event.target) || node === event.target ){
             return;
@@ -81,6 +85,7 @@ export default React.createClass({
     menuClicked:function(event, index, menuItem){
         this.hideMenu();
     },
+
     render: function(){
 
         let style = this.state.style || {};
