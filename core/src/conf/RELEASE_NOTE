@@ -1,6 +1,30 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-This is a bugfix for Pydio 8.0.1, below is a list of the commits
+This is a bugfix and security release for Pydio 8.X, and brings php7.2 support. See the Changelog below for commits details.
+
+Update html changelog
+Missing hook for filter_boot.conf 
+add locations that should be denied 
+fixing german translation 
+Fix filter accessible files before adding to zip 
+Fix sync view between public share and original
+Fix list task in public share
+Always open upload panel in minisite as background tasks panel is not inserted 
+Fix js request for resource without attaching cookie 
+Fix trim user id 
+Fix workspace word 
+Fix video.js version 
+Fix global quota 
+PHP7.2 fixes 
+Read latest_note url from server data instead of passing url as parameter 
+Fix FF right click menu - Close #1411 
+Use Html2Text to transform html to text in emails (cf PR #1310) 
+Better exception catching or it can break webdav upload. Close #1413 - Track count() usages for php7.2 
+Update phpseclib to fix create_function call 
+each() function is deprecated
+
+----
+Pydio 8.0.2 is a bugfix for Pydio 8.0.1, below is a list of the commits
 
 Fix ldap mapping attribute to roles
 Update version to 8.0.1
