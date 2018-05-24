@@ -19,14 +19,14 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1" => "Chiffre Ordner",
-"2" => "Ordnerinhalt verschlüsseln",
-"3" => "Ordner entschlüsseln",
-"4" => "Ordnerinhalt entschlüsseln",
-"5" => "Chiffre Ordner",
-"6" => "Ordnerinhalt verschlüsseln",
+    "1" => "Ordner verschlüsseln",
+    "2" => "Ordnerinhalt verschlüsseln",
+    "3" => "Ordner entschlüsseln",
+    "4" => "Ordnerinhalt entschlüsseln",
+    "5" => "Ordner verschlüsseln",
+    "6" => "Ordnerinhalt verschlüsseln",
     "7" => "Geben Sie den Schlüssel ein, den Sie beim verschlüsseln dieses Ordners angegeben haben.",
     "8" => "Schlüssel",
     "9" => "Schlüssel bestätigen",
-    "10" => "Legen Sie einen Schlüssel fest, damit kein Anderer auf die Dateien zugreifen kann. Achtung: Wenn Sie diesen verlieren können Sie nicht mehr auf die Dateien zugreifen!",
+    "10" => "Einen Schlüssel festlegen, damit niemand anderes auf die Dateien zugreifen kann. Achtung: Wenn dieser Schlüssel verloren geht, kann NICHT mehr auf die Daten zugegriffen werden!",
 );

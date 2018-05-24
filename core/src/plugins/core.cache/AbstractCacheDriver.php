@@ -85,7 +85,8 @@ abstract class AbstractCacheDriver extends Plugin
      * @param AJXP_Node $node
      * @param string $cacheType
      * @param string $details
-     * @return string
+     * @return array
+     * @throws \Exception
      */
     public static function getOptionsForNode($node, $cacheType, $details = ''){
         $ctx = $node->getContext();
@@ -360,7 +361,7 @@ abstract class AbstractCacheDriver extends Plugin
     }
 
     /**
-     * @param CacheProvider
+     * @param Cache\CacheProvider
      * @return bool
      */
     protected function requiresHttpForwarding($cacheDriver){
@@ -375,7 +376,6 @@ abstract class AbstractCacheDriver extends Plugin
 
     /**
      * @return Client
-     * @throws PydioException
      */
     protected function getHttpClient(){
         if(!isSet($this->httpClient)){

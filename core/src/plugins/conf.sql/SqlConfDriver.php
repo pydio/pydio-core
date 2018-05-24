@@ -703,10 +703,17 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $roles = $this->getRolesForRepository($repositoryId, '', $details);
 
         if($details){
-            return array(
-                'users' => count($roles['role_user']),
-                'groups' => count($roles['role_group']) + count($roles['role_role'])
-            );
+            $a = ['users' => 0, 'groups' => 0];
+            if (isSet($roles['role_user'])) {
+                $a['users'] = count($roles['role_user']);
+            }
+            if (isSet($roles['role_group'])) {
+                $a['groups'] = count($roles['role_group']);
+            }
+            if (isSet($roles['role_role'])) {
+                $a['groups'] += count($roles['role_role']);
+            }
+            return $a;
         }else{
             return count($roles);
         }

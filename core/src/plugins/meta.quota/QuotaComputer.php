@@ -219,7 +219,7 @@ class QuotaComputer extends AbstractMetaSource
 
         $ctx = $this->getEffectiveContext($ctx);
         $rootNode = new AJXP_Node($ctx->getUrlBase()."/");
-
+        $data = $this->getUserData($ctx);
         if (!isSet($data["REPO_USAGES"][$ctx->getRepositoryId()]) || $this->options["CACHE_QUOTA"] === false) {
 
             $quota = $rootNode->getSizeRecursive();

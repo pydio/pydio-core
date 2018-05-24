@@ -604,16 +604,32 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             $parseContent = false;
         }
         if ($parseContent && in_array($ext, explode(",", $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_HTML")))) {
-            $doc = @\Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
+            try{
+                $doc = @\Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
+            } catch (\Exception $e){
+                $doc = new \Zend_Search_Lucene_Document();
+            }
         } elseif ($parseContent && $ext == "docx" && class_exists("\Zend_Search_Lucene_Document_Docx")) {
             $realFile = $ajxpNode->getRealFile();
-            $doc = @\Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
+            try{
+                $doc = @\Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
+            } catch (\Exception $e){
+                $doc = new \Zend_Search_Lucene_Document();
+            }
         } elseif ($parseContent && $ext == "docx" && class_exists("\Zend_Search_Lucene_Document_Pptx")) {
             $realFile = $ajxpNode->getRealFile();
-            $doc = @\Zend_Search_Lucene_Document_Pptx::loadPptxFile($realFile);
+            try{
+                $doc = @\Zend_Search_Lucene_Document_Pptx::loadPptxFile($realFile);
+            } catch (\Exception $e){
+                $doc = new \Zend_Search_Lucene_Document();
+            }
         } elseif ($parseContent && $ext == "xlsx" && class_exists("\Zend_Search_Lucene_Document_Xlsx")) {
             $realFile = $ajxpNode->getRealFile();
-            $doc = @\Zend_Search_Lucene_Document_Xlsx::loadXlsxFile($realFile);
+            try{
+                $doc = @\Zend_Search_Lucene_Document_Xlsx::loadXlsxFile($realFile);
+            } catch (\Exception $e){
+                $doc = new \Zend_Search_Lucene_Document();
+            }
         } else {
             $doc = new \Zend_Search_Lucene_Document();
         }

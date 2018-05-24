@@ -64,7 +64,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
     {
         if(!isSet($this->options)) return;
         $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
-        if (!count($test)) {
+        if (is_array($test) && !count($test)) {
             throw new \Exception("Please define an SQL connexion in the core configuration");
         }
     }

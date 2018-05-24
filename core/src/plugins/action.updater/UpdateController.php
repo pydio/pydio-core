@@ -114,7 +114,9 @@ class UpdateController extends Plugin
 
             case "display_upgrade_note":
 
-                $url = $httpVars["url"];
+                //$url = $httpVars["url"];
+                $data = UpgradeManager::getUpgradePath($this->pluginConf["UPDATE_SITE"], "php", $this->pluginConf["UPDATE_CHANNEL"]);
+                $url = $data["latest_note"];
                 $context = UpgradeManager::getContext();
                 if ($context != null) {
                     $content = file_get_contents($url, null, $context);

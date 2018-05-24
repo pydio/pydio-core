@@ -68,7 +68,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     {
         if (!isSet($this->options)) return;
         $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
-        if (!count($test)) {
+        if (is_array($test) && !count($test)) {
             throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
     }

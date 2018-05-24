@@ -524,7 +524,7 @@ class SqlUser extends AbstractUser
     {
         $dirPath = $this->storage->getOption("USERS_DIRPATH");
         if ($dirPath == "") {
-            $dirPath = AJXP_INSTALL_PATH."/data/users";
+            $dirPath = AJXP_CACHE_DIR."/users";
             Logger::info(__CLASS__,"getTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
         $id = UsersService::ignoreUserCase() ?strtolower($this->getId()):$this->getId();
@@ -543,7 +543,7 @@ class SqlUser extends AbstractUser
     {
         $dirPath = $this->storage->getOption("USERS_DIRPATH");
         if ($dirPath == "") {
-            $dirPath = AJXP_INSTALL_PATH."/data/users";
+            $dirPath = AJXP_CACHE_DIR."/users";
             Logger::info(__CLASS__,"setTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
         $id = UsersService::ignoreUserCase() ?strtolower($this->getId()):$this->getId();

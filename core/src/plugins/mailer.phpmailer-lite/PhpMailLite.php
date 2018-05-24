@@ -23,6 +23,7 @@ namespace Pydio\Mailer\Implementation;
 
 use Exception;
 use PHPMailer;
+use Html2Text\Html2Text;
 use phpmailerException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
@@ -88,6 +89,7 @@ class PhpMailLite extends Mailer
         }
 
         $mail->Subject = $subject;
+        $encoder = new Html2Text();
         if ($useHtml) {
             if (strpos($body, "<html") !== false) {
                 $mail->Body = $body;
@@ -95,8 +97,11 @@ class PhpMailLite extends Mailer
                 $mail->Body = "<html><body>" . nl2br($body) . "</body></html>";
             }
             $mail->AltBody = Mailer::simpleHtml2Text($mail->Body);
+            $encoder->setHtml($mail->Body);
+            $mail->AltBody = $encoder->getText();
         } else {
-            $mail->Body = Mailer::simpleHtml2Text($body);
+            $encoder->setHtml($body);
+            $mail->Body = $encoder->getText();
         }
 
         if (!$mail->send()) {

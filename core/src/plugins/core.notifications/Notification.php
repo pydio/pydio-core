@@ -211,13 +211,13 @@ class Notification implements ContextProviderInterface
             $tpl = "[".$this->getDescriptionLocation()."] ";
         }
 
-        if (count($this->relatedNotifications) == 1 && $this->relatedNotifications[0]->getNode()->getUrl() != $this->getNode()->getUrl()){
+        if (is_array($this->relatedNotifications) && count($this->relatedNotifications) == 1 && $this->relatedNotifications[0]->getNode()->getUrl() != $this->getNode()->getUrl()){
 
             $key = "notification.tpl.group.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action;
             $tpl .= $this->replaceVars($mess[$key], $mess).": ";
             $tpl .= "".lcfirst($this->relatedNotifications[0]->getDescriptionLong(true)).".";
 
-        }else if (count($this->relatedNotifications) > 1) {
+        }else if (is_array($this->relatedNotifications) && count($this->relatedNotifications) > 1) {
 
             $key = "notification.tpl.group.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action;
             $tpl .= $this->replaceVars($mess[$key], $mess).": ";

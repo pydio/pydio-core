@@ -1,5 +1,6 @@
 {
   "require": {
-    "phpmailer/phpmailer": "v5.2.22"
+    "phpmailer/phpmailer": "v5.2.22",
+    "html2text/html2text": "4.1.0"
   }
 }

@@ -117,7 +117,7 @@ class DibiConnection extends DibiObject
 			}
 		}
 
-		$this->substitutes = new DibiHashMap(create_function('$expr', 'return ":$expr:";'));
+		$this->substitutes = new DibiHashMap(function($expr){return ":$expr:";});
 		if (!empty($config['substitutes'])) {
 			foreach ($config['substitutes'] as $key => $value) {
 				$this->substitutes->$key = $value;

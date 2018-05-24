@@ -1278,12 +1278,12 @@ class ShareCenter extends Plugin
                     if($node->getRepository()->hasContentFilter()){
                         $cFilter = $node->getRepository()->getContentFilter();
                         $parentNodePath = array_keys($cFilter->filters)[0];
-                        $parentNodeURL = $newContext->getUrlBase().$parentNodePath;
+                        $parentNodeURL = trim($newContext->getUrlBase(), '/').'/'.ltrim($parentNodePath, '/');
                     }else{
                         $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
                         $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
                         $relative = substr($currentRoot, strlen($parentRoot));
-                        $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
+                        $parentNodeURL = trim($newContext->getUrlBase(), '/').'/'.ltrim($relative.$node->getPath(), '/');
                     }
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
@@ -1376,7 +1376,7 @@ class ShareCenter extends Plugin
         }
 
         $this->applyForwardEvent($fromMirrors, $toMirrors, $copy, $direction);
-        if(count($fromMirrors) || count($toMirrors)){
+        if((is_array($fromMirrors) && count($fromMirrors)) || (is_array($toMirrors) && count($toMirrors))){
             // Make sure to switch back to correct repository in memory
             if($fromNode != null) {
                 $fromNode->getRepository()->driverInstance = null;
@@ -1409,7 +1409,7 @@ class ShareCenter extends Plugin
             $toMirrors = $this->findMirrorNodesInShares($toNode, $httpVars["direction"]);
         }
         $this->applyForwardEvent($fromMirrors, $toMirrors, ($httpVars["copy"] === "true"), $httpVars["direction"]);
-        if(count($fromMirrors) || count($toMirrors)){
+        if((is_array($fromMirrors) && count($fromMirrors)) || (is_array($toMirrors) && count($toMirrors))){
             // Make sure to switch back to correct repository in memory
             if($fromNode != null) {
                 $fromNode->getRepository()->driverInstance = null;

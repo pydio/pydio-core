@@ -211,6 +211,9 @@
                     let t = JSON.parse(data);
                     if( t instanceof Object && t.id){
                         let taskObject = new Task(t);
+                        if (this._tasksList === undefined){
+                            this._tasksList = new Map();
+                        }
                         this._tasksList.set(t.id, taskObject);
                         this.notify("tasks_updated", taskObject);
                         global.pydio.notify("poller.frequency", {value:2});
