@@ -335,9 +335,13 @@ class NotificationCenter extends Plugin
                         $this->logInfo("Warning", "Empty node stored in notification ".$notif->getAuthor()."/ ".$notif->getAction());
                         continue;
                     }
-                    //$node->setUserId($node->hasUser() ? $node->getUserId() : $notif->getAuthor());
                     try {
                         @$node->loadNodeInfo();
+                        $testNode = new AJXP_Node($node->getUrl());
+                        $testNode->setUserId($userId);
+                        if(!is_readable($testNode->getUrl())){
+                            continue;
+                        }
                     } catch (\Exception $e) {
                         continue;
                     }
