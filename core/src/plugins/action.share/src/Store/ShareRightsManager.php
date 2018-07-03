@@ -35,6 +35,7 @@ use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
 
@@ -308,17 +309,53 @@ class ShareRightsManager
         return $totalInvitations;
     }
 
+    private $groupsCache = [];
+
+    /**
+     * @param $groupId string
+     * @return string
+     */
+    private function findGroupLabel($groupId){
+        $displayAll = ConfService::getContextConf($this->context, "CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
+        $currentUserGroup = ($this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
+        // DisplayAll => groupId is full group path
+        // !DisplayAll => groupId is relative group path
+        $groupDir = PathUtils::forwardSlashDirname($groupId);
+        $groupBase = PathUtils::forwardSlashBasename($groupId);
+        if($displayAll) {
+            $listBase = "/" . ltrim($groupDir, "/");
+        } else {
+            $groupDir = rtrim(substr($groupDir, strlen($currentUserGroup)), "/");
+            $listBase = rtrim($currentUserGroup, "/")."/".ltrim($groupDir, "/");
+        }
+        if(isSet($this->groupsCache[$listBase])){
+            $groups = $this->groupsCache[$listBase];
+        } else {
+            $groups = UsersService::listChildrenGroups($listBase);
+            $this->groupsCache[$listBase] = $groups;
+        }
+        if(isSet($groups["/".$groupBase])){
+            return $groups["/".$groupBase];
+        } else if (isSet($groups[$groupBase])) {
+            return $groups[$groupBase];
+        } else {
+            return PathUtils::forwardSlashBasename($groupId);
+        }
+    }
+
     /**
      * @param String $repoId
      * @param bool $mixUsersAndGroups
      * @param \Pydio\Access\Core\Model\AJXP_Node|null $watcherNode
      * @return array
+     * @throws \Pydio\Core\Exception\UserNotFoundException
      */
     public function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $watcherNode = null)
     {
         $roles = RolesService::getRolesForRepository($repoId);
         $sharedEntries = $sharedGroups = array();
         $mess = LocaleService::getMessages();
+        $loadedGroups = [];
         foreach($roles as $rId){
             $role = RolesService::getRole($rId);
             if ($role == null) continue;
@@ -329,6 +366,7 @@ class ShareRightsManager
             $WATCH = false;
             $HIDDEN = false;
             $AVATAR = false;
+            $LABEL = "";
             if(strpos($rId, "AJXP_USR_/") === 0){
                 $userId = substr($rId, strlen('AJXP_USR_/'));
                 $role = RolesService::getRole($rId);
@@ -351,28 +389,8 @@ class ShareRightsManager
                 $TYPE = "group";
                 $LABEL = $mess["447"];
             }else if(strpos($rId, "AJXP_GRP_/") === 0){
-                $currentUserGroup = ($this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
-                $rootGroup = "/";
-                if(empty($loadedGroups)){
-                    $displayAll = ConfService::getContextConf($this->context, "CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
-                    $loadedGroups = UsersService::listChildrenGroups($displayAll ? $rootGroup : $currentUserGroup);
-                    if(!$displayAll){
-                        foreach($loadedGroups as $loadedG => $loadedLabel){
-                            unset($loadedGroups[$loadedG]);
-                            $loadedGroups[rtrim($currentUserGroup, "/")."/".ltrim($loadedG, "/")] = $loadedLabel;
-                        }
-                    }
-                }
                 $groupId = substr($rId, strlen('AJXP_GRP_'));
-                if(isSet($loadedGroups[$groupId])) {
-                    $LABEL = $loadedGroups[$groupId];
-                }
-                /*
-                if($groupId == AuthService::filterBaseGroup("/")){
-                    $LABEL = $mess["447"];
-                }
-                */
-                if(empty($LABEL)) $LABEL = $groupId;
+                $LABEL = $this->findGroupLabel($groupId);
                 $TYPE = "group";
             }else{
                 $role = RolesService::getRole($rId);

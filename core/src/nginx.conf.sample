@@ -22,7 +22,7 @@ server {
         }
 
         # Manually deny some paths to ensure Pydio security
-        location ~* ^/(?:\.|conf|data/(?:files|personal|logs|plugins|tmp|cache)|plugins/editor.zoho/agent/files) {
+        location ~* ^/(?:\.|conf|core|data/(?:files|personal|logs|plugins|tmp|cache)|plugins/editor.zoho/agent/files) {
                 deny all;
         }
 

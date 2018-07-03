@@ -234,16 +234,12 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                         $meta["ajxp_description"] = $messages[4]." ". $meta["ajxp_relativetime"];
                     }
                     $tmpNode = new AJXP_Node($hit->node_url, $meta);
-                    if(!$tmpNode->hasUser()){
-                        if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
-                        else $tmpNode->setUserId($ctx->getUser()->getId());
-                    }
+                    if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                    else $tmpNode->setUserId($ctx->getUser()->getId());
                 } else {
                     $tmpNode = new AJXP_Node($hit->node_url, []);
-                    if(!$tmpNode->hasUser()){
-                        if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
-                        else $tmpNode->setUserId($ctx->getUser()->getId());
-                    }
+                    if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                    else $tmpNode->setUserId($ctx->getUser()->getId());
                     $tmpNode->loadNodeInfo();
                 }
                 if($tmpNode->getRepositoryId() != $repoId){
@@ -321,16 +317,12 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node($hit->node_url, $meta);
-                    if(!$tmpNode->hasUser()){
-                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
-                        else $tmpNode->setUserId($ctx->getUser()->getId());
-                    }
+                    if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                    else $tmpNode->setUserId($ctx->getUser()->getId());
                 } else {
                     $tmpNode = new AJXP_Node($hit->node_url, []);
-                    if(!$tmpNode->hasUser()){
-                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
-                        else $tmpNode->setUserId($ctx->getUser()->getId());
-                    }
+                    if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                    else $tmpNode->setUserId($ctx->getUser()->getId());
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {

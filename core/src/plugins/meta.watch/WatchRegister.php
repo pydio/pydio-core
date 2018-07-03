@@ -233,6 +233,7 @@ class WatchRegister extends AbstractMetaSource
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param String $watchType
      * @return array
+     * @throws \Exception
      */
     public function collectWatches($node, $watchType)
     {
@@ -260,6 +261,12 @@ class WatchRegister extends AbstractMetaSource
             $usersMeta = isSet($nodeMeta[self::$META_WATCH_USERS_NAMESPACE]) ? $nodeMeta[self::$META_WATCH_USERS_NAMESPACE] : false;
             $ids = $this->loadWatchesFromMeta($watchType, $currentUserId, $source, $watchMeta, $usersMeta);
             foreach($ids as $id){
+                // Check if original node is really readable by this user Id
+                $testNode = new AJXP_Node($node->getUrl(), []);
+                $testNode->setUserId($id);
+                if(!is_readable($testNode->getUrl())) {
+                    continue;
+                }
                 // Do not send notification to myself!
                 if($id !== $currentUserId){
                     $result["ancestors"][] = array("node" => $source, "id" => $id);
@@ -269,11 +276,13 @@ class WatchRegister extends AbstractMetaSource
 
         return $result;
     }
+
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param String $watchType
      * @param String $userId
      * @return array
+     * @throws \Exception
      */
     public function getWatchesOnNode($node, $watchType, $userId = null)
     {

@@ -729,6 +729,22 @@
                 </phingcall>
             </then>
         </if>
+        <if>
+            <available type="file" file="${plugin_abs_dir}/vendor/meenie/javascript-packer/example-inline.php"/>
+            <then>
+                <phingcall target="delete_me">
+                    <property name="filename" value="${plugin_abs_dir}/vendor/meenie/javascript-packer/example-inline.php"/>
+                </phingcall>
+            </then>
+        </if>
+        <if>
+            <available type="file" file="${plugin_abs_dir}/vendor/dapphp/securimage/examples/test.mysql.static.php"/>
+            <then>
+                <phingcall target="delete_me">
+                    <property name="filename" value="${plugin_abs_dir}/vendor/dapphp/securimage/examples/test.mysql.static.php"/>
+                </phingcall>
+            </then>
+        </if>
     </target>
 
     <target name="clean" description="Clean all working folders">
