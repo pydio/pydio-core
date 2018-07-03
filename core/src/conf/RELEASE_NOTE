@@ -1,6 +1,15 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-This is a bugfix and security release for Pydio 8.X, and brings php7.2 support. See the Changelog below for commits details.
+Bugfix and security release
+
+Update user id inside tmpNode
+Use a selector for possible update sites
+Remove unnecessary files from vendor
+Fix notifications checks
+Fix group labels inconsistencies
+
+----
+Pydio 8.2.0 is a bugfix and security release for Pydio 8.X, and brings php7.2 support. See the Changelog below for commits details.
 
 Update html changelog
 Missing hook for filter_boot.conf 
