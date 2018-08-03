@@ -24,6 +24,8 @@ use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Middleware\SapiMiddleware;
+use Pydio\Core\Http\Server;
+use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -44,6 +46,59 @@ class RestApiMiddleware extends SapiMiddleware
     {
         $this->base = $base;
     }
+
+    /**
+     * Override parent method - standard interface for PSR-7 Middleware
+     *
+     * @param ServerRequestInterface $request Interface that encapsulate http request parameters
+     * @param ResponseInterface $response Interface encapsulating the response
+     * @param callable|null $next Next middleware to call
+     * @return ResponseInterface Returns the modified response interface.
+     * @throws PydioException
+     */
+    public function handleRequest(ServerRequestInterface $request, ResponseInterface $response, callable $next = null){
+
+        $params = $request->getQueryParams();
+        $postParams = $request->getParsedBody();
+        if(is_array($postParams)){
+            $params = array_merge($params, $postParams);
+        }
+        /** @var ServerRequestInterface $request */
+        $request = $request->withParsedBody($params);
+
+        if(in_array("application/json", $request->getHeader("Content-Type"))){
+            $body = "".$request->getBody();
+            $body = json_decode($body, true);
+            if(is_array($body)){
+                $request = $request->withParsedBody(array_merge($request->getParsedBody(), ["request_body" => $body]));
+            }
+        }
+
+        if($request->getMethod() === "OPTIONS" && $request->hasHeader("Access-Control-Request-Method")) {
+            $response = new EmptyResponse(200);
+            $response = $response->withHeader("Access-Control-Allow-Origin", "*");
+            $response = $response->withHeader("Access-Control-Allow-Methods", "POST, GET");
+            $response = $response->withHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+            $this->emitResponse($request, $response);
+            return null;
+        }
+
+        $this->parseRequestRouteAndParams($request, $response);
+
+        $response = Server::callNextMiddleWare($request, $response, $next);
+
+        if(headers_sent()){
+            return;
+        }
+
+
+        $response = $response->withHeader("Access-Control-Allow-Origin", "*");
+        $response = $response->withHeader("Access-Control-Allow-Methods", "POST, GET");
+        $response = $response->withHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+        $this->emitResponse($request, $response);
+    }
+
 
     /**
      * @param ServerRequestInterface $request
