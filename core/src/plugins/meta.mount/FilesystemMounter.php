@@ -173,7 +173,7 @@ class FilesystemMounter extends AbstractMetaSource
         $UNC_PATH = $this->getOption($ctx, "UNC_PATH", $user, $password, false);
         $MOUNT_OPTIONS = $this->getOption($ctx, "MOUNT_OPTIONS", $user, $password, false);
 
-        $cmd = $udevil."mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
+        $cmd = $udevil."mount -t " .escapeshellarg($MOUNT_TYPE) .(empty( $MOUNT_OPTIONS )? " " : " -o " .escapeshellarg($MOUNT_OPTIONS). " " ) .escapeshellarg($UNC_PATH). " " .escapeshellarg($MOUNT_POINT);
         $res = null;
         if($this->getOption($ctx, "MOUNT_ENV_PASSWD") == true){
             putenv("PASSWD=$password");
