@@ -23,6 +23,7 @@ namespace Pydio\Core\Http\Rest;
 
 use Pydio\Core\Http\Server;
 use Pydio\Core\Services\ApplicationState;
+use Tuupola\Middleware\Cors;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -46,8 +47,17 @@ class RestApiServer extends Server
 
     protected function stackMiddleWares()
     {
+        $this->middleWares->push(new Cors([
+            "origin" => ["*"],
+            "methods" => ["POST", "GET"],
+            "headers.allow" => [ "Content-Type", "Access-Control-Allow-Headers", "Authorization", "X-Requested-With"],
+            "headers.expose" => [],
+            "credentials" => true,
+            "cache" => 0
+        ]));
         $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
         $this->middleWares->push(array("Pydio\\Core\\Http\\Rest\\RestAuthMiddleware", "handleRequest"));
+
         $this->topMiddleware = new RestApiMiddleware($this->base);
         $this->middleWares->push(array($this->topMiddleware, "handleRequest"));
     }

@@ -148,7 +148,7 @@ class Server
         return $response;
     }
 
-    
+
 
     /**
      * To be used by middlewares
