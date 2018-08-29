@@ -45,5 +45,11 @@
 
 		<global_param name="NODENAME_MAX_LENGTH" expose="true" group="CONF_MESSAGE[Miscellaneous]" type="integer" label="CONF_MESSAGE[Filename length]" description="CONF_MESSAGE[Maximum characters length of new files or folders]" mandatory="false" default="255"/>
 		<global_param name="AJXP_TMP_DIR" group="CONF_MESSAGE[Miscellaneous]" type="string" label="CONF_MESSAGE[Temporary Folder]" description="CONF_MESSAGE[This is necessary only if you have errors concerning the tmp dir access or writeability : most probably, they are due to PHP SAFE MODE (should disappear in php6) or various OPEN_BASEDIR restrictions. In that case, create and set writeable a tmp folder somewhere at the root of your hosting (but above the web/ or www/ or http/ if possible!!) and enter here the full path to this folder]" mandatory="false" default=""/>
+
+        <global_param name="CORS_ORIGIN" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Allowed Origin]" description="CONF_MESSAGE[Origin hosts allowed to perform CORS requests (comma separated regular expressions)]" mandatory="false" default="*" />
+		<global_param name="CORS_METHODS" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Allowed Methods]" description="CONF_MESSAGE[Methods allowed in CORS requests (comma separated)]" mandatory="false" default="GET, POST" />
+        <global_param name="CORS_HEADERS_ALLOW" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Allowed Headers]" description="CONF_MESSAGE[Headers allowed in CORS requests (comma separated)]" mandatory="false" default="Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With" />
+        <global_param name="CORS_HEADERS_EXPOSE" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Exposed Headers]" description="CONF_MESSAGE[Headers exposed in CORS responses (comma separated)]" mandatory="false" default="" />
+
 	</server_settings>
 </ajxpcore>
