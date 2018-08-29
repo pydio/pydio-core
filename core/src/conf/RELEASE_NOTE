@@ -7,6 +7,8 @@ Use a selector for possible update sites
 Remove unnecessary files from vendor
 Fix notifications checks
 Fix group labels inconsistencies
+Escape argument on the meta.mount form
+Add a PSR7 middleware to handle CORS Requests for the REST API
 
 ----
 Pydio 8.2.0 is a bugfix and security release for Pydio 8.X, and brings php7.2 support. See the Changelog below for commits details.
