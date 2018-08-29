@@ -48,7 +48,7 @@
 
         <global_param name="CORS_ORIGIN" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Allowed Origin]" description="CONF_MESSAGE[Origin hosts allowed to perform CORS requests (comma separated regular expressions)]" mandatory="false" default="*" />
 		<global_param name="CORS_METHODS" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Allowed Methods]" description="CONF_MESSAGE[Methods allowed in CORS requests (comma separated)]" mandatory="false" default="GET, POST" />
-        <global_param name="CORS_HEADERS_ALLOW" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Allowed Headers]" description="CONF_MESSAGE[Headers allowed in CORS requests (comma separated)]" mandatory="false" default="Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With" />
+        <global_param name="CORS_HEADERS_ALLOW" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Allowed Headers]" description="CONF_MESSAGE[Headers allowed in CORS requests (comma separated)]" mandatory="false" default="Authorization, Content-Type, X-Requested-With" />
         <global_param name="CORS_HEADERS_EXPOSE" group="CONF_MESSAGE[Cross-origin resource sharing (CORS)]" type="string" label="CONF_MESSAGE[Exposed Headers]" description="CONF_MESSAGE[Headers exposed in CORS responses (comma separated)]" mandatory="false" default="" />
 
 	</server_settings>

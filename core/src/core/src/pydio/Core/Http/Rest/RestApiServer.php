@@ -48,12 +48,13 @@ class RestApiServer extends Server
 
     protected function stackMiddleWares()
     {
-        $origin = explode(',', ConfService::getGlobalConf("CORS_ORIGIN"));
-        $methods = explode(',', ConfService::getGlobalConf("CORS_METHODS"));
-        $headersAllow = explode(',', ConfService::getGlobalConf("CORS_HEADERS_ALLOW"));
-        $headersExpose = explode(',', ConfService::getGlobalConf("CORS_HEADERS_EXPOSE"));
+        $origin = array_map('trim', explode(',', ConfService::getGlobalConf("CORS_ORIGIN")));
+        $methods = array_map('trim', explode(',', ConfService::getGlobalConf("CORS_METHODS")));
+        $headersAllow = array_map('trim', explode(',', ConfService::getGlobalConf("CORS_HEADERS_ALLOW")));
+        $headersExpose = array_map('trim', explode(',', ConfService::getGlobalConf("CORS_HEADERS_EXPOSE")));
 
         $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
+        $this->middleWares->push(array("Pydio\\Core\\Http\\Rest\\RestAuthMiddleware", "handleRequest"));
         $this->middleWares->push(new Cors([
             "origin" => $origin,
             "methods" => $methods,
@@ -62,7 +63,6 @@ class RestApiServer extends Server
             "credentials" => true,
             "cache" => 0
         ]));
-        $this->middleWares->push(array("Pydio\\Core\\Http\\Rest\\RestAuthMiddleware", "handleRequest"));
 
         $this->topMiddleware = new RestApiMiddleware($this->base);
         $this->middleWares->push(array($this->topMiddleware, "handleRequest"));
