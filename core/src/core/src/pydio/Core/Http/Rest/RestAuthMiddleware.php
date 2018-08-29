@@ -67,9 +67,11 @@ class RestAuthMiddleware
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
 
+
         if(!$ctx->hasUser()){
             $responseInterface = $responseInterface->withStatus(401);
             $responseInterface->getBody()->write('You are not authorized to access this API.');
+            
             return $responseInterface;
         }
 
@@ -102,6 +104,4 @@ class RestAuthMiddleware
         return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
     }
-
-
 }

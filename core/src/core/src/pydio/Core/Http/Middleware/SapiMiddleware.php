@@ -77,7 +77,7 @@ class SapiMiddleware implements ITopLevelMiddleware
         if(headers_sent()){
             return;
         }
-        
+
         $this->emitResponse($request, $response);
     }
 
@@ -112,6 +112,7 @@ class SapiMiddleware implements ITopLevelMiddleware
      * @return void
      */
     public function emitResponse(ServerRequestInterface $request, ResponseInterface $response){
+
         if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
             /**
              * @var SerializableResponseStream $body;
@@ -137,12 +138,16 @@ class SapiMiddleware implements ITopLevelMiddleware
         if( $response->getBody()->getSize() === null
             || $response->getBody()->getSize() > 0
             || $response instanceof \Zend\Diactoros\Response\EmptyResponse
+            || $request->getMethod() === "OPTIONS"
             || $response->getStatusCode() != 200) {
             $emitter = new SapiEmitter();
             ShutdownScheduler::setCloseHeaders($response);
             $emitter->emit($response);
             ShutdownScheduler::getInstance()->callRegisteredShutdown();
         }
+
+
+
     }
 
 }
