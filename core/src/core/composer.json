@@ -21,7 +21,8 @@
     "meenie/javascript-packer":"1.1",
     "dapphp/securimage":"3.6.4",
     "phpseclib/phpseclib":"2.0.11",
-    "pear/mail_mime-decode":"1.5.5.2"
+    "pear/mail_mime-decode":"1.5.5.2",
+    "tuupola/cors-middleware":"0.5.2"
   }
 
 }

@@ -65,7 +65,7 @@ class ApiRouter
      * @param \FastRoute\RouteCollector $r
      */
     public function configureRoutes(\FastRoute\RouteCollector &$r){
-        
+
         $configObject = json_decode(file_get_contents(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/core.ajaxplorer/routes/api2.json"), true);
         foreach ($configObject["paths"] as $path => $methods){
             foreach($methods as $method => $apiData){
@@ -79,7 +79,11 @@ class ApiRouter
                 $path = str_replace("{roleId}", "{roleId:.+}", $path);
                 $r->addRoute(strtoupper($method), $this->base . $this->v2Base . $path , $apiData);
             }
+
+            // Adding OPTIONS to allow CORS Request
+            $r->addRoute("OPTIONS", $this->base . $this->v2Base . $path, []);
         }
+
         // Legacy V1 API
         $r->addRoute("GET", $this->base . $this->v1Base."/{repository_id}/{action}[{optional:.+}]", ["api-v1" => true]);
         $r->addRoute("POST", $this->base . $this->v1Base."/{repository_id}/{action}[{optional:.+}]", ["api-v1" => true]);
