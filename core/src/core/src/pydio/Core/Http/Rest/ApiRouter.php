@@ -81,7 +81,6 @@ class ApiRouter
             }
 
             // Adding OPTIONS to allow CORS Request
-            var_dump($path);
             $r->addRoute("OPTIONS", $this->base . $this->v2Base . $path, []);
         }
 
