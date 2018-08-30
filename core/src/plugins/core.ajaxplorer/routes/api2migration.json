@@ -1274,7 +1274,6 @@
           "description": "Get detail of share",
           "operationId": "adminLoadSharedElementData",
           "produces": [ "application/json" ],
-          "consumers": [ "application/json" ],
           "parameters": [{
               "name": "workspaceId",
               "in" : "path",
@@ -1290,17 +1289,21 @@
               "type": "string"
           },
           {    
-              "in": "body",
-              "name": "request_body",
+              "in": "formData",
+              "name": "owner",
               "description": "file path and owner id",
-              "required": true,
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/definitions/ShareElementPost"
-                  }
-                }
-              }
+              "type": "string"
+          },
+          {
+              "in": "formData",
+              "name": "merged",
+              "type": "boolean",
+              "description": ""
+          },
+          {
+              "in": "formData",
+              "name": "tmp_repository_id",
+              "type": "string"
           }
         ],
           "responses": {
@@ -2049,21 +2052,6 @@
             "items": {
               "$ref": "#/definitions/ShareLink"
             }
-          }
-        }
-      },
-      "ShareElementPost": {
-        "type": "object",
-        "properties" : {
-          "owner": {
-            "type": "string",
-            "description":""
-          },
-          "merged": {
-            "type": "boolean"
-          },
-          "tmp_repository_id": {
-            "type": "string"
           }
         }
       },
