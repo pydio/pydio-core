@@ -1,0 +1,2180 @@
+{
+    "swagger" : "2.0",
+    "info" : {
+      "description" : "Access to a Pydio Server. Second version of the API.",
+      "version" : "2.0.0",
+      "title" : "Pydio API V2"
+    },
+    "host" : "localhost",
+    "basePath" : "/api/v2",
+    "schemes" : [ "http" ],
+    "consumes" : ["application/x-www-form-urlencoded", "multipart/form-data"],
+    "paths" : {
+      "/fs/{path}" : {
+        "get" : {
+          "tags" : [ "File" ],
+          "description" : "Get information about a node and its metadata. By default, it will return \nPydio \"primary\" metadata (stat, internal informations). Extended metadata can\nbe added by some plugins.  \nFor collections (folders), pass the **children** parameter to list its content.  \nTo access the actual content of the nodes, see the I/O API.\n",
+          "operationId" : "getNodeInfos",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "path",
+            "in" : "path",
+            "description" : "Workspace id or alias + full path to the node, e.g. \"/my-files/path/to/node\"",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "meta",
+            "in" : "query",
+            "description" : "Level of precision for expected metadata",
+            "required" : true,
+            "type" : "string",
+            "default" : "standard",
+            "enum" : [ "minimal", "standard", "extended" ]
+          }, {
+            "name" : "children",
+            "in" : "query",
+            "description" : "Load children if node is a collection",
+            "required" : false,
+            "type" : "string",
+            "enum" : [ "dfz", "d", "df", "f", "fz", "z", "dz" ]
+          }, {
+            "name" : "recursive",
+            "in" : "formData",
+            "description" : "If requiring children, load grandchildren recursively",
+            "required" : false,
+            "type" : "boolean"
+          }, {
+            "name" : "max_depth",
+            "in" : "formData",
+            "description" : "If requiring children recursively, stop at the given depth. If -1, no limit.",
+            "required" : false,
+            "type" : "integer",
+            "default" : -1
+          }, {
+            "name" : "max_nodes",
+            "in" : "formData",
+            "description" : "If requiring children recursively, stop at the given depth. If -1, no limit.",
+            "required" : false,
+            "type" : "integer",
+            "default" : -1
+          }, {
+            "name" : "remote_order",
+            "in" : "formData",
+            "description" : "Apply server-side sorting",
+            "required" : false,
+            "type" : "boolean",
+            "default" : false
+          }, {
+            "name" : "order_column",
+            "in" : "formData",
+            "description" : "Order column to use for server-side sorting",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "order_direction",
+            "in" : "formData",
+            "description" : "Order direction to use for server-side sorting (asc or desc)",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "page_position",
+            "in" : "formData",
+            "description" : "For a single file, try to detect the page position in the parent node listing.",
+            "required" : false,
+            "type" : "boolean",
+            "default" : false
+          }, {
+            "name" : "X-Indexation-Required",
+            "in" : "header",
+            "description" : "Invalidate current index and trigger a background indexation",
+            "required" : false,
+            "type" : "boolean"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/NodeList"
+              }
+            }
+          },
+          "x-pydio-action" : "ls"
+        },
+        "post" : {
+          "tags" : [ "File" ],
+          "description" : "Create new resources or move/copy existing resources:\n+ Create a new folder (pass a path **with a trailing slash**), or a new empty file (no trailing slash).\n+ Copy a resource to a new destination: pass destination as {path}, and origin via copy_from parameter.\n+ Rename / Move a resource : basically a copy operation followed by a delete of original\n",
+          "operationId" : "createNode",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "path",
+            "in" : "path",
+            "description" : "Workspace id or alias + full path to the node, e.g. \"/my-files/path/to/node\"",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "copy_source",
+            "in" : "query",
+            "description" : "If it's a move or a copy, indicated the path of the original node. Path must contain the original workspace Id, as it can be used for cross repository copy as well.",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "delete_source",
+            "in" : "query",
+            "description" : "If it's a move/rename, will remove original after copy operation",
+            "required" : false,
+            "type" : "boolean"
+          }, {
+            "name" : "override",
+            "in" : "query",
+            "description" : "Ignore existing resource and override it",
+            "required" : false,
+            "type" : "boolean",
+            "default" : false
+          }, {
+            "name" : "recursive",
+            "in" : "query",
+            "description" : "For directories, create parents if necessary",
+            "required" : false,
+            "type" : "boolean",
+            "default" : false
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "fs_create_resource"
+        },
+        "delete" : {
+          "tags" : [ "File" ],
+          "description" : "Delete existing resource\n",
+          "operationId" : "deleteNode",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "path",
+            "in" : "path",
+            "description" : "Workspace id or alias + full path to the node, e.g. \"/my-files/path/to/node\"",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "delete"
+        },
+        "patch" : {
+          "tags" : [ "File" ],
+          "description" : "Update existing resources metadata (see I/O for content modification). Basic metadata is provided by core plugins, but they can be extended by other plugins.\nFor example :\n`{\"core\": {\"chmod\": 777}}, {\"user_meta\":[{\"metaName\":\"metaValue\"}]}`\n`{\"bookmarks\":{\"bookmarked\": true}, \"locks\":{\"locked\":true}, \"meta.watch\":{\"watch\":true}}`\netc...\n",
+          "operationId" : "updateNode",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "path",
+            "in" : "path",
+            "description" : "Workspace id or alias + full path to the node, e.g. \"/my-files/path/to/node\"",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "metadata",
+            "in" : "formData",
+            "description" : "Json-serialized metadata to update",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "fs_update_metadata"
+        }
+      },
+      "/io/{path}" : {
+        "get" : {
+          "tags" : [ "File" ],
+          "description" : "Get resource content. Depending on the attachment parameter, will try to either trigger a download, or send binary stream with appropriate headers. Depending on the active plugins, may be able to serve: + Plain text + MP3/Wav Stream + MP4 Stream + On-the-fly generated images + On-the-fly generated thumbnails for images or pdf\n",
+          "operationId" : "download",
+          "produces" : [ "application/octet-stream" ],
+          "parameters" : [ {
+            "name" : "path",
+            "in" : "path",
+            "description" : "Workspace id or alias + full path to the node, e.g. \"/my-files/path/to/node\"",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "attachment",
+            "in" : "query",
+            "description" : "if set, send back a force-download, otherwise use Accept header to try to find the best response Content-Type.",
+            "required" : false,
+            "type" : "boolean"
+          }, {
+            "name" : "additional_parameters",
+            "in" : "query",
+            "description" : "some plugin can take more parameters to send various contents\nderived from main resource. For example, for images, you can pass\nget_thumb & dimension\n",
+            "required" : false,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "type" : "file"
+              }
+            }
+          },
+          "x-pydio-action" : "download"
+        },
+        "put" : {
+          "tags" : [ "File" ],
+          "description" : "Create or update resource by posting to Input Stream\n",
+          "operationId" : "uploadStream",
+          "parameters" : [ {
+            "name" : "path",
+            "in" : "path",
+            "description" : "Workspace id or alias + full path to the node, e.g. \"/my-files/path/to/node\"",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "raw",
+            "description" : "binary data",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/InputStream"
+            }
+          }, {
+            "name" : "X-Rename-If-Exists",
+            "in" : "header",
+            "description" : "Automatically increment filename if it already exists",
+            "required" : false,
+            "type" : "boolean"
+          }, {
+            "name" : "X-Append-To",
+            "in" : "header",
+            "description" : "Append uploaded data at the end of existing file",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "X-Partial-Upload",
+            "in" : "header",
+            "description" : "If the current put is a part of a file. If set, the X-Partial-Target-Bytesize header is required.",
+            "required" : false,
+            "type" : "boolean"
+          }, {
+            "name" : "X-Partial-Target-Bytesize",
+            "in" : "header",
+            "description" : "In case of partial upload, the size of the full file as expected at the end of upload.",
+            "required" : false,
+            "type" : "integer"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "upload"
+        }
+      },
+      "/tasks" : {
+        "get" : {
+          "tags" : [ "Task" ],
+          "description" : "List tasks currently running on the server (and visible to the current user).\n",
+          "operationId" : "listTasks",
+          "parameters" : [ {
+            "name" : "filter",
+            "in" : "formData",
+            "description" : "additional filters for task listing (JSON serialized)",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "workspaceId",
+            "in" : "formData",
+            "description" : "Id or Alias of the workspace",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "path",
+            "in" : "formData",
+            "description" : "One or more node pathes",
+            "required" : false,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "collectionFormat" : "multi"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/definitions/Task"
+                }
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.tasks",
+          "x-pydio-action" : "tasks_list"
+        }
+      },
+      "/tasks/{taskId}" : {
+        "get" : {
+          "tags" : [ "Task" ],
+          "description" : "Get information about a currently running task Id\n",
+          "operationId" : "getTaskInfo",
+          "parameters" : [ {
+            "name" : "taskId",
+            "in" : "path",
+            "description" : "Task to monitor on the server",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "$ref" : "#/definitions/Task"
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.tasks",
+          "x-pydio-action" : "task_info"
+        },
+        "post" : {
+          "tags" : [ "Task" ],
+          "description" : "Create a task on the server. This will generally trigger a server-side background \"Task\", which ID will be returned in the PydioResponse['tasks'] array\n",
+          "operationId" : "createTask",
+          "consumes" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "taskId",
+            "in" : "path",
+            "description" : "Task to launch on the server",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "request_body",
+            "description" : "JSON Task object",
+            "required" : false,
+            "schema" : {
+              "$ref" : "#/definitions/Task"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "$ref" : "#/definitions/Task"
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.tasks",
+          "x-pydio-action" : "task_create"
+        },
+        "delete" : {
+          "tags" : [ "Task" ],
+          "description" : "Update a task on the server.\n",
+          "operationId" : "deleteTask",
+          "parameters" : [ {
+            "name" : "taskId",
+            "in" : "path",
+            "description" : "Task to delete on the server",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "$ref" : "#/definitions/Task"
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.tasks",
+          "x-pydio-action" : "task_delete"
+        },
+        "patch" : {
+          "tags" : [ "Task" ],
+          "description" : "Update a task on the server.\n",
+          "operationId" : "updateTask",
+          "consumes" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "taskId",
+            "in" : "path",
+            "description" : "Task to update on the server",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "request_body",
+            "description" : "JSON Diff describing the patches to apply on the task object",
+            "required" : false,
+            "schema" : {
+              "$ref" : "#/definitions/Task"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "$ref" : "#/definitions/Task"
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.tasks",
+          "x-pydio-action" : "task_update"
+        }
+      },
+      "/user" : {
+        "get" : {
+          "tags" : [ "User Account" ],
+          "description" : "List accessible workspace for currently logged user. Alias for /state/?xPath=user/repositories\n",
+          "operationId" : "userInfo",
+          "produces" : [ "application/json" ],
+          "parameters" : [ ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.conf",
+          "x-pydio-action" : "user_state"
+        }
+      },
+      "/user/workspaces" : {
+        "get" : {
+          "tags" : [ "User Account" ],
+          "description" : "List accessible workspace for currently logged user. Alias for /state/?xPath=user/repositories\n",
+          "operationId" : "userWorkspaces",
+          "produces" : [ "application/json" ],
+          "parameters" : [ ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.conf",
+          "x-pydio-action" : "user_state"
+        }
+      },
+      "/user/preferences" : {
+        "get" : {
+          "tags" : [ "User Account" ],
+          "description" : "List accessible workspace for currently logged user. Alias for /state/?xPath=user/preferences\n",
+          "operationId" : "userPreferences",
+          "produces" : [ "application/json" ],
+          "parameters" : [ ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.conf",
+          "x-pydio-action" : "user_state"
+        }
+      },
+      "/workspaces/{workspaceId}" : {
+        "get" : {
+          "tags" : [ "Workspace" ],
+          "description" : "Get information about the given workspace.\nInfo can be gathered via various plugins. Pass the expected metadata type via the X-Pydio-Ws-Info header. Currently supported values are quota|info|changes\n",
+          "operationId" : "getWorkspaceInfo",
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "X-Pydio-WS-Info",
+            "in" : "header",
+            "required" : true,
+            "type" : "string",
+            "enum" : [ "quota", "info" ]
+          }, {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "Id or Alias of the workspace",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "USAGE" : {
+                    "type" : "integer"
+                  },
+                  "TOTAL" : {
+                    "type" : "integer"
+                  }
+                }
+              }
+            }
+          },
+          "x-pydio-plugin" : "core.conf",
+          "x-pydio-action" : "load_repository_info"
+        }
+      },
+      "/workspaces/{workspaceId}/changes/{sequenceId}" : {
+        "get" : {
+          "tags" : [ "Workspace" ],
+          "description" : "Sends back all changes since a given sequence ID.  \n\nThis plugin requires **meta.syncable** active on the workspace.\n",
+          "operationId" : "changes",
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "sequenceId",
+            "in" : "path",
+            "description" : "File to upload",
+            "required" : true,
+            "type" : "integer"
+          }, {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "Id or Alias of the workspace",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful Response",
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "seq_id" : {
+                      "type" : "integer"
+                    },
+                    "node" : {
+                      "$ref" : "#/definitions/Node"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x-pydio-plugin" : "meta.syncable",
+          "x-pydio-action" : "changes"
+        }
+      },
+      "/admin/roles" : {
+        "get" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "List roles\n",
+          "operationId" : "getRoles",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "format",
+            "in" : "query",
+            "description" : "Format produced in output (defaults to xml)",
+            "required" : false,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "A list of roles represented as standard nodes",
+              "schema" : {
+                "$ref" : "#/definitions/NodeList"
+              }
+            }
+          },
+          "x-pydio-action" : "ls"
+        }
+      },
+      "/admin/roles/{roleId}" : {
+        "get" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Get Role by Id\n",
+          "operationId" : "getRole",
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "format",
+            "in" : "query",
+            "description" : "Format produced in output (defaults to xml)",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "roleId",
+            "in" : "path",
+            "description" : "Id of the role to load",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "load_fill_values",
+            "in" : "query",
+            "description" : "Load additional data to build a form for editing this role",
+            "required" : false,
+            "type" : "boolean"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/Role"
+              }
+            }
+          },
+          "x-pydio-action" : "edit_role"
+        },
+        "post" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Create a new role with this ID\n",
+          "operationId" : "createRole",
+          "consumes" : [ "application/json" ],
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "roleId",
+            "in" : "path",
+            "description" : "Id of the role to load",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "role",
+            "description" : "JSON description of the new role",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/Role"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/Role"
+              }
+            }
+          },
+          "x-pydio-action" : "create_role"
+        },
+        "delete" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Delete Role by Id\n",
+          "operationId" : "deleteRole",
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "roleId",
+            "in" : "path",
+            "description" : "Id of the role to delete",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "delete"
+        },
+        "patch" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Update the role\n",
+          "operationId" : "updateRole",
+          "consumes" : [ "application/json" ],
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "roleId",
+            "in" : "path",
+            "description" : "Id of the role to load",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "role",
+            "description" : "JSON description of the new role",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/Role"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/Role"
+              }
+            }
+          },
+          "x-pydio-action" : "post_json_role"
+        }
+      },
+      "/admin/people/{path}" : {
+        "get" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "List roles\n",
+          "operationId" : "getPeople",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "format",
+            "in" : "query",
+            "description" : "Format produced in output (defaults to xml)",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "path",
+            "in" : "path",
+            "description" : "User or group identifier, including full group path (optional)",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "list",
+            "in" : "query",
+            "description" : "list children of the current resource",
+            "required" : false,
+            "type" : "boolean",
+            "default" : true
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "A user/group or list of users and groups",
+              "schema" : {
+                "$ref" : "#/definitions/NodeList"
+              }
+            }
+          },
+          "x-pydio-action" : "ls"
+        },
+        "post" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Create a new user or a new group with this path. To create a user,  make sure to pass a userPass parameter. Otherwise it will create a  group.\n",
+          "operationId" : "createPeople",
+          "consumes" : [ "application/json" ],
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "format",
+            "in" : "query",
+            "description" : "Format produced in output (defaults to xml)",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "path",
+            "in" : "path",
+            "description" : "User or group identifier, including full group path",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "resourceType",
+            "in" : "formData",
+            "description" : "Wether it's a user or a group",
+            "required" : true,
+            "type" : "string",
+            "enum" : [ "user", "group" ]
+          }, {
+            "name" : "groupLabel",
+            "in" : "formData",
+            "description" : "Label of the new group if we are creating a group",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "userPass",
+            "in" : "formData",
+            "description" : "Password of the new user if we are creating a user",
+            "required" : false,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "people-create-resource"
+        },
+        "delete" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Delete Role by Id\n",
+          "operationId" : "deletePeople",
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "format",
+            "in" : "query",
+            "description" : "Format produced in output (defaults to xml)",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "path",
+            "in" : "path",
+            "description" : "User or group identifier, including full group path",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "people-delete-resource"
+        },
+        "patch" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Update user or group specific data with this path. Use resourceType parameter to discriminate, and send a parameterName/parameterValue couple to be patched.\n\nAuthorized parameterName values are described below, along with the parameterValue corresponding specification: \n- For groups\n  - groupLabel : relabel an existing group\n- For users\n  - userPass: change user password\n  - userProfile: update user profile\n  - userLock: set/remove a lock on a user. Value must be a lockname:lockvalue string where lockvalue is \"true\" or \"fale\".\n  - userRoles: Bunch update roles, eventually reorder them, as a JSON encoded array.\n  - userAddRole: add a role to the user\n  - userRemoveRole: remove a role currently applied to the user.\n  - userPreferences: a JSON associative array of key/values to update.\n\nTo edit user/group permissions or parameters, use the role api instead,  using the object specific role_id (AJXP_GRP_/groupPath or AJXP_USR_/userId).\n",
+          "operationId" : "patchPeople",
+          "consumes" : [ "application/json" ],
+          "produces" : [ "application/json" ],
+          "parameters" : [ {
+            "name" : "format",
+            "in" : "query",
+            "description" : "Format produced in output (defaults to xml)",
+            "required" : false,
+            "type" : "string"
+          }, {
+            "name" : "path",
+            "in" : "path",
+            "description" : "User or group identifier, including full group path",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "resourceType",
+            "in" : "query",
+            "description" : "Wether it's a user or a group",
+            "required" : true,
+            "type" : "string",
+            "enum" : [ "user", "group" ]
+          }, {
+            "in" : "body",
+            "name" : "patch-tuple",
+            "description" : "parameterName / parameterValue association",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/PeoplePatch"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Successful response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "people-patch-resource"
+        }
+      },
+      "/admin/workspaces" : {
+        "get" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "List Workspaces\n",
+          "operationId" : "adminListWorkspaces",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ ],
+          "responses" : {
+            "200" : {
+              "description" : "A list of workspaces represented as standard nodes",
+              "schema" : {
+                "$ref" : "#/definitions/NodeList"
+              }
+            }
+          },
+          "x-pydio-action" : "ls"
+        },
+        "post" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Create a workspace from scratch by posting JSON data\n",
+          "operationId" : "adminCreateWorkspace",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "in" : "body",
+            "name" : "payload",
+            "description" : "Repository details",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/AdminWorkspace"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Workspace object",
+              "schema" : {
+                "$ref" : "#/definitions/AdminWorkspace"
+              }
+            }
+          },
+          "x-pydio-action" : "post_repository"
+        },
+        "patch" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Update a workspace by posting JSON data\n",
+          "operationId" : "adminUpdateWorkspace",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "in" : "body",
+            "name" : "payload",
+            "description" : "Repository details",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/AdminWorkspace"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Workspace object",
+              "schema" : {
+                "$ref" : "#/definitions/AdminWorkspace"
+              }
+            }
+          },
+          "x-pydio-action" : "patch_repository"
+        }
+      },
+      "/admin/workspaces/{workspaceId}" : {
+        "get" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Load detail of a workspace\n",
+          "operationId" : "adminGetWorkspace",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "Id or Alias / Load detail of this workspace",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "load_fill_values",
+            "in" : "query",
+            "description" : "Load additional data to build a form for editing this role",
+            "required" : false,
+            "type" : "boolean"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Workspace object",
+              "schema" : {
+                "$ref" : "#/definitions/AdminWorkspace"
+              }
+            }
+          },
+          "x-pydio-action" : "edit_repository"
+        },
+        "delete" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Load detail of a workspace\n",
+          "operationId" : "adminDeleteWorkspace",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "Id or Alias / Load detail of this workspace",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Confirmation response",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "delete"
+        },
+        "patch" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "NOT IMPLEMENTED YET - Edit details of a workspace\n",
+          "operationId" : "adminEditWorkspace",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "Id or Alias / Update details for this workspace",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "payload",
+            "description" : "Repository details",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/AdminWorkspace"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Workspace object",
+              "schema" : {
+                "$ref" : "#/definitions/AdminWorkspace"
+              }
+            }
+          },
+          "x-pydio-action" : "patch_repository"
+        }
+      },
+      "/admin/workspaces/{workspaceId}/features/{metaId}" : {
+        "post" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Add a metasource\n",
+          "operationId" : "adminAddWorkspaceFeature",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "id or alias of this workspace",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "metaId",
+            "in" : "path",
+            "description" : "plugin id for new meta",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "parameters",
+            "description" : "Meta source parameters",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/MetaSourceParameters"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Workspace object",
+              "examples" : {
+                "application/json" : {
+                  "message" : "Succesfully added metasource"
+                }
+              },
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "meta_source_add"
+        },
+        "delete" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Edit a metasource\n",
+          "operationId" : "adminRemoveWorkspaceFeature",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "id or alias of this workspace",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "metaId",
+            "in" : "path",
+            "description" : "plugin id for meta",
+            "required" : true,
+            "type" : "string"
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Workspace object",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "meta_source_delete"
+        },
+        "patch" : {
+          "tags" : [ "Provisioning" ],
+          "description" : "Edit a metasource\n",
+          "operationId" : "adminEditWorkspaceFeature",
+          "produces" : [ "application/json", "application/xml" ],
+          "parameters" : [ {
+            "name" : "workspaceId",
+            "in" : "path",
+            "description" : "id or alias of this workspace",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "name" : "metaId",
+            "in" : "path",
+            "description" : "plugin id for meta",
+            "required" : true,
+            "type" : "string"
+          }, {
+            "in" : "body",
+            "name" : "parameters",
+            "description" : "Meta source parameters",
+            "required" : true,
+            "schema" : {
+              "$ref" : "#/definitions/MetaSourceParameters"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "description" : "Workspace object",
+              "schema" : {
+                "$ref" : "#/definitions/PydioResponse"
+              }
+            }
+          },
+          "x-pydio-action" : "meta_source_edit"
+        }
+      }, 
+      "/admin/workspaces/{workspaceId}/sharelist-load" : {
+        "get" : {
+          "tags": [ "Provisioning"],
+          "description": "Get list of share on workspace",
+          "operationId": "adminLoadShareList",
+          "produces": [ "application/json", "application/xml" ],
+          "consumes": [ "application/json" ],
+          "parameters" : [{
+            "name" : "workspaceId",
+            "in": "path",
+            "description": "Id or Alias of workspace",
+            "required": true,
+            "type": "string"
+          }],
+          "responses": {
+            "200": {
+              "description": "An array of share",
+              "schema" : {
+                "type": "object",
+                "properties": {
+                  "node":{
+                    "type": "object",
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "description": ""
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": ""
+                      },
+                      "label":{
+                        "type": "string",
+                        "description": ""
+                      }                  
+                    }
+                  },
+                  "children":{
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties":{
+                        "key":{
+                          "$ref":"#/definitions/Share"
+                        }
+                      }
+                    }
+                  }
+                }                         
+              },
+              "examples":{                   
+                  "node": {
+                      "path": null,
+                      "type": "collection",
+                      "label": ""
+                  },
+                  "children": {
+                      "/data/repositories//shares/f8c831": {
+                          "share_type": "minisite",
+                          "ajxp_shared": true,
+                          "share_type_readable": "Public Link",
+                          "share_data": "http://py8dev.vpydio.fr/public/f8c831",
+                          "shared_element_hash": "f8c831",
+                          "owner": "admin",
+                          "shared_element_parent_repository": "cea12120d7e672590f3a28c89770d057",
+                          "shared_element_parent_repository_label": "ftp192.168.0.182",
+                          "ajxp_shared_minisite": "public",
+                          "icon": "folder",
+                          "fonticon": "folder",
+                          "original_path": "/Test",
+                          "openicon": "folder",
+                          "ajxp_mime": "repository_editable",
+                          "path": "/data/repositories//shares/f8c831",
+                          "label": "Test"
+                      },
+                      "/data/repositories//shares/1829b9": {
+                          "share_type": "minisite",
+                          "ajxp_shared": true,
+                          "share_type_readable": "Public Link",
+                          "share_data": "http://py8dev.vpydio.fr/public/1829b9",
+                          "shared_element_hash": "1829b9",
+                          "owner": "admin",
+                          "shared_element_parent_repository": "1",
+                          "shared_element_parent_repository_label": "My Files",
+                          "ajxp_shared_minisite": "file",
+                          "icon": "folder",
+                          "fonticon": "file",
+                          "original_path": "/Level1.zip",
+                          "openicon": "folder",
+                          "ajxp_mime": "repository_editable",
+                          "path": "/data/repositories//shares/1829b9",
+                          "label": "Level1.zip"
+                      },
+                      "/data/repositories//shares/2db87f": {
+                          "share_type": "minisite",
+                          "ajxp_shared": true,
+                          "share_type_readable": "Public Link",
+                          "share_data": "http://py8dev.vpydio.fr/public/2db87f",
+                          "shared_element_hash": "2db87f",
+                          "owner": "admin",
+                          "shared_element_parent_repository": "1",
+                          "shared_element_parent_repository_label": "My Files",
+                          "ajxp_shared_minisite": "file",
+                          "icon": "folder",
+                          "fonticon": "file",
+                          "original_path": "/plugins.tar.gz",
+                          "openicon": "folder",
+                          "ajxp_mime": "repository_editable",
+                          "path": "/data/repositories//shares/2db87f",
+                          "label": "plugins.tar.gz"
+                      },
+                      "/data/repositories//shares/f390d6": {
+                          "share_type": "minisite",
+                          "ajxp_shared": true,
+                          "share_type_readable": "Public Link",
+                          "share_data": "http://py8dev.vpydio.fr/public/f390d6",
+                          "shared_element_hash": "f390d6",
+                          "owner": "admin",
+                          "shared_element_parent_repository": "1",
+                          "shared_element_parent_repository_label": "My Files",
+                          "ajxp_shared_minisite": "file",
+                          "icon": "folder",
+                          "fonticon": "file",
+                          "original_path": "/FleischthekeVivi D'Angelo.jpg",
+                          "openicon": "folder",
+                          "ajxp_mime": "repository_editable",
+                          "path": "/data/repositories//shares/f390d6",
+                          "label": "FleischthekeVivi D'Angelo.jpg"
+                      }
+                  }                                
+              }
+            }
+          }
+        }
+      },
+      "/admin/workspaces/{workspaceId}/load-shared-element-data/{file}": {
+        "post": {
+          "tags": [ "Provisioning"],
+          "description": "Get detail of share",
+          "operationId": "adminLoadSharedElementData",
+          "produces": [ "application/json" ],
+          "consumers": [ "application/json" ],
+          "parameters": [{
+              "name": "workspaceId",
+              "in" : "path",
+              "description" : "Id of Alias of workspace",
+              "required": true,
+              "type": "string"
+          },
+          {
+              "name": "file",
+              "in": "path",
+              "description": "relative file path in workspace",
+              "required": true,
+              "type": "string"
+          },
+          {    
+              "in": "body",
+              "name": "request_body",
+              "description": "file path and owner id",
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/definitions/ShareElementPost"
+                  }
+                }
+              }
+          }
+        ],
+          "responses": {
+            "200":{
+              "description": "All information of shares on this node",
+              "schema":{
+                "$ref":"#/definitions/ShareElement"              
+              },
+              "examples": {
+                "repositoryId":"899728d7630de17d5cbe9fc212cf5aca",
+                "users_number":3,
+                "label":"public",
+                "description":"Shared by admin on July, 27th ",
+                "entries":[
+                  {
+                    "ID":"0d0dd1889337",
+                    "TYPE":"tmp_user",
+                    "LABEL":"[Minisite User] public",
+                    "RIGHT":"r",
+                    "HIDDEN":true,
+                    "AVATAR":""
+                    },
+                  {
+                    "ID":"user1",
+                    "TYPE":"user",
+                    "LABEL":"user1",
+                    "RIGHT":"rw",
+                    "AVATAR":""
+                    },
+                  {"ID":"user2",
+                    "TYPE":"user",
+                    "LABEL":"user2",
+                    "RIGHT":"rw",
+                    "AVATAR":""
+                    }],
+                "element_watch":false,
+                "repository_url":"http://py821ent.vpydio.fr/ws-public/",
+                "content_filter": [],
+                "share_owner":"admin",
+                "share_scope":"private",
+                "links":{
+                  "44870f":{
+                    "public":"true",
+                    "disable_download":false,
+                    "hash":"44870f",
+                    "hash_is_shorten":false,
+                    "internal_user_id":"0d0dd1889337",
+                    "public_link":"http://py821ent.vpydio.fr/public/44870f",
+                    "expire_after":0,
+                    "is_expired":false
+                    }
+                  }
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions" : {
+      "PydioResponse" : {
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string"
+          },
+          "level" : {
+            "type" : "string"
+          },
+          "errorCode" : {
+            "type" : "integer"
+          },
+          "nodesDiff" : {
+            "$ref" : "#/definitions/NodesDiff"
+          },
+          "bgAction" : {
+            "$ref" : "#/definitions/BgAction"
+          },
+          "tasks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/definitions/Task"
+            }
+          }
+        },
+        "title" : "PydioResponse",
+        "description" : "Generic container for messages after successful operations or errors",
+        "example" : {
+          "message" : "Operation completed successfuly"
+        }
+      },
+      "Task" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "integer"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "userId" : {
+            "type" : "string"
+          },
+          "wsId" : {
+            "type" : "string"
+          },
+          "actionName" : {
+            "type" : "string"
+          },
+          "schedule" : {
+            "$ref" : "#/definitions/Task_schedule"
+          },
+          "parameters" : {
+            "type" : "object",
+            "properties" : { }
+          }
+        },
+        "title" : "Task",
+        "description" : "Background operation started on the server. It's the client mission to check it on a regular basis.",
+        "example" : {
+          "wsId" : "wsId",
+          "schedule" : {
+            "scheduleValue" : "scheduleValue",
+            "scheduleType" : "scheduleType"
+          },
+          "description" : "description",
+          "id" : "id",
+          "label" : "label",
+          "userId" : "userId",
+          "parameters" : "{}",
+          "status" : 0,
+          "actionName" : "actionName"
+        }
+      },
+      "BgAction" : {
+        "type" : "object",
+        "properties" : {
+          "actionName" : {
+            "type" : "string"
+          },
+          "delay" : {
+            "type" : "integer"
+          }
+        },
+        "title" : "BgAction",
+        "description" : "triggers a background action on the client side"
+      },
+      "Node" : {
+        "type" : "object",
+        "properties" : {
+          "path" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "collection", "leaf" ]
+          },
+          "is_leaf" : {
+            "type" : "boolean"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "ajxp_modiftime" : {
+            "type" : "integer"
+          },
+          "bytesize" : {
+            "type" : "integer"
+          },
+          "stat" : {
+            "type" : "object",
+            "properties" : { }
+          },
+          "ajxp_relativetime" : {
+            "type" : "string"
+          },
+          "ajxp_description" : {
+            "type" : "string"
+          },
+          "icon" : {
+            "type" : "string"
+          },
+          "filesize" : {
+            "type" : "string"
+          },
+          "mimestring_id" : {
+            "type" : "string"
+          },
+          "ajxp_readonly" : {
+            "type" : "boolean"
+          },
+          "file_perms" : {
+            "type" : "string"
+          },
+          "repo_has_recycle" : {
+            "type" : "boolean"
+          },
+          "children" : {
+            "$ref" : "#/definitions/NodeList"
+          }
+        },
+        "title" : "Node",
+        "description" : "A file or folder represented as a generic resource, including metadata and children. Properties before children are part of the \"standard\" metadat set, properties after are returned by the \"extended\" metadata set.",
+        "example" : {
+          "stat" : "{}",
+          "ajxp_readonly" : true,
+          "icon" : "icon",
+          "is_leaf" : true,
+          "label" : "label",
+          "ajxp_relativetime" : "ajxp_relativetime",
+          "filesize" : "filesize",
+          "type" : "collection",
+          "mimestring_id" : "mimestring_id",
+          "path" : "path",
+          "ajxp_description" : "ajxp_description",
+          "bytesize" : 2,
+          "children" : null,
+          "ajxp_modiftime" : 5,
+          "repo_has_recycle" : true,
+          "file_perms" : "file_perms"
+        }
+      },
+      "NodesDiff" : {
+        "type" : "object",
+        "properties" : {
+          "add" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/definitions/Node"
+            }
+          },
+          "update" : {
+            "type" : "array",
+            "description" : "Nodes may have an additional attribute original_path",
+            "items" : {
+              "$ref" : "#/definitions/Node"
+            }
+          },
+          "remove" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "title" : "NodesDiff",
+        "description" : "Description of node removed / added / updated in the backend"
+      },
+      "NodeList" : {
+        "type" : "object",
+        "properties" : {
+          "pagination" : {
+            "$ref" : "#/definitions/PaginationData"
+          },
+          "data" : {
+            "$ref" : "#/definitions/NodeList_data"
+          }
+        },
+        "title" : "NodeList",
+        "description" : "List of Node objects",
+        "example" : {
+          "pagination" : {
+            "current" : 6,
+            "total" : 1,
+            "remoteSort" : "{}",
+            "count" : 0,
+            "dirs" : 5
+          },
+          "data" : {
+            "node" : {
+              "stat" : "{}",
+              "ajxp_readonly" : true,
+              "icon" : "icon",
+              "is_leaf" : true,
+              "label" : "label",
+              "ajxp_relativetime" : "ajxp_relativetime",
+              "filesize" : "filesize",
+              "type" : "collection",
+              "mimestring_id" : "mimestring_id",
+              "path" : "path",
+              "ajxp_description" : "ajxp_description",
+              "bytesize" : 2,
+              "children" : null,
+              "ajxp_modiftime" : 5,
+              "repo_has_recycle" : true,
+              "file_perms" : "file_perms"
+            },
+            "children" : {
+              "key" : {
+                "stat" : "{}",
+                "ajxp_readonly" : true,
+                "icon" : "icon",
+                "is_leaf" : true,
+                "label" : "label",
+                "ajxp_relativetime" : "ajxp_relativetime",
+                "filesize" : "filesize",
+                "type" : "collection",
+                "mimestring_id" : "mimestring_id",
+                "path" : "path",
+                "ajxp_description" : "ajxp_description",
+                "bytesize" : 2,
+                "children" : null,
+                "ajxp_modiftime" : 5,
+                "repo_has_recycle" : true,
+                "file_perms" : "file_perms"
+              }
+            }
+          }
+        }
+      },
+      "PaginationData" : {
+        "type" : "object",
+        "properties" : {
+          "count" : {
+            "type" : "integer",
+            "description" : "total number of children"
+          },
+          "current" : {
+            "type" : "integer",
+            "description" : "current page"
+          },
+          "total" : {
+            "type" : "integer",
+            "description" : "total number of pages"
+          },
+          "dirs" : {
+            "type" : "integer",
+            "description" : "total number of \"collection\" childrens"
+          },
+          "remoteSort" : {
+            "type" : "object",
+            "description" : "additional attributes describing current server-side sorting",
+            "properties" : { }
+          }
+        },
+        "title" : "PaginationData",
+        "description" : "Additional metadata attached to a NodeList for pagination. Could be sent through headers instead.",
+        "example" : {
+          "current" : 6,
+          "total" : 1,
+          "remoteSort" : "{}",
+          "count" : 0,
+          "dirs" : 5
+        }
+      },
+      "InputStream" : {
+        "type" : "string",
+        "title" : "InputStream",
+        "description" : "Simple binary stream"
+      },
+      "Role" : {
+        "type" : "object",
+        "properties" : {
+          "ACL" : {
+            "type" : "object",
+            "description" : "Key/value associating workspace IDs and rights strings (r/w)",
+            "properties" : { }
+          },
+          "MASKS" : {
+            "type" : "object",
+            "description" : "Folders permissions masks",
+            "properties" : { }
+          },
+          "PARAMETERS" : {
+            "type" : "object",
+            "description" : "Refined values of plugins parameters",
+            "properties" : { }
+          },
+          "ACTIONS" : {
+            "type" : "object",
+            "description" : "Enabled/disabled actions of plugins",
+            "properties" : { }
+          },
+          "APPLIES" : {
+            "type" : "object",
+            "description" : "Set of profiles on which this role automatically applies",
+            "properties" : { }
+          }
+        },
+        "title" : "Role",
+        "description" : "Representation of a Role, central container of permissions, actions and parameters.",
+        "example" : {
+          "ACTIONS" : "{}",
+          "ACL" : "{}",
+          "PARAMETERS" : "{}",
+          "MASKS" : "{}",
+          "APPLIES" : "{}"
+        }
+      },
+      "PeoplePatch" : {
+        "type" : "object",
+        "properties" : {
+          "resourceType" : {
+            "type" : "string",
+            "enum" : [ "user", "group" ]
+          },
+          "parameterName" : {
+            "type" : "string",
+            "enum" : [ "groupLabel", "userPass", "userProfile", "userLock", "userRoles", "userAddRole", "userRemoveRole", "userPreferences" ]
+          },
+          "parameterValue" : {
+            "type" : "string"
+          }
+        },
+        "title" : "PeoplePatch",
+        "description" : "a key / value tuple describing which parameter to patch",
+        "example" : {
+          "parameterName" : "groupLabel",
+          "parameterValue" : "parameterValue",
+          "resourceType" : "user"
+        }
+      },
+      "AdminWorkspace" : {
+        "type" : "object",
+        "required" : [ "accessType", "display" ],
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Id of this workspace"
+          },
+          "slug" : {
+            "type" : "string",
+            "description" : "human readable identifier, computed from display"
+          },
+          "display" : {
+            "type" : "string",
+            "description" : "Label for this workspace"
+          },
+          "displayStringId" : {
+            "type" : "string",
+            "description" : "an i18n identifier to adapt the label to the user language"
+          },
+          "accessType" : {
+            "type" : "string",
+            "description" : "plugin name to be used as driver to access the storage. Resulting plugin id is \"access.accessType\"."
+          },
+          "writeable" : {
+            "type" : "boolean",
+            "description" : "wether this workspace/template is writeable or not (not writeable if defined in bootstrap php configs)."
+          },
+          "isTemplate" : {
+            "type" : "boolean",
+            "description" : "wether this is a template or a concrete workspace."
+          },
+          "groupPath" : {
+            "type" : "string",
+            "description" : "If this repository has a groupPath"
+          },
+          "parameters" : {
+            "type" : "object",
+            "description" : "a key/value object containing all driver parameters.",
+            "properties" : { }
+          },
+          "features" : {
+            "type" : "object",
+            "description" : "The additional features parameters.",
+            "properties" : { }
+          },
+          "mask" : {
+            "type" : "object",
+            "description" : "permission mask applied on workspace files and folders",
+            "properties" : { }
+          },
+          "info" : {
+            "$ref" : "#/definitions/AdminWorkspace_info"
+          }
+        },
+        "title" : "Workspace Definition",
+        "description" : "Parameters of a workspace, as seen by administrator",
+        "example" : {
+          "id" : 1,
+          "securityScope" : "USER",
+          "slug" : "my-files",
+          "display" : "My Files",
+          "displayStringId" : 432,
+          "accessType" : "fs",
+          "writeable" : false,
+          "isTemplate" : false,
+          "parameters" : {
+            "CREATION_TIME" : 1468593800,
+            "USER_DESCRIPTION" : 476,
+            "PATH" : "AJXP_DATA_PATH/personal/AJXP_USER",
+            "CREATE" : true,
+            "RECYCLE_BIN" : "recycle_bin",
+            "CHMOD_VALUE" : "0600",
+            "DEFAULT_RIGHTS" : "rw",
+            "PAGINATION_THRESHOLD" : 500,
+            "PAGINATION_NUMBER" : 200
+          },
+          "features" : {
+            "metastore.serial" : {
+              "METADATA_FILE" : ".ajxp_meta",
+              "METADATA_FILE_LOCATION" : "infolders"
+            },
+            "meta.user" : {
+              "meta_fields" : "tags",
+              "meta_labels" : "Tags",
+              "meta_visibility" : "hidden"
+            },
+            "meta.filehasher" : [ ],
+            "meta.watch" : [ ],
+            "meta.syncable" : {
+              "REPO_SYNCABLE" : true
+            },
+            "meta.exif" : {
+              "meta_fields" : "COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude",
+              "meta_labels" : "Latitude,Longitude"
+            },
+            "index.lucene" : {
+              "index_meta_fields" : "tags",
+              "repository_specific_keywords" : "AJXP_USER"
+            }
+          },
+          "INFO" : {
+            "users" : 12,
+            "shares" : 74
+          }
+        }
+      },
+      "MetaSourceParameters" : {
+        "type" : "object",
+        "title" : "MetaSource",
+        "description" : "A set of parameters for meta sources",
+        "example" : {
+          "PLUGIN_PARAMETER_STRING" : "parameterValue1",
+          "PLUGIN_PARAMETER_INT" : 1,
+          "PLUGIN_PARAMETER_BOOL" : true
+        }
+      },
+      "inline_response_200" : {
+        "properties" : {
+          "USAGE" : {
+            "type" : "integer"
+          },
+          "TOTAL" : {
+            "type" : "integer"
+          }
+        },
+        "example" : {
+          "TOTAL" : 6,
+          "USAGE" : 0
+        }
+      },
+      "inline_response_200_1" : {
+        "properties" : {
+          "seq_id" : {
+            "type" : "integer"
+          },
+          "node" : {
+            "$ref" : "#/definitions/Node"
+          }
+        }
+      },
+      "Task_schedule" : {
+        "properties" : {
+          "scheduleType" : {
+            "type" : "string"
+          },
+          "scheduleValue" : {
+            "type" : "string"
+          }
+        },
+        "example" : {
+          "scheduleValue" : "scheduleValue",
+          "scheduleType" : "scheduleType"
+        }
+      },
+      "NodeList_data" : {
+        "properties" : {
+          "node" : {
+            "$ref" : "#/definitions/Node"
+          },
+          "children" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/definitions/Node"
+            }
+          }
+        },
+        "example" : {
+          "node" : {
+            "stat" : "{}",
+            "ajxp_readonly" : true,
+            "icon" : "icon",
+            "is_leaf" : true,
+            "label" : "label",
+            "ajxp_relativetime" : "ajxp_relativetime",
+            "filesize" : "filesize",
+            "type" : "collection",
+            "mimestring_id" : "mimestring_id",
+            "path" : "path",
+            "ajxp_description" : "ajxp_description",
+            "bytesize" : 2,
+            "children" : null,
+            "ajxp_modiftime" : 5,
+            "repo_has_recycle" : true,
+            "file_perms" : "file_perms"
+          },
+          "children" : {
+            "key" : {
+              "stat" : "{}",
+              "ajxp_readonly" : true,
+              "icon" : "icon",
+              "is_leaf" : true,
+              "label" : "label",
+              "ajxp_relativetime" : "ajxp_relativetime",
+              "filesize" : "filesize",
+              "type" : "collection",
+              "mimestring_id" : "mimestring_id",
+              "path" : "path",
+              "ajxp_description" : "ajxp_description",
+              "bytesize" : 2,
+              "children" : null,
+              "ajxp_modiftime" : 5,
+              "repo_has_recycle" : true,
+              "file_perms" : "file_perms"
+            }
+          }
+        }
+      },
+      "AdminWorkspace_info" : {
+        "properties" : {
+          "user" : {
+            "type" : "integer",
+            "description" : "computed number of users accessing this workspace"
+          },
+          "shares" : {
+            "type" : "integer",
+            "description" : "number of children shared from this workspace"
+          }
+        },
+        "description" : "additional informations provided by the server"
+      },
+      "Share" : {
+        "type": "object",
+        "properties" : {
+          "ajxp_shared": {
+            "type": "boolean",
+            "description": ""
+          },
+          "ajxp_shared_minisite": {
+            "type" : "string",
+            "description": ""
+          },
+          "fonticon": {
+            "type": "string",
+            "description": ""
+          },
+          "icon": {
+            "type": "string",
+            "description": ""
+          },
+          "original_path": {
+            "type": "string",
+            "description": ""
+          },
+          "owner" : {
+            "type": "string",
+            "description": ""
+          },
+          "share_data": {
+            "type": "string",
+            "description": ""
+          },
+          "share_type": {
+            "type": "string",
+            "description": ""
+          },
+          "share_type_readable": {
+            "type": "string",
+            "description": ""
+          },
+          "shared_element_hash": {
+            "type": "string",
+            "description": ""
+          },
+          "shared_element_parent_repository": {
+            "type": "string",
+            "description": ""
+          },
+          "share_element_parent_repository_label": {
+            "type": "string",
+            "description": ""
+          },
+          "path": {
+            "type": "string",
+            "description": ""
+          },
+          "ajxp_mime": {
+            "type": "string",
+            "description": ""
+          },
+          "openicon": {
+            "type": "string",
+            "description": ""
+          },
+          "label": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "ShareElement" : {
+        "type": "object",
+        "properties": {
+          "content_filter": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string"
+          },
+          "element_watch": {
+            "type": "boolean"
+          },
+          "repositoryid": {
+            "type": "string"
+          },
+          "repository_url": {
+            "type": "string"
+          },
+          "share_owner": {
+            "type": "string"
+          },
+          "share_scope": {
+            "type": "string"
+          },
+          "users_number": {
+            "type": "integer"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ShareEntry"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ShareLink"
+            }
+          }
+        }
+      },
+      "ShareElementPost": {
+        "type": "object",
+        "properties" : {
+          "owner": {
+            "type": "string",
+            "description":""
+          },
+          "merged": {
+            "type": "boolean"
+          },
+          "tmp_repository_id": {
+            "type": "string"
+          }
+        }
+      },
+      "ShareEntry": {
+        "type": "object",
+        "properties": {
+          "avantar": {
+            "type": "string",
+            "description": ""
+          },
+          "hidden": {
+            "type": "boolean",
+            "description": ""
+          },
+          "id": {
+            "type": "string"
+          },
+          "label":{
+            "type": "string"
+          },
+          "right": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "ShareLink": {
+        "type": "object",
+        "properties":{
+          "disable_download" : {
+              "type": "boolean"
+          },
+          "expire_after": {
+            "type": "boolean"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "hash_is_shorten": {
+            "type" : "boolean"
+          },
+          "internal_user_id": {
+            "type": "string"
+          },
+          "is_expired": {
+            "type": "boolean"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "public_link" : {
+            "type": "string"
+          }
+        }      
+      }
+    },
+    "parameters" : {
+      "formatParameter" : {
+        "name" : "format",
+        "in" : "query",
+        "description" : "Format produced in output (defaults to xml)",
+        "required" : false,
+        "type" : "string"
+      },
+      "pathParameter" : {
+        "name" : "path",
+        "in" : "path",
+        "description" : "Workspace id or alias + full path to the node, e.g. \"/my-files/path/to/node\"",
+        "required" : true,
+        "type" : "string"
+      },
+      "workspaceIdParameter" : {
+        "name" : "workspaceId",
+        "in" : "path",
+        "description" : "Id or Alias of the workspace",
+        "required" : true,
+        "type" : "string"
+      },
+      "workspaceIdFormParameter" : {
+        "name" : "workspaceId",
+        "in" : "formData",
+        "description" : "Id or Alias of the workspace",
+        "required" : true,
+        "type" : "string"
+      },
+      "nodeSelectionParameter" : {
+        "name" : "path",
+        "in" : "formData",
+        "description" : "One or more node pathes",
+        "required" : false,
+        "type" : "array",
+        "items" : {
+          "type" : "string"
+        },
+        "collectionFormat" : "multi"
+      },
+      "peopleParameter" : {
+        "name" : "path",
+        "in" : "path",
+        "description" : "User or group identifier, including full group path",
+        "required" : true,
+        "type" : "string"
+      },
+      "peopleParameterOptional" : {
+        "name" : "path",
+        "in" : "path",
+        "description" : "User or group identifier, including full group path (optional)",
+        "required" : true,
+        "type" : "string"
+      }
+    }
+  }
