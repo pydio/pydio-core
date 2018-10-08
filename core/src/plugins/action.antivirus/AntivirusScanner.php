@@ -117,10 +117,16 @@ class AntivirusScanner extends Plugin
     /**
      * This function immediatly scans the file, it calls the antivirus command
      * @param AJXP_Node $nodeObject
+     * @throws Exception
      */
     private function scanNow($nodeObject)
     {
         $command = $this->getContextualOption($nodeObject->getContext(), "COMMAND");
+        if(empty($command)){
+            $this->logError("Antivirus", "COMMAND parameter not found, could not scan file properly. Please check CONF_DIR/conf.action.antivirus.inc file");
+            echo 'Antivirus command failed, the file could not be scanned properly: please check your configuration.';
+            return;
+        }
         $command = str_replace('$' . 'FILE', escapeshellarg($this->path), $command);
 
         ob_start();
@@ -132,9 +138,15 @@ class AntivirusScanner extends Plugin
             if (self::DEBUG_ON == 1) {
                 echo $output;
             } else {
-                $filename = strrchr($this->path, DIRECTORY_SEPARATOR);
-                $filename = substr($filename, 1);
-                echo 'Virus has been found in : ' . $filename . '         File removed';
+                // Check if file has been removed
+                if(!file_exists($this->path)){
+                    $filename = strrchr($this->path, DIRECTORY_SEPARATOR);
+                    $filename = substr($filename, 1);
+                    echo 'Virus has been found in : ' . $filename . '. File was removed.';
+                } else {
+                    $this->logError("Antivirus", "COMMAND parameter not found, could not scan file properly. Please check CONF_DIR/conf.action.antivirus.inc file. Return code was ".$int);
+                    echo 'Antivirus command failed, the file could not be scanned properly: please check your configuration.';
+                }
             }
         }
         return;

@@ -9,7 +9,7 @@
 		<plugin_author>Sylvain Letreguilly, Pydio Team</plugin_author>
 		<plugin_uri>no</plugin_uri>
 		<plugin_version>1</plugin_version>
-        <core_relation packaged="true" tested_version="7.0"/>
+        <core_relation packaged="true" tested_version="8.2.2"/>
 	</plugin_info>
 
 	<client_settings>
@@ -20,7 +20,8 @@
 
 	<!-- plugin parameter -->
 	<server_settings>
-		<global_param group="CONF_MESSAGE[antivirus]" name="COMMAND" type="string" label="CONF_MESSAGE[antivirus command]" description="CONF_MESSAGE[Enter the antivirus system command. Use $FILE for the file path]" mandatory="false" default="clamscan --remove=yes $FILE"/>
+		<global_param group="CONF_MESSAGE[antivirus]" name="LEGEND1" type="legend" label="CONF_MESSAGE[Antivirus Executable]" description="CONF_MESSAGE[For security reasons, the command executed to scan a file must be set up manually inside the file 'CONFIG_DIR/conf.action.antivirus.inc' on your server.]"/>
+		<global_param group="CONF_MESSAGE[antivirus]" name="LEGEND2" type="legend" label="CONF_MESSAGE[Antivirus Executable]" description="CONF_MESSAGE[Use the $FILE symbol to pass the absolute path to the file to be scanned. Default is 'clamscan --remove=yes $FILE']"/>
 		<global_param group="CONF_MESSAGE[antivirus]" name="EXT" type="textarea" label="CONF_MESSAGE[File extension to scan]" description="CONF_MESSAGE[List all file extension that are to be scanned. Typing */ at the beginning of the list will scan all files execpt for extensions included after */]" mandatory="false" default="*/"/>
 		<global_param group="CONF_MESSAGE[antivirus]" name="SIZE" type="string" label="CONF_MESSAGE[max file size]" description="CONF_MESSAGE[max file size that will be  scanned immediatly after upload]" mandatory="false" default="1G"/>
 		<global_param group="CONF_MESSAGE[Generate a trace file for unscanned files]" name="TRACE" type="boolean" label="CONF_MESSAGE[Trace enabled]" description="CONF_MESSAGE[Store the path to the list of file that have not been scanned]" default="false"/>
