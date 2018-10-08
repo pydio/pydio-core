@@ -64,24 +64,25 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Expects options containing a key 'SQL_DRIVER' with constructor values from dibi::connect()
      *
      * Example:
-     * 		"SQL_DRIVER" => Array(
-     *		'driver' => 'sqlite',
-     *			'file' => "./server/ajxp.db"
-     *		)
+     *        "SQL_DRIVER" => Array(
+     *        'driver' => 'sqlite',
+     *            'file' => "./server/ajxp.db"
+     *        )
      *
      * Example 2:
-     * 		"SQL_DRIVER" => Array(
-     * 		'driver' => 'mysql',
-     * 		'host' => 'localhost',
-     * 		'username' => 'root',
-     * 		'password' => '***',
-     * 		'database' => 'dbname'
-     * 		)
+     *        "SQL_DRIVER" => Array(
+     *        'driver' => 'mysql',
+     *        'host' => 'localhost',
+     *        'username' => 'root',
+     *        'password' => '***',
+     *        'database' => 'dbname'
+     *        )
      *
      * @see AbstractConfDriver#init($options)
      * @param ContextInterface $ctx
      * @param array $options
      * @throws DBConnectionException
+     * @throws PydioException
      */
     public function init(ContextInterface $ctx, $options = [])
     {
@@ -113,18 +114,23 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function performChecks()
     {
         if(!isSet($this->options)) return;
         $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
-            throw new \Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
+            throw new \Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootstrap.json\" in data/plugins/boot.conf/");
         }
     }
 
     /**
      * @param string $pluginId
      * @param array $options
+     * @throws DibiException
      */
     public function _loadPluginConfig($pluginId, &$options)
     {
@@ -143,6 +149,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      *
      * @param String $pluginId
      * @param String $options
+     * @throws DibiException
      */
     public function _savePluginConfig($pluginId, $options)
     {
@@ -293,6 +300,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     /**
      * @param AJXP_Role $role
      * @return RepositoryInterface[]
+     * @throws DibiException
      */
     public function listRepositoriesForRole($role){
         $acls = $role->listAcls();
@@ -307,7 +315,8 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param array $criteria
      * @param int $count possible total count
-     * @return Repository[]
+     * @return RepositoryInterface[]
+     * @throws DibiException
      */
     public function listRepositoriesWithCriteria($criteria, &$count = null){
 
@@ -393,6 +402,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @param $slugOrAlias
      * @param $value
      * @return RepositoryInterface|null
+     * @throws DibiException
      */
     protected function _loadRepository($slugOrAlias, $value){
         if($this->sqlDriver["driver"] == "postgre"){

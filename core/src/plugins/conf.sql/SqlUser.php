@@ -166,6 +166,9 @@ class SqlUser extends AbstractUser
     {
         if (!is_string($prefValue)) {
             $prefValue = '$phpserial$'.serialize($prefValue);
+        } else if(strpos($prefValue, '$phpserial') === 0){
+            $this->log("Cannot save string preference starting with \$phpserial\$!!");
+            return;
         }
         // Prevent a query if the preferences are identical to the existing preferences.
         if (array_key_exists($prefName, $this->prefs) && $this->prefs[$prefName] == $prefValue) {
@@ -211,7 +214,10 @@ class SqlUser extends AbstractUser
         if (isSet($p) && is_string($p)) {
             if (strpos($p, '$phpserial$') !== false && strpos($p, '$phpserial$') === 0) {
                 $p = substr($p, strlen('$phpserial$'));
-                return unserialize($p);
+                $x = unserialize($p, ['allowed_classes' => FALSE]);
+                if ($x === null || $x instanceof \__PHP_Incomplete_Class){
+                    return [];
+                }
             }
             if (strpos($p, '$json$') !== false && strpos($p, '$json$') === 0) {
                 $p = substr($p, strlen('$json$'));
@@ -219,7 +225,10 @@ class SqlUser extends AbstractUser
             }
             // By default, unserialize
             if ($prefName == "CUSTOM_PARAMS") {
-                return unserialize($p);
+                $x = unserialize($p, ['allowed_classes' => FALSE]);
+                if ($x === null || $x instanceof \__PHP_Incomplete_Class){
+                    return [];
+                }
             }
         }
         return $p;

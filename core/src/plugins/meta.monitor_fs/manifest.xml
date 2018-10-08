@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin id="meta.monitor_fs" label="CONF_MESSAGE[FileSystem Monitoring]" description="CONF_MESSAGE[If the workspace is meant to be modified directly through the file system, use this plugin to monitor the changes]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ajxp_plugin id="meta.monitor_fs" label="CONF_MESSAGE[FileSystem Monitoring (experimental)]" description="CONF_MESSAGE[If the workspace is meant to be modified directly through the file system, use this plugin to monitor the changes. This is experimental and should probably not be used.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" enabled="false">
     <plugin_info>
         <core_relation packaged="false" tested_version="5.2.0"/>

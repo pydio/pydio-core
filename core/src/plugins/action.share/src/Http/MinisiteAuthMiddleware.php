@@ -28,6 +28,7 @@ use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
@@ -112,10 +113,14 @@ class MinisiteAuthMiddleware
         $ctx = $requestInterface->getAttribute("ctx");
 
         if (isSet($_GET["lang"])) {
-            if ($ctx->hasUser()) {
-                $ctx->getUser()->setPref("lang", $_GET["lang"]);
-            } else {
-                setcookie("AJXP_lang", $_GET["lang"]);
+            $l = $_GET["lang"];
+            $langs = LocaleService::listAvailableLanguages();
+            if(array_key_exists($l, $langs)){
+                if ($ctx->hasUser()) {
+                    $ctx->getUser()->setPref("lang", $l);
+                } else {
+                    setcookie("AJXP_lang", $l);
+                }
             }
         }
 
