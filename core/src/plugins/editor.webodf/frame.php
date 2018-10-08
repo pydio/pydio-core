@@ -1,12 +1,22 @@
 <?php
 define('AJXP_EXEC', true);
 require_once('../../core/src/pydio/Core/Utils/Vars/InputFilter.php');
+require_once('../../core/src/pydio/Core/Exception/PydioException.php');
+require_once('../../core/src/pydio/Core/Exception/ForbiddenCharacterException.php');
 use Pydio\Core\Utils\Vars\InputFilter;
 
-$AJXP_FILE_URL = InputFilter::securePath(InputFilter::sanitize($_GET["file"], 5));
+try {
+    $test = InputFilter::securePath(InputFilter::sanitize($_GET["file"], InputFilter::SANITIZE_DIRNAME, true));
+}catch (\Pydio\Core\Exception\ForbiddenCharacterException $exception){
+    die("Passed file contains forbidden characters!");
+}
 $parts = explode("/", InputFilter::securePath($_GET["file"]));
 foreach($parts as  $i => $part){
-    $parts[$i] = InputFilter::sanitize($part, InputFilter::SANITIZE_FILENAME);
+    try{
+        $parts[$i] = InputFilter::sanitize($part, InputFilter::SANITIZE_FILENAME);
+    } catch (\Pydio\Core\Exception\ForbiddenCharacterException $e){
+        die("Passed file contains forbidden characters");
+    }
 }
 $AJXP_FILE_URL = implode("/", $parts);
 ?>
