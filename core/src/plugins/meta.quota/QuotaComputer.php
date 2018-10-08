@@ -58,8 +58,8 @@ class QuotaComputer extends AbstractMetaSource
      */
     protected function getEffectiveContext(ContextInterface $ctx){
         $repository = $ctx->getRepository();
-        if($repository->hasParent() && $repository->getOwner() !== null){
-            $parentOwner = $repository->getOwner();
+        $parentOwner = $repository->getOwner();
+        if($repository->hasParent() && !empty($parentOwner)){
             return $ctx->withRepositoryId($repository->getParentId())->withUserId($parentOwner);
         }else{
             return $ctx;
@@ -159,14 +159,15 @@ class QuotaComputer extends AbstractMetaSource
      */
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false)
     {
-        //$repoOptions = $this->getWorkingRepositoryOptions();
-        //$q = $this->accessDriver->directoryUsage("", $repoOptions);
-
         $refNode = ($oldNode !== null ? $oldNode : $newNode);
+        if($refNode->getRepository() !== null && $refNode->getRepository()->getOwner() !== null){
+            // Do not recompute usage for shared repositories, this will be called by other forwarded events (up or down)
+            return;
+        }
         $q = $this->getUsageForContext($refNode->getContext());
-        $this->storeUsage($refNode->getContext(), $q);
+        // Warning, do not store usage again here!
+        //$this->storeUsage($refNode->getContext(), $q);
         $t = $this->getAuthorized($refNode->getContext());
-
         Controller::applyHook("msg.instant", array($refNode->getContext(), "<metaquota usage='{$q}' total='{$t}'/>"));
     }
 
@@ -213,6 +214,7 @@ class QuotaComputer extends AbstractMetaSource
 
     /**
      * @param ContextInterface $ctx
+     * @param bool
      * @return integer
      */
     private function getUsageForContext(ContextInterface $ctx){

@@ -218,6 +218,7 @@ class SqlUser extends AbstractUser
                 if ($x === null || $x instanceof \__PHP_Incomplete_Class){
                     return [];
                 }
+                return $x;
             }
             if (strpos($p, '$json$') !== false && strpos($p, '$json$') === 0) {
                 $p = substr($p, strlen('$json$'));
@@ -229,6 +230,7 @@ class SqlUser extends AbstractUser
                 if ($x === null || $x instanceof \__PHP_Incomplete_Class){
                     return [];
                 }
+                return $x;
             }
         }
         return $p;
