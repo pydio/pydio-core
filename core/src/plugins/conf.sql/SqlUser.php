@@ -144,7 +144,6 @@ class SqlUser extends AbstractUser
      *
      * @param string $textMessage String text of the message to log
      * @param string $severityLevel Integer constant of the logging severity
-     * @return null
      */
     public function log($textMessage, $severityLevel = LOG_LEVEL_DEBUG)
     {
@@ -152,6 +151,25 @@ class SqlUser extends AbstractUser
             $logger = Logger::getInstance();
             $logger->logDebug("AJXP_SQLUSER", $textMessage);
         }
+    }
+
+    /**
+     * Checks whether data can be serialized. Checks recursively inside array values.
+     * Basically only native types are allowed, not objects
+     * @param $data mixed
+     * @return bool
+     */
+    private function canSerialized($data){
+        if (is_array($data)){
+            foreach($data as $k => $v){
+                if(!$this->canSerialized($v)){
+                    return false;
+                }
+            }
+        } else if (is_object($data)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -165,6 +183,10 @@ class SqlUser extends AbstractUser
     public function setPref($prefName, $prefValue)
     {
         if (!is_string($prefValue)) {
+            if(!$this->canSerialized($prefValue)){
+                $this->log("Cannot serialize objects in preferences. Please use only native types");
+                return;
+            }
             $prefValue = '$phpserial$'.serialize($prefValue);
         } else if(strpos($prefValue, '$phpserial') === 0){
             $this->log("Cannot save string preference starting with \$phpserial\$!!");
@@ -214,7 +236,12 @@ class SqlUser extends AbstractUser
         if (isSet($p) && is_string($p)) {
             if (strpos($p, '$phpserial$') !== false && strpos($p, '$phpserial$') === 0) {
                 $p = substr($p, strlen('$phpserial$'));
-                $x = unserialize($p, ['allowed_classes' => FALSE]);
+                if(version_compare(PHP_VERSION, "7.0.0") >= 0){
+                    // Additional checks if we have the option
+                    $x = unserialize($p, ['allowed_classes' => FALSE]);
+                } else {
+                    $x = unserialize($p);
+                }
                 if ($x === null || $x instanceof \__PHP_Incomplete_Class){
                     return [];
                 }
@@ -226,7 +253,12 @@ class SqlUser extends AbstractUser
             }
             // By default, unserialize
             if ($prefName == "CUSTOM_PARAMS") {
-                $x = unserialize($p, ['allowed_classes' => FALSE]);
+                if(version_compare(PHP_VERSION, "7.0.0") >= 0){
+                    // Additional checks if we have the option
+                    $x = unserialize($p, ['allowed_classes' => FALSE]);
+                } else {
+                    $x = unserialize($p);
+                }
                 if ($x === null || $x instanceof \__PHP_Incomplete_Class){
                     return [];
                 }
