@@ -113,7 +113,7 @@
         <action name="download_all">
             <gui text="463" title="464" iconClass="mdi mdi-folder-download" hasAccessKey="false">
                 <context selection="false" dir="true" recycle="false" actionBar="true" contextMenu="false" infoPanel="false"
-                    actionBarGroup="minisite">
+                    actionBarGroup="minisite_folder">
                 </context>
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
