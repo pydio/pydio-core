@@ -431,7 +431,7 @@ class LdapAuthDriver extends AbstractAuthDriver
             }
             if ($isSupportPagedResult)
                 foreach ($ret as $element) {
-                    if (is_resource($element) && count($allEntries["count"]) > 1)
+                    if (is_resource($element) && $allEntries["count"] > 1)
                         @ldap_control_paged_result_response($this->ldapconn, $element, $cookie);
                 }
         } while (($cookie !== null && $cookie != '') && ($isSupportPagedResult) && (!$gotAllEntries));
