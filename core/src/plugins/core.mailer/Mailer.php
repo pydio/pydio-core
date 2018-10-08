@@ -627,7 +627,7 @@ class Mailer extends Plugin implements SqlTableProvider
             return InputFilter::sanitize($email, InputFilter::SANITIZE_EMAILCHARS);
         }, $httpVars["emails"]);
 
-        $from = $this->resolveFrom($ctx, InputFilter::sanitize($httpVars["from"], InputFilter::SANITIZE_EMAILCHARS));
+        $from = $this->resolveFrom($ctx);
         $imageLink = isSet($httpVars["link"]) ? $httpVars["link"] : null;
 
         $multipleSubjects = isSet($httpVars["subjects"]) && count($httpVars["subjects"]) === count($toUsers) ? $httpVars["subjects"] : null;
