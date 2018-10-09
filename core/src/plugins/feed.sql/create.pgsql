@@ -12,12 +12,5 @@ CREATE TABLE ajxp_feed (
   content bytea NOT NULL
 );
 
-CREATE INDEX ajxp_feed_edate_idx ON ajxp_feed (
-  edate,
-  etype,
-  htype,
-  user_id,
-  repository_id
-);
-
-CREATE INDEX ajxp_feed_index_path_idx ON ajxp_feed (index_path);
+CREATE INDEX ajxp_feed_repository_id_idx ON ajxp_feed (repository_id);
+CREATE INDEX ajxp_feed_user_id_idx ON ajxp_feed (user_id);

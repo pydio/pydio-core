@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS ajxp_feed (
   repository_owner text,
   content blob NOT NULL
 );
-CREATE INDEX ajxp_feed_index_path ON ajxp_feed (index_path);
-CREATE INDEX ajxp_feed_index_multiple ON ajxp_feed (edate, etype, user_id, repository_id) ;
+CREATE INDEX ajxp_feed_repository_id_idx ON ajxp_feed (repository_id);
+CREATE INDEX ajxp_feed_user_id_idx ON ajxp_feed (user_id);
