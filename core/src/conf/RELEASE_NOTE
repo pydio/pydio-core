@@ -2,6 +2,32 @@ Pydio ##VERSION_NUMBER## Release Note
 
 Bugfix and security release
 
+Fix upload on mobile apps
+Hard-coded CORS support - to be added via a proper PSR-7 middleware
+Escaping mount type
+PSR-7 middleware for CORS requests
+Latest changes for CORS middleware
+Making it configurable
+Fixing order or middlewares and default values
+Adding to the release note
+Add new api 2 for migration to cells
+Fix api2migration json
+fix counting function
+Change how we set up the Antivirus scanner command
+Fix sanitization in odf iframe
+Use imports
+Fix missing Download All button on minisite
+Make sure meta.monitor_fs is shown as experimental - Fix preferences serial/deserialization
+Update api2.json with shares API's
+Fix Quota computing that doubles quota uisage Refix preferences
+Unserialize second parameter is not supported before php 7
+From parameter is not used in send_mail action
+Update user session if admin is editing himself.
+Change indexes on ajxp_feed.
+Put all executable paths inside config files
+
+Pydio 8.2.1 is a bugfix and security release for Pydio 8.X
+
 Update user id inside tmpNode
 Use a selector for possible update sites
 Remove unnecessary files from vendor
