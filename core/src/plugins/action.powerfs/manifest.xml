@@ -9,8 +9,8 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ZIP_PATH" type="string" label="CONF_MESSAGE[Zip path]"
-                      description="CONF_MESSAGE[Path of the zip utilitary on the command line]" default="zip"/>
+        <global_param name="ZIP_PATH" type="legend" label="CONF_MESSAGE[Zip path]"
+                      description="CONF_MESSAGE[ZIP_PATH: You may have to manually set up the full path to zip executable inside CONF_DIR/conf.action.powerfs.inc. By default, it expects to find the zip command in the PATH.]" default="zip"/>
     </server_settings>
     <registry_contributions>
         <actions>

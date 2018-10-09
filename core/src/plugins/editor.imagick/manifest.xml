@@ -12,13 +12,13 @@
         </resources>
     </client_settings>
 	<server_settings>
-		<global_param name="IMAGE_MAGICK_CONVERT" type="string" label="CONF_MESSAGE[Convert Path]" description="CONF_MESSAGE[Full path on the server to the 'convert' binary]" default="/opt/local/bin/convert" mandatory="true"/>
+		<global_param name="IMAGE_MAGICK_CONVERT" type="legend" label="CONF_MESSAGE[Convert Path]" description="CONF_MESSAGE[IMAGE_MAGICK_CONVERT: use CONF_DIR/conf.editor.imagick.inc to set full path on the server to the 'convert' binary (/opt/local/bin/convert) by default]"/>
 		<global_param name="IM_THUMB_QUALITY" type="string" label="CONF_MESSAGE[Thumbs Options]" description="CONF_MESSAGE[Imagick Options used for generating the thumbnails]" default="-quality 65 -density 150 -resize 250 -flatten"/>
 		<global_param name="IM_VIEWER_QUALITY" type="string" label="CONF_MESSAGE[Images Options]" description="CONF_MESSAGE[Imagick Options used for generation the high scale images]" default="-quality 90 -density 250"/>
         <global_param name="IM_CUSTOM_OPTIONS" type="string" label="CONF_MESSAGE[Shared Options]" description="CONF_MESSAGE[You can add any Image Magick options you want here, applied to both thumbs and big images]" default=""/>
-        <global_param name="ADDITIONAL_ENV_PATH" type="string" label="CONF_MESSAGE[Environment Path]" description="CONF_MESSAGE[Additional path to put in the environment PATH variable before calling the command. Can be necessary for Ghostscript on Mac for example.]" default=""/>
+        <global_param name="ADDITIONAL_ENV_PATH" type="legend" label="CONF_MESSAGE[Environment Path]" description="CONF_MESSAGE[ADDITIONAL_ENV_PATH: you can set additional path to put in the environment PATH variable before calling the command. Can be necessary for Ghostscript on Mac for example. Edit CONF_DIR/conf.editor.imagick.inc]" default=""/>
 		<global_param name="ONTHEFLY_THRESHOLD" type="integer" label="CONF_MESSAGE[Pregeneration Threshold]" description="CONF_MESSAGE[Threshold (in MegaByte) under which the pages are all generated when opening the document, and over which pages are generated on-demand only]" default="5"/>
-		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary (see docs)]" default="" mandatory="false"/>
+		<global_param name="UNOCONV" type="legend" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[UNOCONV: use CONF_DIR/conf.editor.imagick.inc to set full path on the server to the 'unoconv' binary (see docs)]"/>
 	</server_settings>
 	<registry_contributions>
 		<hooks>
