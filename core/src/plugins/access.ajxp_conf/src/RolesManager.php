@@ -27,6 +27,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Conf\Core\AbstractUser;
 use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\ReloadMessage;
@@ -458,6 +459,9 @@ class RolesManager extends AbstractManager
                     if (isSet($userObject)) {
                         $userObject->updatePersonalRole($originalRole);
                         $userObject->save("superuser");
+                        if($ctx->getUser()->getId() === $userObject->getId()){
+                            AuthService::updateSessionUser($userObject);
+                        }
                     } else {
                         RolesService::updateRole($originalRole);
                     }
