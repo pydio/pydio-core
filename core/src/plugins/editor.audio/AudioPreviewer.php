@@ -92,6 +92,7 @@ class AudioPreviewer extends Plugin
 
                 header("Content-Type: ".$cType."; name=\"".$localName."\"");
                 header("Content-Length: ".$size);
+                header("Content-Range: bytes 0-". ($size - 1) . "/" . $size);
 
                 $stream = fopen("php://output", "a");
                 MetaStreamWrapper::copyFileInStream($fileUrl, $stream);
@@ -103,6 +104,7 @@ class AudioPreviewer extends Plugin
 
             });
 
+            $responseInterface = $responseInterface->withStatus(206, 'Partial Content');
             $responseInterface = $responseInterface->withBody($aSyncReader);
 
         } else if ($action == "ls") {
