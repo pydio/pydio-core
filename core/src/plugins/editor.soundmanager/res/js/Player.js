@@ -127,14 +127,17 @@ class Player extends React.Component {
             const radius = rich ? 60: 20
             const width = rich ? 20 : 5
 
+            const durationEstimate = sound.durationEstimate > 0 ? sound.durationEstimate : sound.buffered[0].end
+
             if (this.canvas) {
                 // Background
-                drawSolidArc(this.canvas, '#ddd', radius, width, deg2rad(fullCircle), 0, false);
+                drawSolidArc(this.canvas, '#dddddd', radius, width, deg2rad(fullCircle), 0, false);
                 // Loading ring
-                drawSolidArc(this.canvas, '#ccc', radius, width, deg2rad(fullCircle*(sound.bytesLoaded/sound.bytesTotal)), 0, true);
+                drawSolidArc(this.canvas, '#cccccc', radius, width, deg2rad(fullCircle*(sound.bytesLoaded/sound.bytesTotal)), 0, true);
                 // Playing ring
-                drawSolidArc(this.canvas, '#000', radius, width, deg2rad(fullCircle*(sound.position/sound.durationEstimate)), 0, true);
+                drawSolidArc(this.canvas, '#000000', radius, width, deg2rad(fullCircle*(sound.position/durationEstimate)), 0, true);
             }
+
 
             this.setState({
                 time: getTime(sound.position,true),
@@ -183,7 +186,8 @@ class Player extends React.Component {
 
         const angle = Math.floor(fullCircle-(rad2deg(Math.atan2(deltaX,deltaY))+180));
 
-        const position = Math.floor(sound.durationEstimate*(angle/fullCircle) / 1000)
+        const durationEstimate = sound.durationEstimate > 0 ? sound.durationEstimate : sound.buffered[0].end
+        const position = Math.floor(durationEstimate*(angle/fullCircle) / 1000)
 
         sound.setPosition(position * 1000);
         sound.resume()
