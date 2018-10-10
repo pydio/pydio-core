@@ -18,13 +18,10 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-
-
 import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
-import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui'
-import Player from './Player';
+import {Paper, Table, TableBody, TableRow, TableRowColumn } from 'material-ui'
 
 class Editor extends Component {
 
@@ -35,13 +32,31 @@ class Editor extends Component {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                flex: 1
+                flex: 1,
+                backgroundColor: '#fafafa'
             },
             player: {
                 margin: "auto"
             },
+            paper : {
+                margin: 10,
+            },
             table: {
                 width: "100%"
+            },
+            row:{
+                backgroundColor:'transparent'
+            },
+            rowSelected:{
+                backgroundColor:'#fafafa'
+            },
+            leftCol: {
+                width:60,
+                textAlign:'center',
+                paddingRight:0
+            },
+            leftColIcon:{
+                cursor: 'pointer'
             }
         }
     }
@@ -50,7 +65,13 @@ class Editor extends Component {
         const sound = soundManager.getSoundById(nextProps.node.getPath())
 
         if (sound && this.props.node.getPath() !== nextProps.node.getPath()) {
-            soundManager.soundIDs.map((soundID) => soundManager.sounds[soundID].stop())
+            soundManager.soundIDs.map((soundID) => {
+                try{
+                    soundManager.sounds[soundID].stop()
+                } catch (e) {
+
+                }
+            })
         }
 
         if (sound)  {
@@ -62,15 +83,25 @@ class Editor extends Component {
         }
     }
 
+    onRowsSelected(rows){
+        if(!rows || !rows.length) return;
+        const index = rows[0];
+        const {onRequestSelectionPlay} = this.props;
+        onRequestSelectionPlay(null, index, true);
+    }
+
     render() {
 
-        const {node, selectionPlaying, selection} = this.props;
+        const {node, selectionPlaying, selection, onRequestSelectionPlay} = this.props;
 
         return (
             <div style={Editor.styles.container}>
+                <Paper zDepth={1} style={Editor.styles.paper}>
                 <Table
                     style={Editor.styles.table}
-                    selectable={false}
+                    selectable={true}
+                    multiSelectable={false}
+                    onRowSelection={this.onRowsSelected.bind(this)}
                 >
                     <TableBody
                         displayRowCheckbox={false}
@@ -79,18 +110,25 @@ class Editor extends Component {
                     >
                     {selection && selection.selection.map( (n, index) => {
                         let leftCol = index + 1;
-                        if(selectionPlaying && node && (n.getPath() === node.getPath())){
-                            leftCol = <span className={"mdi mdi-play"}/>;
+                        let rowStyle = Editor.styles.row;
+                        if(node && (n.getPath() === node.getPath())){
+                            if(selectionPlaying){
+                                leftCol = <span className={"mdi mdi-pause"} style={Editor.styles.leftColIcon} onClick={() => {onRequestSelectionPlay(null, index, false)}}/>;
+                            } else {
+                                leftCol = <span className={"mdi mdi-play"}  style={Editor.styles.leftColIcon} onClick={() => {onRequestSelectionPlay(null, index, true)}}/>;
+                            }
+                            rowStyle = Editor.styles.rowSelected;
                         }
                         return (
                             <TableRow key={index}>
-                                <TableRowColumn style={{width:60, textAlign:'center', paddingRight:0}}>{leftCol}</TableRowColumn>
-                                <TableRowColumn>{n.getLabel()}</TableRowColumn>
+                                <TableRowColumn style={{...Editor.styles.leftCol, ...rowStyle}}>{leftCol}</TableRowColumn>
+                                <TableRowColumn style={rowStyle}>{n.getLabel()}</TableRowColumn>
                             </TableRow>
                         )
                     })}
                     </TableBody>
                 </Table>
+                </Paper>
             </div>
         );
     }

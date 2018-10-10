@@ -48,6 +48,13 @@ class SelectionModel {
         else this.currentIndex = 0;
         return this.current();
     }
+
+    byIndex(index){
+        if(this.selection[index]){
+            this.currentIndex = index;
+        }
+        return this.current();
+    }
 }
 
 export default SelectionModel

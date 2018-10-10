@@ -178,7 +178,11 @@ class Player extends React.Component {
 
         if (Math.abs(deltaX) < offset && Math.abs(deltaY) < offset) {
             if (e.type == "mouseup") {
-                soundManager.soundIDs.map((soundID) => soundID !== id && soundManager.sounds[soundID].stop())
+                soundManager.soundIDs.map((soundID) => {
+                    try{
+                        soundID !== id && soundManager.sounds[soundID].stop()
+                    } catch(e){}
+                })
                 sound.togglePause()
             }
             return

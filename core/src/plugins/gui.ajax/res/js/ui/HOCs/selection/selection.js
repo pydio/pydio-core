@@ -56,6 +56,25 @@ const withSelection = (getSelection) => {
                 getSelection(node).then(({selection, currentIndex}) => this.setState({id, selection: new SelectionModel(selection, currentIndex)}))
             }
 
+            onRequestSelectionPlay(index = undefined, playStatus = undefined){
+                const {tab, dispatch} = this.props;
+                const {id, selection} = tab
+                let node;
+                if (index === undefined){
+                    node = selection.nextOrFirst();
+                } else {
+                    node = selection.byIndex(index);
+                }
+                this.setState({
+                    id,
+                    node: node,
+                    title: selection.current().getLabel()
+                });
+                if(playStatus !== undefined && dispatch){
+                    dispatch(EditorActions.tabModify({id: id, playing: playStatus}));
+                }
+            }
+
             render() {
 
                 const {tab, dispatch, ...remainingProps} = this.props
@@ -75,8 +94,7 @@ const withSelection = (getSelection) => {
                         node={selection.current()}
                         selection={selection}
                         selectionPlaying={playing}
-
-                        onRequestSelectionPlay={() => this.setState({id, node: selection.nextOrFirst(), title: selection.current().getLabel()})}
+                        onRequestSelectionPlay={(e, i, p)=>{this.onRequestSelectionPlay(i, p)}}
                     />
                 )
             }
