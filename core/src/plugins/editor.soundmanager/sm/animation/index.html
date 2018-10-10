@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>SoundManager 2: Animation + Sound Demos</title>
+<link rel="stylesheet" href="../index.css" media="screen" />
+</head>
+<body>
+
+<div style="margin:1em">
+
+<h1>Javascript Animation + Sound Demos using <a href="http://www.schillmania.com/projects/soundmanager2/">SoundManager 2</a></h1>
+
+<ol>
+ <li><a href="../animation-1/">Interval-based animation (with sound)</a></li>
+ <li><a href="../christmas-lights/">Smashable Christmas Lights</a></li>
+ <li><a href="../animation-2a/">JS-DOM "painting" + Sound, V1</a></li>
+ <li><a href="../animation-2b/">JS-DOM "painting" + Sound, V2</a></li>
+</ol>
+
+<p>External demo: <a href="http://www.schillmania.com/content/demos/yui-sm2/noisy-events/">A Noisy DOM</a> - part of a Yahoo! User Interface blog post, <a href="http://www.yuiblog.com/blog/2009/06/30/yui-soundmanager/">Enhancing YUI-based Apps with Audio</a>.</p>
+
+<script type="text/javascript">
+function fixLinks() {
+  if (document.location.protocol.match(/http/i)) {
+    return false;
+  }
+  // presumably offline - add index.html to local links, so offline browsing is seamless
+  var l = document.getElementsByTagName('a');
+  var s = null;
+  var tmp = null;
+  var cn = null;
+  for (var i=l.length; i--;) {
+    s = l[i].href.toString();
+    cn = l[i].className;
+    if (!s.match(/http/i) && !cn.match(/norewrite/i) && (s.match(/doc/i) || s.match(/demo/i) || s.match(/../))) {
+      // yep, local.
+      tmp = Math.max(s.lastIndexOf('?'),-1);
+      tmp = Math.max(s.lastIndexOf('#'),tmp);
+      tmp = Math.max(s.lastIndexOf('/')+1,tmp);
+       // console.log(s+' '+s.lastIndexOf('?')+', '+s.lastIndexOf('#')+', '+s.lastIndexOf('/')+' = '+tmp);
+      if (tmp == -1) {
+        tmp = s.length;
+      }
+      if (!s.match(/\.html/i)) {
+        l[i].setAttribute('href',s.substr(0,tmp)+'index.html'+s.substr(tmp));
+      }
+    }
+  }
+}
+fixLinks();
+</script>
+
+</div>

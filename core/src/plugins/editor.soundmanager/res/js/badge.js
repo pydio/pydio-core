@@ -23,15 +23,12 @@
 import React, {Component} from 'react'
 import Player from './Player';
 
-// The threeSixytPlayer is the same for all badges
-var threeSixtyPlayer = new ThreeSixtyPlayer();
-
 export default class Badge extends Component {
 
     componentDidMount() {
         this.loadNode(this.props)
 
-        threeSixtyPlayer.init()
+        // threeSixtyPlayer.init()
     }
 
     componentWillReceiveProps(nextProps) {
@@ -44,20 +41,19 @@ export default class Badge extends Component {
         const {pydio, node} = props
 
         this.setState({
-            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&badge=true',
+            path: node.getPath(),
+            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())),
             mimeType: "audio/" + node.getAjxpMime()
         })
     }
 
     render() {
-        const {mimeType, url} = this.state || {}
+        const {mimeType, path, url} = this.state || {}
 
         if (!url) return null
 
         return (
-            <Player rich={false} style={{width: 40, height: 40, margin: "auto"}} onReady={() => {}}>
-                <a type={mimeType} href={url} />
-            </Player>
+            <Player id={path} autoPlay={true} url={url} rich={false} style={{width: 40, height: 40}} onReady={() => {}} />
         );
     }
 }

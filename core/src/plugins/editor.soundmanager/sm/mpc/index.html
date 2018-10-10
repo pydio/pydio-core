@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>SoundManager 2: A Javascript Sound API - MPC Demo</title>
+<meta name="description" content="An example drum machine (MPC) demo using the SoundManager 2 JavaScript Audio API" />
+<meta name="keywords" content="javascript mpc, javascript drum machine, javascript sound, javascript audio, DHTML sound, work by Scott Schiller, schillmania, javascript to flash communication" />
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+<link rel="stylesheet" href="css/mpc.css" media="screen" />
+<!-- soundManager.useFlashBlock: related CSS -->
+<link rel="stylesheet" type="text/css" href="../flashblock/flashblock.css" />
+<script type="text/javascript" src="../../script/soundmanager2.js"></script>
+<script type="text/javascript" src="script/mpc.js"></script>
+</head>
+<body>
+
+<div id="background"></div>
+
+<div id="site">
+
+ <h1 style="margin-bottom:0px"><a href="../" style="color:#99ccff;text-decoration:none">SoundManager 2</a>: Javascript Drum Machine Demo<span id="isHTML5"></span></h1>
+ <h2 style="margin-top:0px;color:#999">Trigger the pads to play different sounds.</h2>
+ <p id="mpc-debug" class="note">View <a href="#debug=1" onclick="window.location.hash='debug=1';window.location.reload()">with debug output</a></p>
+ <p class="note">Photo: <a href="http://www.flickr.com/photos/schill/191496680/">MPC 2500</a> by .schill on Flickr</a></p>
+ <p class="note"><span style="display:none">(If supported): </span><span id="isHTML5">Your browser is cool and is using 100% HTML5 Audio. Look ma, no Flash!</span></p>
+</div>
+
+<div id="mpc">
+
+ <div id="wrapper">
+
+  <ul>
+   <li id="btn-s0" onmousedown="soundManager.play('s0')">1<div></div></li>
+   <li id="btn-s1" onmousedown="soundManager.play('s1')">2<div></div></li>
+   <li id="btn-s2" onmousedown="soundManager.play('s2')">3<div></div></li>
+   <li id="btn-s3" onmousedown="soundManager.play('s3')">4<div></div></li>
+  </ul>
+
+  <ul>
+   <li id="btn-s4" onmousedown="soundManager.play('s4')">q<div></div></li>
+   <li id="btn-s5" onmousedown="soundManager.play('s5')">w<div></div></li>
+   <li id="btn-s6" onmousedown="soundManager.play('s6')">e<div></div></li>
+   <li id="btn-s7" onmousedown="soundManager.play('s7')">r<div></div></li>
+  </ul>
+
+  <ul>
+   <li id="btn-s8" onmousedown="soundManager.play('s8')">a<div></div></li>
+   <li id="btn-s9" onmousedown="soundManager.play('s9')">s<div></div></li>
+   <li id="btn-s10" onmousedown="soundManager.play('s10')">d<div></div></li>
+   <li id="btn-s11" onmousedown="soundManager.play('s11')">f<div></div></li>
+  </ul>
+
+  <ul>
+   <li id="btn-s12" onmousedown="soundManager.play('s12')">z<div></div></li>
+   <li id="btn-s13" onmousedown="soundManager.play('s13')">x<div></div></li>
+   <li id="btn-s14" onmousedown="soundManager.play('s14')">c<div></div></li>
+   <li id="btn-s15" onmousedown="soundManager.play('s15')">v<div></div></li>
+  </ul>
+
+  <div class="clear"></div>
+
+  </div>
+
+</div>
+
+  <script type="text/javascript">if (window.location.href.toString().match(/debug/i)) { document.getElementById('mpc-debug').style.display = 'none'; }</script>
+
+</div>
+
+</body>
+</html>

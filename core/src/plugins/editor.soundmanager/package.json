@@ -16,7 +16,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-browserify": "~4.0.1",
     "react": "15.4.2",
-    "react-dom":"15.4.2",
-    "soundmanager2": "2.97.20150601-a"
+    "react-dom": "15.4.2",
+    "soundmanager2": "2.97.20170602"
   }
 }

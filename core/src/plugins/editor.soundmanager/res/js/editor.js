@@ -45,36 +45,28 @@ class Editor extends Component {
             }
         }
     }
-    componentDidMount() {
-        this.loadNode(this.props)
-    }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.node !== this.props.node) {
-            this.loadNode(nextProps)
+        const sound = soundManager.getSoundById(nextProps.node.getPath())
+
+        if (sound && this.props.node.getPath() !== nextProps.node.getPath()) {
+            soundManager.soundIDs.map((soundID) => soundManager.sounds[soundID].stop())
+        }
+
+        if (sound)  {
+            if (nextProps.selectionPlaying) {
+                sound.play()
+            } else {
+                sound.pause()
+            }
         }
     }
 
-    loadNode(props) {
-        const {pydio, node} = props
-
-        this.setState({
-            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())),
-            mimeType: "audio/" + node.getAjxpMime()
-        })
-    }
-
     render() {
-        const {mimeType, url} = this.state || {}
 
-        if (!url) return null
 
         return (
             <div style={Editor.styles.container}>
-                <Player style={Editor.styles.player} autoPlay={true} rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
-                    <a type={mimeType} href={url} />
-                </Player>
-
                 <Table
                     style={Editor.styles.table}
                     selectable={true}
@@ -84,12 +76,15 @@ class Editor extends Component {
                         displayRowCheckbox={false}
                         stripedRows={false}
                     >
-                    {this.props.selection && this.props.selection.selection.map( (node, index) => (
-                            <TableRow key={index}>
-                                <TableRowColumn>{index}</TableRowColumn>
-                                <TableRowColumn>{node.getLabel()}</TableRowColumn>
-                            </TableRow>
-                    ))}
+                    {this.props.selection && this.props.selection.selection.map( (node, index) => {
+
+                            return (
+                                <TableRow key={index}>
+                                    <TableRowColumn>{index + 1}</TableRowColumn>
+                                    <TableRowColumn>{node.getLabel()}</TableRowColumn>
+                                </TableRow>
+                            )
+                    })}
                     </TableBody>
                 </Table>
             </div>
@@ -109,11 +104,6 @@ function s4() {
 
 const {withSelection, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-// let ExtendedPlayer = compose(
-//     withMenu,
-//     withErrors
-// )(props => <Player {...props} />)
-
 const editors = pydio.Registry.getActiveExtensionByType("editor")
 const conf = editors.filter(({id}) => id === 'editor.soundmanager')[0]
 
@@ -130,6 +120,17 @@ const getSelection = (node) => new Promise((resolve, reject) => {
         currentIndex: selection.reduce((currentIndex, current, index) => current === node && index || currentIndex, 0)
     })
 })
+
+const getTime = function(nMSec,bAsString) {
+
+  // convert milliseconds to mm:ss, return as object literal or string
+  var nSec = Math.floor(nMSec/1000),
+      min = Math.floor(nSec/60),
+      sec = nSec-(min*60);
+  // if (min === 0 && sec === 0) return null; // return 0:00 as null
+  return (bAsString?(min+':'+(sec<10?'0'+sec:sec)):{'min':min,'sec':sec});
+
+};
 
 export default compose(
     withSelection(getSelection),

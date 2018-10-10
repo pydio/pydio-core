@@ -39,20 +39,19 @@ export default class Preview extends Component {
         const {pydio, node} = props
 
         this.setState({
-            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&panel=true',
+            path: node.getPath(),
+            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())),
             mimeType: "audio/" + node.getAjxpMime()
         })
     }
 
     render() {
-        const {mimeType, url} = this.state || {}
+        const {mimeType, path, url} = this.state || {}
 
         if (!url) return null
 
         return (
-            <Player rich={true} style={{width: "auto", height: "auto"}} onReady={this.props.onLoad}>
-                <a type={mimeType} href={url} />
-            </Player>
+            <Player id={path} url={url} rich={true} style={{width: "auto", height: "auto"}} onReady={this.props.onLoad} />
         );
     }
 }

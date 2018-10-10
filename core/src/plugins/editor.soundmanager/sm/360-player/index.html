@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>360&deg; MP3 player UI demo (SoundManager 2)</title>
+<meta name="description" content="Javascript-driven sound, canvas-based MP3 player UI demo: 360-degree circular control / jog wheel example for playing MP3 links using SoundManager 2, Javascript and Canvas.">
+
+<!-- required -->
+<link rel="stylesheet" type="text/css" href="360player.css" />
+
+<!-- special IE-only canvas fix -->
+<!--[if IE]><script type="text/javascript" src="script/excanvas.js"></script><![endif]-->
+
+<!-- Apache-licensed animation library -->
+<script type="text/javascript" src="script/berniecode-animator.js"></script>
+
+<!-- the core stuff -->
+<script type="text/javascript" src="../../script/soundmanager2.js"></script>
+<script type="text/javascript" src="script/360player.js"></script>
+
+<script type="text/javascript">
+soundManager.setup({
+  // path to directory containing SM2 SWF
+  url: '../../swf/'
+});
+</script>
+
+<!-- stuff you don't need -->
+<!-- makes the fonts nicer etc. -->
+<link rel="stylesheet" type="text/css" href="../index.css" />
+<link rel="stylesheet" type="text/css" href="demo.css" />
+
+<!-- soundManager.useFlashBlock: related CSS -->
+<link rel="stylesheet" type="text/css" href="../flashblock/flashblock.css" />
+
+<style type="text/css">
+
+/* Demo page, general layout */
+
+body {
+ background-image: none;
+}
+
+#left {
+ position:relative;
+ width:950px;
+ max-width:100%;
+}
+
+#left h2 {
+ padding-top:0px;
+ margin-bottom:0.25em;
+ color:#666;
+}
+
+pre.block {
+ margin-top:0.5em;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="left">
+
+ 	<h1><a href="http://www.schillmania.com/projects/soundmanager2/" title="Javascript MP3 player project home">SoundManager 2</a> / <a href="http://schillmania.com/projects/soundmanager2/demo/360-player/">360&deg; Player</a>: JavaScript + Canvas UI</h1>
+
+ <p class="note" style="color:#666;margin-top:0.5em;margin-bottom:0.5em">Canvas-based UI. Load progress, seek, play/pause etc. Also see <a href="canvas-visualization.html" title="Javascript canvas visualization with waveform/eq data">360&deg; UI visualization</a> demo.</p>
+
+<div id="sm2-container">
+ <!-- flash movie is added here -->
+</div>
+
+<div style="margin-top:1.25em">
+
+	<div style="float:left;display:inline;min-width:200px"> <!-- float is just for this demo layout, you don't need it. -->
+ 
+	 <div class="ui360" style="margin-top:-0.55em"><a href="../_mp3/rain.mp3">Rain</a></div>
+
+	 <div class="ui360"><a href="http://freshly-ground.com/data/audio/mpc/20090119%20-%20Untitled%20Groove.mp3">20090119 - Untitled Groove</a></div>
+
+	</div>
+
+
+	<div style="float:left;display:inline;margin-left:40px;border-left:1px solid #ccc;padding-left:30px;width:150px">
+
+	 <div class="sm2-inline-list" style="margin-bottom:10px"> <!-- note the CSS class, changes the layout -->
+
+	  <div class="ui360"><a href="http://www.freshly-ground.com/data/audio/binaural/Mak.mp3">Angry cow sound?</a></div>
+	  <div class="ui360"><a href="http://www.freshly-ground.com/data/audio/binaural/Things that open, close and roll.mp3">Things that open, close and roll</a></div>
+	  <div class="ui360"><a href="http://www.freshly-ground.com/misc/music/20060826%20-%20Armstrong.mp3">20060826 - Armstrong</a></div>
+
+	 </div>
+
+	</div>
+
+</div>
+
+<div style="clear:both"></div>
+
+	
+ <h3>How This Works</h3>
+
+ <p>The script looks for a container element matching <code>div.<span>ui360</span></code>, and then the first link inside of it.</p>
+
+ <div>
+	
+<pre class="block"><code>&lt;div class="<span>ui360</span>"&gt;
+ &lt;a href="/path/to/an.mp3"&gt;play "an.mp3"&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+  
+ </div>
+
+ <p>When the 360 player script loads, it adds a <code>UI</code> template to the block, prepending it in front of the MP3 link:</p>
+
+<pre class="block"><code>&lt;div class="<span>ui360</span>"&gt;
+ <span><span>&lt;-- dynamically-inserted block --&gt;</span></span>
+ &lt;div class="<span>ui</span>"&gt;
+  &lt;canvas class="<span>sm2-canvas</span>"&gt;&lt;/canvas&gt;
+  &lt;span class="<span>sm2-360btn</span>"&gt;&lt;/span&gt; 
+  &lt;div class="<span>sm2-timing</span>"&gt;&lt;/div&gt;
+  &lt;div class="<span>sm2-cover</span>"&gt;&lt;/div&gt;
+ &lt;/div&gt;
+ <span><span>&lt;-- /UI --&gt;</span></span>
+ &lt;a href="<span>/path/to/an.mp3</span>"&gt;
+&lt;/div&gt;</code></pre>
+
+<h3>Customizing the UI</h3>
+
+<p>The player's default 50x50-pixel canvas is defined both within JavaScript and CSS. For an example with different values, see this <a href="canvas-visualization.html" title="360&deg; UI: larger version">larger version</a>.</p>
+
+<pre class="block"><code>threeSixtyPlayer.config = {
+  playNext: <span>false</span>, <span><span>// stop after one sound, or play through list until end</span></span>
+  autoPlay: <span>false</span>, <span><span>// start playing the first sound right away</span></span>
+  allowMultiple: <span>true</span>, <span><span>// let many sounds play at once (false = one at a time)</span></span>
+  loadRingColor: <span>'#ccc',</span> <span><span>// amount of sound which has loaded</span></span>
+  playRingColor: <span>'#000'</span>, <span><span>// amount of sound which has played</span></span>
+  backgroundRingColor: <span>'#eee', </span><span><span>// "default" color shown underneath everything else</span></span>
+  animDuration: <span>500</span>,
+  animTransition: <span>Animator.tx.bouncy</span> <span><span>// http://www.berniecode.com/writing/animator.html</span></span>
+}</code></pre>
+
+<p>The CSS for the canvas UI block is a bit ugly, but JavaScript reads the width of the <code>.sm2-360ui</code> element in the DOM as set by CSS and uses that to later draw and update the canvas element while playing.</p>
+
+<pre class="block"><code>.ui360,
+.sm2-360ui {
+  <span><span>/* size of the container for the circle, etc. */</span></span>
+  width:<span>50px</span>;
+  height:<span>50px</span>;
+}
+</code></pre>
+
+<h3>Third-party Components</h3>
+
+<p>This demo includes use of <a href="http://www.berniecode.com/writing/animator.html">Bernie's Better Animation Class</a> (Apache licensed) for some animation effects.</p>
+<p>Also, some loader/spinner icons from <a href="http://ajaxload.info">ajaxload.info</a> are used for showing loading/buffering states.</p>
+
+<hr />
+
+ <p>
+  <a href="http://www.schillmania.com/projects/soundmanager2/" title="SoundManager 2 home">SoundManager 2 project page</a> (not an MP3 link)
+ </p>
+
+
+</div>
+
+</body>
+</html>
