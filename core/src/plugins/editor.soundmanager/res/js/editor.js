@@ -64,26 +64,30 @@ class Editor extends Component {
 
     render() {
 
+        const {node, selectionPlaying, selection} = this.props;
 
         return (
             <div style={Editor.styles.container}>
                 <Table
                     style={Editor.styles.table}
-                    selectable={true}
-                    multiSelectable={true}
+                    selectable={false}
                 >
                     <TableBody
                         displayRowCheckbox={false}
                         stripedRows={false}
+                        deselectOnClickaway={false}
                     >
-                    {this.props.selection && this.props.selection.selection.map( (node, index) => {
-
-                            return (
-                                <TableRow key={index}>
-                                    <TableRowColumn>{index + 1}</TableRowColumn>
-                                    <TableRowColumn>{node.getLabel()}</TableRowColumn>
-                                </TableRow>
-                            )
+                    {selection && selection.selection.map( (n, index) => {
+                        let leftCol = index + 1;
+                        if(selectionPlaying && node && (n.getPath() === node.getPath())){
+                            leftCol = <span className={"mdi mdi-play"}/>;
+                        }
+                        return (
+                            <TableRow key={index}>
+                                <TableRowColumn style={{width:60, textAlign:'center', paddingRight:0}}>{leftCol}</TableRowColumn>
+                                <TableRowColumn>{n.getLabel()}</TableRowColumn>
+                            </TableRow>
+                        )
                     })}
                     </TableBody>
                 </Table>
