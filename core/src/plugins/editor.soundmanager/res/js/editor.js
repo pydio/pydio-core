@@ -22,8 +22,16 @@ import React, {Component} from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import {Paper, Table, TableBody, TableRow, TableRowColumn } from 'material-ui'
+import Player from './Player'
+import HasherUtils from 'pydio/util/hasher'
 
 class Editor extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {showPlayer: true};
+    }
+
 
     static get styles() {
         return {
@@ -72,6 +80,9 @@ class Editor extends Component {
 
                 }
             })
+            this.setState({showPlayer: false}, () => {
+                this.setState({showPlayer: true});
+            });
         }
 
         if (sound)  {
@@ -93,9 +104,42 @@ class Editor extends Component {
     render() {
 
         const {node, selectionPlaying, selection, onRequestSelectionPlay} = this.props;
+        const {showPlayer} = this.state;
+        console.log(selection, showPlayer);
+        let url, crtIndex = 0;
+        if(selection && showPlayer && node){
+            url = pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath()));
+            selection.selection.forEach((n, i) => {
+                if (n.getPath() === node.getPath()){
+                    crtIndex = i;
+                }
+            })
+        }
 
         return (
             <div style={Editor.styles.container}>
+                {url &&
+                    <Player
+                        id={node.getPath()}
+                        url={url}
+                        rich={true}
+                        style={{width: 250, height: 200, margin: "auto"}}
+                        onReady={() => {}}
+                        onPlay={()=>{
+                            onRequestSelectionPlay(null, crtIndex, true);
+                        }}
+                        onPause={()=>{
+                            onRequestSelectionPlay(null, crtIndex, false);
+                        }}
+                        disableAutoPlay={true}
+                        onFinish={() => {
+                            // Handle autoPlay here
+                            if(selection && selection.selection && selection.selection[crtIndex+1]){
+                                onRequestSelectionPlay(null, crtIndex+1, true);
+                            }
+                        }}
+                    />
+                }
                 <Paper zDepth={1} style={Editor.styles.paper}>
                 <Table
                     style={Editor.styles.table}

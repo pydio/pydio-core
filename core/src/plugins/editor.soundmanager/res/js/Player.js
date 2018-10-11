@@ -91,12 +91,14 @@ class Player extends React.Component {
                 whileplaying: () => soundObserver.whileplaying(id)
             })
 
-            // Adding autoplay, listening to previous sound finish events
-            const previousSoundID = soundManager.soundIDs.indexOf(id) - 1
-            if (previousSoundID > -1) {
-                soundObserver.observe("soundfinish" + soundManager.soundIDs[previousSoundID], () => {
-                    soundManager.getSoundById(id).play()
-                })
+            if(!this.props.disableAutoPlay){
+                // Adding autoplay, listening to previous sound finish events
+                const previousSoundID = soundManager.soundIDs.indexOf(id) - 1
+                if (previousSoundID > -1) {
+                    soundObserver.observe("soundfinish" + soundManager.soundIDs[previousSoundID], () => {
+                        soundManager.getSoundById(id).play()
+                    })
+                }
             }
         })
 
@@ -105,10 +107,21 @@ class Player extends React.Component {
         oCanvasCTX.translate(parseInt(style.width / 2), parseInt(style.height / 2));
         oCanvasCTX.rotate(deg2rad(-90))
 
-        soundObserver.observe("soundplay" + id, () => this.setState({status: STATUS_PLAYING}))
-        soundObserver.observe("soundpause" + id, () => this.setState({status: STATUS_PAUSED}))
-        soundObserver.observe("soundbuffering" + id, () => this.setState({status: STATUS_BUFFERING}))
-        soundObserver.observe("soundresume" + id, () => this.setState({status: STATUS_PLAYING}))
+        soundObserver.observe("soundplay" + id, () => {
+            this.setState({status: STATUS_PLAYING});
+            if(this.props.onPlay) this.props.onPlay();
+        })
+        soundObserver.observe("soundpause" + id, () => {
+            this.setState({status: STATUS_PAUSED});
+            if(this.props.onPause) this.props.onPause();
+        })
+        soundObserver.observe("soundbuffering" + id, () => {
+            this.setState({status: STATUS_BUFFERING});
+        })
+        soundObserver.observe("soundresume" + id, () => {
+            this.setState({status: STATUS_PLAYING});
+            if(this.props.onPlay) this.props.onPlay();
+        })
         soundObserver.observe("soundstop" + id, () => {
             clearCanvas(this.canvas)
             this.setState({status: STATUS_DEFAULT})
@@ -146,7 +159,7 @@ class Player extends React.Component {
 
         // Making sure the status is correct if sound is already playing
         const sound = soundManager.getSoundById(id)
-        if (sound && sound.playState == 1) {
+        if (sound && sound.playState === 1) {
             if (sound.paused) {
                 this.setState({
                     status: STATUS_PAUSED
