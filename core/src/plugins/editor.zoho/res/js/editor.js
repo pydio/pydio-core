@@ -26,7 +26,7 @@ import { compose } from 'redux'
 
 let Viewer = ({url, style}) => {
     return (
-        <iframe src={url} style={{...style, height: "100%", border: 0, flex: 1}} className="vertical_fit"></iframe>
+        <iframe src={url} style={{...style, height: "100%", width: "100%", border: 0, flex: 1}} className="vertical_fit"></iframe>
     );
 };
 
