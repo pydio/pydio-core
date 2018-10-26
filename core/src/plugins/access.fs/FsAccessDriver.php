@@ -2443,6 +2443,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             // test permission on all files before adding to zip
             $topUrl = $selection->currentBaseUrl();
             $realPath = MetaStreamWrapper::getRealFSReference($topUrl);
+            $realPath = str_replace(DIRECTORY_SEPARATOR, '/', $realPath);
             $newNode = new AJXP_Node(str_replace($realPath, $topUrl, $search));
             $newNode->setUserId($ctx->getUser()->getId());
             $isAccessible = $this->isReadable($newNode) || $this->isWriteable($newNode);
