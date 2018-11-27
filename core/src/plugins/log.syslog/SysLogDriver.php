@@ -82,7 +82,7 @@ class SysLogDriver extends TextLogDriver
     public function open()
     {
         $this->fileHandle = openlog($this->signature, LOG_ODELAY | LOG_PID, LOG_LOCAL0);
-        if ($this->fileHandle !== false && count($this->stack)) {
+        if ($this->fileHandle !== false && is_array($this->stack) && count($this->stack)) {
             $this->stackFlush();
         }
     }
