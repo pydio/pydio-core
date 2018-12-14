@@ -40,6 +40,7 @@ use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\InputFilter;
@@ -623,11 +624,73 @@ class UsersManager extends AbstractManager
 
                 break;
 
+            case "export_acl_list":
+                // Action exports a list of user with permission on all workspaces
+                if ($loggedUser->isAdmin()) {
+                    $basePath = isset($httpVars["groupPath"])? $httpVars["groupPath"] : '/';
+                    if (empty($basePath)) {
+                        $basePath = '/';
+                    }
+                    else{
+                        $basePath = '/'.ltrim($basePath,'/');
+                    }
+
+                    $users = UsersService::listUsers($basePath, null, -1, -1, false, true, null, null);
+                    $userAcl = [];
+
+                    $repositories = RepositoryService::listAllRepositories();
+                    $repoOut = array();
+
+                    if ($httpVars['format'] === 'csv'){
+                        $csvStr = '';
+                        foreach ($repositories as $repoObject) {
+                            $repoOut[$repoObject->getId()] = $repoObject->getSlug() . '[' . $repoObject->getDisplay() . ']';
+                            $colname = $repoOut[$repoObject->getId()];
+                            if ($repoOut[$repoObject->getId()] === ""){
+                                $colname = $repoObject->getId();
+                            }
+                            $csvStr .= ','.$colname;
+                        }
+                        $csvStr = $csvStr."\r\n";
+                        foreach ($users as $key => $user) {
+                            $strRight = $key.',';
+                            $tempUser = [];
+                            $acls = $user->getMergedRole()->listAcls();
+                            $slugAcls = [];
+                            foreach ($repoOut as $repoId => $value) {
+                                if (isset($acls[$repoId]) && ($acls[$repoId] !== '') && ($acls[$repoId] !== 'AJXP_VALUE_CLEAR')){
+                                    $strRight .= ','.$acls[$repoId].',';
+                                }else {
+                                    $strRight .= ',,';
+                                }
+                            }
+                            $strRight = trim($strRight, ',')."\r\n";
+                            $csvStr .= $strRight;
+                        }
+                        print($csvStr);
+
+                    }else {
+                        foreach ($repositories as $repoObject) {
+                            $repoOut[$repoObject->getId()] = $repoObject->getSlug() . '[' . $repoObject->getDisplay() . ']';
+                        }
+                        foreach ($users as $key => $user) {
+                            $tempUser = [];
+                            $acls = $user->getMergedRole()->listAcls();
+                            $slugAcls = [];
+                            foreach ($acls as $repoId => $value) {
+                                $idName = $repoOut[$repoId];
+                                if (empty($idName)) $idName = $repoId;
+                                $slugAcls[$idName] = $value;
+                            }
+                            $tempUser[$key] = $slugAcls;
+                            $userAcl[] = $tempUser;
+                        }
+                        $responseInterface = $responseInterface->withBody(new SerializableResponseStream($userAcl));
+                    }
+                }
             default:
                 break;
-
         }
-
         return $responseInterface;
     }
 

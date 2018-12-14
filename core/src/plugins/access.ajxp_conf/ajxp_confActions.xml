@@ -254,6 +254,13 @@
                 <serverCallback methodName="usersAction"/>
             </processing>
         </action>
+
+        <action name="export_acl_list">
+            <processing>
+                <serverCallback methodName="usersAction" restParams="/groupPath" />
+            </processing>
+        </action>
+
         <action name="admin_search_users">
             <processing>
                 <serverCallback methodName="searchUsersAction" restParams="/query/dir+" developerComment="Remote search implementation, currently only supporting users search."/>
