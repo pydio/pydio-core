@@ -654,9 +654,7 @@ class UsersManager extends AbstractManager
                         $csvStr = $csvStr."\r\n";
                         foreach ($users as $key => $user) {
                             $strRight = $key.',';
-                            $tempUser = [];
                             $acls = $user->getMergedRole()->listAcls();
-                            $slugAcls = [];
                             foreach ($repoOut as $repoId => $value) {
                                 if (isset($acls[$repoId]) && ($acls[$repoId] !== '') && ($acls[$repoId] !== 'AJXP_VALUE_CLEAR')){
                                     $strRight .= ','.$acls[$repoId].',';
