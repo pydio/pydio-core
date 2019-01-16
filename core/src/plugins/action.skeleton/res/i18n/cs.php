@@ -18,11 +18,15 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 $mess = array(
-    // will be replaced by the application title
-    "1" => "Vytváří se archiv, chvíli strpení",
-    "2" => "Znovu načíst aktuální adresář",
-    "3" => "Stahování archivu by mělo začít automaticky",
-    "4" => "Vytváří se archiv - %s%",
-    "5" => "nemohu nalézt odpovídající archiv ke stažení. Jste si jisti že jste nainstalovali Zip binary na Váš server?",
+    "1" => "Externí odkaz",
+    "2" => "Odkaz přidán pomocí action.skeleton pluginu",
+    "3" => "Jste si jist že chcete otevřít  %s v novém okně?",
+    "4" => "Modal Link",
+    "5" => "Otevři odkaz v překryvném okně",
+    "6" => "Dynamický obsah",
+    "7" => "Načítám obsah, prosím vyčkejte...",
 );

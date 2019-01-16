@@ -18,11 +18,10 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-$mess = array(
-    // will be replaced by the application title
-    "1" => "Vytváří se archiv, chvíli strpení",
-    "2" => "Znovu načíst aktuální adresář",
-    "3" => "Stahování archivu by mělo začít automaticky",
-    "4" => "Vytváří se archiv - %s%",
-    "5" => "nemohu nalézt odpovídající archiv ke stažení. Jste si jisti že jste nainstalovali Zip binary na Váš server?",
+$mess=array(
+    "1" => "Office dokumenty",
+    "2" => "Náhled a editování kancelářských dokumentů online",
+    "3" => "Word dokument",
+    "4" => "Dokument prezentace",
+    "5" => "Dokument tabulek",
 );

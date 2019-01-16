@@ -18,11 +18,16 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
 $mess = array(
-    // will be replaced by the application title
-    "1" => "Vytváří se archiv, chvíli strpení",
-    "2" => "Znovu načíst aktuální adresář",
-    "3" => "Stahování archivu by mělo začít automaticky",
-    "4" => "Vytváří se archiv - %s%",
-    "5" => "nemohu nalézt odpovídající archiv ke stažení. Jste si jisti že jste nainstalovali Zip binary na Váš server?",
+    "1" => "Obsah indexu",
+    "2" => "Indexuj obsah složky",
+    "3" => "Běh indexace na pozadí",
+    "4" => "Index se zdá být uzamčen, indexační proces pravděpodobně probíhá. Pokud ne, prosíme odstraňte .ajxp_lock soubor umístěný v cache/indexes.",
+    "5" => "Indexace dokončena",
+    "6" => "Pracovní pocha je aktuálně indexována, prosíme zkuste znovu později. Pro vynucené manuální spuštění reindexace, odstraňte .ajxp_lock soubor umístěný v data/cache/indexes.",
+    "7" => "První indexování této pracovní plochy, prosíme počkejte a zkuste znovu vyhledávání",
+    "8" => "Indexování %s na pozadí",
+    "9" => "Nemohu nalézt index pro aktuální pracovní plochu! Nejprve by jste měli spustit indexaci dat!",
+    "10" => "Indexování podsložek na pozadí",
 );
