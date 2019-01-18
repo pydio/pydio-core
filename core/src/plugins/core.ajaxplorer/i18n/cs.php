@@ -728,6 +728,7 @@ $mess=array(
 "628" => "Vrátit",
 "629" => "Prozatím žádné záznamy",
 "630" => "Složky sdílené se mnou",
-"631" => "Upozornění, snažíte se obnovit soubor jehož název se shoduje s již existujícím souborem (%s). Prosím přejmenujte soubor ručně a poté dokončete obnovu souboru z koše!"
-"632" => "Upozornění, snažíte se obnovit složku jejíž název se shoduje s již existující složkou (%s). Prosím přejmenujte složku ručně a poté dokončete obnovu složky z koše!"
+"631" => "Upozornění, snažíte se obnovit soubor jehož název se shoduje s již existujícím souborem (%s). Prosím přejmenujte soubor ručně a poté dokončete obnovu souboru z koše!",
+"632" => "Upozornění, snažíte se obnovit složku jejíž název se shoduje s již existující složkou (%s). Prosím přejmenujte složku ručně a poté dokončete obnovu složky z koše!",
+/* END SENTENCE */
 );
