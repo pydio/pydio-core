@@ -101,7 +101,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
      */
     public function indexationEnds($parentNode, $success){
         if($success && $this->currentIndex) {
-            $this->currentIndex->optimize();
+            $this->currentIndex->forcemerge();
         }
     }
 
