@@ -175,7 +175,7 @@ class TextLogDriver extends AbstractLogDriver
 
         if ($this->fileHandle !== false) {
             if (count($this->stack)) $this->stackFlush();
-            if (fwrite($this->fileHandle, $textMessage) === false) {
+            if (@fwrite($this->fileHandle, $textMessage) === false) {
                 throw new Exception("There was an error writing to log file ($this->logFileName)");
             }
         } else {
