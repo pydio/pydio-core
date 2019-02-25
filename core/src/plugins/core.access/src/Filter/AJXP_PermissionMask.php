@@ -131,7 +131,8 @@ class AJXP_PermissionMask implements \JsonSerializable, \Serializable
     function match($test, $permission){
         // Check if a path has the given permission
         $pathes = $this->flattenTree();
-
+        if (is_array($pathes) && !count($pathes)) return true;
+        
         if(empty($test) || $test == "/" || $test == "/." || $test == "/..") {
             if(!count($pathes)) return true;
             if(isSet($pathes["/"])) {
