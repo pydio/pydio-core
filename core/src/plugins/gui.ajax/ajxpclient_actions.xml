@@ -14,6 +14,7 @@
 			</processing>
 		</action>
 		<action name="display_doc">
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
 			<processing>
 				<serverCallback methodName="switchAction" restParams="/doc_file" developerComment="Load a doc file">
                     <input_param name="doc_file" type="string" description="Text file base name (without extension) located inside the doc folder."/>

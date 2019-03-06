@@ -487,7 +487,7 @@ class RichClient extends Plugin
         if($instance === false) return null;
         $confs = $instance->getConfigs();
         $instance->defineThemeConstants($confs);
-        $value = str_replace(array("AJXP_CLIENT_RESOURCES_FOLDER", "AJXP_CURRENT_VERSION"), array(CLIENT_RESOURCES_FOLDER, AJXP_VERSION), $value);
+        $value = str_replace(array("AJXP_CLIENT_RESOURCES_FOLDER", "AJXP_CURRENT_VERSION"), array(CLIENT_RESOURCES_FOLDER, self::createVersionUuid()), $value);
         if (SessionService::has('PYDIO-SERVER-URI-PREFIX')) {
             $value = str_replace("AJXP_THEME_FOLDER", SessionService::fetch('PYDIO-SERVER-URI-PREFIX').AJXP_THEME_FOLDER, $value);
             $value = str_replace("AJXP_IMAGES_FOLDER", SessionService::fetch('PYDIO-SERVER-URI-PREFIX').AJXP_IMAGES_FOLDER, $value);
@@ -514,6 +514,18 @@ class RichClient extends Plugin
             define("AJXP_IMAGES_FOLDER", $imagesFolder);
         }else{
             define("AJXP_IMAGES_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/common/images");
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private static function createVersionUuid(){
+        if (AJXP_VERSION !== "##VERSION_NUMBER##") {
+            $uuid = PluginsService::getInstance(Context::emptyContext())->getPluginById("boot.conf")->getServerUuid();
+            return md5(AJXP_VERSION . $uuid);
+        } else {
+            return AJXP_VERSION;
         }
     }
 
@@ -566,8 +578,7 @@ class RichClient extends Plugin
         $config["client_timeout_warning"] = floatval($this->getContextualOption($ctx, "CLIENT_TIMEOUT_WARN"));
         $config["availableLanguages"] = LocaleService::listAvailableLanguages();
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
-        $config["ajxpVersion"] = AJXP_VERSION;
-        $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
+        $config["ajxpVersion"] = self::createVersionUuid();
         $analytic = $this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_ID');
         if (!empty($analytic)) {
             $config["googleAnalyticsData"] = array(

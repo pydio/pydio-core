@@ -112,6 +112,16 @@ class UpdateController extends Plugin
 
                 break;
 
+            case "get_version_info":
+
+                header("Content-type: application/json");
+                $data = new \stdClass();
+                $data->version = AJXP_VERSION;
+                $data->versionDate = AJXP_VERSION_DATE;
+                print json_encode($data);
+
+                break;
+
             case "display_upgrade_note":
 
                 //$url = $httpVars["url"];

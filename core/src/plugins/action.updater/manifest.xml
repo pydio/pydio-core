@@ -24,6 +24,13 @@
                     </serverCallback>
                 </processing>
             </action>
+            <action name="get_version_info">
+                <processing>
+                    <serverCallback methodName="switchAction" restParams="/" developerComment="Get version information (authenticated only).">
+                        <output type="JSON" description="Version information"/>
+                    </serverCallback>
+                </processing>
+            </action>
             <action name="display_upgrade_note">
                 <processing>
                     <serverCallback methodName="switchAction" restParams="/" developerComment="Display upgrade note"/>

@@ -28,11 +28,20 @@ const UpdaterDashboard = React.createClass({
 
 
     getInitialState: function(){
-        return {checks: -1};
+        return {checks: -1, version:'...', versionDate:''};
     },
 
     componentDidMount:function(){
         this.checkForUpgrade();
+        this.checkCurrentVersion();
+    },
+
+    checkCurrentVersion(){
+        PydioApi.getClient().request({get_action:'get_version_info'}, (transp)=>{
+            if(transp.responseJSON){
+                this.setState(transp.responseJSON);
+            }
+        });
     },
 
     checkForUpgrade: function(){
@@ -123,12 +132,12 @@ const UpdaterDashboard = React.createClass({
                 ></iframe>
             </div>
         );
-        let version = pydio.Parameters.get("ajxpVersion");
+        const {version, versionDate} = this.state;
         let additionalDescription;
-        if(version == '##VERSION_NUMBER##'){
+        if(version === '##VERSION_NUMBER##'){
             additionalDescription = this.context.getMessage('21', 'updater');
-        }else{
-            additionalDescription = this.context.getMessage('22', 'updater').replace('%1', version).replace('%2', pydio.Parameters.get("ajxpVersionDate"));
+        }else if (version !== '...') {
+            additionalDescription = this.context.getMessage('22', 'updater').replace('%1', version).replace('%2', versionDate);
         }
         return (
             <div className="update-checker" style={{height:'100%'}}>
