@@ -40,11 +40,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class VideoReader extends Plugin
 {
     /**
-     * @param $action
-     * @param $httpVars
-     * @param $filesVars
-     * @param \Pydio\Core\Model\ContextInterface $contextInterface
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @throws FileNotFoundException
+     * @throws \Pydio\Core\Exception\PydioException
      */
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
@@ -137,9 +136,6 @@ class VideoReader extends Plugin
                 fclose($stream);
             }
             Controller::applyHook("node.read", array($node));
-        } else if ($action == "get_sess_id") {
-            $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
-            $responseInterface->getBody()->write(session_id());
         }
     }
 

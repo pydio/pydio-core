@@ -68,21 +68,8 @@ class Viewer extends React.Component {
     loadNode(props) {
         const {pydio, node} = props
 
-        this.getSessionId().then((sessionId) => this.setState({
-            url: pydio.Parameters.get('ajxpServerAccess') + '&ajxp_sessid=' + sessionId + '&get_action=read_video_data&file=' + encodeURIComponent(node.getPath())
-        }));
-    }
-
-    // Util functions
-    getSessionId() {
-        const {pydio} = this.props
-
-        return new Promise((resolve, reject) => {
-            pydio.ApiClient.request({
-                get_action: 'get_sess_id'
-            }, function(transport) {
-                resolve(transport.responseText)
-            })
+        this.setState({
+            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=read_video_data&file=' + encodeURIComponent(node.getPath())
         });
     }
 

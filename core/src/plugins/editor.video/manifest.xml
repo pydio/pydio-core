@@ -24,18 +24,7 @@
 					</serverCallback>
 				</processing>
 			</action>
-			<action name="get_sess_id">
-				<processing>
-					<serverCallback methodName="switchAction"/>
-				</processing>
-			</action>
 		</actions>
-        <!--
-        Sample hook for registering pre-encoded alternative versions of the videos. Still experimental.
-        <hooks>
-            <serverCallback methodName="videoAlternateVersions" hookName="node.info"/>
-        </hooks>
-        -->
 	</registry_contributions>
 	<dependencies>
 		<!-- Stream Wrapper must be implemented -->
