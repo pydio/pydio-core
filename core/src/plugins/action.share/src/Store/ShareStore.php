@@ -166,47 +166,13 @@ class ShareStore {
      */
     public function loadShare($hash){
 
-        $dlFolder = $this->legacyPublicFolder;
-        $file = $dlFolder."/".$hash.".php";
-        if(!is_file($file)) {
-            $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
-            if(!empty($data)){
-                return $data;
-            }
-            return [];
-        }
-        if(!class_exists("ShareCenter")) {
-            class_alias("Pydio\\Share\\ShareCenter", "ShareCenter");
-        }
-        $lines = file($file);
-
-        // Eval the existing line 3, should be like
-        //    $cypheredData = base64_decode("cMYIUkAcvOqGFLbT5j/jyP/VzYJqV03X2.....71gJsTtxw==");
-        $cypheredData = '';
-        eval($lines[3]);
-        if(!empty($cypheredData)) {
-            $key = str_pad($hash, 16, "\0");
-            $inputData = Crypto::decrypt($cypheredData, $key, false);
-            if(!empty($inputData)){
-                $publicletData = @unserialize($inputData);
-                $publicletData["PUBLICLET_PATH"] = $file;
-                return $publicletData;
-            }
+        $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
+        if(!empty($data)){
+            return $data;
         }
         return [];
     }
-
-    /**
-     * Test if hash.php is a real file.
-     * @param string $hash
-     * @return bool
-     */
-    public function shareIsLegacy($hash){
-        $dlFolder = $this->legacyPublicFolder;
-        $file = $dlFolder."/".$hash.".php";
-        return is_file($file);
-    }
-
+    
     /**
      * Update a single share property
      * @param string $hash
