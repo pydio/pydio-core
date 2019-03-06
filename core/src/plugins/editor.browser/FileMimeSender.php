@@ -119,6 +119,9 @@ class FileMimeSender extends Plugin
             $fileMime = "application/octet-stream";
         }
 
+        if(strpos($fileMime, "text/html") !== false){
+            $fileMime = "text/plain";
+        }
         //Send headers
         $responseInterface = HTMLWriter::responseWithInlineHeaders($responseInterface, basename($selectedNodeUrl), $filesize, $fileMime);
         $aSyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selectedNode) {
