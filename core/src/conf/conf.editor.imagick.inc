@@ -30,4 +30,11 @@ $DRIVER_CONF = [
     "ADDITIONAL_ENV_PATH" => "",
     //Full path on the server to the 'unoconv' binary (see docs)
     "UNOCONV" => "",
+    // Imagick Options used for generating the thumbnails
+    "IM_THUMB_QUALITY" => "-quality 65 -density 150 -resize 250 -flatten",
+    // Imagick Options used for generation the high scale images
+    "IM_VIEWER_QUALITY" => "-quality 90 -density 250",
+    // You can add any Image Magick options you want here, applied to both thumbs and big images
+    "IM_CUSTOM_OPTIONS" => ""
+
 ];

@@ -57,7 +57,7 @@ class SMBAccessDriver extends FsAccessDriver
 
     protected function loadExternalWrapper(){
         if(!empty($this->pluginConf['SMBCLIENT']) && !defined('SMB4PHP_SMBCLIENT')){
-            define ('SMB4PHP_SMBCLIENT', $this->pluginConf["SMBCLIENT"]);
+            define ('SMB4PHP_SMBCLIENT', escapeshellcmd($this->pluginConf["SMBCLIENT"]));
         }
         if(!empty($this->pluginConf['SMB_PATH_TMP']) && !defined('SMB_PATH_TMP')){
             define ('SMB4PHP_SMBTMP', $this->pluginConf["SMB_PATH_TMP"]);
