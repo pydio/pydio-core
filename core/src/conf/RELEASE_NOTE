@@ -2,6 +2,28 @@ Pydio ##VERSION_NUMBER## Release Note
 
 Bugfix and security release
 
+This is a bugfix and security release for Pydio 8.X, see the Changelog below for commits details.
+Remove symlink (details)
+Fix zoho display in IE11 (details)
+fix download multiple files on windows env (details)
+fix download all on smb workspace (details)
+fix php72 compat (details)
+Add export user list action (details)
+Remove unused variables (details)
+replace deprecated function (details)
+bypass writing error in text log (details)
+fix permission merging with mask (details)
+Let video player add its own cookie (details)
+Remove support for legacyShares (details)
+Seed the version number with server uuid (details)
+Do not open html ctype in external window (details)
+Set webdav force basic auth to true by default (details)
+Move some configs in inc file (details)
+
+---
+
+Pydio 8.2.2 is a bugfix and security release for Pydio 8.X
+
 Fix upload on mobile apps
 Hard-coded CORS support - to be added via a proper PSR-7 middleware
 Escaping mount type
