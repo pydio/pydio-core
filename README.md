@@ -1,16 +1,22 @@
+
+| WARNING |
+| --- |
+| Pydio Core will be **End Of Life on 2019, Dec. 31st**. After that date, there will be no more security fixes. Please consider switching to [Pydio Cells](https://github.com/pydio/cells) now! Pydio 8 Enterprise will be supported for another year. |
+
+
 ## Pydio Core
 
 [Homepage](https://pydio.com/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
 [Issue-Tracker](https://github.com/pydio/pydio-core/issues) 
-| ![Latest Stable](https://img.shields.io/badge/stable-8.0.0-brightgreen.svg) 
+| ![Latest Stable](https://img.shields.io/badge/stable-8.2.3-brightgreen.svg) 
 | ![License Badge](https://img.shields.io/badge/License-AGPL%203%2B-blue.svg)
 | [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core) 
 |  [![Build Status](https://travis-ci.org/pydio/pydio-core.svg)](https://travis-ci.org/pydio/pydio-core) 
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
-* Latest Stable release : 8.0.1
+* Latest Stable release : 8.2.3
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/Pydio)
 
@@ -23,7 +29,7 @@ Please DO NOT send emails to Charles, but use the forum located on https://pydio
 
 #### Setting up your dev environment
 
-Pydio 7 requires **PHP5.5.9** and upper. 
+Pydio 8 requires **PHP5.5.9** and upper. 
 
 The web root of the application is located in ***core/src/***. Create a virtual host to point to this folder, set up your webserver to use index.php as default page. This is generally done by default. 
 
