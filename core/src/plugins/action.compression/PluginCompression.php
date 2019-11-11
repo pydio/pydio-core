@@ -60,6 +60,33 @@ class PluginCompression extends Plugin
      * @throws \Pydio\Core\Exception\ActionNotFoundException
      * @throws \Pydio\Core\Exception\AuthRequiredException
      */
+    
+    // Multi-platform function taken from stackoverflow
+    // http://stackoverflow.com/questions/12424787/how-to-check-if-a-shell-command-exists-from-php
+    // Check that a command exists on the system for use with exec
+    public function command_exists ($command)
+    {
+    $whereIsCommand = (PHP_OS == 'WINNT') ? 'where' : 'which';
+    $process = proc_open(
+        "$whereIsCommand $command",
+        array(
+        0 => array("pipe", "r"), //STDIN
+        1 => array("pipe", "w"), //STDOUT
+        2 => array("pipe", "w"), //STDERR
+        ),
+        $pipes
+    );
+    if ($process !== false) {
+        $stdout = stream_get_contents($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        proc_close($process);
+        return $stdout != '';
+    }
+    return false;
+    }
+     
     public function receiveAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
@@ -78,9 +105,9 @@ class PluginCompression extends Plugin
         $responseInterface = $responseInterface->withBody($serializableStream);
 
         switch ($requestInterface->getAttribute("action")) {
-
+        
             case "compression":
-
+            
                 $archiveName = InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
                 $archiveFormat = '.' . InputFilter::sanitize($httpVars["type_archive"], InputFilter::SANITIZE_ALPHANUM);
                 $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
@@ -140,51 +167,107 @@ class PluginCompression extends Plugin
                     $postMessageStatus($messages["compression.17"], Task::STATUS_FAILED);
                     throw new PydioException($messages["compression.17"]);
                 }
-                try {
-                    $tmpArchiveName = tempnam(ApplicationState::getTemporaryFolder(), "tar-compression") . ".tar";
-                    $archive = new PharData($tmpArchiveName);
-                } catch (Exception $e) {
-                    $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
-                    throw $e;
-                }
-                $counterCompression = 0;
-                //THE TWO ARRAY ARE MERGED FOR THE FOREACH LOOP
-                $tabAllFiles = array_combine($tabAllRecursiveFiles, $tabFilesNames);
-                foreach ($tabAllFiles as $fullPath => $fileName) {
+                // Builds a shell command that changes to the workspace location in the filesystem, and then 
+                // compresses with tar and any parallel compression utilities that are installed.
+                if ($this->command_exists("tar")) {
+                    $FileNames = array();
+                    $FolderNames = array();
+                    foreach ($nodes as $node) {
+                        $nodeUrl = $node->getUrl();
+                        if (is_file($nodeUrl) && filesize($nodeUrl) < $maxAuthorizedSize) {
+                            array_push($FileNames, escapeshellarg(substr($nodeUrl, $currentDirUrlLength)));
+                        }
+                        if (is_dir($nodeUrl)) {
+                            array_push($FolderNames, escapeshellarg(substr($nodeUrl, $currentDirUrlLength)));
+                        }
+                    }
+                    if ($archiveFormat == ".tar.gz") {
+                        if ($this->command_exists("pigz")) {
+                            $tarCommand = "tar -I pigz -cf ";
+                        } else {
+                            $tarCommand = "tar -czf ";
+                        }
+                    } elseif ($archiveFormat == ".tar.bz2") {
+                        if ($this->command_exists("lbzip2")) {
+                            $tarCommand = "tar -I lbzip2 -cf ";
+                        } elseif ($this->command_exists("pbzip2")) {
+                            $tarCommand = "tar -I pbzip2 -cf ";
+                        } else {
+                            $tarCommand = "tar -cjf ";
+                        }
+                    } elseif ($archiveFormat == ".tar") {
+                        $tarCommand = "tar -cf ";
+                    } else {
+                        file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.15"]);
+                        throw new PydioException($messages["compression.15"]);
+                    }
+                    $changeDirCommand = "cd " . MetaStreamWrapper::getRealFSReference($currentDirUrl) . " && ";
+                    $compressCommand = $changeDirCommand . $tarCommand . escapeshellarg($archiveName) . " " . implode(" ", $FolderNames) . " " . implode(" ", $FileNames);
+                    $cmdExitCode = 0;
+                    $cmdOutput = '';
+                    exec($compressCommand, $cmdOutput, $cmdExitCode);
+                    if ($cmdExitCode > 0) {
+                        file_put_contents($progressCompressionFileName, "Error : " . $messages["compression.15"]);
+                        throw new PydioException($messages["compression.15"]);
+                    }
+                 } else {
+                    // If tar command is not found, compress with PHP Phar instead
                     try {
-                        $archive->addFile(MetaStreamWrapper::getRealFSReference($fullPath), $fileName);
-                        $counterCompression++;
-                        $percent = round(($counterCompression / count($tabAllFiles)) * 100, 0, PHP_ROUND_HALF_DOWN);
-                        $postMessageStatus(sprintf($messages["compression.6"], $percent . " %"), Task::STATUS_RUNNING, $percent);
+                        $tmpArchiveName = tempnam(ApplicationState::getTemporaryFolder(), "tar-compression") . ".tar";
+                        $archive = new PharData($tmpArchiveName);
                     } catch (Exception $e) {
-                        unlink($tmpArchiveName);
                         $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
                         throw $e;
                     }
-                }
-                $finalArchive = $tmpArchiveName;
-                if ($typeArchive != ".tar") {
-                    $archiveTypeCompress = substr(strrchr($typeArchive, "."), 1);
-                    $postMessageStatus(sprintf($messages["compression.7"], strtoupper($archiveTypeCompress)), Task::STATUS_RUNNING);
-                    if ($archiveTypeCompress == "gz") {
-                        $archive->compress(Phar::GZ);
-                    } elseif ($archiveTypeCompress == "bz2") {
-                        $archive->compress(Phar::BZ2);
+                    $counterCompression = 0;
+                    //THE TWO ARRAY ARE MERGED FOR THE FOREACH LOOP
+                    $tabAllFiles = array_combine($tabAllRecursiveFiles, $tabFilesNames);
+                    foreach ($tabAllFiles as $fullPath => $fileName) {
+                        try {
+                            $archive->addFile(MetaStreamWrapper::getRealFSReference($fullPath), $fileName);
+                            $counterCompression++;
+                            $percent = round(($counterCompression / count($tabAllFiles)) * 100, 0, PHP_ROUND_HALF_DOWN);
+                            $postMessageStatus(sprintf($messages["compression.6"], $percent . " %"), Task::STATUS_RUNNING, $percent);
+                        } catch (Exception $e) {
+                            unlink($tmpArchiveName);
+                            $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
+                            throw $e;
+                        }
                     }
-                    $finalArchive = $tmpArchiveName . "." . $archiveTypeCompress;
-                }
+                    $finalArchive = $tmpArchiveName;
+                    if ($typeArchive != ".tar") {
+                        $archiveTypeCompress = substr(strrchr($typeArchive, "."), 1);
+                        $postMessageStatus(sprintf($messages["compression.7"], strtoupper($archiveTypeCompress)), Task::STATUS_RUNNING);
+                        if ($archiveTypeCompress == "gz") {
+                            $archive->compress(Phar::GZ);
+                        } elseif ($archiveTypeCompress == "bz2") {
+                            $archive->compress(Phar::BZ2);
+                        }
+                        $finalArchive = $tmpArchiveName . "." . $archiveTypeCompress;
+                    }
+
+                    $newNode = new AJXP_Node($currentDirUrl . $archiveName);
+                    $destArchive = $newNode->getRealFile();
+                    rename($finalArchive, $destArchive);
+                    Controller::applyHook("node.before_create", array($newNode, filesize($destArchive)));
+
+                    if (file_exists($tmpArchiveName)) {
+                        unlink($tmpArchiveName);
+                        unlink(substr($tmpArchiveName, 0, -4));
+                    }
+                    Controller::applyHook("node.change", array(null, $newNode, false), true);
+                    $postMessageStatus("Finished", Task::STATUS_COMPLETE);
+                    break;
+
+                    // End of Phar compression section
+                }       
 
                 $newNode = new AJXP_Node($currentDirUrl . $archiveName);
                 $destArchive = $newNode->getRealFile();
-                rename($finalArchive, $destArchive);
                 Controller::applyHook("node.before_create", array($newNode, filesize($destArchive)));
-                if (file_exists($tmpArchiveName)) {
-                    unlink($tmpArchiveName);
-                    unlink(substr($tmpArchiveName, 0, -4));
-                }
                 Controller::applyHook("node.change", array(null, $newNode, false), true);
                 $postMessageStatus("Finished", Task::STATUS_COMPLETE);
-
+                
                 break;
 
             case "extraction":
@@ -239,29 +322,65 @@ class PluginCompression extends Plugin
 
                 mkdir($currentDirUrl . $onlyFileName, 0777, true);
                 chmod(MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), 0777);
-                try {
-                    $archive = new PharData(MetaStreamWrapper::getRealFSReference($currentAllPydioPath));
-                    $fichiersArchive = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($pharCurrentAllPydioPath));
-                    foreach ($fichiersArchive as $file) {
-                        $fileGetPathName = $file->getPathname();
-                        if ($file->isDir()) {
-                            continue;
+
+                // Builds a command that will use any parallel extraction utilities installed to extract an archive file though tar.
+                if ($this->command_exists("tar")) {
+                    if ($pathInfoCurrentAllPydioPath == "gz") {
+                        if ($this->command_exists("pigz")) {
+                            $tarCommand = "tar -I pigz -xf ";
+                        } else {
+                            $tarCommand = "tar -xzf ";
                         }
-                        $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
-                        try {
-                            $archive->extractTo(MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
-                        } catch (Exception $e) {
-                            $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
-                            throw new PydioException($e);
+                    } elseif ($pathInfoCurrentAllPydioPath == "bz2") {
+                        if ($this->command_exists("lbzip2")) {
+                            $tarCommand = "tar -I lbzip2 -xf ";
+                        } elseif ($this->command_exists("pbzip2")) {
+                            $tarCommand = "tar -I pbzip2 -xf ";
+                        } else {
+                            $tarCommand = "tar -xjf ";
                         }
-                        $counterExtract++;
-                        $progress = round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN);
-                        $postMessageStatus(sprintf($messages["compression.13"], $progress . "%"), Task::STATUS_RUNNING, $progress);
+                    } elseif ($pathInfoCurrentAllPydioPath == "tar") {
+                        $tarCommand = "tar -xf ";
+                    } else {
+                        file_put_contents($progressExtractFileName, "Error : " . $messages["compression.15"]);
+                        throw new PydioException($messages["compression.15"]);
                     }
-                } catch (Exception $e) {
-                    $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
-                    throw new PydioException($e);
+                    $extractCommand = $tarCommand . escapeshellarg(MetaStreamWrapper::getRealFSReference($currentDirUrl . $fileArchive)) . " -C " . escapeshellarg(MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName));
+                    $cmdExitCode = 0;
+                    $cmdOutput = '';
+                    exec($extractCommand, $cmdOutput, $cmdExitCode);
+                    if ($cmdExitCode > 0) {
+                        file_put_contents($progressExtractFileName, "Error : " . $messages["compression.15"]);
+                        throw new PydioException($messages["compression.15"]);
+                    }
+                } else {
+                    // If tar command is not found, extract using PHP Phar instead
+                    try {
+                        $archive = new PharData(MetaStreamWrapper::getRealFSReference($currentAllPydioPath));
+                        $fichiersArchive = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($pharCurrentAllPydioPath));
+                        foreach ($fichiersArchive as $file) {
+                            $fileGetPathName = $file->getPathname();
+                            if ($file->isDir()) {
+                                continue;
+                            }
+                            $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
+                            try {
+                                $archive->extractTo(MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
+                            } catch (Exception $e) {
+                                $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
+                                throw new PydioException($e);
+                            }
+                            $counterExtract++;
+                            $progress = round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN);
+                            $postMessageStatus(sprintf($messages["compression.13"], $progress . "%"), Task::STATUS_RUNNING, $progress);
+                        }
+                    } catch (Exception $e) {
+                        $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
+                        throw new PydioException($e);
+                    }
+                // End of Phar extraction section
                 }
+
                 $postMessageStatus("Done", Task::STATUS_COMPLETE, 100);
                 $newNode = new AJXP_Node($currentDirUrl . $onlyFileName);
                 $nodesDiff = new NodesDiff();
