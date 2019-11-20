@@ -38,6 +38,7 @@ use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\PluginFramework\Plugin;
 
 use Pydio\Access\Core\Model\NodesDiff;
+use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 use RecursiveDirectoryIterator;
@@ -244,6 +245,11 @@ class PluginCompression extends Plugin
                     $fichiersArchive = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($pharCurrentAllPydioPath));
                     foreach ($fichiersArchive as $file) {
                         $fileGetPathName = $file->getPathname();
+                        // .ajxp_recycle_cache.ser
+                        // ignore all hidden files
+                        if (StatHelper::isHidden($fileGetPathName)) {
+                            continue;
+                        }
                         if ($file->isDir()) {
                             continue;
                         }
