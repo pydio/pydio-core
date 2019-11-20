@@ -379,7 +379,8 @@ class FilteredUsersList{
             $searchLimit = min($end - $offset, $this->getConf('USERS_LIST_COMPLETE_LIMIT'));
         }
         $baseGroup      = $this->computeBaseGroup($groupPathFilter, $searchQuery);
-
+        $baseGroup = rtrim($baseGroup, '/');
+        
         if(!empty($searchQuery)) {
             $regexp = '^'.$searchQuery;
             $pregexp = '/^'.preg_quote($searchQuery).'/i';
