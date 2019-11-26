@@ -124,7 +124,7 @@ class RecentListManager
                     'original_path' => $nodePath
                 ]);
                 $nodesList->addBranch($newNode);
-            }catch(\Exception $e){}
+            }catch(\Exception $e){$e->getMessage();}
         }
         return $nodesList;
     }

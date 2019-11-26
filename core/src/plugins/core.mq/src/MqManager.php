@@ -396,7 +396,7 @@ class MqManager extends Plugin
                 }
 
                 $data = $this->msgExchanger->consumeInstantChannel($ctx, $httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
-                if (count($data)) {
+                if (is_array($data) && count($data)) {
                    ksort($data);
                    foreach ($data as $messageObject) {
                        if(isSet($regexp) && isSet($messageObject->nodePaths)){
