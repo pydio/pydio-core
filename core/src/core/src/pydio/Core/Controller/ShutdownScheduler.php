@@ -155,8 +155,8 @@ class ShutdownScheduler
     public function callRegisteredShutdown($cliOutput = null)
     {
         session_write_close();
-        @ob_end_flush();
-        @flush();
+        ob_end_flush();
+        flush();
 
         // test for backtrack
         $test = debug_backtrace();
