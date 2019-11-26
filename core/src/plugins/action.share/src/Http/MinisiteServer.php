@@ -100,6 +100,9 @@ class MinisiteServer extends Server
      */
     public function catchError($code, $message, $fichier, $ligne, $context)
     {
+        if(error_reporting() == 0) {
+            return ;
+        }
         $req = $this->getRequest();
         $resp = new Response();
 
