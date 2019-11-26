@@ -22,6 +22,7 @@ namespace Pydio\Access\Core;
 
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -183,7 +184,7 @@ class RecycleBinManager
                 $s .= fread($fp, 4096);
             }
             fclose($fp);
-            $result = unserialize($s);
+            $result = StringHelper::safeUnserialize($s);
         }
         return $result;
     }

@@ -115,7 +115,6 @@ class RepositoriesManager extends AbstractManager
                 break;
 
             case "create_repository" :
-
                 $repDef = $httpVars;
                 $isTemplate = isSet($httpVars["sf_checkboxes_active"]);
                 unset($repDef["get_action"]);

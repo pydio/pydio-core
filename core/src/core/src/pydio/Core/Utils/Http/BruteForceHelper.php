@@ -23,6 +23,7 @@ namespace Pydio\Core\Utils\Http;
 
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -43,7 +44,7 @@ class BruteForceHelper
     {
         $failedLog = ApplicationState::getTemporaryFolder() . "/failedAJXP.log";
         $loginAttempt = @file_get_contents($failedLog);
-        $loginArray = unserialize($loginAttempt);
+        $loginArray = StringHelper::safeUnserialize($loginAttempt);
         $ret = array();
         $curTime = time();
         if (is_array($loginArray)) {

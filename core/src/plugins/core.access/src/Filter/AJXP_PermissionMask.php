@@ -21,6 +21,7 @@
 namespace Pydio\Access\Core\Filter;
 
 use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -317,6 +318,6 @@ class AJXP_PermissionMask implements \JsonSerializable, \Serializable
      */
     public function unserialize($serialized)
     {
-        $this->permissionTree = unserialize($serialized);
+        $this->permissionTree = StringHelper::safeUnserialize($serialized, true);
     }
 }

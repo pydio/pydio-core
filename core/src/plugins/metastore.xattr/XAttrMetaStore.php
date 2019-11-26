@@ -24,6 +24,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -139,7 +140,7 @@ class XAttrMetaStore extends AbstractMetaSource implements IMetaStoreProvider
             foreach($keyList as $k){
                 if(strpos($k, $startKey) === 0){
                     $mData = \xattr_get($path, $k);
-                    $decData = unserialize(base64_decode($mData));
+                    $decData = StringHelper::safeUnserialize(base64_decode($mData));
                     if(is_array($decData)) $arrMeta = array_merge_recursive($arrMeta, $decData);
                 }
             }
@@ -147,7 +148,7 @@ class XAttrMetaStore extends AbstractMetaSource implements IMetaStoreProvider
         }else{
             $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
             $data = \xattr_get($path, $key);
-            $data = unserialize(base64_decode($data));
+            $data = StringHelper::safeUnserialize(base64_decode($data));
             if( empty($data) || !is_array($data)) return array();
             return $data;
         }

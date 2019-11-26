@@ -32,6 +32,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -228,7 +229,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 // Backward compatibility
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
-                    $meta = unserialize(base64_decode($hit->serialized_metadata));
+                    $meta = StringHelper::safeUnserialize(base64_decode($hit->serialized_metadata));
                     if(isSet($meta["ajxp_modiftime"])){
                         $meta["ajxp_relativetime"] = StatHelper::relativeDate($meta["ajxp_modiftime"], $messages);
                         $meta["ajxp_description"] = $messages[4]." ". $meta["ajxp_relativetime"];
@@ -315,7 +316,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 // Backward compat with old protocols
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
-                    $meta = unserialize(base64_decode($hit->serialized_metadata));
+                    $meta = StringHelper::safeUnserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node($hit->node_url, $meta);
                     if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
                     else $tmpNode->setUserId($ctx->getUser()->getId());

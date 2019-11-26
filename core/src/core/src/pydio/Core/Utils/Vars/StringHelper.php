@@ -320,4 +320,22 @@ class StringHelper
             return $uuid;
         }
     }
+
+
+    /**
+     * @param $string serialized string
+     * @param $allowed_classes mixed
+     * @return mixed
+     */
+    public static function safeUnserialize($string, $allowed_classes = false){
+        if ((version_compare(PHP_VERSION, "7.0.0") >= 0) && !empty($allowed_classes)){
+            return unserialize($string, ['allowed_classes' => $allowed_classes]);
+        } else {
+            return unserialize($string);
+        }
+
+        //if ($x === null || $x instanceof \__PHP_Incomplete_Class){
+        //    return [];
+        //}
+    }
 }

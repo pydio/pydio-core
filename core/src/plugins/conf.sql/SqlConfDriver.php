@@ -139,7 +139,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
         $res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
         $config_row = $res_opts->fetchPairs();
-        $confOpt = unserialize($config_row[$pluginId]);
+        $confOpt = StringHelper::safeUnserialize($config_row[$pluginId]);
         if (is_array($confOpt)) {
             foreach($confOpt as $key => $value) $options[$key] = $value;
         }
@@ -204,9 +204,9 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
         foreach ($options_result as $k => $v) {
             if (strpos($v, '$phpserial$') !== false && strpos($v, '$phpserial$') === 0) {
-                $v = unserialize(substr($v, strlen('$phpserial$')));
+                $v = StringHelper::safeUnserialize(substr($v, strlen('$phpserial$')), true);
             } else if ($k == "META_SOURCES") {
-                $v = unserialize($v);
+                $v = StringHelper::safeUnserialize($v, true);
             }
             $repo->options[$k] = $v;
         }
@@ -537,7 +537,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             }
             $all = $children_results->fetchAll();
             foreach ($all as $item) {
-                $role = unserialize($item["serial_role"]);
+                $role = StringHelper::safeUnserialize($item["serial_role"], ["Pydio\\Conf\\Core\\AJXP_Role", "Pydio\\Conf\\Core\\AjxpRole", "Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask"]);
                 $role->setAcl($repositoryId, "");
                 $this->updateRole($role);
             }
@@ -783,7 +783,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         foreach ($all as $role_row) {
             $id = $role_row['role_id'];
             $serialized = $role_row['serial_role'];
-            $object = unserialize($serialized);
+            $object = StringHelper::safeUnserialize($serialized, ["Pydio\\Conf\\Core\\AJXP_Role", "Pydio\\Conf\\Core\\AjxpRole", "Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask"]);
             if ($object instanceof AjxpRole || $object instanceof AJXP_Role) {
                 $roles[$id] = $object;
                 if($object instanceof AJXP_Role){
@@ -817,7 +817,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         foreach ($all as $role_row) {
             $id = $role_row['role_id'];
             $serialized = $role_row['serial_role'];
-            $object = unserialize($serialized);
+            $object = StringHelper::safeUnserialize($serialized, ["Pydio\\Conf\\Core\\AJXP_Role", "Pydio\\Conf\\Core\\AjxpRole", "Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask"]);
             if ($object instanceof AJXP_Role) {
                 $roles[$id] = $object;
                 $object->setLastUpdated($role_row["last_updated"]);
@@ -1093,7 +1093,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         if(!count($value)) return false;
         $value = $value[0];
         if ($dataType == "serial") {
-            $data = unserialize($value["serialized_data"]);
+            $data = StringHelper::safeUnserialize($value["serialized_data"], true);
         } else {
             $data = $value["binary_data"];
         }
@@ -1147,7 +1147,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $result = array();
         foreach($children_results as $value){
             if ($dataType == "serial") {
-                $data = unserialize($value["serialized_data"]);
+                $data = StringHelper::safeUnserialize($value["serialized_data"], true);
             } else {
                 $data = $value["binary_data"];
             }

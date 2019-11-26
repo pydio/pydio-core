@@ -27,6 +27,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\SessionService;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -59,7 +60,7 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
         if (!is_file($file)) return array();
         $content = file_get_contents($file);
         if (empty($content)) return array();
-        $data = unserialize($content);
+        $data = StringHelper::safeUnserialize($content);
         if (is_array($data)) return $data;
         return array();
     }
@@ -169,7 +170,7 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
         if ($decoded == null) {
             return false;
         }
-        $data = unserialize($decoded);
+        $data = StringHelper::safeUnserialize($decoded);
         if (empty($data) || !is_array($data) || !isset($data["user_id"]) || !isset($data["user_pwd"])) {
             $this->logDebug(__FUNCTION__, "Cyphered Token found but wrong deserizalized data");
             return false;

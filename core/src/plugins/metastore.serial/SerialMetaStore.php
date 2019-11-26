@@ -28,6 +28,7 @@ use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -242,7 +243,7 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
             self::$currentMetaName = $metaFile;
             $rawData = @file_get_contents($metaFile);
             if ($rawData !== false) {
-                self::$fullMetaCache[$metaFile] = unserialize($rawData);
+                self::$fullMetaCache[$metaFile] = StringHelper::safeUnserialize($rawData);
             }
         }
         if (isSet(self::$fullMetaCache[$metaFile]) && is_array(self::$fullMetaCache[$metaFile])) {
@@ -363,7 +364,7 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
         if(!is_file($metaFile)) return $result;
         $raw_data = file_get_contents($metaFile);
         if($raw_data === false) return $result;
-        $metadata = unserialize($raw_data);
+        $metadata = StringHelper::safeUnserialize($raw_data);
         if($metadata === false || !is_array($metadata)) return $result;
         $srcPath = $ajxpNode->getPath();
         if($srcPath == "/") $srcPath = "";

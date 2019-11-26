@@ -29,6 +29,7 @@ use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -236,12 +237,7 @@ class SqlUser extends AbstractUser
         if (isSet($p) && is_string($p)) {
             if (strpos($p, '$phpserial$') !== false && strpos($p, '$phpserial$') === 0) {
                 $p = substr($p, strlen('$phpserial$'));
-                if(version_compare(PHP_VERSION, "7.0.0") >= 0){
-                    // Additional checks if we have the option
-                    $x = unserialize($p, ['allowed_classes' => FALSE]);
-                } else {
-                    $x = unserialize($p);
-                }
+                $x = StringHelper::safeUnserialize($p);
                 if ($x === null || $x instanceof \__PHP_Incomplete_Class){
                     return [];
                 }
@@ -253,12 +249,7 @@ class SqlUser extends AbstractUser
             }
             // By default, unserialize
             if ($prefName == "CUSTOM_PARAMS") {
-                if(version_compare(PHP_VERSION, "7.0.0") >= 0){
-                    // Additional checks if we have the option
-                    $x = unserialize($p, ['allowed_classes' => FALSE]);
-                } else {
-                    $x = unserialize($p);
-                }
+                $x = StringHelper::safeUnserialize($p);
                 if ($x === null || $x instanceof \__PHP_Incomplete_Class){
                     return [];
                 }
@@ -421,11 +412,11 @@ class SqlUser extends AbstractUser
         if (isSet($this->rights["ajxp.roles"])) {
             if (is_string($this->rights["ajxp.roles"])) {
                 if (strpos($this->rights["ajxp.roles"], '$phpserial$') === 0) {
-                    $this->rights["ajxp.roles"] = unserialize(str_replace('$phpserial$', '', $this->rights["ajxp.roles"]));
+                    $this->rights["ajxp.roles"] = StringHelper::safeUnserialize(str_replace('$phpserial$', '', $this->rights["ajxp.roles"]));
                 } else if (strpos($this->rights["ajxp.roles"], '$json$') === 0) {
                     $this->rights["ajxp.roles"] = json_decode(str_replace('$json$', '', $this->rights["ajxp.roles"]), true);
                 } else {
-                    $this->rights["ajxp.roles"] = unserialize($this->rights["ajxp.roles"]);
+                    $this->rights["ajxp.roles"] = StringHelper::safeUnserialize($this->rights["ajxp.roles"]);
                 }
             }
             if(is_array($this->rights["ajxp.roles"])){
@@ -476,7 +467,7 @@ class SqlUser extends AbstractUser
                 $index++;
             }
         }else{
-            $this->rights["ajxp.roles.order"] = unserialize(str_replace('$phpserial$', '', $this->rights["ajxp.roles.order"]));
+            $this->rights["ajxp.roles.order"] = StringHelper::safeUnserialize(str_replace('$phpserial$', '', $this->rights["ajxp.roles.order"]));
         }
 
         // CHECK USER PERSONAL ROLE

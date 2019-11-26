@@ -25,6 +25,7 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -182,7 +183,7 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
             $arrMeta = array();
             foreach($data as $k => $mData){
                 if(strpos($k, $startKey) === 0){
-                    $decData = unserialize(base64_decode($mData));
+                    $decData = StringHelper::safeUnserialize(base64_decode($mData));
                     if(is_array($decData)) $arrMeta = array_merge_recursive($arrMeta, $decData);
                 }
             }
@@ -191,7 +192,7 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
             $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
             $mKey = $this->getMetaKey($nameSpace,$scope,$user);
             if (isSet($data[$mKey])) {
-                $arrMeta =  unserialize(base64_decode($data[$mKey]));
+                $arrMeta = StringHelper::safeUnserialize(base64_decode($data[$mKey]));
                 if(is_array($arrMeta)) return $arrMeta;
             }
         }

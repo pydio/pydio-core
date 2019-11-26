@@ -253,7 +253,7 @@ class EmlParser extends Plugin
             $realFile = $ajxpNode->getRealFile();
         }
         $cacheItem = LocalCache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
-        $data = unserialize($cacheItem->getData());
+        $data = StringHelper::safeUnserialize($cacheItem->getData());
         $data["ajxp_mime"] = "eml";
         $data["mimestring"] = "Email";
         $metadata = array_merge($metadata, $data);

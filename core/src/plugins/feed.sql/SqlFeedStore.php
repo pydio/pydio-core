@@ -32,6 +32,7 @@ use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Enterprise\Session\PydioSessionManager;
 use Pydio\Notification\Core\IFeedStore;
 use Pydio\Notification\Core\Notification;
@@ -198,7 +199,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         foreach ($res as $n => $row) {
             $object = new \stdClass();
             $object->hookname = $row->htype;
-            $object->arguments = unserialize($row->content);
+            $object->arguments = StringHelper::safeUnserialize($row->content, ["Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
             $object->author = $row->user_id;
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
@@ -278,7 +279,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
         $data = array();
         foreach ($res as $n => $row) {
-            $test = unserialize($row->content);
+            $test = StringHelper::safeUnserialize($row->content, ["Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
             if ($test instanceof Notification) {
                 $test->alert_id = $row->id;
                 $data[] = $test;
@@ -312,7 +313,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             /**
              * @var $startEventNotif Notification
              */
-            $startEventNotif = unserialize($startEventRow->content);
+            $startEventNotif = StringHelper::safeUnserialize($startEventRow->content, ["Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
             if(empty($startEventNotif) || ! $startEventNotif instanceof Notification) {
                 return;
             }
@@ -337,7 +338,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         // Load alerts with empty index_path
         $res = dibi::query("SELECT [id],[content],[index_path] FROM [ajxp_feed] WHERE [etype] = %s AND [index_path] IS NULL", "alert");
         foreach ($res as $row) {
-            $test = unserialize($row->content);
+            $test = StringHelper::safeUnserialize($row->content, ["Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
             if ($test instanceof Notification) {
                 $url = $test->getNode()->getUrl();
                 try {
@@ -417,7 +418,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         foreach ($res as $n => $row) {
             $object = new \stdClass();
             $object->path = $row->index_path;
-            $object->content = unserialize($row->content);
+            $object->content = StringHelper::safeUnserialize($row->content, ["Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
             $object->author = $row->user_id;
             $object->date = $row->edate;
             $object->repository = $row->repository_id;

@@ -23,6 +23,7 @@ namespace Pydio\Mq\Implementation;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Notification\Core\IMessageExchanger;
@@ -231,7 +232,7 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
     {
         $data = array();
         if (file_exists($this->getPluginWorkDir()."/worker/$channelName.ser")) {
-            $data = unserialize(file_get_contents($this->getPluginWorkDir()."/worker/$channelName.ser"));
+            $data = StringHelper::safeUnserialize(file_get_contents($this->getPluginWorkDir()."/worker/$channelName.ser"), true);
             file_put_contents($this->getPluginWorkDir()."/worker/$channelName.ser", array(), LOCK_EX);
         }
         return $data;
@@ -249,7 +250,7 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
         $fExists = false;
         if (file_exists($this->getPluginWorkDir()."/worker/$channel.ser")) {
             $fExists = true;
-            $data = unserialize(file_get_contents($this->getPluginWorkDir()."/worker/$channel.ser"));
+            $data = StringHelper::safeUnserialize(file_get_contents($this->getPluginWorkDir()."/worker/$channel.ser"), true);
         }
         $data[] = $message;
         if (!$fExists) {

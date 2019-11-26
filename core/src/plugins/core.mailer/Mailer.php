@@ -39,6 +39,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
 use Pydio\Core\Controller\HTMLWriter;
@@ -225,7 +226,7 @@ class Mailer extends Plugin implements SqlTableProvider
 
             // Retrieving notification information
             /** @var Notification $notification */
-            $notification = unserialize($value["notification_object"]);
+            $notification = StringHelper::safeUnserialize($value["notification_object"], ["Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
             if(!$notification instanceof Notification){
                 continue;
             }

@@ -26,6 +26,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Notification\Core\IMessageExchanger;
@@ -91,7 +92,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         $single = dibi::query('SELECT [content] FROM [ajxp_mq_queues] WHERE [channel_name] = %s', $channelName)->fetchSingle();
         if(!empty($single)){
             if(!isset(self::$channels)) self::$channels = array();
-            $data = unserialize(gzinflate($single));
+            $data = StringHelper::safeUnserialize(gzinflate($single), true);
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
@@ -312,7 +313,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         $arr = array();
         $deleted = array();
         foreach ($rows as $row) {
-            $arr[] = unserialize($row["serialized_data"]);
+            $arr[] = StringHelper::safeUnserialize($row["serialized_data"], true);
             $deleted[] = $row["object_id"];
         }
         if (count($deleted)) {

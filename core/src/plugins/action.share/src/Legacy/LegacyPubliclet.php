@@ -37,6 +37,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Share\Model\ShareLink;
 use Pydio\Share\ShareCenter;
 use Pydio\Share\Store\ShareRightsManager;
@@ -157,7 +158,7 @@ class LegacyPubliclet
                 copy($store, $store.".bak");
             }
 
-            $data = unserialize(file_get_contents($store));
+            $data = StringHelper::safeUnserialize(file_get_contents($store));
             foreach($data as $filePath => &$metadata){
 
                 foreach($metadata as $userName => &$meta){

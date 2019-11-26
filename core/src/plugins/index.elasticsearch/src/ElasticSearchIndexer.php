@@ -31,6 +31,7 @@ use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\VarsFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
 use \Elastica;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -238,7 +239,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                 $source = $hit->getSource();
 
                 if ($source["serialized_metadata"] != null) {
-                    $meta = unserialize(base64_decode($source["serialized_metadata"]));
+                    $meta = StringHelper::safeUnserialize(base64_decode($source["serialized_metadata"]));
                     $tmpNode = new AJXP_Node($source["node_url"], $meta);
                     if(!$tmpNode->hasUser()){
                         if($source['ajxp_scope'] === "user" && !empty($source['ajxp_user'])) $tmpNode->setUserId($source['ajxp_user']);
@@ -308,7 +309,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
             foreach ($hits as $hit) {
 
                 if ($hit->serialized_metadata!=null) {
-                    $meta = unserialize(base64_decode($hit->serialized_metadata));
+                    $meta = StringHelper::safeUnserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node($hit->node_url, $meta);
                     if(!$tmpNode->hasUser()){
                         if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);

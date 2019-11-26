@@ -34,6 +34,7 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Controller\UnixProcess;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -140,7 +141,9 @@ class HttpDownload extends Plugin
             case "stop_dl":
                 $newName = "__".str_replace(".dlpart", ".ser", $basename);
                 $hiddenFilename = $currentDirUrl.$newName;
-                $data = @unserialize(@file_get_contents($hiddenFilename));
+                $content = @file_get_contents($hiddenFilename);
+                if (empty($content)) return;
+                $data = StringHelper::safeUnserialize($content);
                 header("text/plain");
                 $this->logDebug("Getting $hiddenFilename",$data);
                 if (isSet($data["pid"])) {
@@ -259,7 +262,7 @@ class HttpDownload extends Plugin
         $newName = "__".str_replace(".dlpart", ".ser", $basename);
         $hidFile = str_replace($basename, $newName, $ajxpNode->getUrl());
         if (is_file($hidFile)) {
-            $data = unserialize(file_get_contents($hidFile));
+            $data = StringHelper::safeUnserialize(file_get_contents($hidFile));
             if ($data["totalSize"] != -1) {
                 $ajxpNode->target_bytesize = $data["totalSize"];
                 $ajxpNode->target_filesize = StatHelper::roundSize($data["totalSize"]);
