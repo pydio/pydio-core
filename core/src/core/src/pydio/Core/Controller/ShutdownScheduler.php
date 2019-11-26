@@ -25,6 +25,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Dav\DAVResponse;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Utils\Vars\BackTraceHelper;
 use Pydio\Log\Core\Logger;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -154,8 +155,16 @@ class ShutdownScheduler
     public function callRegisteredShutdown($cliOutput = null)
     {
         session_write_close();
-        ob_end_flush();
-        flush();
+        @ob_end_flush();
+        @flush();
+
+        // test for backtrack
+        $test = debug_backtrace();
+        if(!BackTraceHelper::scan($test, BackTraceHelper::TPL_SHUTDOWN_SCHEDULER)){
+            Logger::warning(__CLASS__, __FUNCTION__, "Malicious code suspected !!!");
+            //return;
+        }
+
         $index = 0;
         while (count($this->callbacks)) {
             $arguments = array_shift($this->callbacks);
