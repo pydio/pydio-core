@@ -174,7 +174,7 @@ class Pydio extends Observable{
         this.observe("server_message", (xml) => {
             const reload = XMLUtils.XPathSelectSingleNode(xml, "tree/require_registry_reload");
             if(reload){
-                if(reload.getAttribute("repositoryId") != this.repositoryId){
+                if(reload.getAttribute("repositoryId") !== this.repositoryId){
                     this.loadXmlRegistry(false, null, null, reload.getAttribute("repositoryId"));
                     this.repositoryId = null;
                 }
