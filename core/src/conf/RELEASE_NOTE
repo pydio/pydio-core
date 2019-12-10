@@ -1,24 +1,40 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+This is a bugfix and security release for Pydio 8.X, see the Changelog below for commits details.
+
+Add EOL date
+Fix list user in group
+Fix override hidden file in recycle_bin
+Fix notification
+Security patch
+Add backtrace warning
+Ignore error of @ case
+Remove @
+Disable by default
+Fix smart-app-banner dependency
+---
+
+Pydio 8.2.3
+
 Bugfix and security release
 
 This is a bugfix and security release for Pydio 8.X, see the Changelog below for commits details.
-Remove symlink (details)
-Fix zoho display in IE11 (details)
-fix download multiple files on windows env (details)
-fix download all on smb workspace (details)
-fix php72 compat (details)
-Add export user list action (details)
-Remove unused variables (details)
-replace deprecated function (details)
-bypass writing error in text log (details)
-fix permission merging with mask (details)
-Let video player add its own cookie (details)
-Remove support for legacyShares (details)
-Seed the version number with server uuid (details)
-Do not open html ctype in external window (details)
-Set webdav force basic auth to true by default (details)
-Move some configs in inc file (details)
+Remove symlink
+Fix zoho display in IE11
+fix download multiple files on windows env
+fix download all on smb workspace
+fix php72 compat
+Add export user list action
+Remove unused variables
+replace deprecated function
+bypass writing error in text log
+fix permission merging with mask
+Let video player add its own cookie
+Remove support for legacyShares
+Seed the version number with server uuid
+Do not open html ctype in external window
+Set webdav force basic auth to true by default
+Move some configs in inc file
 
 ---
 
