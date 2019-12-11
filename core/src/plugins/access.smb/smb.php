@@ -239,7 +239,7 @@ class smb
                     }
                     $mode = '';
                     switch ($tag) {
-                        case 'skip':    continue;
+                        case 'skip':    continue 2;
                         case 'shares':  $mode = 'shares';     break;
                         case 'servers': $mode = 'servers';    break;
                         case 'workg':   $mode = 'workgroups'; break;
