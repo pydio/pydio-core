@@ -644,7 +644,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $reqStr .= ' ';
 
         // Building where
-        if (!empty($q['where'])) {
+        if (!empty($q['whereor'])) {
             $q['where'][] = ['%or', $q['whereor']];
         }
 
