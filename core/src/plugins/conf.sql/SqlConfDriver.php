@@ -590,19 +590,26 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
         // Initing where and args
         if(is_numeric($repositoryId)){
-            $likeRepositoryId = "i:$repositoryId;s:";
+            $likeRepositoryId = "i:$repositoryId;s";
         }else{
-            $likeRepositoryId = '"'.$repositoryId.'";s:';
+            $likeRepositoryId = '"'.$repositoryId.'";s';
         }
         switch ($this->sqlDriver["driver"]) {
             case "sqlite":
             case "sqlite3":
             case "postgre":
-                $q['where'][] = ['[searchable_repositories] LIKE %~like~', $likeRepositoryId];
+                //$q['whereor'][] = ['[searchable_repositories] LIKE %~like~', $likeRepositoryId];
+                $q['whereor'][] = ['[searchable_repositories]  LIKE %~like~' , $likeRepositoryId.':1:"r"'];
+                $q['whereor'][] = ['[searchable_repositories]  LIKE %~like~', $likeRepositoryId.':1:"w"'];
+                $q['whereor'][] = ['[searchable_repositories]  LIKE %~like~' , $likeRepositoryId.':2:"rw"'];
                 break;
             case "mysql":
             case "mysqli":
-                $q['where'][] = ['[serial_role] LIKE %~like~', $likeRepositoryId];
+                //$q['where'][] = ['[serial_role] LIKE %~like~', $likeRepositoryId];
+                $q['whereor'][] = ['[serial_role]  LIKE %~like~' , $likeRepositoryId.':1:"r"'];
+                $q['whereor'][] = ['[serial_role]  LIKE %~like~' , $likeRepositoryId.':1:"w"'];
+                $q['whereor'][] = ['[serial_role]  LIKE %~like~' , $likeRepositoryId.':2:"rw"'];
+
                 break;
             default:
                 return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
@@ -612,11 +619,12 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $q['where'][] = ['[role_id] LIKE %like~', $rolePrefix];
         }
 
+        $q['where'][] = ['1 = %i', 1];
+
         // Initing group by
         $q['groupBy'][] = '[role_id]';
 
         // Building the request from $q
-
         // Building select
         $reqStr = 'SELECT';
         foreach ($q['select'] as $k => $v) {
@@ -637,6 +645,11 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
         // Building where
         if (!empty($q['where'])) {
+            $q['where'][] = ['%or', $q['whereor']];
+        }
+
+        // Building whereor
+        if (!empty($q['where'])) {
             $reqStr .= 'WHERE %and';
             $reqStr .= ' ';
         }
@@ -649,7 +662,8 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $reqStr .= ' ';
         }
 
-        $res =  dibi::query($reqStr, $q['where']);
+        $res = dibi::query($reqStr, $q['where']);
+
         $all = $res->fetchAll();
         foreach ($all as $item) {
             $rId = $item['role_id'];
@@ -717,8 +731,8 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             if (isSet($roles['role_user'])) {
                 $a['users'] = count($roles['role_user']);
             }
-            if (isSet($roles['role_group'])) {
-                $a['groups'] = count($roles['role_group']);
+            if (isSet($roles['role_grp'])) {
+                $a['groups'] = count($roles['role_grp']);
             }
             if (isSet($roles['role_role'])) {
                 $a['groups'] += count($roles['role_role']);
