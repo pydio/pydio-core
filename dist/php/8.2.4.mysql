@@ -1,0 +1,3 @@
+UPDATE ajxp_roles SET serial_role=replace(serial_role,'O:9:"AJXP_Role"', 'O:25:"Pydio\Conf\Core\AJXP_Role"');
+UPDATE ajxp_feed SET content=replace(content, 'O:9:"AJXP_Node"', 'O:33:"Pydio\\Access\\Core\\Model\\AJXP_Node"');
+UPDATE ajxp_feed SET content=replace(content, 'O:17:"AJXP_Notification"', 'O:36:"Pydio\Notification\Core\Notification"');
