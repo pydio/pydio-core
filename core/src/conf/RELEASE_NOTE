@@ -1,5 +1,13 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+This is a hotfix for Pydio 8.2.4 that could lead to breaking changes on old installations
+
+Add compat class name for unserialization
+Fix count accessible users
+
+---
+Pydio 8.2.4
+
 This is a bugfix and security release for Pydio 8.X, see the Changelog below for commits details.
 
 Add EOL date
