@@ -537,7 +537,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             }
             $all = $children_results->fetchAll();
             foreach ($all as $item) {
-                $role = StringHelper::safeUnserialize($item["serial_role"], ["AJXP_Role", "AjxpRole", "AJXP_PermissionMask", "Pydio\\Conf\\Core\\AJXP_Role", "Pydio\\Conf\\Core\\AjxpRole", "Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask"]);
+                $role = StringHelper::safeUnserialize($item["serial_role"], true);
                 $role->setAcl($repositoryId, "");
                 $this->updateRole($role);
             }
@@ -797,7 +797,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         foreach ($all as $role_row) {
             $id = $role_row['role_id'];
             $serialized = $role_row['serial_role'];
-            $object = StringHelper::safeUnserialize($serialized, ["AJXP_Role", "AJXPRole", "AJXP_PermissionMask", "Pydio\\Conf\\Core\\AJXP_Role", "Pydio\\Conf\\Core\\AjxpRole", "Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask"]);
+            $object = StringHelper::safeUnserialize($serialized, true);
             if ($object instanceof AjxpRole || $object instanceof AJXP_Role) {
                 $roles[$id] = $object;
                 if($object instanceof AJXP_Role){
@@ -831,7 +831,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         foreach ($all as $role_row) {
             $id = $role_row['role_id'];
             $serialized = $role_row['serial_role'];
-            $object = StringHelper::safeUnserialize($serialized, ["AJXP_Role", "AjxpRole", "AJXP_PermissionMask", "Pydio\\Conf\\Core\\AJXP_Role", "Pydio\\Conf\\Core\\AjxpRole", "Pydio\\Access\\Core\\Filter\\AJXP_PermissionMask"]);
+            $object = StringHelper::safeUnserialize($serialized, true);
             if ($object instanceof AJXP_Role) {
                 $roles[$id] = $object;
                 $object->setLastUpdated($role_row["last_updated"]);

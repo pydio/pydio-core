@@ -226,7 +226,7 @@ class Mailer extends Plugin implements SqlTableProvider
 
             // Retrieving notification information
             /** @var Notification $notification */
-            $notification = StringHelper::safeUnserialize($value["notification_object"], ["AJXP_Notification", "AJXP_Node", "Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
+            $notification = StringHelper::safeUnserialize($value["notification_object"], true);
             if(!$notification instanceof Notification){
                 continue;
             }

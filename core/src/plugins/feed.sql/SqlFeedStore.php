@@ -199,7 +199,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         foreach ($res as $n => $row) {
             $object = new \stdClass();
             $object->hookname = $row->htype;
-            $object->arguments = StringHelper::safeUnserialize($row->content, ["AJXP_Notification", "AJXP_Node", "Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
+            $object->arguments = StringHelper::safeUnserialize($row->content, true);
             $object->author = $row->user_id;
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
@@ -279,7 +279,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
         $data = array();
         foreach ($res as $n => $row) {
-            $test = StringHelper::safeUnserialize($row->content, ["AJXP_Notification", "AJXP_Node", "Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
+            $test = StringHelper::safeUnserialize($row->content, true);
             if ($test instanceof Notification) {
                 $test->alert_id = $row->id;
                 $data[] = $test;
@@ -313,7 +313,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             /**
              * @var $startEventNotif Notification
              */
-            $startEventNotif = StringHelper::safeUnserialize($startEventRow->content, ["AJXP_Notification", "AJXP_Node", "Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
+            $startEventNotif = StringHelper::safeUnserialize($startEventRow->content, true);
             if(empty($startEventNotif) || ! $startEventNotif instanceof Notification) {
                 return;
             }
@@ -338,7 +338,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         // Load alerts with empty index_path
         $res = dibi::query("SELECT [id],[content],[index_path] FROM [ajxp_feed] WHERE [etype] = %s AND [index_path] IS NULL", "alert");
         foreach ($res as $row) {
-            $test = StringHelper::safeUnserialize($row->content, ["AJXP_Notification", "AJXP_Node", "Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
+            $test = StringHelper::safeUnserialize($row->content, true);
             if ($test instanceof Notification) {
                 $url = $test->getNode()->getUrl();
                 try {
@@ -418,7 +418,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         foreach ($res as $n => $row) {
             $object = new \stdClass();
             $object->path = $row->index_path;
-            $object->content = StringHelper::safeUnserialize($row->content, ["AJXP_Notification", "AJXP_Node", "Pydio\\Access\\Core\\Model\\AJXP_Node", "Pydio\\Notification\\Core\\Notification"]);
+            $object->content = StringHelper::safeUnserialize($row->content, true);
             $object->author = $row->user_id;
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
