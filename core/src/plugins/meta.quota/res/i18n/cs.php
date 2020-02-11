@@ -19,12 +19,8 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-    "1" => "Reset hesla",
-    "2" => "Nastavte své nové heslo",
-    "3" => "Zadejte prosím svůj login a zresetované heslo bude zasláno na váš email.",
-    "4" => "Váš identifikátor",
-    "5" => "Požadavek na změnu hesla byl zaslán na emailovou adresu registrovanou s vaším uživatelským účtem. Klikněte na odkaz v emailu pro provedení změny hesla.",
-    "6" => "Děkujeme, nyní se můžete přihlásit!",
-    "7" => "Byla vyžádána změna hesla pro účet vedený pod touto emailovou adresou. Pokud jste tento požadavek nevyžádali vy, můžete tento email ignorovat. Jinak klikněte na následující odkaz pro reset svého hesla:",
-    "8" => "Použijte formulář níže pro rest hesla. Prosíme zadejte Vaše uživatelské jméno a nové heslo dvakrát.",
+"1" => "Využití kvóty (načítám...)",
+"2" => "KLikni k novému načtení využití kvóty",
+"3" => "Překračujete Vaši kvótu",
+"4" => "Využití kvóty",
 );

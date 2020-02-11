@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2017 Charles du Jeu <charles (at) cdujeu.me>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,20 +18,14 @@
 *
 * The latest code can be found at <https://pydio.com>.
 */
-$mess=array(
-"1" => "Meta data",
-"2" => "Bez označení",
-"3" => "Odstranit hodnocení",
-"4" => "Nedůležité",
-"5" => "Úkoly",
-"6" => "Osobní",
-"7" => "Práce",
-"8" => "Důležité",
-"9" => "Bez hodnoty",
-"10" => "Existující nebo nový štítek",
-"11" => "Žádná metadata nenastavena, klikněte pro přidání",
-"12" => "Vícenásobný výběr:",
-"13" => "vyberte pole která chcete aktualizovat, hodnota bude aplikována na všechny vybrané soubory",
-"14" => "Edituj metadata",
-"15" => "Uložit metadata",
+$mess = array(
+    "1" => "E-mail úspěšně odeslán %s uživateli(ům)",
+    "2" => "Nenalezena adresa pro odeslání tohoto e-mailu!",
+    "3" => "Není nakonfigorována služba pro odesílání e-mailů, kontaktujte prosím svého administrátora",
+    "4" => "Od",
+    "5" => "Pro",
+    "6" => "Předmět",
+    "7" => "Zpráva",
+    "8" => "Vyberte uživatele nebo napište adresu",
+    "9" => "Výběr upozornění",
 );

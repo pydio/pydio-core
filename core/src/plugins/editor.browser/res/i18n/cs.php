@@ -18,11 +18,13 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-$mess = array(
-    // will be replaced by the application title
-    "1" => "Vytváří se archiv, chvíli strpení",
-    "2" => "Znovu načíst aktuální adresář",
-    "3" => "Stahování archivu by mělo začít automaticky",
-    "4" => "Vytváří se archiv - %s%",
-    "5" => "nemohu nalézt odpovídající archiv ke stažení. Jste si jisti že jste nainstalovali Zip binary na Váš server?",
+$mess=array(
+"1" => "Externí okno",
+"2" => "Externí okno prohlížeče",
+"3" => "Otevírání souboru v externím okně, prosíme vyčkejte, toto okno se zavře automaticky.",
+    "4" => "Nová URL záložka",
+    "5" => "Alternativně můžete <a>vytvořit novou záložku pro URL</a>",
+    "6" => "Zadejte URL začínající http/https",
+    "7" => "URL Záložka",
+    "8" => "Zadejte jméno pro tuto záložku",
 );
