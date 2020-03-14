@@ -41,6 +41,9 @@ function pydio_user_delete($account){
 }
 
 
+function pydio_map_roles($role) {
+    return user_role_load($role)->name;
+}
 
 function pydio_user_func($op, &$edit, $account, $category = null){
 	require_once("class.DrupalPydio.php");
@@ -50,10 +53,13 @@ function pydio_user_func($op, &$edit, $account, $category = null){
 			"ajxp_auto_create" => (variable_get('pydio_auto_create', "0") == "0"?true:false)
     );
 	$drupHandler = new DrupalPydio($params);
+
+        $roles = array_map("pydio_map_roles", array_keys($account->roles));
+
 	if(!$drupHandler->glueCodeFound) return ;
 	switch ($op) {
 		case "login":
-			$drupHandler->onLoginUser($edit["input"]["name"], $edit["input"]["pass"]);
+			$drupHandler->onLoginUser($edit["input"]["name"], $edit["input"]["pass"], $roles);
 			break;
 	
 		case "logout":
@@ -61,13 +67,11 @@ function pydio_user_func($op, &$edit, $account, $category = null){
 			break;
 			
 		case "insert":
-		    $admin = in_array('3', array_values($account->roles)) || in_array('administrator', array_values($account->roles));
-			$result = $drupHandler->onAfterStoreUser($edit['name'], $edit['pass'], $admin, true);
+			$result = $drupHandler->onAfterStoreUser($account->name, $account->pass, $roles, true);
 			break;
 
 		case "update":
-		    $admin = in_array('3', array_values($account->roles)) || in_array('administrator', array_values($account->roles));
-			$result = $drupHandler->onAfterStoreUser($account->name, $account->pass, $admin, false);
+			$result = $drupHandler->onAfterStoreUser($account->name, $account->pass, $roles, false);
 			break;
 
 		case "delete":

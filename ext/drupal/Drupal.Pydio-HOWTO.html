@@ -15,7 +15,7 @@ or [drupal 7]"<i>modules/</i>" folder of your Drupal installation.</p>
 done, with the standard pydio authentication mechanism, be sure
 that at least an "admin" user is created.</p><p>If you intend to allow
 guest browsing, set the "Allow Guest Browsing" option to
-true in the Pydio Settings &gt; Global Options &gt; Core Options &gt; Authentication,  and if you are logged, log out. This should create the
+true in the Pydio Settings &gt; Application Options &gt; Application Core &gt; Authentication,  and if you are logged, log out. This should create the
 "guest" user. As admin, log back to the interface and
 create a "Guest" Repository. Go to the users section and
 grant access (read only may be better) to this repository to the
@@ -27,8 +27,8 @@ want to create automatically "personal" folders for each
 users. Considering the acces rights, the trick here would be to set a "Default Right" value to "rw", so that you don't have to
 manually edit the users rights each time you add them.</p>
 
-<p><strong>2.4 Auth.remote configuration</strong></p><p><strong></strong><span style="font-weight: normal;">Logged as admin, go to </span>Settings &gt; Global Options &gt; Core Options &gt; Authentication,<span style="font-weight: normal;"> </span><span style="font-style: normal;"><span style="font-weight: normal;"></span></span><span style="font-weight: normal;">and set the
-Authentication "Main Instance" driver to be the "Remote Authentication" ( = auth.remote plugin)</span><span style="font-weight: normal;"> :<span style="font-family: monospace;"><br></span></span></p><ul><li>Choose the CMS Type "Drupal"</li><li>Enter your Drupal installation full URL (e.g. http://domain.tld/drupal)</li><li>Leave the Login URL to default "/" , except if no login form can be found on your drupal home page.</li><li>Leave the Auth Form ID to default "user-login-form", except if the login form on your drupal home page has not as html ID this string. You can check that using the HTML inspector of your favorite browser.</li><li>Exit Action: either leads back to drupal page, or triggers a log out.</li><li>Local Prefix: force some users with specific prefix to be stored and authenticated locally (not against drupal).</li><li>Secret Key: this will be a string that both side (pydio &amp; drupal) will share to recognize each other</li><li>Login Redirect: if set to a given page URL, when arriving on pydio, a not-logged guest will be directly redirected to this page.</li><li>Admin Login: make sure a specific user will be recognized as administrator by Pydio.<br></li></ul>
+<p><strong>2.4 Auth.remote configuration</strong></p><p><strong></strong><span style="font-weight: normal;">Logged as admin, go to </span>Settings &gt; Application Options &gt; Application Core &gt; Authentication,<span style="font-weight: normal;"> </span><span style="font-style: normal;"><span style="font-weight: normal;"></span></span><span style="font-weight: normal;">and set the
+Authentication "Main Instance" driver to be the "Remote Authentication" ( = auth.remote plugin)</span><span style="font-weight: normal;"> :<span style="font-family: monospace;"><br></span></span></p><ul><li>Choose the CMS Type "Drupal"</li><li>Enter your Drupal installation full URL (e.g. http://domain.tld/drupal)</li><li>Leave the Login URL to default "/" , except if no login form can be found on your drupal home page.</li><li>Leave the Auth Form ID to default "user-login". Your drupal installation may use a different ID for the login form. (Drupal 6 used user-login-form and other login modules may use something else.) You can check that using the HTML inspector of your favorite browser.</li><li>Exit Action: either leads back to drupal page, or triggers a log out.</li><li>Local Prefix: force some users with specific prefix to be stored and authenticated locally (not against drupal).</li><li>Secret Key: this will be a string that both side (pydio &amp; drupal) will share to recognize each other</li><li>Roles Map: This string will map your drupal roles to pydio roles when users are created and updated. The format is "DrupalRole:PydioRole,DrupalRole2:PydioRole2". Members of the administrator role will automatically map to administrator users in pydio.</li><li>Login Redirect: if set to a given page URL, when arriving on pydio, a not-logged guest will be directly redirected to this page.</li><li>Admin Login: make sure a specific user will be recognized as administrator by Pydio.<br></li></ul>
 <p>Other options should be left to default values, otherwise put your mouse on the options label to get more info. For the secret key, warning, if you want to use a "$" sign in
 your key, you have to put a \ before.</p><p>Also make sure NOT to set a secondary instance, this plugin does not support multi-auth configuration yet.<br></p>
 
@@ -39,8 +39,8 @@ Modules"  or [7]"Modules". Here you can select the
 "Pydio Bridge" module under the "Other"
 section. Enable the plugin.</p>
 <p><strong>3.2 Configure the module</strong></p><p><strong></strong>Go to "Site
-Configuration &gt; Pydio Settings" (click on the module
-"Help" for v7). There are three parameters to configure for
+Configuration &gt; Pydio Settings" or for Drupal 7 Click the "Pydio Settings" link
+under the admin menu. There are three parameters to configure for
 this plugin :&nbsp;</p>
 <ul>
 	<li><p style="margin-bottom: 0cm;"><strong>Pydio Install Path</strong>
@@ -59,10 +59,9 @@ this plugin :&nbsp;</p>
 	specially if you are installing this "bridge" when already
 	managing many users in a Drupal installation. By default ("no"),
 	Users will be created in Pydio only by a Drupal administrator
-	action of creating a Drupal users. Existing users will not be
-	recognized by Pydio. If you set to "Auto create",
-	existing users will be automatically created when a user logs in to
-	Drupal. 
+	action of creating a Drupal user. Existing users will not be
+	recognized by Pydio. If you enable "Auto create", existing users 
+        will be automatically created when a user logs in to Drupal. 
 	</p>
 </li></ul>
 <p>Save the module configuration.</p>
