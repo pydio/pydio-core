@@ -72,3 +72,7 @@ New in latest build, in the Settings panel, you can find a new "Developer" node 
 #### Signing the CLA
 
 Please [sign the Contributor License Agreement](https://pydio.com/en/community/contribute/contributor-license-agreement-cla) before contributing.
+
+### Docker support
+
+You can use this [docker image](https://github.com/cedvan/docker-pydio) to launch pydio with docker
