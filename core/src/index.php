@@ -22,6 +22,8 @@
  * Will dispatch the actions on the plugins.
  */
 
+setlocale(LC_ALL, "en_US.utf8");  //Set locale to UTF-8 to avoid stripping of non-ASCII-characters (e.g. in filenames).
+
 use Pydio\Core\Http\TopLevelRouter;
 
 include_once("base.conf.php");
