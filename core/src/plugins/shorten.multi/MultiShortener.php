@@ -170,6 +170,31 @@ class MultiShortener extends Plugin
                     return $shorturl;
                 }
                 break;
+            case 5:
+                if (!isSet($type["POLR_DOMAIN"])) {
+                    $this->logError("Config", "polr Shortener : you must set the domain name");
+                    return null;
+                }
+                if (!isSet($type["POLR_APIKEY"])) {
+                    $this->logError("Config", "polr Shortener : you must set the api key");
+                    return null;
+                }
+                $polr_domain = $type["POLR_DOMAIN"];
+                $polr_api = $type["POLR_APIKEY"];
+                $polr = 'http://'.$polr_domain.'/api/v2/action/shorten?key='.$polr_api.'&url='.$url;
+                $response = FileHelper::getRemoteContent($polr);
+                if (isSet($response)) {
+                    $shorturl = $response;
+                    if ($useidn) {
+                        // WARNING: idn_to_utf8 requires php-idn module.
+                        // WARNING: http_build_url requires php-pecl-http module.
+                        $purl = parse_url($shorturl);
+                        $purl['host'] = idn_to_utf8($purl['host']);
+                        $shorturl = http_build_url($purl);
+                    }
+                    return $shorturl;
+                }
+                break;
 
             default:
                 break;

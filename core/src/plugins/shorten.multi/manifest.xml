@@ -27,6 +27,10 @@
 		<global_param group_switch_name="shorten_type" group_switch_label="yourls" group_switch_value="yourls" name="YOURLS_DOMAIN" type="string" label="CONF_MESSAGE[Short domain]" description="CONF_MESSAGE[Yourls domain]" mandatory="false"/>
 		<global_param group_switch_name="shorten_type" group_switch_label="yourls" group_switch_value="yourls" name="YOURLS_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[API Key]" mandatory="false"/>
 		<global_param group_switch_name="shorten_type" group_switch_label="yourls" group_switch_value="yourls" name="YOURLS_USEIDN" type="boolean" label="CONF_MESSAGE[Use IDN]" description="CONF_MESSAGE[Use IDN]" mandatory="false" default="false"/>
+        <global_param group_switch_name="shorten_type" group_switch_label="polr" group_switch_value="polr" name="shorten_type" type="hidden" label="" description="" mandatory="false" default="5"/>
+        <global_param group_switch_name="shorten_type" group_switch_label="polr" group_switch_value="polr" name="POLR_DOMAIN" type="string" label="CONF_MESSAGE[Short domain]" description="CONF_MESSAGE[Short domain]" mandatory="false"/>
+        <global_param group_switch_name="shorten_type" group_switch_label="polr" group_switch_value="polr" name="POLR_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[API Key]" mandatory="false"/>
+
     </server_settings>
 	<registry_contributions>
         <hooks>
