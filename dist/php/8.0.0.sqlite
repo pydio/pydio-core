@@ -5,14 +5,15 @@ CREATE TABLE IF NOT EXISTS ajxp_user_prefs_temp (
   val blob DEFAULT NULL
 );
 /* SEPARATOR */
-CREATE UNIQUE INDEX (ajxp_user_prefs_unique) ON ajxp_user_prefs_temp(`login`,`name`);
+CREATE UNIQUE INDEX ajxp_user_prefs_unique ON ajxp_user_prefs_temp(`login`,`name`);
 /* SEPARATOR */
 INSERT INTO ajxp_user_prefs_temp (SELECT * from ajxp_user_prefs
 	WHERE NOT EXISTS(
             SELECT 1
-            FROM ajxp_user_prefs As S2
+            FROM ajxp_user_prefs, ajxp_user_prefs As S2
             WHERE S2.login = ajxp_user_prefs.login AND S2.name = ajxp_user_prefs.name
                 AND S2.rid > ajxp_user_prefs.rid
+	    GROUP BY 1
             HAVING COUNT(*) > 0
     )
 );
@@ -21,7 +22,7 @@ DROP TABLE ajxp_user_prefs;
 /* SEPARATOR */
 ALTER TABLE ajxp_user_prefs_temp RENAME TO ajxp_user_prefs;
 /* SEPARATOR */
-ALTER TABLE ajxp_roles ADD COLUMN owner_user_id text DEFAULT NULL
+ALTER TABLE ajxp_roles ADD COLUMN owner_user_id text DEFAULT NULL;
 /* SEPARATOR */
 CREATE UNIQUE INDEX owner_role ON ajxp_roles(`role_id`, `owner_user_id`);
 /* SEPARATOR */
