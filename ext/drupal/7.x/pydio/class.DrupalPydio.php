@@ -22,7 +22,7 @@ class DrupalPydio
      * @return	boolean	True on success
      * @since	1.5
      */
-    public function onLoginUser($name, $password)
+    public function onLoginUser($name, $password, $roles)
     {
         // Initialize variables
         $success = false;
@@ -33,7 +33,7 @@ class DrupalPydio
         $AJXP_GLUE_GLOBALS["secret"] = $this->secret;
         $AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
         $AJXP_GLUE_GLOBALS["plugInAction"] = "login";
-        $AJXP_GLUE_GLOBALS["login"] = array("name"=>$name, "password"=>"");
+        $AJXP_GLUE_GLOBALS["login"] = array("name"=>$name, "password"=>"", "roles"=>$roles);
 
            include($this->glueCode);
         return true;
@@ -77,7 +77,7 @@ class DrupalPydio
      * @param	boolean		true if user was succesfully stored in the database
      * @param	string		message
      */
-    public function onAfterStoreUser($name, $password, $isAdmin, $isnew)
+    public function onAfterStoreUser($name, $password, $roles, $isnew)
     {
         // convert the user parameters passed to the event
         // to a format the external application
@@ -87,10 +87,12 @@ class DrupalPydio
         //global $plugInAction, $result, $secret, $user;
         $AJXP_GLUE_GLOBALS["secret"] = $this->secret;
 
+        $isAdmin = in_array('administrator', $roles);
         $AJXP_GLUE_GLOBALS["user"] = array();
         $AJXP_GLUE_GLOBALS["user"]['name']	= $name;
         $AJXP_GLUE_GLOBALS["user"]['password']	= $password;
         $AJXP_GLUE_GLOBALS["user"]['right'] = ($isAdmin?'admin':'');
+        $AJXP_GLUE_GLOBALS["user"]['roles'] = $roles;
         $AJXP_GLUE_GLOBALS["plugInAction"] = ($isnew?"addUser":"updateUser");
 
            include($this->glueCode);
