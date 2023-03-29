@@ -24,5 +24,5 @@ $mess = array(
     "2" => "Znovu načíst aktuální adresář",
     "3" => "Stahování archivu by mělo začít automaticky",
     "4" => "Vytváří se archiv - %s%",
-    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
+    "5" => "nemohu nalézt odpovídající archiv ke stažení. Jste si jisti že jste nainstalovali Zip binary na Váš server?",
 );
